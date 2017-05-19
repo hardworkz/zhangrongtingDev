@@ -1,0 +1,25 @@
+//
+//  PayOnlineViewController.h
+//  kuangjiaTingWen
+//
+//  Created by Zhimi on 17/1/3.
+//  Copyright © 2017年 贺楠. All rights reserved.
+//
+
+#import <UIKit/UIKit.h>
+
+@interface PayOnlineViewController : UIViewController
+
+@property (assign, nonatomic) float rewardCount;
+
+@property (strong, nonatomic) NSString *uid;
+
+@property (strong, nonatomic) NSString *post_id;
+
+@property (assign, nonatomic) double balanceCount;
+
+@property (strong, nonatomic) NSMutableDictionary *myPersonalInfoDict;
+
+@property (assign, nonatomic) BOOL isPayClass;
+
+@end
