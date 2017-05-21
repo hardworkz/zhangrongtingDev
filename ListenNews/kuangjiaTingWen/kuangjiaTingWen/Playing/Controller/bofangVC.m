@@ -1695,12 +1695,12 @@ static bofangVC *_instance = nil;
         switch (selectedindex) {
             case 0:
             {
-                NSString *imgUrl = [NSString stringWithFormat:@"%@",[self.newsModel.ImgStrjiemu stringByReplacingOccurrencesOfString:@"\\" withString:@""]];
-                NSString *imgUrl1 = [imgUrl stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-                NSString *imgUrl2 = [imgUrl1 stringByReplacingOccurrencesOfString:@"thumb:" withString:@""];
-                NSString *imgUrl3 = [imgUrl2 stringByReplacingOccurrencesOfString:@"{" withString:@""];
-                NSString *imgUrl4 = [imgUrl3 stringByReplacingOccurrencesOfString:@"}" withString:@""];
-                NSURL *url = [NSURL URLWithString:imgUrl4];
+//                NSString *imgUrl = [NSString stringWithFormat:@"%@",[self.newsModel.ImgStrjiemu stringByReplacingOccurrencesOfString:@"\\" withString:@""]];
+//                NSString *imgUrl1 = [imgUrl stringByReplacingOccurrencesOfString:@"\"" withString:@""];
+//                NSString *imgUrl2 = [imgUrl1 stringByReplacingOccurrencesOfString:@"thumb:" withString:@""];
+//                NSString *imgUrl3 = [imgUrl2 stringByReplacingOccurrencesOfString:@"{" withString:@""];
+//                NSString *imgUrl4 = [imgUrl3 stringByReplacingOccurrencesOfString:@"}" withString:@""];
+                NSURL *url = [NSURL URLWithString:self.newsModel.ImgStrjiemu];
                 NSURLRequest *q = [NSURLRequest requestWithURL:url cachePolicy:NSURLRequestUseProtocolCachePolicy timeoutInterval:5];
                 NSData *dataImage = [NSURLConnection sendSynchronousRequest:q returningResponse:nil error:nil];
                 
@@ -2049,13 +2049,13 @@ static bofangVC *_instance = nil;
 //                            nil];
 //    [tencentOAuth authorize:permissions inSafari:NO];
     
-    NSString *imgUrl = [NSString stringWithFormat:@"%@",[self.newsModel.ImgStrjiemu stringByReplacingOccurrencesOfString:@"\\" withString:@""]];
-    NSString *imgUrl1 = [imgUrl stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-    NSString *imgUrl2 = [imgUrl1 stringByReplacingOccurrencesOfString:@"thumb:" withString:@""];
-    NSString *imgUrl3 = [imgUrl2 stringByReplacingOccurrencesOfString:@"{" withString:@""];
-    NSString *imgUrl4 = [imgUrl3 stringByReplacingOccurrencesOfString:@"}" withString:@""];
+//    NSString *imgUrl = [NSString stringWithFormat:@"%@",[self.newsModel.ImgStrjiemu stringByReplacingOccurrencesOfString:@"\\" withString:@""]];
+//    NSString *imgUrl1 = [imgUrl stringByReplacingOccurrencesOfString:@"\"" withString:@""];
+//    NSString *imgUrl2 = [imgUrl1 stringByReplacingOccurrencesOfString:@"thumb:" withString:@""];
+//    NSString *imgUrl3 = [imgUrl2 stringByReplacingOccurrencesOfString:@"{" withString:@""];
+//    NSString *imgUrl4 = [imgUrl3 stringByReplacingOccurrencesOfString:@"}" withString:@""];
     
-    [self getImageWithURLStr:imgUrl4 OnSucceed:^(UIImage *image) {
+    [self getImageWithURLStr:self.newsModel.ImgStrjiemu OnSucceed:^(UIImage *image) {
         //压缩图片大小
         CGFloat compression = 0.8f;
         CGFloat maxCompression = 0.1f;
@@ -2109,7 +2109,7 @@ static bofangVC *_instance = nil;
             
         }else{
             
-            [self getImageWithURLStr:imgUrl4 OnSucceed:^(UIImage *image) {
+            [self getImageWithURLStr:self.newsModel.ImgStrjiemu OnSucceed:^(UIImage *image) {
                 
                 //压缩图片大小
                 CGFloat compression = 0.8f;
@@ -2175,36 +2175,35 @@ static bofangVC *_instance = nil;
         [al show];
         return;
     }
-    NSString *imgUrl = [NSString stringWithFormat:@"%@",[self.newsModel.ImgStrjiemu stringByReplacingOccurrencesOfString:@"\\" withString:@""]];
-    NSString *imgUrl1 = [imgUrl stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-    NSString *imgUrl2 = [imgUrl1 stringByReplacingOccurrencesOfString:@"thumb:" withString:@""];
-    NSString *imgUrl3 = [imgUrl2 stringByReplacingOccurrencesOfString:@"{" withString:@""];
-    NSString *imgUrl4 = [imgUrl3 stringByReplacingOccurrencesOfString:@"}" withString:@""];
     WXMediaMessage *message = [WXMediaMessage message];
     message.title = self.newsModel.Titlejiemu;
     
-    [self getImageWithURLStr:imgUrl4 OnSucceed:^(UIImage *image) {
+    [self getImageWithURLStr:self.newsModel.ImgStrjiemu OnSucceed:^(UIImage *image) {
         //压缩图片大小
         CGFloat compression = 0.8f;
-        CGFloat maxCompression = 0.1f;
-        int maxFileSize = 32*1024;
+//        CGFloat maxCompression = 0.1f;
+        int maxFileSize = 25*1024;
         //转化为二进制
         NSData *imageData = UIImageJPEGRepresentation(image, compression);
         //压缩小于32K
-        while ([imageData length] < maxFileSize && compression > maxCompression) {
+        while ([imageData length] > maxFileSize) {
             compression -= 0.1;
             imageData = UIImageJPEGRepresentation(image, compression);
+            if (compression < 0.1)
+                break;
         }
         //当图片还是大于32K时，则用图标
         RTLog(@"%lu",(unsigned long)[imageData length]);
         if ([imageData length] < maxFileSize) {
             //设置图片
             UIImage *thumbImage = [UIImage imageWithData:imageData];
-            NSData *thumbImageData = [thumbImage dataWithMaxFileSize:25 * 1024 maxSide:200];
-            [message setThumbImage:[UIImage imageWithData:thumbImageData]];
+//            NSData *thumbImageData = [thumbImage dataWithMaxFileSize:25 * 1024 maxSide:200];
+            [message setThumbImage:thumbImage];
             WXMusicObject *ext = [WXMusicObject object];
             ext.musicUrl = [NSString stringWithFormat:@"http://tingwen.me/index.php/article/yulan/id/%@.html",self.newsModel.jiemuID];
+            ext.musicLowBandUrl = ext.musicUrl;
             ext.musicDataUrl = self.newsModel.post_mp;
+            ext.musicLowBandDataUrl = ext.musicDataUrl;
             message.mediaObject = ext;
             SendMessageToWXReq* req = [[SendMessageToWXReq alloc] init];
             req.bText = NO;
@@ -2219,7 +2218,7 @@ static bofangVC *_instance = nil;
             
         }else{
             
-            [self getImageWithURLStr:imgUrl4 OnSucceed:^(UIImage *image) {
+            [self getImageWithURLStr:self.newsModel.ImgStrjiemu OnSucceed:^(UIImage *image) {
                 
                 //压缩图片大小
                 CGFloat compression = 0.8f;
@@ -2674,12 +2673,12 @@ static bofangVC *_instance = nil;
     //    设置后台播放时显示的东西，例如歌曲名字，图片等
     //    <MediaPlayer/MediaPlayer.h>
     
-    NSString *imgUrl = [NSString stringWithFormat:@"%@",[self.newsModel.ImgStrjiemu stringByReplacingOccurrencesOfString:@"\\" withString:@""]];
-    NSString *imgUrl1 = [imgUrl stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-    NSString *imgUrl2 = [imgUrl1 stringByReplacingOccurrencesOfString:@"thumb:" withString:@""];
-    NSString *imgUrl3 = [imgUrl2 stringByReplacingOccurrencesOfString:@"{" withString:@""];
-    NSString *imgUrl4 = [imgUrl3 stringByReplacingOccurrencesOfString:@"}" withString:@""];
-    [self getImageWithURLStr:imgUrl4 OnSucceed:^(UIImage *image) {
+//    NSString *imgUrl = [NSString stringWithFormat:@"%@",[self.newsModel.ImgStrjiemu stringByReplacingOccurrencesOfString:@"\\" withString:@""]];
+//    NSString *imgUrl1 = [imgUrl stringByReplacingOccurrencesOfString:@"\"" withString:@""];
+//    NSString *imgUrl2 = [imgUrl1 stringByReplacingOccurrencesOfString:@"thumb:" withString:@""];
+//    NSString *imgUrl3 = [imgUrl2 stringByReplacingOccurrencesOfString:@"{" withString:@""];
+//    NSString *imgUrl4 = [imgUrl3 stringByReplacingOccurrencesOfString:@"}" withString:@""];
+    [self getImageWithURLStr:self.newsModel.ImgStrjiemu OnSucceed:^(UIImage *image) {
         if (image == nil) {
             image = [UIImage imageNamed:@"tingwen_bg_square"];
         }
@@ -2830,12 +2829,13 @@ static bofangVC *_instance = nil;
         maskLayer.path = maskPath.CGPath;
         zhengwenImg.layer.mask = maskLayer;
         
-        NSString *imgUrl = [NSString stringWithFormat:@"%@",[self.newsModel.ImgStrjiemu stringByReplacingOccurrencesOfString:@"\\" withString:@""]];
-        NSString *imgUrl1 = [imgUrl stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-        NSString *imgUrl2 = [imgUrl1 stringByReplacingOccurrencesOfString:@"thumb:" withString:@""];
-        NSString *imgUrl3 = [imgUrl2 stringByReplacingOccurrencesOfString:@"{" withString:@""];
-        NSString *imgUrl4 = [imgUrl3 stringByReplacingOccurrencesOfString:@"}" withString:@""];
+//        NSString *imgUrl = [NSString stringWithFormat:@"%@",[self.newsModel.ImgStrjiemu stringByReplacingOccurrencesOfString:@"\\" withString:@""]];
+//        NSString *imgUrl1 = [imgUrl stringByReplacingOccurrencesOfString:@"\"" withString:@""];
+//        NSString *imgUrl2 = [imgUrl1 stringByReplacingOccurrencesOfString:@"thumb:" withString:@""];
+//        NSString *imgUrl3 = [imgUrl2 stringByReplacingOccurrencesOfString:@"{" withString:@""];
+//        NSString *imgUrl4 = [imgUrl3 stringByReplacingOccurrencesOfString:@"}" withString:@""];
         //生成图片
+        NSString *imgUrl4 = self.newsModel.ImgStrjiemu;
         if ([imgUrl4 rangeOfString:@"userDownLoadPathImage"].location != NSNotFound) {
             [zhengwenImg sd_setImageWithURL:[NSURL fileURLWithPath:imgUrl4] placeholderImage:[UIImage imageNamed:@"thumbnailsdefault"]];
         }

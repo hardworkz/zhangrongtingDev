@@ -197,7 +197,6 @@
 //微信支付key
 #define kAppId_WeiXin @"wx53ca9b29537db1d2"
 
-
 /**
  *  详情页显示格式
  */
