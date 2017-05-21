@@ -464,7 +464,7 @@
     [dic setObject:@"2" forKey:@"type"];
     [CommonCode writeToUserD:dic andKey:REWARDINFODICTKEY];
     //注册微信
-    [WXApi registerApp:kAppId_WeiXin withDescription:@"demo 2.0"];
+    [WXApi registerApp:kAppId_WeiXin];
 
     [NetWorkTool netwokingPostZhiFu:@"http://admin.tingwen.me/weixin/example/app.php" andParameters:@{@"total_fees" : @(self.rewardCount * 100)} success:^(id obj) {
         

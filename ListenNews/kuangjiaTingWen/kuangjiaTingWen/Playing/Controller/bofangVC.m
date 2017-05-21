@@ -1739,11 +1739,11 @@ static bofangVC *_instance = nil;
             }
                 break;
             case 1:{
-                [weakSelf shareToWechatWithscene:0];
+                [weakSelf shareToWechatWithscene:WXSceneSession];
             }
                 break;
             case 2:{
-                [weakSelf shareToWechatWithscene:1];
+                [weakSelf shareToWechatWithscene:WXSceneTimeline];
             }
                 break;
             case 3:{
@@ -2191,11 +2191,12 @@ static bofangVC *_instance = nil;
         //转化为二进制
         NSData *imageData = UIImageJPEGRepresentation(image, compression);
         //压缩小于32K
-        while ([imageData length] > maxFileSize && compression > maxCompression) {
+        while ([imageData length] < maxFileSize && compression > maxCompression) {
             compression -= 0.1;
             imageData = UIImageJPEGRepresentation(image, compression);
         }
         //当图片还是大于32K时，则用图标
+        RTLog(@"%lu",(unsigned long)[imageData length]);
         if ([imageData length] < maxFileSize) {
             //设置图片
             UIImage *thumbImage = [UIImage imageWithData:imageData];

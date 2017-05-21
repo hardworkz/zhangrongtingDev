@@ -13,7 +13,7 @@
 #import <TencentOpenAPI/TencentOAuth.h>
 #import "AppDelegate.h"
 #import <UMSocialCore/UMSocialCore.h>
-#import "UMSocialWechatHandler.h"
+//#import "UMSocialWechatHandler.h"
 #import "AFNetworking.h"
 
 @interface LoginVC ()<TencentSessionDelegate,WXApiDelegate>
@@ -402,7 +402,7 @@
 - (void)weChatBtnAction:(UIButton *)sender{
     
     //注册微信
-    [WXApi registerApp:KweChatLoginAppID withDescription:@"demo 2.0"];
+    [WXApi registerApp:KweChatLoginAppID];
     
     if (![WXApi isWXAppInstalled]){
         UIAlertView *al = [[UIAlertView alloc]initWithTitle:@"提示" message:@"请安装微信" delegate:nil cancelButtonTitle:@"知道了" otherButtonTitles: nil];

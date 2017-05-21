@@ -16,7 +16,7 @@
 #import "ShareAlertView.h"
 #import "AppDelegate.h"
 #import "UIImage+compress.h"
-#import "UMSocialWechatHandler.h"
+//#import "UMSocialWechatHandler.h"
 #import "BatchDownloadTableTableViewController.h"
 #import "NSDate+TimeFormat.h"
 #import "UIView+tap.h"

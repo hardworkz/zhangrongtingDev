@@ -19,7 +19,7 @@
     _pinglunshijianF = CGRectMake(CGRectGetMaxX(_pinglunImgF) + 8.0 / 375 * IPHONE_W, CGRectGetMaxY(_pinglunTitleF) + 5.0 / 667 * IPHONE_H, 200.0 / 375 * IPHONE_W, 20.0 / 667 * IPHONE_H);
     if ([model.to_user_login length]) {//判断是否是回复内容
         CGSize pinglunLabSize = [@"回复" boundingRectWithSize:CGSizeMake(MAXFLOAT, MAXFLOAT) options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:[UIFont systemFontOfSize:16.0f]} context:nil].size;
-        _pinglunLabF = CGRectMake(CGRectGetMaxX(_pinglunImgF) - 3.0 / 375 * IPHONE_W, CGRectGetMaxY(_pinglunshijianF) + 10.0 / 667 * IPHONE_H, pinglunLabSize.width, pinglunLabSize.height);
+        _pinglunLabF = CGRectMake(CGRectGetMaxX(_pinglunImgF)/ 375 * IPHONE_W, CGRectGetMaxY(_pinglunshijianF) + 10.0 / 667 * IPHONE_H, pinglunLabSize.width, pinglunLabSize.height);
         
         NSString *name = [model.to_user_nicename length]?model.to_user_nicename:model.to_user_login;
         CGSize commenterSize = [[NSString stringWithFormat:@"@%@",name] boundingRectWithSize:CGSizeMake(MAXFLOAT, MAXFLOAT) options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:[UIFont systemFontOfSize:16.0f]} context:nil].size;
@@ -40,7 +40,7 @@
         _contentF = CGRectMake(CGRectGetMaxX(_pinglunImgF) - 3.0 / 375 * IPHONE_W, CGRectGetMaxY(_pinglunshijianF) + 10.0 / 667 * IPHONE_H,contentSize.width, contentSize.height);
     }
     else{
-        CGSize contentSize = [model.content boundingRectWithSize:CGSizeMake(SCREEN_WIDTH - _pinglunLabF.origin.x, MAXFLOAT) options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:[UIFont systemFontOfSize:16.0f]} context:nil].size;
+        CGSize contentSize = [model.content boundingRectWithSize:CGSizeMake(SCREEN_WIDTH - CGRectGetMaxX(_pinglunImgF)/ 375 * IPHONE_W, MAXFLOAT) options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:[UIFont systemFontOfSize:16.0f]} context:nil].size;
         
         _content = model.content;
         _contentF = CGRectMake(CGRectGetMaxX(_pinglunImgF) - 3.0 / 375 * IPHONE_W, CGRectGetMaxY(_pinglunshijianF) + 10.0 / 667 * IPHONE_H,contentSize.width, contentSize.height);

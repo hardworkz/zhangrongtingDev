@@ -38,6 +38,7 @@ PODS:
   - UIView+FDCollapsibleConstraints (1.1)
   - UIView+Positioning (1.1)
   - UMengAnalytics (4.2.4)
+  - WechatOpenSDK (1.7.7)
 
 DEPENDENCIES:
   - AFNetworking (~> 2.6)
@@ -51,6 +52,7 @@ DEPENDENCIES:
   - UIView+FDCollapsibleConstraints (~> 1.1)
   - UIView+Positioning (~> 1.1)
   - UMengAnalytics (~> 4.2.4)
+  - WechatOpenSDK
 
 SPEC CHECKSUMS:
   AFNetworking: cb8d14a848e831097108418f5d49217339d4eb60
@@ -67,7 +69,8 @@ SPEC CHECKSUMS:
   UIView+FDCollapsibleConstraints: 9357eaf03b4e088263ab74a3b86a382a64ce38dd
   UIView+Positioning: e93fe9e3186d1ed7d60e344aa12787911e902056
   UMengAnalytics: ef8d45f94c0e5771dc364cf6a5731d9d3b101da2
+  WechatOpenSDK: cbd332148eb792d444ed4eec94f421d98f2046ee
 
-PODFILE CHECKSUM: 0533bc93aeefc6c3f35164b23c0a78a4b1228403
+PODFILE CHECKSUM: 3370413737d7253d137d37dec4131330204b821c
 
-COCOAPODS: 1.0.1
+COCOAPODS: 1.2.1

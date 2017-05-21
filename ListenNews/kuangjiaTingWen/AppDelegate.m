@@ -9,7 +9,7 @@
 #import "AppDelegate.h"
 #import "bofangVC.h"
 #import <UMSocialCore/UMSocialCore.h>
-#import "UMSocialWechatHandler.h"
+//#import "UMSocialWechatHandler.h"
 #import "UMSocialSinaHandler.h"
 #import "guanggaoVC.h"
 #import "WeiboSDK.h"
@@ -640,8 +640,13 @@
  * @param resp具体的回应内容，是自动释放的
  */
 -(void)onResp:(BaseResp*)resp{
-    NSLog(@"%@",resp);
-    
+    NSLog(@"%d",resp.errCode);
+    //把返回的类型转换成与发送时相对于的返回类型,这里为SendMessageToWXResp
+//    SendMessageToWXResp *sendResp = (SendMessageToWXResp *)resp;
+//    //使用UIAlertView 显示回调信息
+//    NSString *str = [NSString stringWithFormat:@"%d----%@",sendResp.errCode,sendResp.errStr];
+//    UIAlertView *alertview = [[UIAlertView alloc] initWithTitle:@"回调信息" message:str delegate:self cancelButtonTitle:@"确认" otherButtonTitles:nil, nil];
+//    [alertview show];
     // SendMessageToQQResp应答帮助类
     if ([resp.class isSubclassOfClass: [SendMessageToQQResp class]]) {  //QQ分享回应
         if (_qqDelegate) {
