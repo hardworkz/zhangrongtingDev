@@ -153,6 +153,10 @@
 		6985B9321D7404EF0081BCBD /* SAMTextView.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6985B9301D7404EE0081BCBD /* SAMTextView.framework */; };
 		6985B9341D740F6A0081BCBD /* TTTAttributedLabel.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6985B9331D740F690081BCBD /* TTTAttributedLabel.framework */; };
 		698CBDAA1ECE7C7200040108 /* Foundation+Log.m in Sources */ = {isa = PBXBuildFile; fileRef = 698CBDA91ECE7C7200040108 /* Foundation+Log.m */; };
+		69919FBB1ED2CB1400E31757 /* CustomAlertView.m in Sources */ = {isa = PBXBuildFile; fileRef = 69919FBA1ED2CB1400E31757 /* CustomAlertView.m */; };
+		69919FC21ED2D17100E31757 /* UIButton+Extension.m in Sources */ = {isa = PBXBuildFile; fileRef = 69919FBD1ED2D17100E31757 /* UIButton+Extension.m */; };
+		69919FC31ED2D17100E31757 /* UIImage+Extension.m in Sources */ = {isa = PBXBuildFile; fileRef = 69919FBF1ED2D17100E31757 /* UIImage+Extension.m */; };
+		69919FC41ED2D17100E31757 /* UIImageView+Extension.m in Sources */ = {isa = PBXBuildFile; fileRef = 69919FC11ED2D17100E31757 /* UIImageView+Extension.m */; };
 		699582001EC559D20037E9A4 /* FeedBackAndListenFriendModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 699581FF1EC559D20037E9A4 /* FeedBackAndListenFriendModel.m */; };
 		699582031EC55A140037E9A4 /* BlobNewTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 699582021EC55A140037E9A4 /* BlobNewTableViewCell.m */; };
 		699582061EC55A380037E9A4 /* FeedBackAndListenFriendFrameModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 699582051EC55A380037E9A4 /* FeedBackAndListenFriendFrameModel.m */; };
@@ -738,6 +742,14 @@
 		6985B9301D7404EE0081BCBD /* SAMTextView.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SAMTextView.framework; path = "Pods/../build/Debug-iphoneos/SAMTextView/SAMTextView.framework"; sourceTree = "<group>"; };
 		6985B9331D740F690081BCBD /* TTTAttributedLabel.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = TTTAttributedLabel.framework; path = "Pods/../build/Debug-iphoneos/TTTAttributedLabel/TTTAttributedLabel.framework"; sourceTree = "<group>"; };
 		698CBDA91ECE7C7200040108 /* Foundation+Log.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "Foundation+Log.m"; sourceTree = "<group>"; };
+		69919FB91ED2CB1400E31757 /* CustomAlertView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CustomAlertView.h; sourceTree = "<group>"; };
+		69919FBA1ED2CB1400E31757 /* CustomAlertView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CustomAlertView.m; sourceTree = "<group>"; };
+		69919FBC1ED2D17100E31757 /* UIButton+Extension.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIButton+Extension.h"; sourceTree = "<group>"; };
+		69919FBD1ED2D17100E31757 /* UIButton+Extension.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIButton+Extension.m"; sourceTree = "<group>"; };
+		69919FBE1ED2D17100E31757 /* UIImage+Extension.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+Extension.h"; sourceTree = "<group>"; };
+		69919FBF1ED2D17100E31757 /* UIImage+Extension.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+Extension.m"; sourceTree = "<group>"; };
+		69919FC01ED2D17100E31757 /* UIImageView+Extension.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImageView+Extension.h"; sourceTree = "<group>"; };
+		69919FC11ED2D17100E31757 /* UIImageView+Extension.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImageView+Extension.m"; sourceTree = "<group>"; };
 		699581FE1EC559D20037E9A4 /* FeedBackAndListenFriendModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FeedBackAndListenFriendModel.h; sourceTree = "<group>"; };
 		699581FF1EC559D20037E9A4 /* FeedBackAndListenFriendModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FeedBackAndListenFriendModel.m; sourceTree = "<group>"; };
 		699582011EC55A140037E9A4 /* BlobNewTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BlobNewTableViewCell.h; sourceTree = "<group>"; };
@@ -2550,6 +2562,12 @@
 				69C713331EC0740F00F2729E /* UIViewController+AutoBack.m */,
 				699582111EC5B40E0037E9A4 /* UIView+Extension.h */,
 				699582121EC5B40E0037E9A4 /* UIView+Extension.m */,
+				69919FBC1ED2D17100E31757 /* UIButton+Extension.h */,
+				69919FBD1ED2D17100E31757 /* UIButton+Extension.m */,
+				69919FBE1ED2D17100E31757 /* UIImage+Extension.h */,
+				69919FBF1ED2D17100E31757 /* UIImage+Extension.m */,
+				69919FC01ED2D17100E31757 /* UIImageView+Extension.h */,
+				69919FC11ED2D17100E31757 /* UIImageView+Extension.m */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -2557,6 +2575,8 @@
 		69C713C01EC0754200F2729E /* View */ = {
 			isa = PBXGroup;
 			children = (
+				69919FB91ED2CB1400E31757 /* CustomAlertView.h */,
+				69919FBA1ED2CB1400E31757 /* CustomAlertView.m */,
 				699582011EC55A140037E9A4 /* BlobNewTableViewCell.h */,
 				699582021EC55A140037E9A4 /* BlobNewTableViewCell.m */,
 				69601E6B1EC98C5400445561 /* CommentAndReviewTableViewCell.h */,
@@ -3302,6 +3322,7 @@
 				69C713621EC0740F00F2729E /* TXLCell.m in Sources */,
 				69C713A41EC0740F00F2729E /* GestureControlAlertView.m in Sources */,
 				69711B0E1EBC140C00A01728 /* RSADataSigner.m in Sources */,
+				69919FBB1ED2CB1400E31757 /* CustomAlertView.m in Sources */,
 				69C713861EC0740F00F2729E /* NewQATextController.m in Sources */,
 				69711B0C1EBC140C00A01728 /* NSDataEx.m in Sources */,
 				69C713731EC0740F00F2729E /* TradingRecordViewController.m in Sources */,
@@ -3310,6 +3331,7 @@
 				695745A31D5C7384001022AD /* UILabel+Night.m in Sources */,
 				69C7133D1EC0740F00F2729E /* MultiImageView.m in Sources */,
 				636B58A81D34D87600290681 /* IQUIView+Hierarchy.m in Sources */,
+				69919FC31ED2D17100E31757 /* UIImage+Extension.m in Sources */,
 				69C713801EC0740F00F2729E /* xiugaimimaVC.m in Sources */,
 				6300DB3B1D05648F00B82C42 /* SDWebImageDecoder.m in Sources */,
 				636E33881D01154C002BA6DD /* main.m in Sources */,
@@ -3417,6 +3439,7 @@
 				636B58AD1D34D87600290681 /* IQTextView.m in Sources */,
 				69C713B01EC0740F00F2729E /* cellRightBtn.m in Sources */,
 				69C713551EC0740F00F2729E /* forgetVC.m in Sources */,
+				69919FC41ED2D17100E31757 /* UIImageView+Extension.m in Sources */,
 				6300DB431D05648F00B82C42 /* UIImageView+HighlightedWebCache.m in Sources */,
 				69C713991EC0740F00F2729E /* zhuboxiangqingBtn.m in Sources */,
 				69C713451EC0740F00F2729E /* ClassViewController.m in Sources */,
@@ -3475,6 +3498,7 @@
 				634EA5051D139EC200108A51 /* TYSlidePageScrollView.m in Sources */,
 				691907A41D3F74B00012A42E /* SVProgressAnimatedView.m in Sources */,
 				69C713851EC0740F00F2729E /* NewQAController.m in Sources */,
+				69919FC21ED2D17100E31757 /* UIButton+Extension.m in Sources */,
 				69C7137D1EC0740F00F2729E /* titleImageVC.m in Sources */,
 				69601E701EC98CEA00445561 /* CommentAndReviewFrameModel.m in Sources */,
 				E91D53A91D93719A008B8564 /* MJRefreshAutoNormalFooter.m in Sources */,
@@ -3710,7 +3734,7 @@
 					"$(inherited)",
 					"-ObjC",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.popwcn.listenNews;
+				PRODUCT_BUNDLE_IDENTIFIER = com.popwcn.ListenNewsExploreVersion;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -3796,7 +3820,7 @@
 					"$(inherited)",
 					"-ObjC",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.popwcn.listenNews;
+				PRODUCT_BUNDLE_IDENTIFIER = com.popwcn.ListenNewsExploreVersion;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";

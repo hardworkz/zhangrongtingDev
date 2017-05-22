@@ -32,6 +32,9 @@
 #import "UITableView+FDTemplateLayoutCell.h"
 #import "UIView+Positioning.h"
 #import "UIView+Extension.h"
+#import "UIButton+Extension.h"
+#import "UIImage+Extension.h"
+#import "UIImageView+Extension.h"
 #import "NSString+Check.h"
 #import "TTTAttributedLabel.h"
 #import "MJRefresh.h"
@@ -70,6 +73,9 @@
  *  @return UIColor对象
  */
 #define ColorWithRGBA(R, G, B, A) [UIColor colorWithRed:R/255.0 green:G/255.0 blue:B/255.0 alpha:A]
+
+//HEXCOLOR(0x00ffff)
+#define HEXCOLOR(c)                         [UIColor colorWithRed:((c>>16)&0xFF)/255.0 green:((c>>8)&0xFF)/255.0 blue:(c&0xFF)/255.0 alpha:1.0]
 //图片对象
 #define ImageWithName(imageName) [UIImage imageNamed:imageName]
 

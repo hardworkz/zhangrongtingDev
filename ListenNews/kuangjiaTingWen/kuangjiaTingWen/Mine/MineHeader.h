@@ -22,6 +22,7 @@
 
 #import "MultiImageView.h"
 #import "UIView+tap.h"
+#import "CustomAlertView.h"
 
 #import "gerenzhuyeVC.h"
 

@@ -60,7 +60,7 @@
 @property (strong, nonatomic) NSString *is_zan;/**<*/
 @property (strong, nonatomic) NSString *zan_num;/**<*/
 @property (assign, nonatomic,readonly) CGSize oneImageSize;
-@property (strong, nonatomic) NSArray *child_comment;/**<*/
+@property (strong, nonatomic) NSMutableArray *child_comment;/**<*/
 @property (strong, nonatomic) NewObj *post;/**<*/
 @property (strong, nonatomic) UserModel *user;/**<用户模型*/
 

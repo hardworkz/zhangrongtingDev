@@ -10,6 +10,7 @@
 #import "NSDate+TimeFormat.h"
 
 @interface BlobNewTableViewCell ()<UITableViewDelegate,UITableViewDataSource>
+
 @property (weak, nonatomic) UIImageView *headerImage;
 @property (weak, nonatomic) UILabel *creat_timeLabel;
 @property (weak, nonatomic) UILabel *content;
@@ -32,7 +33,10 @@
 @property(strong,nonatomic)UIImageView *voiceImgV;
 @property (strong, nonatomic) UILabel *tipLabel;
 
+@property (strong, nonatomic) CustomAlertView *alertView;
+
 @property (strong, nonatomic) NSMutableArray *dataArray;
+
 @end
 @implementation BlobNewTableViewCell
 - (NSMutableArray *)dataArray
@@ -455,7 +459,7 @@
 #pragma mark - table view datasource and delegate
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    return self.frameModel.model.child_comment.count;
+    return self.dataArray.count;
 }
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
@@ -477,10 +481,55 @@
 }
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
+    ExdangqianUserUid = [CommonCode readFromUserD:@"dangqianUserUid"];
     CommentAndReviewFrameModel *frameModel = self.dataArray[indexPath.row];
-    if (self.addReview) {
-        self.addReview(self,frameModel.model);
+    _commentIndexRow = indexPath.row;
+    if ([frameModel.model.uid isEqualToString:ExdangqianUserUid]) {//判断点击评论是否为当前用户
+        _alertView = [[CustomAlertView alloc] initWithCustomView:[self setupDeleteAlertView]];
+        _alertView.alertHeight = 105;
+        _alertView.alertDuration = 0.25;
+        _alertView.coverAlpha = 0.6;
+        [_alertView show];
+    }else{
+        if (self.addReview) {
+            self.addReview(self,frameModel.model);
+        }
     }
+}
+- (UIView *)setupDeleteAlertView
+{
+    UIView *bgView = [[UIView alloc] init];
+    bgView.backgroundColor = HEXCOLOR(0xe3e3e3);
+    bgView.frame = CGRectMake(0, 0, SCREEN_WIDTH, 105);
+    
+    UIButton *deleteBtn = [[UIButton alloc] init];
+    deleteBtn.frame = CGRectMake(0, 0, SCREEN_WIDTH, 50);
+    deleteBtn.backgroundColor = [UIColor whiteColor];
+    [deleteBtn setTitle:@"删除" forState:UIControlStateNormal];
+    [deleteBtn setTitleColor:[UIColor redColor] forState:UIControlStateNormal];
+    deleteBtn.titleLabel.font = [UIFont systemFontOfSize:17];
+    [deleteBtn addTarget:self action:@selector(delete)];
+    [bgView addSubview:deleteBtn];
+    
+    UIButton *cancelBtn = [[UIButton alloc] init];
+    cancelBtn.frame = CGRectMake(0, 55, SCREEN_WIDTH, 50);
+    cancelBtn.backgroundColor = [UIColor whiteColor];
+    [cancelBtn setTitle:@"取消" forState:UIControlStateNormal];
+    [cancelBtn setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+    cancelBtn.titleLabel.font = [UIFont systemFontOfSize:17];
+    [cancelBtn addTarget:self action:@selector(cancel)];
+    [bgView addSubview:cancelBtn];
+    
+    return bgView;
+}
+- (void)delete{//删除本地数据，并请求接口删除对应评论ID
+    if (self.deleteComment) {
+        self.deleteComment(self, _indexRow ,_commentIndexRow);
+    }
+    [_alertView coverClick];
+}
+- (void)cancel{
+    [_alertView coverClick];
 }
 //用户点击评论回复
 - (void)userReviewClickedWithModel:(child_commentModel *)model

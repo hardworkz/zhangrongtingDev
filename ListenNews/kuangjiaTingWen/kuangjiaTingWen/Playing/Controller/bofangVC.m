@@ -184,13 +184,14 @@ static bofangVC *_instance = nil;
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(houtaibofangxiayishou:) name:@"houtaibofangxiayishou" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(getActInfoNotification:) name:@"getActInfoNotification" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(getAhocComment:) name:@"getAhocComment" object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(tingyouquanbofangwanbi:) name:@"tingyouquanbofangwanbi" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector       (tingyouquanbofangwanbi:) name:@"tingyouquanbofangwanbi" object:nil];
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(PayResultsBack:) name:@"PayResultsBack" object:nil];
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(WechatPayResultsBack:) name:@"WechatPayResultsBack" object:nil];
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(TcoinPayResultsBack:) name:@"TcoinPayResultsBack" object:nil];
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(RewardBack:) name:@"RewardBack" object:nil];
     //监听播放完毕
 //    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(PlayedidEnd:) name:AVPlayerItemDidPlayToEndTimeNotification object:Explayer.currentItem];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(playStop) name:AVPlayerItemPlaybackStalledNotification object:Explayer.currentItem];
     //定时器通知
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(timerStop:) name:@"timerStop" object:nil];
     //手势控制通知
@@ -218,7 +219,12 @@ static bofangVC *_instance = nil;
     self.isRewardBack = NO;
     
 }
-
+//新闻缓冲没有完成播放暂停调用方法
+- (void)playStop
+{
+    RTLog(@"播放停止了");
+    [self performSelector:@selector(bofangRightAction:) withObject:nil afterDelay:0.5f];
+}
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     
@@ -1361,6 +1367,7 @@ static bofangVC *_instance = nil;
         self.newsModel.jiemuIs_fan = arr[ExcurrentNumber + 1][@"post_act"][@"is_fan"];
         self.newsModel.post_keywords = arr[ExcurrentNumber + 1][@"post_keywords"];
         self.newsModel.url = arr[ExcurrentNumber + 1][@"url"];
+        
         NSString *imgUrl = [NSString stringWithFormat:@"%@",[arr[ExcurrentNumber + 1][@"smeta"] stringByReplacingOccurrencesOfString:@"\\" withString:@""]];
         NSString *imgUrl1 = [imgUrl stringByReplacingOccurrencesOfString:@"\"" withString:@""];
         NSString *imgUrl2 = [imgUrl1 stringByReplacingOccurrencesOfString:@"thumb:" withString:@""];
@@ -2171,7 +2178,7 @@ static bofangVC *_instance = nil;
     [WXApi registerApp:KweChatappID];
     
     if (![WXApi isWXAppInstalled]){
-        UIAlertView *al = [[UIAlertView alloc]initWithTitle:@"提示" message:@"请安装微信" delegate:nil cancelButtonTitle:@"知道了" otherButtonTitles: nil];
+        UIAlertView *al = [[UIAlertView alloc]initWithTitle:@"提示" message:@"请先安装微信" delegate:nil cancelButtonTitle:@"知道了" otherButtonTitles: nil];
         [al show];
         return;
     }
@@ -2182,14 +2189,14 @@ static bofangVC *_instance = nil;
         //压缩图片大小
         CGFloat compression = 0.8f;
 //        CGFloat maxCompression = 0.1f;
-        int maxFileSize = 25*1024;
+        int maxFileSize = 32*1024;
         //转化为二进制
         NSData *imageData = UIImageJPEGRepresentation(image, compression);
         //压缩小于32K
         while ([imageData length] > maxFileSize) {
             compression -= 0.1;
             imageData = UIImageJPEGRepresentation(image, compression);
-            if (compression < 0.1)
+            if (compression < 0.2)
                 break;
         }
         //当图片还是大于32K时，则用图标
@@ -2197,13 +2204,12 @@ static bofangVC *_instance = nil;
         if ([imageData length] < maxFileSize) {
             //设置图片
             UIImage *thumbImage = [UIImage imageWithData:imageData];
-//            NSData *thumbImageData = [thumbImage dataWithMaxFileSize:25 * 1024 maxSide:200];
-            [message setThumbImage:thumbImage];
+            NSData *thumbImageData = [thumbImage dataWithMaxFileSize:25 * 1024 maxSide:200];
+            [message setThumbImage:[UIImage imageWithData:thumbImageData]];
             WXMusicObject *ext = [WXMusicObject object];
-            ext.musicUrl = [NSString stringWithFormat:@"http://tingwen.me/index.php/article/yulan/id/%@.html",self.newsModel.jiemuID];
-            ext.musicLowBandUrl = ext.musicUrl;
+            ext.musicUrl = [NSString stringWithFormat:@"https://tingwen.me/index.php/article/yulan/id/%@.html",self.newsModel.jiemuID];
+//            ext.musicUrl = @"http://www.baidu.com/";
             ext.musicDataUrl = self.newsModel.post_mp;
-            ext.musicLowBandDataUrl = ext.musicDataUrl;
             message.mediaObject = ext;
             SendMessageToWXReq* req = [[SendMessageToWXReq alloc] init];
             req.bText = NO;
@@ -2241,7 +2247,8 @@ static bofangVC *_instance = nil;
                 NSData *thumbImageData = [thumbImage dataWithMaxFileSize:25 * 1024 maxSide:200];
                 [message setThumbImage:[UIImage imageWithData:thumbImageData]];
                 WXMusicObject *ext = [WXMusicObject object];
-                ext.musicUrl = [NSString stringWithFormat:@"http://tingwen.me/index.php/article/yulan/id/%@.html",self.newsModel.jiemuID];
+                ext.musicUrl = [NSString stringWithFormat:@"https://tingwen.me/index.php/article/yulan/id/%@.html",self.newsModel.jiemuID];
+//                ext.musicUrl = @"http://www.baidu.com/";
                 ext.musicDataUrl = self.newsModel.post_mp;
                 message.mediaObject = ext;
                 SendMessageToWXReq* req = [[SendMessageToWXReq alloc] init];

@@ -70,7 +70,6 @@
     [self setupData];
     [self setupView];
 }
-
 - (void)setupData{
 //    [self.blogTableview registerNib:[UINib nibWithNibName:BlogTableViewCellID bundle:nil] forCellReuseIdentifier:BlogTableViewCellID];
     self.blogArray = [NSMutableArray new];
@@ -417,6 +416,9 @@
     }];
     [cell.photosImageView setTapImageBlock:^(MultiImageView *view, UIImageView *imgv, NSInteger idx) {
         [weakSelf showPhotos:view.images selectedIndex:idx];
+    }];
+    [cell setDeleteComment:^(BlobNewTableViewCell *cell,NSInteger index,NSInteger commentIndex){
+        [weakSelf reloadFrameArrayWithIndex:index commnetIndex:commentIndex];
     }];
 
     return cell;
@@ -940,6 +942,20 @@
     }
     return frameModelArray;
 }
+- (void)reloadFrameArrayWithIndex:(NSInteger)index commnetIndex:(NSInteger)commentIndex
+{
+    FeedBackAndListenFriendFrameModel *frameModel = [[FeedBackAndListenFriendFrameModel alloc] init];
+    FeedBackAndListenFriendFrameModel *Fmodel = self.blogArray[index];
+//    child_commentModel *model = Fmodel.model.child_comment[commentIndex];
+    [Fmodel.model.child_comment removeObjectAtIndex:commentIndex];
+    
+    frameModel.isFeedbackVC = self.isFeedbackVC;
+    frameModel.model = Fmodel.model;
+    [self.blogArray replaceObjectAtIndex:index withObject:frameModel];
+    
+    [self.blogTableview reloadRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:index inSection:0]] withRowAnimation:UITableViewRowAnimationNone];
+}
+
 - (void)addFavInTableViewCell:(BlobNewTableViewCell *)cell andIszan:(int)iszan{
     NSIndexPath *indexPath = [self.blogTableview indexPathForCell:cell];
     FeedBackAndListenFriendFrameModel *blog = self.blogArray[indexPath.row];
