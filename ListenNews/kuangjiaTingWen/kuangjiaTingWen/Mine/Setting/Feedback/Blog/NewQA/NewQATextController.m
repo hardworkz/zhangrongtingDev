@@ -63,10 +63,10 @@ typedef NS_ENUM(NSInteger, BlogContentType)
 
 -(void)viewDidAppear:(BOOL)animated
 {
-    [super viewDidAppear:animated];
     dispatch_once(&onceToken, ^{
         [self.txBlogText becomeFirstResponder];
     });
+    [super viewDidAppear:animated];
 }
 
 #pragma mark - UITextViewDelegate

@@ -137,7 +137,7 @@ selector:_selector name:_name object:nil];
 #define IMAGEVIEWHTTP(a,b) [a sd_setImageWithURL:[NSURL URLWithString:USERPHOTOHTTPSTRINGZhuBo(b)] placeholderImage:[UIImage imageNamed:@"thumbnailsdefault"]]
 
 //新闻图片url处理
-#define NEWSSEMTPHOTOURL(smetaUrl) [[[[[NSString stringWithFormat:@"%@",[smetaUrl stringByReplacingOccurrencesOfString:@"\\" withString:@""]] stringByReplacingOccurrencesOfString:@"\"" withString:@""]] stringByReplacingOccurrencesOfString:@"thumb:" withString:@""] stringByReplacingOccurrencesOfString:@"{" withString:@""] stringByReplacingOccurrencesOfString:@"}" withString:@""]
+#define NEWSSEMTPHOTOURL(smetaUrl) [[[[[smetaUrl stringByReplacingOccurrencesOfString:@"\\" withString:@""] stringByReplacingOccurrencesOfString:@"\"" withString:@""] stringByReplacingOccurrencesOfString:@"thumb:" withString:@""]stringByReplacingOccurrencesOfString:@"{" withString:@""]stringByReplacingOccurrencesOfString:@"}" withString:@""]
 
 
 //测试环境地址

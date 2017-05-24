@@ -444,12 +444,7 @@
                     }
                     
                     ExcurrentNumber = 0;
-                    NSString *imgUrl = [NSString stringWithFormat:@"%@",[[lunboVC.infoArr firstObject][@"smeta"] stringByReplacingOccurrencesOfString:@"\\" withString:@""]];
-                    NSString *imgUrl1 = [imgUrl stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-                    NSString *imgUrl2 = [imgUrl1 stringByReplacingOccurrencesOfString:@"thumb:" withString:@""];
-                    NSString *imgUrl3 = [imgUrl2 stringByReplacingOccurrencesOfString:@"{" withString:@""];
-                    NSString *imgUrl4 = [imgUrl3 stringByReplacingOccurrencesOfString:@"}" withString:@""];
-                    [bofangVC shareInstance].newsModel.ImgStrjiemu = imgUrl4;
+                    [bofangVC shareInstance].newsModel.ImgStrjiemu = [lunboVC.infoArr firstObject][@"smeta"];
                     [bofangVC shareInstance].newsModel.ZhengWenjiemu = [lunboVC.infoArr firstObject][@"post_excerpt"];
                     [bofangVC shareInstance].newsModel.praisenum = [lunboVC.infoArr firstObject][@"praisenum"];
                     [bofangVC shareInstance].newsModel.url = [lunboVC.infoArr firstObject][@"url"];
@@ -747,12 +742,7 @@
     }
     
     //        ExcurrentNumber = (int)indexPath.row;
-    NSString *imgUrl = [NSString stringWithFormat:@"%@",[self.pushNewsInfo[@"smeta"] stringByReplacingOccurrencesOfString:@"\\" withString:@""]];
-    NSString *imgUrl1 = [imgUrl stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-    NSString *imgUrl2 = [imgUrl1 stringByReplacingOccurrencesOfString:@"thumb:" withString:@""];
-    NSString *imgUrl3 = [imgUrl2 stringByReplacingOccurrencesOfString:@"{" withString:@""];
-    NSString *imgUrl4 = [imgUrl3 stringByReplacingOccurrencesOfString:@"}" withString:@""];
-    [bofangVC shareInstance].newsModel.ImgStrjiemu = imgUrl4;
+    [bofangVC shareInstance].newsModel.ImgStrjiemu = self.pushNewsInfo[@"smeta"];
     [bofangVC shareInstance].newsModel.ZhengWenjiemu = self.pushNewsInfo[@"post_excerpt"];
     [bofangVC shareInstance].newsModel.praisenum = self.pushNewsInfo[@"praisenum"];
     //[[bofangVC shareInstance].newsModel.tableView reloadData];
@@ -1551,18 +1541,12 @@
             [imgLeft setFrame:CGRectMake(SCREEN_WIDTH - 125.0 / 375 * IPHONE_W, 19 + offsetY, 105.0 / 375 * IPHONE_W, 70.0 / 375 *IPHONE_W)];
         }
 
-        NSString *imgUrl = [NSString stringWithFormat:@"%@",[arr[indexPath.row][@"smeta"] stringByReplacingOccurrencesOfString:@"\\" withString:@""]];
-        NSString *imgUrl1 = [imgUrl stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-        NSString *imgUrl2 = [imgUrl1 stringByReplacingOccurrencesOfString:@"thumb:" withString:@""];
-        NSString *imgUrl3 = [imgUrl2 stringByReplacingOccurrencesOfString:@"{" withString:@""];
-        NSString *imgUrl4 = [imgUrl3 stringByReplacingOccurrencesOfString:@"}" withString:@""];
-        NSLog(@"imageURL:%@---- indexRow:%ld",imgUrl4,indexPath.row);
-        if ([imgUrl4  rangeOfString:@"http"].location != NSNotFound){
-            [imgLeft sd_setImageWithURL:[NSURL URLWithString:imgUrl4]];
+        if ([NEWSSEMTPHOTOURL(arr[indexPath.row][@"smeta"])  rangeOfString:@"http"].location != NSNotFound){
+            [imgLeft sd_setImageWithURL:[NSURL URLWithString:NEWSSEMTPHOTOURL(arr[indexPath.row][@"smeta"])]];
             //placeholderImage:[UIImage imageNamed:@"thumbnailsdefault"]
         }
         else{
-            NSString *str = USERPHOTOHTTPSTRINGZhuBo(imgUrl4);
+            NSString *str = USERPHOTOHTTPSTRINGZhuBo(NEWSSEMTPHOTOURL(arr[indexPath.row][@"smeta"]));
             [imgLeft sd_setImageWithURL:[NSURL URLWithString:str]];
             //placeholderImage:[UIImage imageNamed:@"thumbnailsdefault"]
         }
@@ -1761,38 +1745,9 @@
             [bofangVC shareInstance].newsModel.url = arr[indexPath.row][@"url"];
             [bofangVC shareInstance].iszhuboxiangqing = NO;
             dangqianbofangTable = tableView;
-            if ([arr[indexPath.row][@"post_time"] intValue] / 1000 / 60)
-            {
-                if ([arr[indexPath.row][@"post_time"] intValue] / 1000 / 60 > 9)
-                {
-                    [bofangVC shareInstance].yinpinzongTime.text = [NSString stringWithFormat:@"%d:%d",[arr[indexPath.row][@"post_time"] intValue] / 1000 / 60,[arr[indexPath.row][@"post_time"] intValue] / 1000 % 60];
-                }else
-                {
-                    if ([arr[indexPath.row][@"post_time"] intValue] / 1000 % 60 < 10)
-                    {
-                        [bofangVC shareInstance].yinpinzongTime.text = [NSString stringWithFormat:@"0%d:0%d",[arr[indexPath.row][@"post_time"] intValue] / 1000 / 60,[arr[indexPath.row][@"post_time"] intValue] / 1000 % 60];
-                    }else
-                    {
-                        [bofangVC shareInstance].yinpinzongTime.text = [NSString stringWithFormat:@"0%d:%d",[arr[indexPath.row][@"post_time"] intValue] / 1000 / 60,[arr[indexPath.row][@"post_time"] intValue] / 1000 % 60];
-                    }
-                }
-            }else
-            {
-                if ([arr[indexPath.row][@"post_time"] intValue] / 1000 > 10)
-                {
-                    [bofangVC shareInstance].yinpinzongTime.text = [NSString stringWithFormat:@"00:%d",[arr[indexPath.row][@"post_time"] intValue] / 1000 % 60];
-                }else
-                {
-                    [bofangVC shareInstance].yinpinzongTime.text = [NSString stringWithFormat:@"00:0%d",[arr[indexPath.row][@"post_time"] intValue] / 1000 % 60];
-                }
-            }
+            [bofangVC shareInstance].yinpinzongTime.text = [[bofangVC shareInstance] convertStringWithTime:[arr[indexPath.row][@"post_time"] intValue] / 1000];
             ExcurrentNumber = (int)indexPath.row;
-            NSString *imgUrl = [NSString stringWithFormat:@"%@",[arr[indexPath.row][@"smeta"] stringByReplacingOccurrencesOfString:@"\\" withString:@""]];
-            NSString *imgUrl1 = [imgUrl stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-            NSString *imgUrl2 = [imgUrl1 stringByReplacingOccurrencesOfString:@"thumb:" withString:@""];
-            NSString *imgUrl3 = [imgUrl2 stringByReplacingOccurrencesOfString:@"{" withString:@""];
-            NSString *imgUrl4 = [imgUrl3 stringByReplacingOccurrencesOfString:@"}" withString:@""];
-            [bofangVC shareInstance].newsModel.ImgStrjiemu = imgUrl4;
+            [bofangVC shareInstance].newsModel.ImgStrjiemu = arr[indexPath.row][@"smeta"];
             [bofangVC shareInstance].newsModel.ZhengWenjiemu = arr[indexPath.row][@"post_excerpt"];
             [bofangVC shareInstance].newsModel.praisenum = arr[indexPath.row][@"praisenum"];
             [bofangVC shareInstance].newsModel.post_keywords = arr[indexPath.row][@"post_keywords"];
@@ -2352,12 +2307,7 @@
                 NSMutableArray *imgArr = [[NSMutableArray alloc]init];
                 if ([self.slideADResult count]) {
                     for (int i = 0; i < self.ztADResult.count - self.slideADResult.count; i ++ ){
-                        NSString *imgUrl = [NSString stringWithFormat:@"%@",[self.ztADResult[i][0][@"smeta"] stringByReplacingOccurrencesOfString:@"\\" withString:@""]];
-                        NSString *imgUrl1 = [imgUrl stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-                        NSString *imgUrl2 = [imgUrl1 stringByReplacingOccurrencesOfString:@"thumb:" withString:@""];
-                        NSString *imgUrl3 = [imgUrl2 stringByReplacingOccurrencesOfString:@"{" withString:@""];
-                        NSString *imgUrl4 = [imgUrl3 stringByReplacingOccurrencesOfString:@"}" withString:@""];
-                        [imgArr addObject:imgUrl4];
+                        [imgArr addObject:NEWSSEMTPHOTOURL(self.ztADResult[i][0][@"smeta"])];
                     }
                     tbScView.ztADCount = [imgArr count];
                     for (int i = 0 ; i < [self.slideADResult count]; i ++) {
@@ -2366,12 +2316,7 @@
                 }
                 else{
                      for (int i = 0; i < self.ztADResult.count; i ++ ){
-                                 NSString *imgUrl = [NSString stringWithFormat:@"%@",[self.ztADResult[i][0][@"smeta"] stringByReplacingOccurrencesOfString:@"\\" withString:@""]];
-                                 NSString *imgUrl1 = [imgUrl stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-                                 NSString *imgUrl2 = [imgUrl1 stringByReplacingOccurrencesOfString:@"thumb:" withString:@""];
-                                 NSString *imgUrl3 = [imgUrl2 stringByReplacingOccurrencesOfString:@"{" withString:@""];
-                                 NSString *imgUrl4 = [imgUrl3 stringByReplacingOccurrencesOfString:@"}" withString:@""];
-                                 [imgArr addObject:imgUrl4];
+                                 [imgArr addObject:NEWSSEMTPHOTOURL(self.ztADResult[i][0][@"smeta"])];
                              }
                              tbScView.ztADCount = [imgArr count];
                              

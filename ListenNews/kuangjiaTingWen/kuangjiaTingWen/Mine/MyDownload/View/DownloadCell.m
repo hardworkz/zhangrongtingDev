@@ -44,17 +44,12 @@
     object.delegate = self;
     self.labelName.text = object.obj[@"post_title"];
     //新闻图片url处理
-    NSString *imgUrl = [NSString stringWithFormat:@"%@",[object.obj[@"smeta"]  stringByReplacingOccurrencesOfString:@"\\" withString:@""]];
-    NSString *imgUrl1 = [imgUrl stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-    NSString *imgUrl2 = [imgUrl1 stringByReplacingOccurrencesOfString:@"thumb:" withString:@""];
-    NSString *imgUrl3 = [imgUrl2 stringByReplacingOccurrencesOfString:@"{" withString:@""];
-    NSString *imgUrl4 = [imgUrl3 stringByReplacingOccurrencesOfString:@"}" withString:@""];
-    NSString *finalURL = imgUrl4;
-    if ([finalURL  rangeOfString:@"http"].location != NSNotFound){
-        finalURL = imgUrl4;
+    NSString *finalURL;
+    if ([NEWSSEMTPHOTOURL(object.obj[@"smeta"])  rangeOfString:@"http"].location != NSNotFound){
+        finalURL = NEWSSEMTPHOTOURL(object.obj[@"smeta"]);
     }
     else{
-        finalURL = USERPHOTOHTTPSTRINGZhuBo(imgUrl4);
+        finalURL = USERPHOTOHTTPSTRINGZhuBo(NEWSSEMTPHOTOURL(object.obj[@"smeta"]));
     }
     [self.ImageNew sd_setImageWithURL:[NSURL URLWithString:finalURL] placeholderImage:[UIImage imageNamed:@"thumbnailsdefault"]];
     __weak __typeof(self) selfBlock = self;

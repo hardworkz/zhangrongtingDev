@@ -237,16 +237,11 @@
             [self.newMessageButton setHidden:NO];
             [self.newMessageTipsLabel setText:[NSString stringWithFormat:@"%ld则新消息",[Addcriticism count]]];
             //头像url处理
-            NSString *imgUrl = [NSString stringWithFormat:@"%@",[[Addcriticism firstObject][@"to_avatar"] stringByReplacingOccurrencesOfString:@"\\" withString:@""]];
-            NSString *imgUrl1 = [imgUrl stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-            NSString *imgUrl2 = [imgUrl1 stringByReplacingOccurrencesOfString:@"thumb:" withString:@""];
-            NSString *imgUrl3 = [imgUrl2 stringByReplacingOccurrencesOfString:@"{" withString:@""];
-            NSString *imgUrl4 = [imgUrl3 stringByReplacingOccurrencesOfString:@"}" withString:@""];
-            if ([imgUrl4  rangeOfString:@"http"].location != NSNotFound){
-                [self.newMessageImage sd_setImageWithURL:[NSURL URLWithString:imgUrl4] placeholderImage:AvatarPlaceHolderImage];
+            if ([NEWSSEMTPHOTOURL([Addcriticism firstObject][@"to_avatar"])  rangeOfString:@"http"].location != NSNotFound){
+                [self.newMessageImage sd_setImageWithURL:[NSURL URLWithString:[Addcriticism firstObject][@"to_avatar"]] placeholderImage:AvatarPlaceHolderImage];
             }
             else{
-                NSString *str = USERPHOTOHTTPSTRING(imgUrl4);
+                NSString *str = USERPHOTOHTTPSTRING([Addcriticism firstObject][@"to_avatar"]);
                 [self.newMessageImage sd_setImageWithURL:[NSURL URLWithString:str] placeholderImage:AvatarPlaceHolderImage];
             }
         }
@@ -310,16 +305,11 @@
         [self.zhuyetableView.tableHeaderView addSubview:self.newMessageButton];
         [self.newMessageTipsLabel setText:[NSString stringWithFormat:@"%ld则新消息",[Addcriticism count]]];
         //头像url处理
-        NSString *imgUrl = [NSString stringWithFormat:@"%@",[[Addcriticism firstObject][@"avatar"] stringByReplacingOccurrencesOfString:@"\\" withString:@""]];
-        NSString *imgUrl1 = [imgUrl stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-        NSString *imgUrl2 = [imgUrl1 stringByReplacingOccurrencesOfString:@"thumb:" withString:@""];
-        NSString *imgUrl3 = [imgUrl2 stringByReplacingOccurrencesOfString:@"{" withString:@""];
-        NSString *imgUrl4 = [imgUrl3 stringByReplacingOccurrencesOfString:@"}" withString:@""];
-        if ([imgUrl4  rangeOfString:@"http"].location != NSNotFound){
-            [self.newMessageImage sd_setImageWithURL:[NSURL URLWithString:imgUrl4] placeholderImage:AvatarPlaceHolderImage];
+        if ([NEWSSEMTPHOTOURL([Addcriticism firstObject][@"avatar"])  rangeOfString:@"http"].location != NSNotFound){
+            [self.newMessageImage sd_setImageWithURL:[NSURL URLWithString:NEWSSEMTPHOTOURL([Addcriticism firstObject][@"avatar"])] placeholderImage:AvatarPlaceHolderImage];
         }
         else{
-            NSString *str = USERPHOTOHTTPSTRING(imgUrl4);
+            NSString *str = USERPHOTOHTTPSTRING(NEWSSEMTPHOTOURL([Addcriticism firstObject][@"avatar"]));
             [self.newMessageImage sd_setImageWithURL:[NSURL URLWithString:str] placeholderImage:AvatarPlaceHolderImage];
         }
     }
@@ -388,16 +378,11 @@
     }
     else{
         //头像url处理
-        NSString *imgUrl = [NSString stringWithFormat:@"%@",[self.avatar stringByReplacingOccurrencesOfString:@"\\" withString:@""]];
-        NSString *imgUrl1 = [imgUrl stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-        NSString *imgUrl2 = [imgUrl1 stringByReplacingOccurrencesOfString:@"thumb:" withString:@""];
-        NSString *imgUrl3 = [imgUrl2 stringByReplacingOccurrencesOfString:@"{" withString:@""];
-        NSString *imgUrl4 = [imgUrl3 stringByReplacingOccurrencesOfString:@"}" withString:@""];
-        if ([imgUrl4  rangeOfString:@"http"].location != NSNotFound){
-            [titleImgV sd_setImageWithURL:[NSURL URLWithString:imgUrl4] placeholderImage:AvatarPlaceHolderImage];
+        if ([NEWSSEMTPHOTOURL(self.avatar)  rangeOfString:@"http"].location != NSNotFound){
+            [titleImgV sd_setImageWithURL:[NSURL URLWithString:NEWSSEMTPHOTOURL(self.avatar)] placeholderImage:AvatarPlaceHolderImage];
         }
         else{
-            NSString *str = USERPHOTOHTTPSTRING(imgUrl4);
+            NSString *str = USERPHOTOHTTPSTRING(NEWSSEMTPHOTOURL(self.avatar));
             [titleImgV sd_setImageWithURL:[NSURL URLWithString:str] placeholderImage:AvatarPlaceHolderImage];
         }
     }
@@ -828,12 +813,7 @@
                 }
             }
             ExcurrentNumber = (int)indexPath.row;
-            NSString *imgUrl = [NSString stringWithFormat:@"%@",[model.post.smeta stringByReplacingOccurrencesOfString:@"\\" withString:@""]];
-            NSString *imgUrl1 = [imgUrl stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-            NSString *imgUrl2 = [imgUrl1 stringByReplacingOccurrencesOfString:@"thumb:" withString:@""];
-            NSString *imgUrl3 = [imgUrl2 stringByReplacingOccurrencesOfString:@"{" withString:@""];
-            NSString *imgUrl4 = [imgUrl3 stringByReplacingOccurrencesOfString:@"}" withString:@""];
-            [bofangVC shareInstance].newsModel.ImgStrjiemu = imgUrl4;
+            [bofangVC shareInstance].newsModel.ImgStrjiemu = model.post.smeta;
             [bofangVC shareInstance].newsModel.ZhengWenjiemu = model.post.post_excerpt;
             [bofangVC shareInstance].newsModel.praisenum = model.post.praisenum;
             [[bofangVC shareInstance].tableView reloadData];
@@ -1268,9 +1248,8 @@ didSelectLinkWithTransitInformation:(NSDictionary *)components {
     [qingshuruyonghuming addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
     }]];
     [qingshuruyonghuming addAction:[UIAlertAction actionWithTitle:@"登录" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-        LoginNavC *loginNavC = [LoginNavC new];
         LoginVC *loginFriVC = [LoginVC new];
-        loginNavC = [[LoginNavC alloc]initWithRootViewController:loginFriVC];
+        LoginNavC *loginNavC = [[LoginNavC alloc]initWithRootViewController:loginFriVC];
         [loginNavC.navigationBar setBackgroundColor:[UIColor whiteColor]];
         //        [loginNavC.navigationBar setBackgroundImage:[UIImage imageNamed:@"mian-1"] forBarMetrics:UIBarMetricsDefault];
         loginNavC.navigationBar.tintColor = [UIColor blackColor];
@@ -1338,9 +1317,8 @@ didSelectLinkWithTransitInformation:(NSDictionary *)components {
         [qingshuruyonghuming addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
         }]];
         [qingshuruyonghuming addAction:[UIAlertAction actionWithTitle:@"登录" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-            LoginNavC *loginNavC = [LoginNavC new];
             LoginVC *loginFriVC = [LoginVC new];
-            loginNavC = [[LoginNavC alloc]initWithRootViewController:loginFriVC];
+            LoginNavC *loginNavC = [[LoginNavC alloc]initWithRootViewController:loginFriVC];
             [loginNavC.navigationBar setBackgroundColor:[UIColor whiteColor]];
             //        [loginNavC.navigationBar setBackgroundImage:[UIImage imageNamed:@"mian-1"] forBarMetrics:UIBarMetricsDefault];
             loginNavC.navigationBar.tintColor = [UIColor blackColor];

@@ -224,21 +224,16 @@
     maskLayer.path = maskPath.CGPath;
     zhengwenImg.layer.mask = maskLayer;
     
-    NSString *imgUrl = [NSString stringWithFormat:@"%@",[self.auditionResult[@"smeta"] stringByReplacingOccurrencesOfString:@"\\" withString:@""]];
-    NSString *imgUrl1 = [imgUrl stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-    NSString *imgUrl2 = [imgUrl1 stringByReplacingOccurrencesOfString:@"thumb:" withString:@""];
-    NSString *imgUrl3 = [imgUrl2 stringByReplacingOccurrencesOfString:@"{" withString:@""];
-    NSString *imgUrl4 = [imgUrl3 stringByReplacingOccurrencesOfString:@"}" withString:@""];
     //生成图片
-    if ([imgUrl4 rangeOfString:@"userDownLoadPathImage"].location != NSNotFound) {
-        [zhengwenImg sd_setImageWithURL:[NSURL fileURLWithPath:imgUrl4] placeholderImage:[UIImage imageNamed:@"thumbnailsdefault"]];
+    if ([NEWSSEMTPHOTOURL(self.auditionResult[@"smeta"]) rangeOfString:@"userDownLoadPathImage"].location != NSNotFound) {
+        [zhengwenImg sd_setImageWithURL:[NSURL fileURLWithPath:NEWSSEMTPHOTOURL(self.auditionResult[@"smeta"])] placeholderImage:[UIImage imageNamed:@"thumbnailsdefault"]];
     }
-    else if ([imgUrl4  rangeOfString:@"http"].location != NSNotFound)
+    else if ([NEWSSEMTPHOTOURL(self.auditionResult[@"smeta"])  rangeOfString:@"http"].location != NSNotFound)
     {
-        [zhengwenImg sd_setImageWithURL:[NSURL URLWithString:imgUrl4] placeholderImage:[UIImage imageNamed:@"thumbnailsdefault"]];
+        [zhengwenImg sd_setImageWithURL:[NSURL URLWithString:NEWSSEMTPHOTOURL(self.auditionResult[@"smeta"])] placeholderImage:[UIImage imageNamed:@"thumbnailsdefault"]];
     }
     else{
-        NSString *str = USERPHOTOHTTPSTRINGZhuBo(imgUrl4);
+        NSString *str = USERPHOTOHTTPSTRINGZhuBo(NEWSSEMTPHOTOURL(self.auditionResult[@"smeta"]));
         [zhengwenImg sd_setImageWithURL:[NSURL URLWithString:str] placeholderImage:[UIImage imageNamed:@"thumbnailsdefault"]];
     }
     
@@ -505,9 +500,8 @@
     [qingshuruyonghuming addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
     }]];
     [qingshuruyonghuming addAction:[UIAlertAction actionWithTitle:@"登录" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-        LoginNavC *loginNavC = [LoginNavC new];
         LoginVC *loginFriVC = [LoginVC new];
-        loginNavC = [[LoginNavC alloc]initWithRootViewController:loginFriVC];
+        LoginNavC *loginNavC = [[LoginNavC alloc]initWithRootViewController:loginFriVC];
         [loginNavC.navigationBar setBackgroundColor:[UIColor whiteColor]];
         //        [loginNavC.navigationBar setBackgroundImage:[UIImage imageNamed:@"mian-1"] forBarMetrics:UIBarMetricsDefault];
         loginNavC.navigationBar.tintColor = [UIColor blackColor];

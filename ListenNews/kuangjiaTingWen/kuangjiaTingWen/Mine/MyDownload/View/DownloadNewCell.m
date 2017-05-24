@@ -100,7 +100,7 @@
         }
         _sizeLabel.text = [NSString stringWithFormat:@"%@", newobj.post_size];
         //    NSLog(@"%@", newobj.smeta);
-        NSMutableString *dateString = [NSMutableString string];
+        NSMutableString *dateString;
         if (SCREEN_WIDTH < 350) {
             dateString = [[[newobj.post_date componentsSeparatedByString:@" "]firstObject]mutableCopy];
         }else {
@@ -129,7 +129,7 @@
 
         [_imageV sd_setImageWithURL:[NSURL URLWithString:newobj.smeta] placeholderImage:imaD];
         _sizeLabel.text = [NSString stringWithFormat:@"%@", newobj.post_size];
-        NSMutableString *dateString = [NSMutableString string];
+        NSMutableString *dateString;
         if (SCREEN_WIDTH < 350) {
             dateString = [[[newobj.post_date componentsSeparatedByString:@" "]firstObject]mutableCopy];
         }else {

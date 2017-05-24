@@ -472,12 +472,7 @@
     
     
     //头像url处理
-    NSString *imgUrl = [NSString stringWithFormat:@"%@",[components[@"avatar"] stringByReplacingOccurrencesOfString:@"\\" withString:@""]];
-    NSString *imgUrl1 = [imgUrl stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-    NSString *imgUrl2 = [imgUrl1 stringByReplacingOccurrencesOfString:@"thumb:" withString:@""];
-    NSString *imgUrl3 = [imgUrl2 stringByReplacingOccurrencesOfString:@"{" withString:@""];
-    NSString *imgUrl4 = [imgUrl3 stringByReplacingOccurrencesOfString:@"}" withString:@""];
-    gerenzhuye.avatar = imgUrl4;
+    gerenzhuye.avatar = NEWSSEMTPHOTOURL(components[@"avatar"]);
     gerenzhuye.fan_num = components[@"fan_num"];
     gerenzhuye.guan_num = components[@"guan_num"];
     self.hidesBottomBarWhenPushed = YES;
@@ -805,7 +800,7 @@ didSelectLinkWithTransitInformation:(NSDictionary *)components {
             }
             
             [cell.commentLabel setLinkAttributes:@{NSForegroundColorAttributeName : [UIColor blackColor],NSFontAttributeName : gFontMain13}];
-            NSMutableDictionary *CommentInformationDic = [NSMutableDictionary new];
+            NSMutableDictionary *CommentInformationDic;
             CommentInformationDic = [user mutableCopy];
             [CommentInformationDic setObject:@"1" forKey:@"isComment"];
             [CommentInformationDic setObject:[NSString stringWithFormat:@"%ld",(long)indexPath.row] forKey:@"rowIndex"];
@@ -932,12 +927,7 @@ didSelectLinkWithTransitInformation:(NSDictionary *)components {
                 }
             }
             ExcurrentNumber = (int)indexPath.row;
-            NSString *imgUrl = [NSString stringWithFormat:@"%@",[self.infoArr[indexPath.row][@"post"][@"smeta"] stringByReplacingOccurrencesOfString:@"\\" withString:@""]];
-            NSString *imgUrl1 = [imgUrl stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-            NSString *imgUrl2 = [imgUrl1 stringByReplacingOccurrencesOfString:@"thumb:" withString:@""];
-            NSString *imgUrl3 = [imgUrl2 stringByReplacingOccurrencesOfString:@"{" withString:@""];
-            NSString *imgUrl4 = [imgUrl3 stringByReplacingOccurrencesOfString:@"}" withString:@""];
-            [bofangVC shareInstance].newsModel.ImgStrjiemu = imgUrl4;
+            [bofangVC shareInstance].newsModel.ImgStrjiemu = self.infoArr[indexPath.row][@"post"][@"smeta"];
             [bofangVC shareInstance].newsModel.ZhengWenjiemu = self.infoArr[indexPath.row][@"post"][@"post_excerpt"];
             [bofangVC shareInstance].newsModel.praisenum = self.infoArr[indexPath.row][@"post"][@"praisenum"];
             [[bofangVC shareInstance].tableView reloadData];

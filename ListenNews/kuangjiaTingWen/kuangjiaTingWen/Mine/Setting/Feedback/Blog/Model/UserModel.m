@@ -16,4 +16,13 @@
         return @{@"ID":@"id"};
     }];
 }
+- (NSString *)avatar
+{
+    NSString *imgUrl = [NSString stringWithFormat:@"%@",[_avatar stringByReplacingOccurrencesOfString:@"\\" withString:@""]];
+    NSString *imgUrl1 = [imgUrl stringByReplacingOccurrencesOfString:@"\"" withString:@""];
+    NSString *imgUrl2 = [imgUrl1 stringByReplacingOccurrencesOfString:@"thumb:" withString:@""];
+    NSString *imgUrl3 = [imgUrl2 stringByReplacingOccurrencesOfString:@"{" withString:@""];
+    NSString *imgUrl4 = [imgUrl3 stringByReplacingOccurrencesOfString:@"}" withString:@""];
+    return imgUrl4;
+}
 @end

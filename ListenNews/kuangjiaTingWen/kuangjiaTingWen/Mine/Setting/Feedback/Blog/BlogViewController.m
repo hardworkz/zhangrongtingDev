@@ -168,16 +168,11 @@
             [self.blogTableview.tableHeaderView addSubview:self.newMessageButton];
             [self.newMessageTipsLabel setText:[NSString stringWithFormat:@"%ld则新消息",[feedback count]]];
             //头像url处理
-            NSString *imgUrl = [NSString stringWithFormat:@"%@",[[feedback firstObject][@"user"][@"avatar"] stringByReplacingOccurrencesOfString:@"\\" withString:@""]];
-            NSString *imgUrl1 = [imgUrl stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-            NSString *imgUrl2 = [imgUrl1 stringByReplacingOccurrencesOfString:@"thumb:" withString:@""];
-            NSString *imgUrl3 = [imgUrl2 stringByReplacingOccurrencesOfString:@"{" withString:@""];
-            NSString *imgUrl4 = [imgUrl3 stringByReplacingOccurrencesOfString:@"}" withString:@""];
-            if ([imgUrl4  rangeOfString:@"http"].location != NSNotFound){
-                [self.newMessageImage sd_setImageWithURL:[NSURL URLWithString:imgUrl4] placeholderImage:AvatarPlaceHolderImage];
+            if ([NEWSSEMTPHOTOURL([feedback firstObject][@"user"][@"avatar"])  rangeOfString:@"http"].location != NSNotFound){
+                [self.newMessageImage sd_setImageWithURL:[NSURL URLWithString:NEWSSEMTPHOTOURL([feedback firstObject][@"user"][@"avatar"])] placeholderImage:AvatarPlaceHolderImage];
             }
             else{
-                NSString *str = USERPHOTOHTTPSTRING(imgUrl4);
+                NSString *str = USERPHOTOHTTPSTRING(NEWSSEMTPHOTOURL([feedback firstObject][@"user"][@"avatar"]));
                 [self.newMessageImage sd_setImageWithURL:[NSURL URLWithString:str] placeholderImage:AvatarPlaceHolderImage];
             }
         }
@@ -194,16 +189,11 @@
             [self.blogTableview.tableHeaderView addSubview:self.newMessageButton];
             [self.newMessageTipsLabel setText:[NSString stringWithFormat:@"%ld则新消息",[newprompt count]]];
             //头像url处理
-            NSString *imgUrl = [NSString stringWithFormat:@"%@",[[newprompt firstObject][@"user"][@"avatar"] stringByReplacingOccurrencesOfString:@"\\" withString:@""]];
-            NSString *imgUrl1 = [imgUrl stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-            NSString *imgUrl2 = [imgUrl1 stringByReplacingOccurrencesOfString:@"thumb:" withString:@""];
-            NSString *imgUrl3 = [imgUrl2 stringByReplacingOccurrencesOfString:@"{" withString:@""];
-            NSString *imgUrl4 = [imgUrl3 stringByReplacingOccurrencesOfString:@"}" withString:@""];
-            if ([imgUrl4  rangeOfString:@"http"].location != NSNotFound){
-                [self.newMessageImage sd_setImageWithURL:[NSURL URLWithString:imgUrl4] placeholderImage:AvatarPlaceHolderImage];
+            if ([NEWSSEMTPHOTOURL([newprompt firstObject][@"user"][@"avatar"])  rangeOfString:@"http"].location != NSNotFound){
+                [self.newMessageImage sd_setImageWithURL:[NSURL URLWithString:NEWSSEMTPHOTOURL([newprompt firstObject][@"user"][@"avatar"])] placeholderImage:AvatarPlaceHolderImage];
             }
             else{
-                NSString *str = USERPHOTOHTTPSTRING(imgUrl4);
+                NSString *str = USERPHOTOHTTPSTRING(NEWSSEMTPHOTOURL([newprompt firstObject][@"user"][@"avatar"]));
                 [self.newMessageImage sd_setImageWithURL:[NSURL URLWithString:str] placeholderImage:AvatarPlaceHolderImage];
             }
         }
@@ -236,7 +226,7 @@
 }
 
 - (void)viewDidDisappear:(BOOL)animated{
-    [super viewWillDisappear:animated];
+    [super viewDidDisappear:animated];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillShowNotification object:nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillHideNotification object:nil];
 }
@@ -495,12 +485,7 @@
                 }
             }
             ExcurrentNumber = (int)indexPath.row;
-            NSString *imgUrl = [[NSString stringWithFormat:@"%@",model.post.smeta] stringByReplacingOccurrencesOfString:@"\\" withString:@""];
-            NSString *imgUrl1 = [imgUrl stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-            NSString *imgUrl2 = [imgUrl1 stringByReplacingOccurrencesOfString:@"thumb:" withString:@""];
-            NSString *imgUrl3 = [imgUrl2 stringByReplacingOccurrencesOfString:@"{" withString:@""];
-            NSString *imgUrl4 = [imgUrl3 stringByReplacingOccurrencesOfString:@"}" withString:@""];
-            [bofangVC shareInstance].newsModel.ImgStrjiemu = imgUrl4;
+            [bofangVC shareInstance].newsModel.ImgStrjiemu = model.post.smeta;
             [bofangVC shareInstance].newsModel.ZhengWenjiemu = model.post.post_excerpt;
             [bofangVC shareInstance].newsModel.praisenum = model.post.praisenum;
             [[bofangVC shareInstance].tableView reloadData];
@@ -1257,9 +1242,8 @@
     [qingshuruyonghuming addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
     }]];
     [qingshuruyonghuming addAction:[UIAlertAction actionWithTitle:@"登录" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-        LoginNavC *loginNavC = [LoginNavC new];
         LoginVC *loginFriVC = [LoginVC new];
-        loginNavC = [[LoginNavC alloc]initWithRootViewController:loginFriVC];
+        LoginNavC *loginNavC = [[LoginNavC alloc]initWithRootViewController:loginFriVC];
         [loginNavC.navigationBar setBackgroundColor:[UIColor whiteColor]];
         //        [loginNavC.navigationBar setBackgroundImage:[UIImage imageNamed:@"mian-1"] forBarMetrics:UIBarMetricsDefault];
         loginNavC.navigationBar.tintColor = [UIColor blackColor];
@@ -1434,12 +1418,7 @@
     gerenzhuye.user_id = components[@"id"];
     
     //头像url处理
-    NSString *imgUrl = [NSString stringWithFormat:@"%@",[components[@"avatar"] stringByReplacingOccurrencesOfString:@"\\" withString:@""]];
-    NSString *imgUrl1 = [imgUrl stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-    NSString *imgUrl2 = [imgUrl1 stringByReplacingOccurrencesOfString:@"thumb:" withString:@""];
-    NSString *imgUrl3 = [imgUrl2 stringByReplacingOccurrencesOfString:@"{" withString:@""];
-    NSString *imgUrl4 = [imgUrl3 stringByReplacingOccurrencesOfString:@"}" withString:@""];
-    gerenzhuye.avatar = imgUrl4;
+    gerenzhuye.avatar = NEWSSEMTPHOTOURL(components[@"avatar"]);
     gerenzhuye.fan_num = components[@"fan_num"];
     gerenzhuye.guan_num = components[@"guan_num"];
     self.hidesBottomBarWhenPushed = YES;

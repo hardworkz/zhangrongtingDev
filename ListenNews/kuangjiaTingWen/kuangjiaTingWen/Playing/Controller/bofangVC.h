@@ -27,7 +27,7 @@
 @property (assign, nonatomic) BOOL isPushNews;
 @property (assign, nonatomic) BOOL isFirst;
 
-
+- (NSString *)convertStringWithTime:(float)time;/**<计算音频总时间*/
 - (void)configNowPlayingInfoCenter;
 - (void)doplay2;
 @end

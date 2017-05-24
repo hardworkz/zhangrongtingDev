@@ -37,17 +37,12 @@
         [_headImage sd_setImageWithURL:[NSURL URLWithString:USERPHOTOHTTPSTRING(unreadMessage[@"to_avatar"])] placeholderImage:AvatarPlaceHolderImage];
     }
     
-    NSString *imgUrl = [NSString stringWithFormat:@"%@",[unreadMessage[@"smeta"] stringByReplacingOccurrencesOfString:@"\\" withString:@""]];
-    NSString *imgUrl1 = [imgUrl stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-    NSString *imgUrl2 = [imgUrl1 stringByReplacingOccurrencesOfString:@"thumb:" withString:@""];
-    NSString *imgUrl3 = [imgUrl2 stringByReplacingOccurrencesOfString:@"{" withString:@""];
-    NSString *imgUrl4 = [imgUrl3 stringByReplacingOccurrencesOfString:@"}" withString:@""];
-    if ([imgUrl4  rangeOfString:@"http"].location != NSNotFound){
-        imgUrl4 = [imgUrl4 stringByReplacingOccurrencesOfString:@"http" withString:@"https"];
+    if ([NEWSSEMTPHOTOURL(unreadMessage[@"smeta"])  rangeOfString:@"http"].location != NSNotFound){
+        NSString *imgUrl4 = [NEWSSEMTPHOTOURL(unreadMessage[@"smeta"]) stringByReplacingOccurrencesOfString:@"http" withString:@"https"];
         [_newsImage sd_setImageWithURL:[NSURL URLWithString:imgUrl4] placeholderImage:[UIImage imageNamed:@"thumbnailsdefault"]];
     }
     else{
-        NSString *str = USERPHOTOHTTPSTRINGZhuBo(imgUrl4);
+        NSString *str = USERPHOTOHTTPSTRINGZhuBo(NEWSSEMTPHOTOURL(unreadMessage[@"smeta"]));
         [_newsImage sd_setImageWithURL:[NSURL URLWithString:str] placeholderImage:[UIImage imageNamed:@"thumbnailsdefault"]];
     }
     

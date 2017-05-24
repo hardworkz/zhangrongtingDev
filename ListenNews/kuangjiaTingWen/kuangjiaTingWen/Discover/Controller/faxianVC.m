@@ -273,12 +273,7 @@
                     if (IS_IPAD) {
                         [imgLeft setFrame:CGRectMake(SCREEN_WIDTH - 125.0 / 375 * IPHONE_W, 19, 105.0 / 375 * IPHONE_W, 70.0 / 375 *IPHONE_W)];
                     }
-                    NSString *imgUrl = [NSString stringWithFormat:@"%@",[self.SouSuodataArrM[indexPath.row][@"smeta"] stringByReplacingOccurrencesOfString:@"\\" withString:@""]];
-                    NSString *imgUrl1 = [imgUrl stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-                    NSString *imgUrl2 = [imgUrl1 stringByReplacingOccurrencesOfString:@"thumb:" withString:@""];
-                    NSString *imgUrl3 = [imgUrl2 stringByReplacingOccurrencesOfString:@"{" withString:@""];
-                    NSString *imgUrl4 = [imgUrl3 stringByReplacingOccurrencesOfString:@"}" withString:@""];
-                    [imgLeft sd_setImageWithURL:[NSURL URLWithString:imgUrl4]];
+                    [imgLeft sd_setImageWithURL:[NSURL URLWithString:NEWSSEMTPHOTOURL(self.SouSuodataArrM[indexPath.row][@"smeta"])]];
                     imgLeft.contentMode = UIViewContentModeScaleAspectFill;
                     imgLeft.clipsToBounds = YES;
                     [cell.contentView addSubview:imgLeft];
@@ -347,7 +342,7 @@
                     //大小
                     UILabel *dataLab = [[UILabel alloc]initWithFrame:CGRectMake(SCREEN_WIDTH - 213.0 / 375 * IPHONE_W, 86.0 / 667 *IPHONE_H, 45.0 / 375 * IPHONE_W, 21.0 / 667 *IPHONE_H)];
                     dataLab.text = [NSString stringWithFormat:@"%.1lf%@",[self.SouSuodataArrM[indexPath.row][@"post_size"] intValue] / 1024.0 / 1024.0,@"M"];
-                    NSString *str = [NSString stringWithFormat:@"%@",dataLab.text];
+//                    NSString *str = [NSString stringWithFormat:@"%@",dataLab.text];
 //                    if (str.length > 5)
 //                    {
 //                        dataLab.frame = CGRectMake(dataLab.frame.origin.x, dataLab.frame.origin.y, (str.length - 1) * 9.2 / 375 * IPHONE_W, 21);
@@ -376,12 +371,7 @@
             }
             else {
             UIImageView *imgLeft = [[UIImageView alloc]initWithFrame:CGRectMake(SCREEN_WIDTH - 125.0 / 375 * IPHONE_W, 19, 105.0 / 375 * IPHONE_W,   84.72 / 375 *IPHONE_W)];
-            NSString *imgUrl = [NSString stringWithFormat:@"%@",[self.SouSuodataArrM[indexPath.row][@"smeta"] stringByReplacingOccurrencesOfString:@"\\" withString:@""]];
-            NSString *imgUrl1 = [imgUrl stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-            NSString *imgUrl2 = [imgUrl1 stringByReplacingOccurrencesOfString:@"thumb:" withString:@""];
-            NSString *imgUrl3 = [imgUrl2 stringByReplacingOccurrencesOfString:@"{" withString:@""];
-            NSString *imgUrl4 = [imgUrl3 stringByReplacingOccurrencesOfString:@"}" withString:@""];
-            [imgLeft sd_setImageWithURL:[NSURL URLWithString:imgUrl4]];
+            [imgLeft sd_setImageWithURL:[NSURL URLWithString:self.SouSuodataArrM[indexPath.row][@"smeta"]]];
             //placeholderImage:[UIImage imageNamed:@"thumbnailsdefault"]
             [cell.contentView addSubview:imgLeft];
             imgLeft.contentMode = UIViewContentModeScaleAspectFill;
@@ -439,7 +429,7 @@
             //大小
             UILabel *dataLab = [[UILabel alloc]initWithFrame:CGRectMake(SCREEN_WIDTH - 213.0 / 375 * IPHONE_W, 86.0 / 667 *IPHONE_H, 45.0 / 375 * IPHONE_W, 21.0 / 667 *IPHONE_H)];
             dataLab.text = [NSString stringWithFormat:@"%.1lf%@",[self.SouSuodataArrM[indexPath.row][@"post_size"] intValue] / 1024.0 / 1024.0,@"M"];
-            NSString *str = [NSString stringWithFormat:@"%@",dataLab.text];
+//            NSString *str = [NSString stringWithFormat:@"%@",dataLab.text];
 //            if (str.length > 5)
 //            {
 //                dataLab.frame = CGRectMake(dataLab.frame.origin.x, dataLab.frame.origin.y, (str.length - 1) * 9.2 / 375 * IPHONE_W, 21.0 / 667 * SCREEN_HEIGHT);
@@ -786,12 +776,7 @@
                     }
                     
                     ExcurrentNumber = (int)indexPath.row;
-                    NSString *imgUrl = [NSString stringWithFormat:@"%@",[self.SouSuodataArrM[indexPath.row][@"smeta"] stringByReplacingOccurrencesOfString:@"\\" withString:@""]];
-                    NSString *imgUrl1 = [imgUrl stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-                    NSString *imgUrl2 = [imgUrl1 stringByReplacingOccurrencesOfString:@"thumb:" withString:@""];
-                    NSString *imgUrl3 = [imgUrl2 stringByReplacingOccurrencesOfString:@"{" withString:@""];
-                    NSString *imgUrl4 = [imgUrl3 stringByReplacingOccurrencesOfString:@"}" withString:@""];
-                    [bofangVC shareInstance].newsModel.ImgStrjiemu = imgUrl4;
+                    [bofangVC shareInstance].newsModel.ImgStrjiemu = self.SouSuodataArrM[indexPath.row][@"smeta"];
                     [bofangVC shareInstance].newsModel.ZhengWenjiemu = self.SouSuodataArrM[indexPath.row][@"post_excerpt"];
                     [bofangVC shareInstance].newsModel.praisenum = self.SouSuodataArrM[indexPath.row][@"praisenum"];
                     [bofangVC shareInstance].newsModel.post_keywords = self.SouSuodataArrM[indexPath.row][@"post_keywords"];
@@ -892,12 +877,7 @@
                     }
                     
                     ExcurrentNumber = (int)indexPath.row;
-                    NSString *imgUrl = [NSString stringWithFormat:@"%@",[self.SouSuodataArrM[indexPath.row][@"smeta"] stringByReplacingOccurrencesOfString:@"\\" withString:@""]];
-                    NSString *imgUrl1 = [imgUrl stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-                    NSString *imgUrl2 = [imgUrl1 stringByReplacingOccurrencesOfString:@"thumb:" withString:@""];
-                    NSString *imgUrl3 = [imgUrl2 stringByReplacingOccurrencesOfString:@"{" withString:@""];
-                    NSString *imgUrl4 = [imgUrl3 stringByReplacingOccurrencesOfString:@"}" withString:@""];
-                    [bofangVC shareInstance].newsModel.ImgStrjiemu = imgUrl4;
+                    [bofangVC shareInstance].newsModel.ImgStrjiemu = self.SouSuodataArrM[indexPath.row][@"smeta"];
                     [bofangVC shareInstance].newsModel.ZhengWenjiemu = self.SouSuodataArrM[indexPath.row][@"post_excerpt"];
                     [bofangVC shareInstance].newsModel.praisenum = self.SouSuodataArrM[indexPath.row][@"praisenum"];
                     [bofangVC shareInstance].newsModel.post_keywords = self.SouSuodataArrM[indexPath.row][@"post_keywords"];
@@ -1259,9 +1239,8 @@
     [qingshuruyonghuming addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
     }]];
     [qingshuruyonghuming addAction:[UIAlertAction actionWithTitle:@"去登录" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-        LoginNavC *loginNavC = [LoginNavC new];
         LoginVC *loginFriVC = [LoginVC new];
-        loginNavC = [[LoginNavC alloc]initWithRootViewController:loginFriVC];
+        LoginNavC *loginNavC = [[LoginNavC alloc]initWithRootViewController:loginFriVC];
         [loginNavC.navigationBar setBackgroundColor:[UIColor whiteColor]];
         //        [loginNavC.navigationBar setBackgroundImage:[UIImage imageNamed:@"mian-1"] forBarMetrics:UIBarMetricsDefault];
         loginNavC.navigationBar.tintColor = [UIColor blackColor];
@@ -1402,12 +1381,7 @@
     }
     
     //        ExcurrentNumber = (int)indexPath.row;
-    NSString *imgUrl = [NSString stringWithFormat:@"%@",[self.pushNewsInfo[@"smeta"] stringByReplacingOccurrencesOfString:@"\\" withString:@""]];
-    NSString *imgUrl1 = [imgUrl stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-    NSString *imgUrl2 = [imgUrl1 stringByReplacingOccurrencesOfString:@"thumb:" withString:@""];
-    NSString *imgUrl3 = [imgUrl2 stringByReplacingOccurrencesOfString:@"{" withString:@""];
-    NSString *imgUrl4 = [imgUrl3 stringByReplacingOccurrencesOfString:@"}" withString:@""];
-    [bofangVC shareInstance].newsModel.ImgStrjiemu = imgUrl4;
+    [bofangVC shareInstance].newsModel.ImgStrjiemu = self.pushNewsInfo[@"smeta"];
     [bofangVC shareInstance].newsModel.ZhengWenjiemu = self.pushNewsInfo[@"post_excerpt"];
     [bofangVC shareInstance].newsModel.praisenum = self.pushNewsInfo[@"praisenum"];
     //            [[bofangVC shareInstance].newsModel.tableView reloadData];

@@ -112,17 +112,12 @@ typedef enum : NSUInteger {
         self.runLoopModes = [NSSet setWithObject:NSRunLoopCommonModes];
         self.obj = obj;
         //新闻图片url处理
-        NSString *imgUrl = [NSString stringWithFormat:@"%@",[obj[@"smeta"]  stringByReplacingOccurrencesOfString:@"\\" withString:@""]];
-        NSString *imgUrl1 = [imgUrl stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-        NSString *imgUrl2 = [imgUrl1 stringByReplacingOccurrencesOfString:@"thumb:" withString:@""];
-        NSString *imgUrl3 = [imgUrl2 stringByReplacingOccurrencesOfString:@"{" withString:@""];
-        NSString *imgUrl4 = [imgUrl3 stringByReplacingOccurrencesOfString:@"}" withString:@""];
-        NSString *finalURL = imgUrl4;
+        NSString *finalURL = NEWSSEMTPHOTOURL(obj[@"smeta"]);
         if ([finalURL  rangeOfString:@"http"].location != NSNotFound){
-            finalURL = imgUrl4;
+            finalURL = NEWSSEMTPHOTOURL(obj[@"smeta"]);
         }
         else{
-            finalURL = USERPHOTOHTTPSTRINGZhuBo(imgUrl4);
+            finalURL = USERPHOTOHTTPSTRINGZhuBo(NEWSSEMTPHOTOURL(obj[@"smeta"]));
         }
         self.imageURL = finalURL;
         self.downUrl = url;
@@ -528,17 +523,12 @@ typedef enum : NSUInteger {
             @synchronized(selfBlock) {
                 @autoreleasepool {
                     //获取图片目录路径
-                    NSString *imgUrl = [NSString stringWithFormat:@"%@",[_obj[@"smeta"]  stringByReplacingOccurrencesOfString:@"\\" withString:@""]];
-                    NSString *imgUrl1 = [imgUrl stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-                    NSString *imgUrl2 = [imgUrl1 stringByReplacingOccurrencesOfString:@"thumb:" withString:@""];
-                    NSString *imgUrl3 = [imgUrl2 stringByReplacingOccurrencesOfString:@"{" withString:@""];
-                    NSString *imgUrl4 = [imgUrl3 stringByReplacingOccurrencesOfString:@"}" withString:@""];
-                    NSString *finalURL = imgUrl4;
+                    NSString *finalURL = NEWSSEMTPHOTOURL(_obj[@"smeta"]);
                     if ([finalURL  rangeOfString:@"http"].location != NSNotFound){
-                        finalURL = imgUrl4;
+                        finalURL = NEWSSEMTPHOTOURL(_obj[@"smeta"]);
                     }
                     else{
-                        finalURL = USERPHOTOHTTPSTRINGZhuBo(imgUrl4);
+                        finalURL = USERPHOTOHTTPSTRINGZhuBo(NEWSSEMTPHOTOURL(_obj[@"smeta"]));
                     }
                     //存储路径去掉 "/"符号
                     NSString *imagePath = [ProManager.userDownLoadPathImage stringByAppendingPathComponent:[finalURL stringByReplacingOccurrencesOfString:@"/" withString:@""]];
@@ -549,17 +539,12 @@ typedef enum : NSUInteger {
                         //设置本地图片地址
                         //下载完成
                         //新闻图片url处理
-                        NSString *imgUrl = [NSString stringWithFormat:@"%@",[selfBlock.obj[@"smeta"]  stringByReplacingOccurrencesOfString:@"\\" withString:@""]];
-                        NSString *imgUrl1 = [imgUrl stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-                        NSString *imgUrl2 = [imgUrl1 stringByReplacingOccurrencesOfString:@"thumb:" withString:@""];
-                        NSString *imgUrl3 = [imgUrl2 stringByReplacingOccurrencesOfString:@"{" withString:@""];
-                        NSString *imgUrl4 = [imgUrl3 stringByReplacingOccurrencesOfString:@"}" withString:@""];
-                        NSString *finalURL = imgUrl4;
+                        NSString *finalURL = NEWSSEMTPHOTOURL(selfBlock.obj[@"smeta"]);
                         if ([finalURL  rangeOfString:@"http"].location != NSNotFound){
-                            finalURL = imgUrl4;
+                            finalURL = NEWSSEMTPHOTOURL(selfBlock.obj[@"smeta"]);
                         }
                         else{
-                            finalURL = USERPHOTOHTTPSTRINGZhuBo(imgUrl4);
+                            finalURL = USERPHOTOHTTPSTRINGZhuBo(NEWSSEMTPHOTOURL(selfBlock.obj[@"smeta"]));
                         }
                         [objDic setValue:[finalURL stringByReplacingOccurrencesOfString:@"/" withString:@""] forKey:@"smeta"];
                     }else {

@@ -15,7 +15,7 @@
 @property (nonatomic, strong) NSArray *imageArray;
 @property (nonatomic, strong) UIScrollView *scrollView;
 @property (nonatomic, strong) UILabel *dibuLab;
-@property (nonatomic, assign) NSInteger *ztADCount;
+@property (nonatomic, assign) NSInteger ztADCount;
 //@property (nonatomic, weak) id<CycleScrollViewDelegate> delegate;
 @property (nonatomic,strong)NSString *biaozhiStr;
 - (id)initWithFrame:(CGRect)frame andArr:(NSArray *)infoArr;

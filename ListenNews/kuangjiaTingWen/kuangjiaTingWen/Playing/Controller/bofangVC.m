@@ -113,13 +113,21 @@
 
 @property (assign, nonatomic) BOOL isCollected;
 
+@property (strong, nonatomic) AVPlayer *bofangPlayer;
+
 + (instancetype)shareInstance;
 @end
 __weak bofangVC *weakVC;
 __weak AVPlayer *weakPlayer;
 static bofangVC *_instance = nil;
 @implementation bofangVC
-
+- (AVPlayer *)bofangPlayer
+{
+    if (_bofangPlayer == nil) {
+        _bofangPlayer = [[AVPlayer alloc] init];
+    }
+    return _bofangPlayer;
+}
 + (instancetype)shareInstance {
     static dispatch_once_t onceToken ;
     dispatch_once(&onceToken, ^{
@@ -229,7 +237,7 @@ static bofangVC *_instance = nil;
 }
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    
+    [self.tableView setContentOffset:CGPointMake(0, 0) animated:NO];
     IQKeyboardManager *manager = [IQKeyboardManager sharedManager];
     manager.enable = YES;
     manager.shouldResignOnTouchOutside = YES;
@@ -584,7 +592,7 @@ static bofangVC *_instance = nil;
     
     [self bofangqiSet];
 }
-
+#pragma mark - 播放器设置
 - (void)bofangqiSet{
     self.isFirst = YES;
     //程序刚运行时，有播放
@@ -620,15 +628,10 @@ static bofangVC *_instance = nil;
     
     //初始时，禁用播放按钮
     [bofangCenterBtn setEnabled:NO];
-    //    if (Explayer)
-    //    {
-    //        [Explayer replaceCurrentItemWithPlayerItem:[[AVPlayerItem alloc]initWithURL:[NSURL URLWithString:self.newsModel.post_mp]]];
-    //    }else
-    //    {
     if (self.newsModel.post_mp.length > 0){
         
     }
-    Explayer = [[AVPlayer alloc]init];
+    Explayer = self.bofangPlayer;
     //添加观察者，用来监视播放器的状态变化
     [Explayer addObserver:self forKeyPath:@"status" options:NSKeyValueObservingOptionNew context:nil];
     //添加观察者，用来监听播放器的缓冲进度loadedTimeRanges属性
@@ -645,36 +648,7 @@ static bofangVC *_instance = nil;
     self.yinpinzongTime.textColor = nTextColorMain;
     [self.yinpinzongTime setTextAlignment:NSTextAlignmentRight];
     self.yinpinzongTime.font = [UIFont systemFontOfSize:12.0f ];
-//    [self reloadPlayAllTime];/**<刷新音频总时长*/
-    if ([self.newsModel.post_time intValue] / 1000 / 60)
-    {
-        if ([self.newsModel.post_time intValue] / 1000 / 60 > 9)
-        {
-            self.yinpinzongTime.text = [NSString stringWithFormat:@"%d:%d",[self.newsModel.post_time intValue] / 1000 / 60,[self.newsModel.post_time intValue] / 1000 % 60];
-            if ([self.newsModel.post_time intValue] / 1000 % 60 < 10)
-            {
-                self.yinpinzongTime.text = [NSString stringWithFormat:@"%d:0%d",[self.newsModel.post_time intValue] / 1000 / 60,[self.newsModel.post_time intValue] / 1000 % 60];
-            }
-        }else
-        {
-            if ([self.newsModel.post_time intValue] / 1000 % 60 < 10)
-            {
-                self.yinpinzongTime.text = [NSString stringWithFormat:@"0%d:0%d",[self.newsModel.post_time intValue] / 1000 / 60,[self.newsModel.post_time intValue] / 1000 % 60];
-            }else
-            {
-                self.yinpinzongTime.text = [NSString stringWithFormat:@"0%d:%d",[self.newsModel.post_time intValue] / 1000 / 60,[self.newsModel.post_time intValue] / 1000 % 60];
-            }
-        }
-    }else
-    {
-        if ([self.newsModel.post_time intValue] / 1000 > 10)
-        {
-            self.yinpinzongTime.text = [NSString stringWithFormat:@"00:%d",[self.newsModel.post_time intValue] / 1000 % 60];
-        }else
-        {
-            self.yinpinzongTime.text = [NSString stringWithFormat:@"00:0%d",[self.newsModel.post_time intValue] / 1000 % 60];
-        }
-    }
+    [self reloadPlayAllTime];/**<刷新音频总时长*/
     
     [dibuView addSubview:self.yinpinzongTime];
     
@@ -725,6 +699,10 @@ static bofangVC *_instance = nil;
     
     [dibuView addSubview:bofangCenterBtn];
     
+    if (timeObserver != nil) {
+        [Explayer removeTimeObserver:timeObserver];
+        timeObserver = nil;
+    }
     timeObserver = [Explayer addPeriodicTimeObserverForInterval:CMTimeMake(1, 1) queue:dispatch_get_main_queue() usingBlock:^(CMTime time) {
         //获取当前播放时间
         float currentTime = (float)weakPlayer.currentItem.currentTime.value / (float)weakPlayer.currentItem.currentTime.timescale;
@@ -736,36 +714,7 @@ static bofangVC *_instance = nil;
         }
         NSTimeInterval timeInterval = [weakVC availableDuration];//计算缓冲进度
 
-        if (testTime / 60)
-        {
-            if (testTime / 60 > 9)
-            {
-                dangqianTime.text = [NSString stringWithFormat:@"%d:%d",testTime / 60,testTime % 60];
-                if (testTime % 60 < 10)
-                {
-                    dangqianTime.text = [NSString stringWithFormat:@"%d:0%d",testTime / 60,testTime % 60];
-                }
-            }else
-            {
-                if (testTime % 60 < 10)
-                {
-                    dangqianTime.text = [NSString stringWithFormat:@"0%d:0%d",testTime / 60,testTime % 60];
-                }else
-                {
-                    dangqianTime.text = [NSString stringWithFormat:@"0%d:%d",testTime / 60,testTime % 60];
-                }
-                
-            }
-        }
-        else{
-            if (testTime > 9)
-            {
-                dangqianTime.text = [NSString stringWithFormat:@"00:%d",testTime % 60];
-            }else
-            {
-                dangqianTime.text = [NSString stringWithFormat:@"00:0%d",testTime % 60];
-            }
-        }
+        dangqianTime.text = [self convertStringWithTime:testTime];
         CMTime duration = weakPlayer.currentItem.duration;
         CGFloat totalDuration = CMTimeGetSeconds(duration);
         [weakVC.prgBufferProgress setProgress:timeInterval / totalDuration animated:YES];
@@ -869,31 +818,42 @@ static bofangVC *_instance = nil;
 #pragma mark - 计算音频总时长方法
 - (void)reloadPlayAllTime
 {
-    if ([self.newsModel.post_time intValue] / 1000 / 60)
-    {
-        if ([self.newsModel.post_time intValue] / 1000 / 60 > 9)
-        {
-            self.yinpinzongTime.text = [NSString stringWithFormat:@"%d:%d",[self.newsModel.post_time intValue] / 1000 / 60,[self.newsModel.post_time intValue] / 1000 % 60];
-        }else
-        {
-            if ([self.newsModel.post_time intValue] / 1000 % 60 < 10)
-            {
-                self.yinpinzongTime.text = [NSString stringWithFormat:@"0%d:0%d",[self.newsModel.post_time intValue] / 1000 / 60,[self.newsModel.post_time intValue] / 1000 % 60];
-            }else
-            {
-                self.yinpinzongTime.text = [NSString stringWithFormat:@"0%d:%d",[self.newsModel.post_time intValue] / 1000 / 60,[self.newsModel.post_time intValue] / 1000 % 60];
-            }
-        }
-    }else
-    {
-        if ([self.newsModel.post_time intValue] / 1000 > 10)
-        {
-            self.yinpinzongTime.text = [NSString stringWithFormat:@"00:%d",[self.newsModel.post_time intValue] / 1000 % 60];
-        }else
-        {
-            self.yinpinzongTime.text = [NSString stringWithFormat:@"00:0%d",[self.newsModel.post_time intValue] / 1000 % 60];
-        }
-    }
+    self.yinpinzongTime.text = [self convertStringWithTime:[self.newsModel.post_time intValue] / 1000];
+//    if ([self.newsModel.post_time intValue] / 1000 / 60)
+//    {
+//        if ([self.newsModel.post_time intValue] / 1000 / 60 > 9)
+//        {
+//            self.yinpinzongTime.text = [NSString stringWithFormat:@"%d:%d",[self.newsModel.post_time intValue] / 1000 / 60,[self.newsModel.post_time intValue] / 1000 % 60];
+//        }else
+//        {
+//            if ([self.newsModel.post_time intValue] / 1000 % 60 < 10)
+//            {
+//                self.yinpinzongTime.text = [NSString stringWithFormat:@"0%d:0%d",[self.newsModel.post_time intValue] / 1000 / 60,[self.newsModel.post_time intValue] / 1000 % 60];
+//            }else
+//            {
+//                self.yinpinzongTime.text = [NSString stringWithFormat:@"0%d:%d",[self.newsModel.post_time intValue] / 1000 / 60,[self.newsModel.post_time intValue] / 1000 % 60];
+//            }
+//        }
+//    }else
+//    {
+//        if ([self.newsModel.post_time intValue] / 1000 > 10)
+//        {
+//            self.yinpinzongTime.text = [NSString stringWithFormat:@"00:%d",[self.newsModel.post_time intValue] / 1000 % 60];
+//        }else
+//        {
+//            self.yinpinzongTime.text = [NSString stringWithFormat:@"00:0%d",[self.newsModel.post_time intValue] / 1000 % 60];
+//        }
+//    }
+}
+#pragma mark - 私有方法转换时间为时分秒
+- (NSString *)convertStringWithTime:(float)time {
+    if (isnan(time)) time = 0.f;
+    int min = time / 60.0;
+    int sec = time - min * 60;
+    NSString * minStr = min > 9 ? [NSString stringWithFormat:@"%d",min] : [NSString stringWithFormat:@"0%d",min];
+    NSString * secStr = sec > 9 ? [NSString stringWithFormat:@"%d",sec] : [NSString stringWithFormat:@"0%d",sec];
+    NSString * timeStr = [NSString stringWithFormat:@"%@:%@",minStr, secStr];
+    return timeStr;
 }
 #pragma mark - 设置新闻模型数据
 - (void)playActionWithNextIndex:(NSUInteger)index
@@ -920,6 +880,7 @@ static bofangVC *_instance = nil;
 #pragma mark - 抽出共用方法
 - (void)sameMethod
 {
+    [Explayer replaceCurrentItemWithPlayerItem:nil];/**<清空之前设置的值，改善内存泄露问题*/
     [self reloadPlayAllTime];/**<刷新音频总时长*/
     dianzanshu = self.newsModel.praisenum;
     self.sliderProgress.maximumValue = [self.newsModel.post_time intValue] / 1000;
@@ -927,8 +888,8 @@ static bofangVC *_instance = nil;
     [self loadData];
     [self huoqupinglunliebiao];
     [self configNowPlayingInfoCenter];
-    [self.tableView scrollsToTop];
     [self.tableView reloadData];
+    [self.tableView setContentOffset:CGPointMake(0, 0) animated:NO];
     
     if ([ExwhichBoFangYeMianStr isEqualToString:@"Downloadbofang"]){
         [Explayer replaceCurrentItemWithPlayerItem:[[AVPlayerItem alloc]initWithURL:[NSURL fileURLWithPath:self.newsModel.post_mp]]];
@@ -1247,9 +1208,8 @@ static bofangVC *_instance = nil;
         }]];
         [qingshuruyonghuming addAction:[UIAlertAction actionWithTitle:@"登录" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
             [self doPlay:bofangCenterBtn];
-            LoginNavC *loginNavC = [LoginNavC new];
             LoginVC *loginFriVC = [LoginVC new];
-            loginNavC = [[LoginNavC alloc]initWithRootViewController:loginFriVC];
+            LoginNavC *loginNavC = [[LoginNavC alloc]initWithRootViewController:loginFriVC];
             [loginNavC.navigationBar setBackgroundColor:[UIColor whiteColor]];
             loginNavC.navigationBar.tintColor = [UIColor blackColor];
             [self presentViewController:loginNavC animated:YES completion:nil];
@@ -1320,9 +1280,8 @@ static bofangVC *_instance = nil;
         }]];
         [qingshuruyonghuming addAction:[UIAlertAction actionWithTitle:@"去登录" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
             [self doPlay:bofangCenterBtn];
-            LoginNavC *loginNavC = [LoginNavC new];
             LoginVC *loginFriVC = [LoginVC new];
-            loginNavC = [[LoginNavC alloc]initWithRootViewController:loginFriVC];
+            LoginNavC *loginNavC = [[LoginNavC alloc]initWithRootViewController:loginFriVC];
             [loginNavC.navigationBar setBackgroundColor:[UIColor whiteColor]];
             loginNavC.navigationBar.tintColor = [UIColor blackColor];
             [self presentViewController:loginNavC animated:YES completion:nil];
@@ -2009,9 +1968,8 @@ static bofangVC *_instance = nil;
     [qingshuruyonghuming addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
     }]];
     [qingshuruyonghuming addAction:[UIAlertAction actionWithTitle:@"登录" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-        LoginNavC *loginNavC = [LoginNavC new];
         LoginVC *loginFriVC = [LoginVC new];
-        loginNavC = [[LoginNavC alloc]initWithRootViewController:loginFriVC];
+        LoginNavC *loginNavC = [[LoginNavC alloc]initWithRootViewController:loginFriVC];
         [loginNavC.navigationBar setBackgroundColor:[UIColor whiteColor]];
         loginNavC.navigationBar.tintColor = [UIColor blackColor];
         [self presentViewController:loginNavC animated:YES completion:nil];
@@ -2027,9 +1985,8 @@ static bofangVC *_instance = nil;
         [_finalRewardButton startAnimation];
     }]];
     [alertC addAction:[UIAlertAction actionWithTitle:@"登录" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-        LoginNavC *loginNavC = [LoginNavC new];
         LoginVC *loginFriVC = [LoginVC new];
-        loginNavC = [[LoginNavC alloc]initWithRootViewController:loginFriVC];
+        LoginNavC *loginNavC = [[LoginNavC alloc]initWithRootViewController:loginFriVC];
         [loginNavC.navigationBar setBackgroundColor:[UIColor whiteColor]];
         loginNavC.navigationBar.tintColor = [UIColor blackColor];
         [self presentViewController:loginNavC animated:YES completion:nil];

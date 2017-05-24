@@ -345,8 +345,8 @@ typedef enum : NSUInteger {
 - (void)addAttentionJieMu {
     _xwStatue = XWButtonStatueJieMu;
 
-    NSString *idString = nil;
-    idString = _zhuBo.i_id;
+//    NSString *idString = nil;
+//    idString = _zhuBo.i_id;
     NSString *str = [DSE encryptUseDES:ExdangqianUser];
     [[NSNotificationCenter defaultCenter]postNotificationName:@"addCellJieMu" object:_zhuBo];
     if (!_zhuBo.isHaoYou) {

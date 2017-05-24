@@ -25,28 +25,12 @@
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "kuangjiaTingWen/kuangjiaTingWen/Mine/Setting/Feedback/Blog/UnreadDetailVC/UnreadDetailViewController.m"
-            timestampString = "517202219.748299"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "43"
-            endingLineNumber = "43"
-            landmarkName = "-viewDidLoad"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
             filePath = "kuangjiaTingWen/kuangjiaTingWen/HomePage/Controller/ClassViewController.m"
-            timestampString = "517209320.541093"
+            timestampString = "517305232.763994"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "722"
-            endingLineNumber = "722"
+            startingLineNumber = "721"
+            endingLineNumber = "721"
             landmarkName = "-playTestMp:"
             landmarkType = "7">
          </BreakpointContent>
@@ -57,13 +41,13 @@
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "kuangjiaTingWen/kuangjiaTingWen/HomePage/Controller/shouyeVC.m"
-            timestampString = "517219040.9383"
+            filePath = "kuangjiaTingWen/kuangjiaTingWen/Playing/Controller/bofangVC.m"
+            timestampString = "517313290.227798"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1742"
-            endingLineNumber = "1742"
-            landmarkName = "-tableView:didSelectRowAtIndexPath:"
+            startingLineNumber = "3079"
+            endingLineNumber = "3079"
+            landmarkName = "-dealloc"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -73,13 +57,13 @@
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "kuangjiaTingWen/kuangjiaTingWen/HomePage/Controller/shouyeVC.m"
-            timestampString = "517219053.835075"
+            filePath = "kuangjiaTingWen/kuangjiaTingWen/Playing/Controller/bofangVC.m"
+            timestampString = "517312906.770187"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1762"
-            endingLineNumber = "1762"
-            landmarkName = "-tableView:didSelectRowAtIndexPath:"
+            startingLineNumber = "604"
+            endingLineNumber = "604"
+            landmarkName = "-bofangqiSet"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -89,29 +73,13 @@
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "kuangjiaTingWen/kuangjiaTingWen/HomePage/Controller/shouyeVC.m"
-            timestampString = "517219129.774707"
+            filePath = "kuangjiaTingWen/kuangjiaTingWen/Playing/Controller/bofangVC.m"
+            timestampString = "517313258.650758"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1790"
-            endingLineNumber = "1790"
-            landmarkName = "-tableView:didSelectRowAtIndexPath:"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "kuangjiaTingWen/kuangjiaTingWen/HomePage/Controller/shouyeVC.m"
-            timestampString = "517219157.175808"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1799"
-            endingLineNumber = "1799"
-            landmarkName = "-tableView:didSelectRowAtIndexPath:"
+            startingLineNumber = "1130"
+            endingLineNumber = "1130"
+            landmarkName = "-jiazaichenggong:"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

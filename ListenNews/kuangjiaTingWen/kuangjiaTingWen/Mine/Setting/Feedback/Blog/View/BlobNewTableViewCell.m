@@ -245,17 +245,12 @@
     //设置头像
     UserModel *user = frameModel.model.user;
     //头像url处理
-    NSString *imgUrl = [NSString stringWithFormat:@"%@",[user.avatar stringByReplacingOccurrencesOfString:@"\\" withString:@""]];
-    NSString *imgUrl1 = [imgUrl stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-    NSString *imgUrl2 = [imgUrl1 stringByReplacingOccurrencesOfString:@"thumb:" withString:@""];
-    NSString *imgUrl3 = [imgUrl2 stringByReplacingOccurrencesOfString:@"{" withString:@""];
-    NSString *imgUrl4 = [imgUrl3 stringByReplacingOccurrencesOfString:@"}" withString:@""];
-    if ([imgUrl4  rangeOfString:@"http"].location != NSNotFound)
+    if ([user.avatar  rangeOfString:@"http"].location != NSNotFound)
     {
-        [_headerImage sd_setImageWithURL:[NSURL URLWithString:imgUrl4] placeholderImage:AvatarPlaceHolderImage];
+        [_headerImage sd_setImageWithURL:[NSURL URLWithString:user.avatar] placeholderImage:AvatarPlaceHolderImage];
     }else
     {
-        NSString *str = USERPHOTOHTTPSTRING(imgUrl4);
+        NSString *str = USERPHOTOHTTPSTRING(user.avatar);
         [_headerImage sd_setImageWithURL:[NSURL URLWithString:str] placeholderImage:AvatarPlaceHolderImage];
     }
     //设置用户昵称
