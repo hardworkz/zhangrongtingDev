@@ -64,14 +64,12 @@
 @end
 
 @implementation BlogViewController
-
 - (void)viewDidLoad{
     [super viewDidLoad];
     [self setupData];
     [self setupView];
 }
 - (void)setupData{
-//    [self.blogTableview registerNib:[UINib nibWithNibName:BlogTableViewCellID bundle:nil] forCellReuseIdentifier:BlogTableViewCellID];
     self.blogArray = [NSMutableArray new];
     self.isReplyComment = NO;
     self.replyComment_tuid = @"0";
@@ -141,7 +139,7 @@
     //添加观察者，用来监听播放器的缓冲进度loadedTimeRanges属性
 //    [Explayer addObserver:self forKeyPath:@"loadedTimeRange" options:NSKeyValueObservingOptionNew context:nil];
     //播放完毕后发出通知
-    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(voicePlayEnd:) name:AVPlayerItemDidPlayToEndTimeNotification object:self.voicePlayer.currentItem];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(voicePlayEnd:) name:AVPlayerItemDidPlayToEndTimeNotification object:nil];
     
 }
 
@@ -220,16 +218,14 @@
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
     [IQKeyboardManager sharedManager].enable = NO;
-//    IQKeyboardManager *manager = [IQKeyboardManager sharedManager];
-//    manager.enable = YES;
-//    manager.shouldResignOnTouchOutside = YES;
-//    manager.shouldToolbarUsesTextFieldTintColor = NO;
-//    manager.enableAutoToolbar = NO;
-    
 }
 
 - (void)viewWillDisappear:(BOOL)animated{
     [super viewWillDisappear:animated];
+    
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:AVPlayerItemDidPlayToEndTimeNotification object:nil];
+    [CommonCode writeToUserD:@"NO" andKey:TINGYOUQUANBOFANGWANBI];
+    
     [IQKeyboardManager sharedManager].enable = NO;
     [self dissmissKeyboard];
     [self.voiceImgV removeFromSuperview];
@@ -1004,7 +1000,7 @@
         }
     }
     else{
-        [NetWorkTool addAndCancelPraiseWithaccessToken:[DSE encryptUseDES:ExdangqianUser] comments_id:model.ID sccess:^(NSDictionary *responseObject) {
+        [NetWorkTool addAndCancelPraiseWithaccessToken:[DSE encryptUseDES:ExdangqianUser] userAccessToken:[DSE encryptUseDES:model.user.ID] comments_id:model.ID sccess:^(NSDictionary *responseObject) {
             [weakSelf loadData];
             cell.praiseButton.userInteractionEnabled = YES;
             if (iszan == 1) {
@@ -1534,16 +1530,17 @@
         ExisRigester = NO;
     }
     
+    [self.player stop];
     [self.voicePlayer pause];
     [CommonCode writeToUserD:@"YES" andKey:TINGYOUQUANBOFANGWANBI];
     _isPlaying = NO;
 }
 
 - (void)dealloc {
+    RTLog(@"dealloc--------");
     [self.voicePlayer removeObserver:self forKeyPath:@"statu"];
-//    [Explayer removeObserver:self forKeyPath:@"loadedTimeRange"];
-//    [Explayer removeObserver:self forKeyPath:@"status"];
-//    [Explayer removeObserver:self forKeyPath:@"loadedTimeRanges"];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:AVPlayerItemDidPlayToEndTimeNotification object:nil];
+    [CommonCode writeToUserD:@"NO" andKey:TINGYOUQUANBOFANGWANBI];
 }
 
 #pragma mark - UIButtonAction

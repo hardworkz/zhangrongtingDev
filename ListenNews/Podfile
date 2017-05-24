@@ -14,5 +14,7 @@ target 'kuangjiaTingWen' do
   pod 'MJExtension','~>3.0.13'
   pod 'UMengAnalytics','~>4.2.4'#标准SDK，含IDFA
   pod 'WechatOpenSDK','~>1.7.7'
+  pod 'Reachability','~>3.2'
+  
   use_frameworks!
 end

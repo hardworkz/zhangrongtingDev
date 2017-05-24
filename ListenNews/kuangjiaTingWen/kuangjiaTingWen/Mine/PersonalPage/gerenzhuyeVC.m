@@ -1176,25 +1176,13 @@ didSelectLinkWithTransitInformation:(NSDictionary *)components {
 
 #pragma mark - tableCellBlockMethods
 - (void)addFavInTableViewCell:(BlobNewTableViewCell *)cell andIszan:(int )iszan{
-//    NSIndexPath *indexPath = [self.zhuyetableView indexPathForCell:cell];
-//    NSMutableDictionary *blog = self.infoArr[indexPath.row];
-//    cell.praiseButton.userInteractionEnabled = NO;
-//    DefineWeakSelf;
-//    [NetWorkTool addAndCancelPraiseWithaccessToken:[DSE encryptUseDES:ExdangqianUser] comments_id:blog[@"id"] sccess:^(NSDictionary *responseObject) {
-//        [weakSelf refreshData];
-//        //            [weakSelf.blogTableview reloadData];
-//        cell.praiseButton.userInteractionEnabled = YES;
-//    } failure:^(NSError *error) {
-//        cell.praiseButton.userInteractionEnabled = YES;
-//        [SVProgressHUD showErrorWithStatus:@"网络请求失败"];
-//        [self performSelector:@selector(SVPDismiss) withObject:nil afterDelay:1.0];
-    //    }];
+    
     NSIndexPath *indexPath = [self.zhuyetableView indexPathForCell:cell];
     FeedBackAndListenFriendFrameModel *blog = self.infoArr[indexPath.row];
     FeedBackAndListenFriendModel *model = blog.model;
     cell.praiseButton.userInteractionEnabled = NO;
     DefineWeakSelf;
-    [NetWorkTool addAndCancelPraiseWithaccessToken:[DSE encryptUseDES:ExdangqianUser] comments_id:model.ID sccess:^(NSDictionary *responseObject) {
+    [NetWorkTool addAndCancelPraiseWithaccessToken:[DSE encryptUseDES:ExdangqianUser] userAccessToken:self.isMypersonalPage?[DSE encryptUseDES:ExdangqianUserUid]:[DSE encryptUseDES:model.user.ID] comments_id:model.ID sccess:^(NSDictionary *responseObject) {
         [weakSelf loadData];
         cell.praiseButton.userInteractionEnabled = YES;
         if (iszan == 1) {

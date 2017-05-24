@@ -39,6 +39,7 @@
 #import "TTTAttributedLabel.h"
 #import "MJRefresh.h"
 #import "Masonry.h"
+#import "SuNetworkMonitor.h"
 
 #import "PlayingHeader.h"
 #import "MineHeader.h"
@@ -97,6 +98,16 @@
 // 当前系统版本
 #define CurrentSystemVersion [CommonCode getCurrentSystemVersion]
 
+// 消息通知
+#define RegisterNotify(_name, _selector)                    \
+[[NSNotificationCenter defaultCenter] addObserver:self  \
+selector:_selector name:_name object:nil];
+
+#define RemoveNofify            \
+[[NSNotificationCenter defaultCenter] removeObserver:self];
+
+#define SendNotify(_name, _object)  \
+[[NSNotificationCenter defaultCenter] postNotificationName:_name object:_object];
 //------------------------本地文件地址-----------------------------
 /**
  *  获取NSBundle文件地址
@@ -247,6 +258,8 @@
 //上一次播放的新闻详情 
 #define THELASTNEWSDATA @"theLastNewsData"
 
+//网络状态发生改变通知
+#define NETWORKSTATUSCHANGE @"NetworkStatusChange"
 
 
 #endif /* pchfile_pch */

@@ -162,7 +162,7 @@
         dianzanNumlab.textColor = [UIColor grayColor];
         dianzanNumlab.alpha = 0.7f;
         sender.selected = NO;
-        [NetWorkTool addAndCancelPraiseWithaccessToken:[DSE encryptUseDES:ExdangqianUser] comments_id:_frameModel.model.playCommentID sccess:^(NSDictionary *responseObject) {
+        [NetWorkTool addAndCancelPraiseWithaccessToken:[DSE encryptUseDES:ExdangqianUser] userAccessToken:[DSE encryptUseDES:_frameModel.model.uid] comments_id:_frameModel.model.playCommentID sccess:^(NSDictionary *responseObject) {
             NSLog(@"responseObject = %@",responseObject);
             NSLog(@"针对评论取消点赞");
         } failure:^(NSError *error) {
@@ -175,7 +175,7 @@
         dianzanNumlab.textColor = ColorWithRGBA(0, 159, 240, 1);
         dianzanNumlab.alpha = 1.0f;
         sender.selected = YES;
-        [NetWorkTool addAndCancelPraiseWithaccessToken:[DSE encryptUseDES:ExdangqianUser] comments_id:_frameModel.model.playCommentID sccess:^(NSDictionary *responseObject) {
+        [NetWorkTool addAndCancelPraiseWithaccessToken:[DSE encryptUseDES:ExdangqianUser] userAccessToken:[DSE encryptUseDES:_frameModel.model.uid] comments_id:_frameModel.model.playCommentID sccess:^(NSDictionary *responseObject) {
             NSLog(@"responseObject = %@",responseObject);
             NSLog(@"针对评论点赞");
         } failure:^(NSError *error) {

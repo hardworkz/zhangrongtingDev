@@ -33,6 +33,18 @@
 @end
 
 @implementation AppDelegate
++ (AppDelegate *)delegate {
+    return (AppDelegate *)[UIApplication sharedApplication].delegate;
+}
+#pragma mark - network
+- (void)setNetworkStatus:(NetworkStatus)networkStatus {
+    if (_networkStatus != networkStatus) {
+        _networkStatus = networkStatus;
+        SendNotify(NETWORKSTATUSCHANGE, nil)
+    }else {
+        _networkStatus = networkStatus;
+    }
+}
 
 //-(BOOL)application:(UIApplication *)application willFinishLaunchingWithOptions:(NSDictionary *)launchOptions{
 //    
@@ -49,6 +61,8 @@
     
     [self.window makeKeyAndVisible];
     
+    //监听网络变化
+    [[SuNetworkMonitor monitor] startMonitorNetwork];
     
     //友盟统计
     NSString *version = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];

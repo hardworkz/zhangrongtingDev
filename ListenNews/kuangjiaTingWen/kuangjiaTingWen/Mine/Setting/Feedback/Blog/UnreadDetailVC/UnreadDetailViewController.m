@@ -180,7 +180,7 @@
             //听友圈
             [NetWorkTool newPromptGetOneWithaccessToken:AvatarAccessToken parentid:self.parentid path:self.path sccess:^(NSDictionary *responseObject) {
                 
-                NSLog(@"%@",responseObject[@"results"]);
+                RTLog(@"%@",responseObject[@"results"]);
                 
                 if ([[responseObject[@"results"][@"user"] allKeys] containsObject:@"user_login"]) {
                     [weakSelf.infoArr addObject:responseObject[@"results"]];
@@ -202,7 +202,7 @@
             //意见反馈
             [NetWorkTool feedbackGetOneWithaccessToken:AvatarAccessToken feedback_id:self.feedback_id sccess:^(NSDictionary *responseObject) {
                 //
-                NSLog(@"%@",responseObject[@"results"]);
+                RTLog(@"%@",responseObject[@"results"]);
                 if ([responseObject[@"status"] integerValue] == 1) {
                    [weakSelf.infoArr addObject:responseObject[@"results"]];
                     [weakSelf.unreadTableview reloadData];
@@ -236,7 +236,7 @@
     DefineWeakSelf;
     switch (self.pageSource) {
         case 1:{
-            [NetWorkTool addAndCancelPraiseWithaccessToken:[DSE encryptUseDES:ExdangqianUser] comments_id:blog[@"id"] sccess:^(NSDictionary *responseObject) {
+            [NetWorkTool addAndCancelPraiseWithaccessToken:[DSE encryptUseDES:ExdangqianUser] userAccessToken:[DSE encryptUseDES:blog[@"uid"]] comments_id:blog[@"id"] sccess:^(NSDictionary *responseObject) {
                 [weakSelf loadData];
                 //            [weakSelf.blogTableview reloadData];
                 cell.praiseButton.userInteractionEnabled = YES;

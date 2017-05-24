@@ -164,6 +164,7 @@
 		6995820D1EC563240037E9A4 /* child_commentModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 6995820C1EC563240037E9A4 /* child_commentModel.m */; };
 		699582101EC569A50037E9A4 /* UserDetailModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 6995820F1EC569A50037E9A4 /* UserDetailModel.m */; };
 		699582131EC5B40E0037E9A4 /* UIView+Extension.m in Sources */ = {isa = PBXBuildFile; fileRef = 699582121EC5B40E0037E9A4 /* UIView+Extension.m */; };
+		69A7BABA1ED4177C0094E0BA /* SuNetworkMonitor.m in Sources */ = {isa = PBXBuildFile; fileRef = 69A7BAB91ED4177C0094E0BA /* SuNetworkMonitor.m */; };
 		69C713341EC0740F00F2729E /* CommonCode.m in Sources */ = {isa = PBXBuildFile; fileRef = 69C711E51EC0740E00F2729E /* CommonCode.m */; };
 		69C713351EC0740F00F2729E /* CommonEnums.m in Sources */ = {isa = PBXBuildFile; fileRef = 69C711E71EC0740E00F2729E /* CommonEnums.m */; };
 		69C713361EC0740F00F2729E /* ProjiectDownLoadManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 69C711EA1EC0740E00F2729E /* ProjiectDownLoadManager.m */; };
@@ -765,6 +766,8 @@
 		6995820F1EC569A50037E9A4 /* UserDetailModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UserDetailModel.m; sourceTree = "<group>"; };
 		699582111EC5B40E0037E9A4 /* UIView+Extension.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIView+Extension.h"; sourceTree = "<group>"; };
 		699582121EC5B40E0037E9A4 /* UIView+Extension.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIView+Extension.m"; sourceTree = "<group>"; };
+		69A7BAB81ED4177C0094E0BA /* SuNetworkMonitor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SuNetworkMonitor.h; sourceTree = "<group>"; };
+		69A7BAB91ED4177C0094E0BA /* SuNetworkMonitor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SuNetworkMonitor.m; sourceTree = "<group>"; };
 		69C711E41EC0740E00F2729E /* CommonCode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CommonCode.h; sourceTree = "<group>"; };
 		69C711E51EC0740E00F2729E /* CommonCode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CommonCode.m; sourceTree = "<group>"; };
 		69C711E61EC0740E00F2729E /* CommonEnums.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CommonEnums.h; sourceTree = "<group>"; };
@@ -1780,6 +1783,15 @@
 			path = Model;
 			sourceTree = "<group>";
 		};
+		69A7BAB71ED4177C0094E0BA /* NetworkTool */ = {
+			isa = PBXGroup;
+			children = (
+				69A7BAB81ED4177C0094E0BA /* SuNetworkMonitor.h */,
+				69A7BAB91ED4177C0094E0BA /* SuNetworkMonitor.m */,
+			);
+			path = NetworkTool;
+			sourceTree = "<group>";
+		};
 		69C711E21EC0740E00F2729E /* kuangjiaTingWen */ = {
 			isa = PBXGroup;
 			children = (
@@ -2341,6 +2353,7 @@
 		69C712CF1EC0740F00F2729E /* Playing */ = {
 			isa = PBXGroup;
 			children = (
+				69A7BAB71ED4177C0094E0BA /* NetworkTool */,
 				69C712D01EC0740F00F2729E /* AchorVC */,
 				69C712DC1EC0740F00F2729E /* Comment */,
 				69C712DF1EC0740F00F2729E /* Controller */,
@@ -3215,7 +3228,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -3476,6 +3489,7 @@
 				69C713531EC0740F00F2729E /* HelpAndFeedbackViewController.m in Sources */,
 				69C713BF1EC0740F00F2729E /* UIViewController+AutoBack.m in Sources */,
 				69C713921EC0740F00F2729E /* Post_actor.m in Sources */,
+				69A7BABA1ED4177C0094E0BA /* SuNetworkMonitor.m in Sources */,
 				E91D53A81D93719A008B8564 /* MJRefreshAutoGifFooter.m in Sources */,
 				69C7138C1EC0740F00F2729E /* FontViewController.m in Sources */,
 				69C7135F1EC0740F00F2729E /* tianjiaGuanZhuVC.m in Sources */,

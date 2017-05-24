@@ -28,6 +28,7 @@ PODS:
     - DACircularProgress (~> 2.3)
     - MBProgressHUD (~> 0.9)
     - SDWebImage (!= 3.7.2, ~> 3.7)
+  - Reachability (3.2)
   - SAMTextView (0.2.2)
   - SDWebImage (3.8.2):
     - SDWebImage/Core (= 3.8.2)
@@ -44,7 +45,8 @@ DEPENDENCIES:
   - AFNetworking (~> 2.6)
   - iAppInfos (~> 0.1.0)
   - MJExtension (~> 3.0.13)
-  - MWPhotoBrowser
+  - MWPhotoBrowser (~> 2.1.2)
+  - Reachability
   - SAMTextView (~> 0.2.2)
   - TTTAttributedLabel
   - UIKitCategoryAdditions (~> 0.0.1)
@@ -52,7 +54,7 @@ DEPENDENCIES:
   - UIView+FDCollapsibleConstraints (~> 1.1)
   - UIView+Positioning (~> 1.1)
   - UMengAnalytics (~> 4.2.4)
-  - WechatOpenSDK
+  - WechatOpenSDK (~> 1.7.7)
 
 SPEC CHECKSUMS:
   AFNetworking: cb8d14a848e831097108418f5d49217339d4eb60
@@ -61,6 +63,7 @@ SPEC CHECKSUMS:
   MBProgressHUD: 1569cf7ace17a8bac47aabfbb8580a49690386d1
   MJExtension: 5932755f451458eefa24239358817f8d291240c7
   MWPhotoBrowser: 5836d7aa041dc05a13de380c246826578adc5ea5
+  Reachability: 33e18b67625424e47b6cde6d202dce689ad7af96
   SAMTextView: 979c43bb1fa5859ddfbfeb35e9c296a2b0ec55fd
   SDWebImage: 098e97e6176540799c27e804c96653ee0833d13c
   TTTAttributedLabel: 0a2ac7b2dd726d32a070dafb01446026b11e624f
@@ -71,6 +74,6 @@ SPEC CHECKSUMS:
   UMengAnalytics: ef8d45f94c0e5771dc364cf6a5731d9d3b101da2
   WechatOpenSDK: cbd332148eb792d444ed4eec94f421d98f2046ee
 
-PODFILE CHECKSUM: 3370413737d7253d137d37dec4131330204b821c
+PODFILE CHECKSUM: 5d9d3b65260017fbc434334befb9a9e3963118ea
 
-COCOAPODS: 1.2.1
+COCOAPODS: 1.0.1

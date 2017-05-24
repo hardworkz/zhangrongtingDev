@@ -1597,12 +1597,14 @@ NSMutableDictionary *dic = [[NSMutableDictionary alloc]initWithCapacity:1
 }
 
 + (void)addAndCancelPraiseWithaccessToken:(NSString *)accessToken
+                              userAccessToken:(NSString *)userAccessToken
                               comments_id:(NSString *)comments_id
                                    sccess:(void (^)(NSDictionary *responseObject))success
                                   failure:(void (^)(NSError *error))failure{
     
     NSMutableDictionary *dic = [[NSMutableDictionary alloc]initWithCapacity:1];
     dic[@"accessToken"] = accessToken;
+    dic[@"commenterAccessToken"] = userAccessToken;
     dic[@"comments_id"] = comments_id;
     [self asyncNetworkingUrl:@"/interface/addAndCancelPraise" andDict:dic success:success failure:failure];
     
@@ -2039,5 +2041,14 @@ NSMutableDictionary *dic = [[NSMutableDictionary alloc]initWithCapacity:1
     dic[@"act_id"] = act_id;
     [self asyncNetworkingUrl:@"/interfaceNew/get_order" andDict:dic success:success failure:failure];
 }
-
+//删除自己的评论
++ (void)postDeleteSelfCommentWithaccessToken:(NSString *)accessToken
+                                 commnet_id:(NSString *)comment_id
+                                  sccess:(void (^)(NSDictionary *responseObject))success
+                                 failure:(void(^)(NSError *error))failure{
+    NSMutableDictionary *dic = [[NSMutableDictionary alloc]initWithCapacity:1];
+    dic[@"accessToken"] = accessToken;
+    dic[@"id"] = comment_id;
+    [self asyncNetworkingUrl:@"/interfaceYou/delSelfComment" andDict:dic success:success failure:failure];
+}
 @end

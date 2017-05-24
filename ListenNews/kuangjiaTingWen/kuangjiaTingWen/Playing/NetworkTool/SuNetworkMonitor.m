@@ -7,7 +7,8 @@
 //
 
 #import "SuNetworkMonitor.h"
-#import <Reachability.h>
+#import "Reachability.h"
+#import "AppDelegate.h"
 
 @interface SuNetworkMonitor () {
     
@@ -47,13 +48,13 @@
     NetworkStatus status = _reachability.currentReachabilityStatus;
     switch (status) {
         case NotReachable:
-            BASE_INFO_FUN(@"无连接");
+//            BASE_INFO_FUN(@"无连接");
             break;
         case ReachableViaWiFi:
-            BASE_INFO_FUN(@"WiFi连接");
+//            BASE_INFO_FUN(@"WiFi连接");
             break;
         case ReachableViaWWAN:
-            BASE_INFO_FUN(@"数据网络");
+//            BASE_INFO_FUN(@"数据网络");
             break;
         default:
             break;
@@ -71,8 +72,5 @@
     
     return _reachability.currentReachabilityStatus != NotReachable;
 }
-
-
-
 
 @end

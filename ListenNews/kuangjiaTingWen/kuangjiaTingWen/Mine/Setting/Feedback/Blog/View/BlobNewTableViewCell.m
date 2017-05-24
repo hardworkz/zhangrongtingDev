@@ -523,10 +523,21 @@
     return bgView;
 }
 - (void)delete{//删除本地数据，并请求接口删除对应评论ID
-    if (self.deleteComment) {
-        self.deleteComment(self, _indexRow ,_commentIndexRow);
-    }
     [_alertView coverClick];
+    child_commentModel *model = self.frameModel.model.child_comment[_commentIndexRow];
+    [NetWorkTool postDeleteSelfCommentWithaccessToken:AvatarAccessToken commnet_id:model.ID sccess:^(NSDictionary *responseObject) {
+        if ([responseObject[@"status"] intValue] == 1) {
+            if (self.deleteComment) {
+                self.deleteComment(self, _indexRow ,_commentIndexRow);
+            }
+        }else{
+            XWAlerLoginView *xw = [[XWAlerLoginView alloc]initWithTitle:@"删除失败，请重新再试"];
+            [xw show];
+        }
+    } failure:^(NSError *error) {
+        XWAlerLoginView *xw = [[XWAlerLoginView alloc]initWithTitle:@"网络错误"];
+        [xw show];
+    }];
 }
 - (void)cancel{
     [_alertView coverClick];
