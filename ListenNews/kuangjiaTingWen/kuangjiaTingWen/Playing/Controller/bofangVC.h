@@ -23,6 +23,7 @@
 @property(nonatomic)NSInteger zidongjiazaiTableTag;
 
 @property(nonatomic)BOOL iszhuboxiangqing;
+@property(nonatomic)BOOL isMyCollectionVC;/**<从我的收藏进入*/
 @property(nonatomic)BOOL isPlay;
 @property (assign, nonatomic) BOOL isPushNews;
 @property (assign, nonatomic) BOOL isFirst;

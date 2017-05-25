@@ -282,6 +282,7 @@ static bofangVC *_instance = nil;
 
 -(void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
+    self.isMyCollectionVC = NO;
     RTLog(@"viewWillDisappear");
     [IQKeyboardManager sharedManager].enable = NO;
     [self.navigationController setNavigationBarHidden:NO animated:YES];
@@ -929,7 +930,7 @@ static bofangVC *_instance = nil;
     [self doPlay:bofangCenterBtn];
     [self performSelector:@selector(doplay2) withObject:nil afterDelay:0.5f];
     
-    [CommonCode writeToUserD:arr[ExcurrentNumber][@"id"] andKey:@"dangqianbofangxinwenID"];
+//    [CommonCode writeToUserD:arr[ExcurrentNumber][@"id"] andKey:@"dangqianbofangxinwenID"];
     if ([[CommonCode readFromUserD:@"yitingguoxinwenID"] isKindOfClass:[NSArray class]])
     {
         NSMutableArray *yitingguoArr = [NSMutableArray arrayWithArray:[CommonCode readFromUserD:@"yitingguoxinwenID"]];
@@ -951,6 +952,8 @@ static bofangVC *_instance = nil;
         if (ExcurrentNumber == 0){
             RTLog(@"后面没有新闻了");
             [[NSNotificationCenter defaultCenter] postNotificationName:@"gaibianyanse" object:nil];
+            XWAlerLoginView *xw = [[XWAlerLoginView alloc]initWithTitle:@"已经是第一条了"];
+            [xw show];
         }
         else{
             if (ExisRigester == YES){
@@ -961,12 +964,22 @@ static bofangVC *_instance = nil;
             
             
             arr = [NSMutableArray arrayWithArray:[CommonCode readFromUserD:@"zhuyeliebiao"]];
-            if ((ExcurrentNumber - 1) > [arr count] ) {
-                self.newsModel.jiemuID = [arr firstObject][@"id"];
-                ExcurrentNumber = 1;
-            }
-            else{
-                self.newsModel.jiemuID = arr[ExcurrentNumber - 1][@"id"];
+            if (self.isMyCollectionVC) {
+                if ((ExcurrentNumber - 1) > [arr count] ) {
+                    self.newsModel.jiemuID = [arr firstObject][@"post_id"];
+                    ExcurrentNumber = 1;
+                }
+                else{
+                    self.newsModel.jiemuID = arr[ExcurrentNumber - 1][@"post_id"];
+                }
+            }else{
+                if ((ExcurrentNumber - 1) > [arr count] ) {
+                    self.newsModel.jiemuID = [arr firstObject][@"id"];
+                    ExcurrentNumber = 1;
+                }
+                else{
+                    self.newsModel.jiemuID = arr[ExcurrentNumber - 1][@"id"];
+                }
             }
             
             [CommonCode writeToUserD:self.newsModel.jiemuID andKey:@"dangqianbofangxinwenID"];
@@ -1048,6 +1061,14 @@ static bofangVC *_instance = nil;
             }
             else if([ExwhichBoFangYeMianStr isEqualToString:@"zhuboxiangqingbofang"]){
                 [[NSNotificationCenter defaultCenter] postNotificationName:@"zhuboxiangqingbofang" object:nil];
+            }else
+                if([ExwhichBoFangYeMianStr isEqualToString:@"我的收藏"]){//播放到最后一条，停止播放
+                    XWAlerLoginView *xw = [[XWAlerLoginView alloc]initWithTitle:@"已经是最后一条了"];
+                    [xw show];
+                    [self doPlay:bofangCenterBtn];
+                    //改变播放新闻列表文字颜色通知
+//                    [[NSNotificationCenter defaultCenter] postNotificationName:@"gaibianyanse" object:nil];
+                    return;
             }
             //改变播放新闻列表文字颜色通知
             [[NSNotificationCenter defaultCenter] postNotificationName:@"gaibianyanse" object:nil];
@@ -1056,14 +1077,25 @@ static bofangVC *_instance = nil;
             
         }
         else{
-            if ((ExcurrentNumber + 1) <= [arr count] - 1) {
-                self.newsModel.jiemuID = arr[ExcurrentNumber + 1][@"id"];
-            }
-            else{
-                self.newsModel.jiemuID = [arr firstObject][@"id"];
-                ExcurrentNumber = -1;
+            if (self.isMyCollectionVC) {
+                if ((ExcurrentNumber + 1) <= [arr count] - 1) {
+                    self.newsModel.jiemuID = arr[ExcurrentNumber + 1][@"post_id"];
+                }
+                else{
+                    self.newsModel.jiemuID = [arr firstObject][@"post_id"];
+                    ExcurrentNumber = -1;
+                }
+            }else{
+                if ((ExcurrentNumber + 1) <= [arr count] - 1) {
+                    self.newsModel.jiemuID = arr[ExcurrentNumber + 1][@"id"];
+                }
+                else{
+                    self.newsModel.jiemuID = [arr firstObject][@"id"];
+                    ExcurrentNumber = -1;
+                }
             }
             [CommonCode writeToUserD:self.newsModel.jiemuID andKey:@"dangqianbofangxinwenID"];
+            RTLog(@"saveID:%@",self.newsModel.jiemuID);
             [NetWorkTool getPaoGuoJieMuPingLunLieBiaoWithJieMuID:[CommonCode readFromUserD:@"dangqianbofangxinwenID"] anduid:ExdangqianUserUid andPage:@"1" andLimit:@"10" sccess:^(NSDictionary *responseObject) {
                 if ([responseObject[@"results"] isKindOfClass:[NSArray class]])
                 {
@@ -1115,7 +1147,14 @@ static bofangVC *_instance = nil;
                     ExisRigester = NO;
                 }
             }
-            else{
+            else if ([ExwhichBoFangYeMianStr isEqualToString:@"我的收藏"]){
+                XWAlerLoginView *xw = [[XWAlerLoginView alloc]initWithTitle:@"已经是最后一条了"];
+                [xw show];
+                [self doPlay:bofangCenterBtn];
+                //改变播放新闻列表文字颜色通知
+//                [[NSNotificationCenter defaultCenter] postNotificationName:@"gaibianyanse" object:nil];
+                return;
+            }else{
                 //如果数组中的播放成员播放完毕，就要加载
                 [[NSNotificationCenter defaultCenter] postNotificationName:@"bofangRightyaojiazaishujv" object:nil];
                 [[NSNotificationCenter defaultCenter] postNotificationName:@"gaibianyanse" object:nil];
@@ -1123,12 +1162,22 @@ static bofangVC *_instance = nil;
            
         }
         else{
-            if ((ExcurrentNumber + 1) <= [arr count] - 1) {
-                self.newsModel.jiemuID = arr[ExcurrentNumber + 1][@"id"];
-            }
-            else{
-                self.newsModel.jiemuID = [arr firstObject][@"id"];
-                ExcurrentNumber = -1;
+            if (self.isMyCollectionVC) {
+                if ((ExcurrentNumber + 1) <= [arr count] - 1) {
+                    self.newsModel.jiemuID = arr[ExcurrentNumber + 1][@"post_id"];
+                }
+                else{
+                    self.newsModel.jiemuID = [arr firstObject][@"post_id"];
+                    ExcurrentNumber = -1;
+                }
+            }else{
+                if ((ExcurrentNumber + 1) <= [arr count] - 1) {
+                    self.newsModel.jiemuID = arr[ExcurrentNumber + 1][@"id"];
+                }
+                else{
+                    self.newsModel.jiemuID = [arr firstObject][@"id"];
+                    ExcurrentNumber = -1;
+                }
             }
             [CommonCode writeToUserD:self.newsModel.jiemuID andKey:@"dangqianbofangxinwenID"];
             [CommonCode writeToUserD:arr[ExcurrentNumber + 1] andKey:@"dangqianbofangxinwen"];
@@ -2263,20 +2312,23 @@ static bofangVC *_instance = nil;
     [self.tableView reloadData];
 }
 
-#pragma mark - 后台控制
+#pragma mark - 后台系统中断音频控制
 - (void)handleInterruption:(NSNotification *)notification{
     NSDictionary *info = notification.userInfo;
     AVAudioSessionInterruptionType type = [info[AVAudioSessionInterruptionTypeKey] unsignedIntegerValue];
     if (type == AVAudioSessionInterruptionTypeBegan) {
         //Handle InterruptionBegan
+        //系统暂停音频，则设置播放器
+        [self doPlay:bofangCenterBtn];
         RTLog(@"interruptionTypeBegan");
     }else{
-        AVAudioSessionInterruptionOptions options = [info[AVAudioSessionInterruptionOptionKey] unsignedIntegerValue];
-        if (options == AVAudioSessionInterruptionOptionShouldResume) {
+        [self doPlay:bofangCenterBtn];
+//        AVAudioSessionInterruptionOptions options = [info[AVAudioSessionInterruptionOptionKey] unsignedIntegerValue];
+//        if (options == AVAudioSessionInterruptionOptionShouldResume) {
             //Handle Resume
-            [Explayer play];
-            [bofangCenterBtn setImage:[UIImage imageNamed:@"home_news_ic_pause"] forState:UIControlStateNormal];
-        }
+//            [Explayer play];
+//            [bofangCenterBtn setImage:[UIImage imageNamed:@"home_news_ic_pause"] forState:UIControlStateNormal];
+//        }
     }
 }
 
@@ -2343,6 +2395,7 @@ static bofangVC *_instance = nil;
         AVAudioSessionRouteDescription *routeDescription=dic[AVAudioSessionRouteChangePreviousRouteKey];
         AVAudioSessionPortDescription *portDescription= [routeDescription.outputs firstObject];
         //原设备为耳机则暂停
+        RTLog(@"%@",portDescription.portType);
         if ([portDescription.portType isEqualToString:@"Headphones"]) {
             [self doPlay:bofangCenterBtn];
         }
