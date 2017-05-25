@@ -459,31 +459,7 @@
             [bofangVC shareInstance].iszhuboxiangqing = NO;
             [bofangVC shareInstance].newsModel.post_keywords = model.post.post_keywords;
             [bofangVC shareInstance].newsModel.url = model.post.url;
-            if ([model.post.post_time intValue] / 1000 / 60)
-            {
-                if ([model.post.post_time intValue] / 1000 / 60 > 9)
-                {
-                    [bofangVC shareInstance].yinpinzongTime.text = [NSString stringWithFormat:@"%d:%d",[model.post.post_time intValue] / 1000 / 60,[model.post.post_time intValue] / 1000 % 60];
-                }
-                else{
-                    if ([model.post.post_time intValue] / 1000 % 60 < 10)
-                    {
-                        [bofangVC shareInstance].yinpinzongTime.text = [NSString stringWithFormat:@"0%d:0%d",[model.post.post_time intValue] / 1000 / 60,[model.post.post_time intValue] / 1000 % 60];
-                    }else
-                    {
-                        [bofangVC shareInstance].yinpinzongTime.text = [NSString stringWithFormat:@"0%d:%d",[model.post.post_time intValue] / 1000 / 60,[model.post.post_time intValue] / 1000 % 60];
-                    }
-                }
-            }else
-            {
-                if ([model.post.post_time intValue] / 1000 > 10)
-                {
-                    [bofangVC shareInstance].yinpinzongTime.text = [NSString stringWithFormat:@"00:%d",[model.post.post_time intValue] / 1000 % 60];
-                }else
-                {
-                    [bofangVC shareInstance].yinpinzongTime.text = [NSString stringWithFormat:@"00:0%d",[model.post.post_time intValue] / 1000 % 60];
-                }
-            }
+            [bofangVC shareInstance].yinpinzongTime.text = [[bofangVC shareInstance] convertStringWithTime:[model.post.post_time intValue] / 1000];
             ExcurrentNumber = (int)indexPath.row;
             [bofangVC shareInstance].newsModel.ImgStrjiemu = model.post.smeta;
             [bofangVC shareInstance].newsModel.ZhengWenjiemu = model.post.post_excerpt;

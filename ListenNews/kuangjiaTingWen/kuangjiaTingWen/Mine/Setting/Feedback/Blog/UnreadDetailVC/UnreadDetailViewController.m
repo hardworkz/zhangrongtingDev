@@ -901,31 +901,7 @@ didSelectLinkWithTransitInformation:(NSDictionary *)components {
             [bofangVC shareInstance].iszhuboxiangqing = NO;
             [bofangVC shareInstance].newsModel.post_keywords = self.infoArr[indexPath.row][@"post"][@"post_keywords"];
             [bofangVC shareInstance].newsModel.url = self.infoArr[indexPath.row][@"post"][@"url"];
-            if ([self.infoArr[indexPath.row][@"post"][@"post_time"] intValue] / 1000 / 60)
-            {
-                if ([self.infoArr[indexPath.row][@"post"][@"post_time"] intValue] / 1000 / 60 > 9)
-                {
-                    [bofangVC shareInstance].yinpinzongTime.text = [NSString stringWithFormat:@"%d:%d",[self.infoArr[indexPath.row][@"post"][@"post_time"] intValue] / 1000 / 60,[self.infoArr[indexPath.row][@"post"][@"post_time"] intValue] / 1000 % 60];
-                }
-                else{
-                    if ([self.infoArr[indexPath.row][@"post"][@"post_time"] intValue] / 1000 % 60 < 10)
-                    {
-                        [bofangVC shareInstance].yinpinzongTime.text = [NSString stringWithFormat:@"0%d:0%d",[self.infoArr[indexPath.row][@"post"][@"post_time"] intValue] / 1000 / 60,[self.infoArr[indexPath.row][@"post"][@"post_time"] intValue] / 1000 % 60];
-                    }else
-                    {
-                        [bofangVC shareInstance].yinpinzongTime.text = [NSString stringWithFormat:@"0%d:%d",[self.infoArr[indexPath.row][@"post"][@"post_time"] intValue] / 1000 / 60,[self.infoArr[indexPath.row][@"post"][@"post_time"] intValue] / 1000 % 60];
-                    }
-                }
-            }else
-            {
-                if ([self.infoArr[indexPath.row][@"post"][@"post_time"] intValue] / 1000 > 10)
-                {
-                    [bofangVC shareInstance].yinpinzongTime.text = [NSString stringWithFormat:@"00:%d",[self.infoArr[indexPath.row][@"post"][@"post_time"] intValue] / 1000 % 60];
-                }else
-                {
-                    [bofangVC shareInstance].yinpinzongTime.text = [NSString stringWithFormat:@"00:0%d",[self.infoArr[indexPath.row][@"post"][@"post_time"] intValue] / 1000 % 60];
-                }
-            }
+            [bofangVC shareInstance].yinpinzongTime.text = [[bofangVC shareInstance] convertStringWithTime:[self.infoArr[indexPath.row][@"post"][@"post_time"] intValue] / 1000];
             ExcurrentNumber = (int)indexPath.row;
             [bofangVC shareInstance].newsModel.ImgStrjiemu = self.infoArr[indexPath.row][@"post"][@"smeta"];
             [bofangVC shareInstance].newsModel.ZhengWenjiemu = self.infoArr[indexPath.row][@"post"][@"post_excerpt"];

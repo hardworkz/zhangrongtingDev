@@ -1827,31 +1827,7 @@
             [bofangVC shareInstance].newsModel.post_time = xinwenArr[indexPath.row][@"post_time"];
             [bofangVC shareInstance].newsModel.post_keywords = xinwenArr[indexPath.row][@"post_keywords"];
             [bofangVC shareInstance].newsModel.url = xinwenArr[indexPath.row][@"url"];
-            if ([xinwenArr[indexPath.row][@"post_time"] intValue] / 1000 / 60)
-            {
-                if ([xinwenArr[indexPath.row][@"post_time"] intValue] / 1000 / 60 > 9)
-                {
-                    [bofangVC shareInstance].yinpinzongTime.text = [NSString stringWithFormat:@"%d:%d",[xinwenArr[indexPath.row][@"post_time"] intValue] / 1000 / 60,[xinwenArr[indexPath.row][@"post_time"] intValue] / 1000 % 60];
-                }else
-                {
-                    if ([xinwenArr[indexPath.row][@"post_time"] intValue] / 1000 % 60 < 10)
-                    {
-                        [bofangVC shareInstance].yinpinzongTime.text = [NSString stringWithFormat:@"0%d:0%d",[xinwenArr[indexPath.row][@"post_time"] intValue] / 1000 / 60,[xinwenArr[indexPath.row][@"post_time"] intValue] / 1000 % 60];
-                    }else
-                    {
-                        [bofangVC shareInstance].yinpinzongTime.text = [NSString stringWithFormat:@"0%d:%d",[xinwenArr[indexPath.row][@"post_time"] intValue] / 1000 / 60,[xinwenArr[indexPath.row][@"post_time"] intValue] / 1000 % 60];
-                    }
-                }
-            }else
-            {
-                if ([xinwenArr[indexPath.row][@"post_time"] intValue] / 1000 > 10)
-                {
-                    [bofangVC shareInstance].yinpinzongTime.text = [NSString stringWithFormat:@"00:%d",[xinwenArr[indexPath.row][@"post_time"] intValue] / 1000 % 60];
-                }else
-                {
-                    [bofangVC shareInstance].yinpinzongTime.text = [NSString stringWithFormat:@"00:0%d",[xinwenArr[indexPath.row][@"post_time"] intValue] / 1000 % 60];
-                }
-            }
+            [bofangVC shareInstance].yinpinzongTime.text = [[bofangVC shareInstance] convertStringWithTime:[xinwenArr[indexPath.row][@"post_time"] intValue] / 1000];
             ExcurrentNumber = (int)indexPath.row;
             [bofangVC shareInstance].newsModel.ImgStrjiemu = xinwenArr[indexPath.row][@"smeta"];
             [bofangVC shareInstance].newsModel.ZhengWenjiemu = xinwenArr[indexPath.row][@"post_excerpt"];

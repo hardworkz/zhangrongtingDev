@@ -212,28 +212,8 @@ static NSInteger selectIndex2 = -1;
             [bofangVC shareInstance].newsModel.post_keywords = obj.post_keywords;
             [bofangVC shareInstance].newsModel.url = obj.url;
             [bofangVC shareInstance].iszhuboxiangqing = NO;
-            if ([obj.post_time intValue] / 1000 / 60){
-                if ([obj.post_time intValue] / 1000 / 60 > 9){
-                    [bofangVC shareInstance].yinpinzongTime.text = [NSString stringWithFormat:@"%d:%d",[obj.post_time intValue] / 1000 / 60,[obj.post_time intValue] / 1000 % 60];
-                }
-                else{
-                    if ([obj.post_time intValue] / 1000 % 60 < 10)
-                    {
-                        [bofangVC shareInstance].yinpinzongTime.text = [NSString stringWithFormat:@"0%d:0%d",[obj.post_time intValue] / 1000 / 60,[obj.post_time intValue] / 1000 % 60];
-                    }
-                    else{
-                        [bofangVC shareInstance].yinpinzongTime.text = [NSString stringWithFormat:@"0%d:%d",[obj.post_time intValue] / 1000 / 60,[obj.post_time intValue] / 1000 % 60];
-                    }
-                }
-            }
-            else{
-                if ([obj.post_time intValue] / 1000 > 10){
-                    [bofangVC shareInstance].yinpinzongTime.text = [NSString stringWithFormat:@"00:%d",[obj.post_time intValue] / 1000 % 60];
-                }
-                else{
-                    [bofangVC shareInstance].yinpinzongTime.text = [NSString stringWithFormat:@"00:0%d",[obj.post_time intValue] / 1000 % 60];
-                }
-            }
+            [bofangVC shareInstance].yinpinzongTime.text = [[bofangVC shareInstance] convertStringWithTime:[obj.post_time intValue] / 1000];
+            
             ExcurrentNumber = 0;
             
             [bofangVC shareInstance].newsModel.ImgStrjiemu = obj.smeta;
@@ -452,28 +432,8 @@ static NSInteger selectIndex2 = -1;
         [bofangVC shareInstance].newsModel.post_keywords = obj.post_keywords;
         [bofangVC shareInstance].newsModel.url = obj.url;
         [bofangVC shareInstance].iszhuboxiangqing = NO;
-        if ([obj.post_time intValue] / 1000 / 60){
-            if ([obj.post_time intValue] / 1000 / 60 > 9){
-                [bofangVC shareInstance].yinpinzongTime.text = [NSString stringWithFormat:@"%d:%d",[obj.post_time intValue] / 1000 / 60,[obj.post_time intValue] / 1000 % 60];
-            }
-            else{
-                if ([obj.post_time intValue] / 1000 % 60 < 10)
-                {
-                    [bofangVC shareInstance].yinpinzongTime.text = [NSString stringWithFormat:@"0%d:0%d",[obj.post_time intValue] / 1000 / 60,[obj.post_time intValue] / 1000 % 60];
-                }
-                else{
-                    [bofangVC shareInstance].yinpinzongTime.text = [NSString stringWithFormat:@"0%d:%d",[obj.post_time intValue] / 1000 / 60,[obj.post_time intValue] / 1000 % 60];
-                }
-            }
-        }
-        else{
-            if ([obj.post_time intValue] / 1000 > 10){
-                [bofangVC shareInstance].yinpinzongTime.text = [NSString stringWithFormat:@"00:%d",[obj.post_time intValue] / 1000 % 60];
-            }
-            else{
-                [bofangVC shareInstance].yinpinzongTime.text = [NSString stringWithFormat:@"00:0%d",[obj.post_time intValue] / 1000 % 60];
-            }
-        }
+        [bofangVC shareInstance].yinpinzongTime.text = [[bofangVC shareInstance] convertStringWithTime:[obj.post_time intValue] / 1000];
+        
         ExcurrentNumber = (int)indexPath.row;
         
         [bofangVC shareInstance].newsModel.ImgStrjiemu = obj.smeta;

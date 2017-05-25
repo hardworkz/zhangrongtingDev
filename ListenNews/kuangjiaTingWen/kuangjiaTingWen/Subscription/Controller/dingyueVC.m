@@ -285,31 +285,7 @@
         [bofangVC shareInstance].iszhuboxiangqing = NO;
         [bofangVC shareInstance].newsModel.post_keywords = self.infoArr[indexPath.row][@"post_keywords"];
         [bofangVC shareInstance].newsModel.url = self.infoArr[indexPath.row][@"url"];
-        if ([self.infoArr[indexPath.row][@"post_time"] intValue] / 1000 / 60)
-        {
-            if ([self.infoArr[indexPath.row][@"post_time"] intValue] / 1000 / 60 > 9)
-            {
-                [bofangVC shareInstance].yinpinzongTime.text = [NSString stringWithFormat:@"%d:%d",[self.infoArr[indexPath.row][@"post_time"] intValue] / 1000 / 60,[self.infoArr[indexPath.row][@"post_time"] intValue] / 1000 % 60];
-            }
-            else{
-                if ([self.infoArr[indexPath.row][@"post_time"] intValue] / 1000 % 60 < 10)
-                {
-                    [bofangVC shareInstance].yinpinzongTime.text = [NSString stringWithFormat:@"0%d:0%d",[self.infoArr[indexPath.row][@"post_time"] intValue] / 1000 / 60,[self.infoArr[indexPath.row][@"post_time"] intValue] / 1000 % 60];
-                }else
-                {
-                    [bofangVC shareInstance].yinpinzongTime.text = [NSString stringWithFormat:@"0%d:%d",[self.infoArr[indexPath.row][@"post_time"] intValue] / 1000 / 60,[self.infoArr[indexPath.row][@"post_time"] intValue] / 1000 % 60];
-                }
-            }
-        }else
-        {
-            if ([self.infoArr[indexPath.row][@"post_time"] intValue] / 1000 > 10)
-            {
-                [bofangVC shareInstance].yinpinzongTime.text = [NSString stringWithFormat:@"00:%d",[self.infoArr[indexPath.row][@"post_time"] intValue] / 1000 % 60];
-            }else
-            {
-                [bofangVC shareInstance].yinpinzongTime.text = [NSString stringWithFormat:@"00:0%d",[self.infoArr[indexPath.row][@"post_time"] intValue] / 1000 % 60];
-            }
-        }
+        [bofangVC shareInstance].yinpinzongTime.text = [[bofangVC shareInstance] convertStringWithTime:[self.infoArr[indexPath.row][@"post_time"] intValue] / 1000];
         ExcurrentNumber = (int)indexPath.row;
         [bofangVC shareInstance].newsModel.ImgStrjiemu = self.infoArr[indexPath.row][@"smeta"];
         [bofangVC shareInstance].newsModel.ZhengWenjiemu = self.infoArr[indexPath.row][@"post_excerpt"];
@@ -552,33 +528,8 @@
     [bofangVC shareInstance].newsModel.post_time = self.pushNewsInfo[@"post_time"];
     [bofangVC shareInstance].newsModel.post_keywords = self.pushNewsInfo[@"post_keywords"];
     [bofangVC shareInstance].iszhuboxiangqing = NO;
+    [bofangVC shareInstance].yinpinzongTime.text = [[bofangVC shareInstance] convertStringWithTime:[self.pushNewsInfo[@"post_time"] intValue] / 1000];
     //        dangqianbofangTable = tableView;
-    if ([self.pushNewsInfo[@"post_time"] intValue] / 1000 / 60)
-    {
-        if ([self.pushNewsInfo[@"post_time"] intValue] / 1000 / 60 > 9)
-        {
-            [bofangVC shareInstance].yinpinzongTime.text = [NSString stringWithFormat:@"%d:%d",[self.pushNewsInfo[@"post_time"] intValue] / 1000 / 60,[self.pushNewsInfo[@"post_time"] intValue] / 1000 % 60];
-        }else
-        {
-            if ([self.pushNewsInfo[@"post_time"] intValue] / 1000 % 60 < 10)
-            {
-                [bofangVC shareInstance].yinpinzongTime.text = [NSString stringWithFormat:@"0%d:0%d",[self.pushNewsInfo[@"post_time"] intValue] / 1000 / 60,[self.pushNewsInfo[@"post_time"] intValue] / 1000 % 60];
-            }else
-            {
-                [bofangVC shareInstance].yinpinzongTime.text = [NSString stringWithFormat:@"0%d:%d",[self.pushNewsInfo[@"post_time"] intValue] / 1000 / 60,[self.pushNewsInfo[@"post_time"] intValue] / 1000 % 60];
-            }
-        }
-    }else
-    {
-        if ([self.pushNewsInfo[@"post_time"] intValue] / 1000 > 10)
-        {
-            [bofangVC shareInstance].yinpinzongTime.text = [NSString stringWithFormat:@"00:%d",[self.pushNewsInfo[@"post_time"] intValue] / 1000 % 60];
-        }else
-        {
-            [bofangVC shareInstance].yinpinzongTime.text = [NSString stringWithFormat:@"00:0%d",[self.pushNewsInfo[@"post_time"] intValue] / 1000 % 60];
-        }
-    }
-    
     //        ExcurrentNumber = (int)indexPath.row;
     [bofangVC shareInstance].newsModel.ImgStrjiemu = self.pushNewsInfo[@"smeta"];
     [bofangVC shareInstance].newsModel.ZhengWenjiemu = self.pushNewsInfo[@"post_excerpt"];
@@ -662,32 +613,8 @@
     [bofangVC shareInstance].newsModel.post_keywords = dic[@"post_keywords"];
     [bofangVC shareInstance].newsModel.url = dic[@"url"];
     [bofangVC shareInstance].iszhuboxiangqing = NO;
+    [bofangVC shareInstance].yinpinzongTime.text = [[bofangVC shareInstance] convertStringWithTime:[dic[@"post_time"] intValue] / 1000];
     //  dangqianbofangTable = tableView;
-    if ([dic[@"post_time"] intValue] / 1000 / 60)
-    {
-        if ([dic[@"post_time"] intValue] / 1000 / 60 > 9)
-        {
-            [bofangVC shareInstance].yinpinzongTime.text = [NSString stringWithFormat:@"%d:%d",[dic[@"post_time"] intValue] / 1000 / 60,[dic[@"post_time"] intValue] / 1000 % 60];
-        }else
-        {
-            if ([dic[@"post_time"] intValue] / 1000 % 60 < 10)
-            {
-                [bofangVC shareInstance].yinpinzongTime.text = [NSString stringWithFormat:@"0%d:0%d",[dic[@"post_time"] intValue] / 1000 / 60,[dic[@"post_time"] intValue] / 1000 % 60];
-            }else
-            {
-                [bofangVC shareInstance].yinpinzongTime.text = [NSString stringWithFormat:@"0%d:%d",[dic[@"post_time"] intValue] / 1000 / 60,[dic[@"post_time"]intValue] / 1000 % 60];
-            }
-        }
-    }else
-    {
-        if ([dic[@"post_time"] intValue] / 1000 > 10)
-        {
-            [bofangVC shareInstance].yinpinzongTime.text = [NSString stringWithFormat:@"00:%d",[dic[@"post_time"] intValue] / 1000 % 60];
-        }else
-        {
-            [bofangVC shareInstance].yinpinzongTime.text = [NSString stringWithFormat:@"00:0%d",[dic[@"post_time"] intValue] / 1000 % 60];
-        }
-    }
     
     [bofangVC shareInstance].newsModel.ImgStrjiemu = dic[@"ImgStrjiemu"];
     [bofangVC shareInstance].newsModel.ZhengWenjiemu = dic[@"ZhengWenjiemu"];
