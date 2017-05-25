@@ -209,6 +209,8 @@ static bofangVC *_instance = nil;
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(WechatPayResultsBack:) name:@"WechatPayResultsBack" object:nil];
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(TcoinPayResultsBack:) name:@"TcoinPayResultsBack" object:nil];
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(RewardBack:) name:@"RewardBack" object:nil];
+    //添加通知，拔出耳机后暂停播放
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(routeChange:) name:AVAudioSessionRouteChangeNotification object:nil];
     //监听播放完毕
 //    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(PlayedidEnd:) name:AVPlayerItemDidPlayToEndTimeNotification object:Explayer.currentItem];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(playStop) name:AVPlayerItemPlaybackStalledNotification object:Explayer.currentItem];
@@ -2302,6 +2304,7 @@ static bofangVC *_instance = nil;
     }];
 
 }
+#pragma mark - 线控方法
 - (void)remoteControlReceivedWithEvent:(UIEvent *)event {
     //判断是否是后台音频
     if (event.type == UIEventTypeRemoteControl) {
@@ -2323,6 +2326,25 @@ static bofangVC *_instance = nil;
             default:
                 [self doPlay:bofangCenterBtn];
                 break;
+        }
+    }
+}
+#pragma mark - 拔插耳机线方法
+/**
+ *  一旦输出改变则执行此方法
+ *
+ *  @param notification 输出改变通知对象
+ */
+-(void)routeChange:(NSNotification *)notification{
+    NSDictionary *dic=notification.userInfo;
+    int changeReason= [dic[AVAudioSessionRouteChangeReasonKey] intValue];
+    //等于AVAudioSessionRouteChangeReasonOldDeviceUnavailable表示旧输出不可用
+    if (changeReason==AVAudioSessionRouteChangeReasonOldDeviceUnavailable) {
+        AVAudioSessionRouteDescription *routeDescription=dic[AVAudioSessionRouteChangePreviousRouteKey];
+        AVAudioSessionPortDescription *portDescription= [routeDescription.outputs firstObject];
+        //原设备为耳机则暂停
+        if ([portDescription.portType isEqualToString:@"Headphones"]) {
+            [self doPlay:bofangCenterBtn];
         }
     }
 }
@@ -3156,6 +3178,7 @@ static bofangVC *_instance = nil;
 {
     RTLog(@"dealloc");
     [[NSNotificationCenter defaultCenter] removeObserver:self name:AVPlayerItemDidPlayToEndTimeNotification object:Explayer.currentItem];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:AVAudioSessionRouteChangeNotification object:nil];
 }
 
 @end
