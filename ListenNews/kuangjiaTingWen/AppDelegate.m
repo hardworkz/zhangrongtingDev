@@ -284,22 +284,6 @@
     //小米推送
     [self setMIPush];
     
-    //注册远程通知
-//    if ([[UIDevice currentDevice].systemVersion floatValue] < 8.0)
-//    {
-//        UIRemoteNotificationType type = UIRemoteNotificationTypeAlert | UIRemoteNotificationTypeBadge | UIRemoteNotificationTypeSound;
-//        
-//        [application registerForRemoteNotificationTypes:type];
-//    }
-//    else
-//    {
-//        UIUserNotificationType type = UIUserNotificationTypeAlert | UIUserNotificationTypeBadge | UIUserNotificationTypeSound;
-//        
-//        UIUserNotificationSettings *setting = [UIUserNotificationSettings settingsForTypes:type categories:nil];
-//        
-//        [application registerUserNotificationSettings:setting];
-//        
-//    }
     
     //推送唤醒APP的
     NSDictionary *userInfo = launchOptions[UIApplicationLaunchOptionsRemoteNotificationKey];

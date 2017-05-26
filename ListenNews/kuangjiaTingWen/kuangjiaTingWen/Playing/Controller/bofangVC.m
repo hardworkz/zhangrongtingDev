@@ -2316,19 +2316,18 @@ static bofangVC *_instance = nil;
 - (void)handleInterruption:(NSNotification *)notification{
     NSDictionary *info = notification.userInfo;
     AVAudioSessionInterruptionType type = [info[AVAudioSessionInterruptionTypeKey] unsignedIntegerValue];
-    if (type == AVAudioSessionInterruptionTypeBegan) {
+    if (type == AVAudioSessionInterruptionTypeBegan) {//进入别的应用
         //Handle InterruptionBegan
-        //系统暂停音频，则设置播放器
+        //系统暂停音频，则设置暂停播放器
         [self doPlay:bofangCenterBtn];
         RTLog(@"interruptionTypeBegan");
     }else{
-        [self doPlay:bofangCenterBtn];
-//        AVAudioSessionInterruptionOptions options = [info[AVAudioSessionInterruptionOptionKey] unsignedIntegerValue];
-//        if (options == AVAudioSessionInterruptionOptionShouldResume) {
-            //Handle Resume
-//            [Explayer play];
-//            [bofangCenterBtn setImage:[UIImage imageNamed:@"home_news_ic_pause"] forState:UIControlStateNormal];
-//        }
+        RTLog(@"interruptionTypeEnd");
+        AVAudioSessionInterruptionOptions options = [info[AVAudioSessionInterruptionOptionKey] unsignedIntegerValue];
+        if (options == AVAudioSessionInterruptionOptionShouldResume) {
+            //Handle Resume 重新开始播放
+            [self doPlay:bofangCenterBtn];
+        }
     }
 }
 
