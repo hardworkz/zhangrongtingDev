@@ -961,7 +961,7 @@
         }
     }
     else{
-        [NetWorkTool addAndCancelPraiseWithaccessToken:[DSE encryptUseDES:ExdangqianUser] userAccessToken:[DSE encryptUseDES:model.user.ID] comments_id:model.ID sccess:^(NSDictionary *responseObject) {
+        [NetWorkTool addAndCancelPraiseWithaccessToken:[DSE encryptUseDES:ExdangqianUser] uid:model.user.ID comments_id:model.ID sccess:^(NSDictionary *responseObject) {
             [weakSelf loadData];
             cell.praiseButton.userInteractionEnabled = YES;
             if (iszan == 1) {

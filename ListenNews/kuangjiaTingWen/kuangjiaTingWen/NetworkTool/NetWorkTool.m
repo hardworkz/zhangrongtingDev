@@ -1597,14 +1597,14 @@ NSMutableDictionary *dic = [[NSMutableDictionary alloc]initWithCapacity:1
 }
 
 + (void)addAndCancelPraiseWithaccessToken:(NSString *)accessToken
-                              userAccessToken:(NSString *)userAccessToken
+                              uid:(NSString *)uid
                               comments_id:(NSString *)comments_id
                                    sccess:(void (^)(NSDictionary *responseObject))success
                                   failure:(void (^)(NSError *error))failure{
     
     NSMutableDictionary *dic = [[NSMutableDictionary alloc]initWithCapacity:1];
     dic[@"accessToken"] = accessToken;
-    dic[@"commenterAccessToken"] = userAccessToken;
+    dic[@"uid"] = uid;
     dic[@"comments_id"] = comments_id;
     [self asyncNetworkingUrl:@"/interface/addAndCancelPraise" andDict:dic success:success failure:failure];
     

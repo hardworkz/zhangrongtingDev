@@ -1139,7 +1139,7 @@ didSelectLinkWithTransitInformation:(NSDictionary *)components {
     FeedBackAndListenFriendModel *model = blog.model;
     cell.praiseButton.userInteractionEnabled = NO;
     DefineWeakSelf;
-    [NetWorkTool addAndCancelPraiseWithaccessToken:[DSE encryptUseDES:ExdangqianUser] userAccessToken:self.isMypersonalPage?[DSE encryptUseDES:ExdangqianUserUid]:[DSE encryptUseDES:model.user.ID] comments_id:model.ID sccess:^(NSDictionary *responseObject) {
+    [NetWorkTool addAndCancelPraiseWithaccessToken:[DSE encryptUseDES:ExdangqianUser] uid:self.isMypersonalPage?ExdangqianUserUid:model.user.ID comments_id:model.ID sccess:^(NSDictionary *responseObject) {
         [weakSelf loadData];
         cell.praiseButton.userInteractionEnabled = YES;
         if (iszan == 1) {

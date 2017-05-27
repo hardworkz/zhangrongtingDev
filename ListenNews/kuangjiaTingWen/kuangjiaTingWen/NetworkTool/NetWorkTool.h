@@ -964,7 +964,7 @@
  *  @param failure     错误
  */
 + (void)addAndCancelPraiseWithaccessToken:(NSString *)accessToken
-                          userAccessToken:(NSString *)userAccessToken
+                          uid:(NSString *)uid
                               comments_id:(NSString *)comments_id
                                    sccess:(void (^)(NSDictionary *responseObject))success
                                   failure:(void (^)(NSError *error))failure;

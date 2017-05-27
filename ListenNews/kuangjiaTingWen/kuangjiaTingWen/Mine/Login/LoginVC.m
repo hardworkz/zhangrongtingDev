@@ -62,7 +62,7 @@
     [self.view addSubview:textFBgV];
     
     UIButton *LoginBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    LoginBtn.frame = CGRectMake(45.0 / 375 * IPHONE_W, textFBgV.frame.origin.y + textFBgV.frame.size.height, IPHONE_W - 90.0 / 375 * IPHONE_W, 32.0 / 667 * IPHONE_H);
+    LoginBtn.frame = CGRectMake(45.0 / 375 * IPHONE_W, textFBgV.frame.origin.y + textFBgV.frame.size.height + 7, IPHONE_W - 90.0 / 375 * IPHONE_W, 32.0 / 667 * IPHONE_H);
     [self.view addSubview:LoginBtn];
     [LoginBtn setBackgroundColor:gMainColor];
     [LoginBtn setTitle:@"登录" forState:UIControlStateNormal];
