@@ -22,7 +22,6 @@
 @property (weak, nonatomic) UIButton *deleteBtn;
 @property (weak, nonatomic) UIButton *commentBtn;
 @property (weak, nonatomic) UIImageView *favImage;
-@property (weak, nonatomic) UILabel *favLabel;
 @property (weak, nonatomic) UIImageView *commentBgView;
 @property (weak, nonatomic) UIView *devider;
 
@@ -271,17 +270,11 @@
             self.contentNewsView.hidden = NO;
             self.voiceView.hidden = YES;
             //设置新闻图片
-            NSString *aimgUrl = [NSString stringWithFormat:@"%@",[model.post.smeta stringByReplacingOccurrencesOfString:@"\\" withString:@""]];
-            NSString *bimgUrl1 = [aimgUrl stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-            NSString *cimgUrl2 = [bimgUrl1 stringByReplacingOccurrencesOfString:@"thumb:" withString:@""];
-            NSString *dimgUrl3 = [cimgUrl2 stringByReplacingOccurrencesOfString:@"{" withString:@""];
-            NSString *eimgUrl4 = [dimgUrl3 stringByReplacingOccurrencesOfString:@"}" withString:@""];
-            
-            if ([eimgUrl4  rangeOfString:@"http"].location != NSNotFound){
-                [_newsImage sd_setImageWithURL:[NSURL URLWithString:eimgUrl4] placeholderImage:NewsPlaceHolderImage];
+            if ([NEWSSEMTPHOTOURL(model.post.smeta)  rangeOfString:@"http"].location != NSNotFound){
+                [_newsImage sd_setImageWithURL:[NSURL URLWithString:NEWSSEMTPHOTOURL(model.post.smeta)] placeholderImage:NewsPlaceHolderImage];
             }
             else{
-                NSString *str = USERPHOTOHTTPSTRINGZhuBo(eimgUrl4);
+                NSString *str = USERPHOTOHTTPSTRINGZhuBo(NEWSSEMTPHOTOURL(model.post.smeta));
                 [_newsImage sd_setImageWithURL:[NSURL URLWithString:str] placeholderImage:NewsPlaceHolderImage];
             }
             //设置新闻标题
@@ -353,7 +346,7 @@
     //点赞人数
     [_favImage setImage:[UIImage imageNamed:@"feeback_fav"]];
     if (![_isFeebackBlog ? model.zan_num : model.praisenum isEqualToString:@"0"]) {
-        _favLabel.fd_collapsed = NO;
+//        _favLabel.fd_collapsed = NO;
         _favLabel.text = [NSString stringWithFormat:@"%@人点赞",_isFeebackBlog ? model.zan_num : model.praisenum ];
     }else
     {

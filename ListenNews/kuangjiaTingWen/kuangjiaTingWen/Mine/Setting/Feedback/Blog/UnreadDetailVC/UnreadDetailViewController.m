@@ -236,7 +236,7 @@
     DefineWeakSelf;
     switch (self.pageSource) {
         case 1:{
-            [NetWorkTool addAndCancelPraiseWithaccessToken:[DSE encryptUseDES:ExdangqianUser] uid:blog[@"uid"] comments_id:blog[@"id"] sccess:^(NSDictionary *responseObject) {
+            [NetWorkTool addAndCancelPraiseWithaccessToken:[DSE encryptUseDES:ExdangqianUser] comments_id:blog[@"id"] sccess:^(NSDictionary *responseObject) {
                 [weakSelf loadData];
                 //            [weakSelf.blogTableview reloadData];
                 cell.praiseButton.userInteractionEnabled = YES;

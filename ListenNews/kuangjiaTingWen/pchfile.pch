@@ -172,42 +172,42 @@ selector:_selector name:_name object:nil];
 
 #pragma mark -- 第三方切换配置
 //FM
-//#pragma mark 微信分享
-//#define KweChatappID @"wx4041964cf987e1e0"
-//#pragma mark 微信登录
-//#define KweChatLoginAppID @"wx4bad076e5dba3fab"
-//#define KweChatLoginAppSecret @"8e6c48652d522868c9ec792e06c4d639"
-//#pragma mark 听闻（FM）
-////微博appkey
-//#define KweiBoappkey @"2382842831"
-////微博appSecret
-//#define KweiBoappSecret @"92a40c993f907138b910622453a87a44"
-////微博appUrl
-//#define KweiBoUrl @"http://open.weibo.com/apps/1160650661/privilege/oauth"
-////腾讯appID
-//#define kAppId_QQ @"1105760468"
-////QQ41e890d4
-////腾讯appKey
-//#define kAppKey_QQ @"q3MDPSnYu1BqmGyG"
+#pragma mark 微信分享
+#define KweChatappID @"wx4041964cf987e1e0"
+#pragma mark 微信登录
+#define KweChatLoginAppID @"wx4bad076e5dba3fab"
+#define KweChatLoginAppSecret @"8e6c48652d522868c9ec792e06c4d639"
+#pragma mark 听闻（FM）
+//微博appkey
+#define KweiBoappkey @"2382842831"
+//微博appSecret
+#define KweiBoappSecret @"92a40c993f907138b910622453a87a44"
+//微博appUrl
+#define KweiBoUrl @"http://open.weibo.com/apps/1160650661/privilege/oauth"
+//腾讯appID
+#define kAppId_QQ @"1105760468"
+//QQ41e890d4
+//腾讯appKey
+#define kAppKey_QQ @"q3MDPSnYu1BqmGyG"
 
 //电台
-#pragma mark 微信分享
-#define KweChatappID @"wxd5f60a219ecad5d5"
-#pragma mark 微信登录
-#define KweChatLoginAppID @"wxcff5e0171440230a"
-#define KweChatLoginAppSecret @"9abcaa0d78a9ab9d940960357cca0af3"
-#pragma mark 听闻（电台）
-//微博appkey
-#define KweiBoappkey @"2998039169"
-//微博appSecret
-#define KweiBoappSecret @"5d0c94894a1747cff857db03dcd0de2b"
-//微博appUrl
-#define KweiBoUrl @"http://open.weibo.com/apps/1164861942/privilege/oauth"
-//腾讯appID
-#define kAppId_QQ @"1105686687"
-//QQ41e7709f
-//腾讯appKey
-#define kAppKey_QQ @"qvZ7tCZqmcQplBP9"
+//#pragma mark 微信分享
+//#define KweChatappID @"wxd5f60a219ecad5d5"
+//#pragma mark 微信登录
+//#define KweChatLoginAppID @"wxcff5e0171440230a"
+//#define KweChatLoginAppSecret @"9abcaa0d78a9ab9d940960357cca0af3"
+//#pragma mark 听闻（电台）
+////微博appkey
+//#define KweiBoappkey @"2998039169"
+////微博appSecret
+//#define KweiBoappSecret @"5d0c94894a1747cff857db03dcd0de2b"
+////微博appUrl
+//#define KweiBoUrl @"http://open.weibo.com/apps/1164861942/privilege/oauth"
+////腾讯appID
+//#define kAppId_QQ @"1105686687"
+////QQ41e7709f
+////腾讯appKey
+//#define kAppKey_QQ @"qvZ7tCZqmcQplBP9"
 
 
 #pragma mark 微信支付（听闻FM、听闻电台都是用的旧版的支付key）

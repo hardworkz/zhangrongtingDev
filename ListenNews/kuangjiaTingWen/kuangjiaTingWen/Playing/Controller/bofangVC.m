@@ -101,6 +101,7 @@
 @property (strong, nonatomic) UIView *topView;
 @property (strong, nonatomic) UIButton *leftBtn;
 @property (strong, nonatomic) UIButton *rightBtn;
+@property (strong, nonatomic) UIButton *scrollTopBtn;
 //新闻详情控件
 @property (strong, nonatomic) UITextView *zhengwenTextView;
 @property (strong, nonatomic) UIImageView *zhengwenImg;
@@ -156,6 +157,7 @@ static bofangVC *_instance = nil;
 }
 - (void)viewDidLoad {
     [super viewDidLoad];
+    
     self.view.backgroundColor = [UIColor whiteColor];
     isJiaZaiWan = NO;
     _isCollected = NO;
@@ -164,6 +166,8 @@ static bofangVC *_instance = nil;
     ExdangqianUserUid = [CommonCode readFromUserD:@"dangqianUserUid"];
     angle = 0.0f;
     [self.view addSubview:self.tableView];
+    //置顶按钮
+    [self.view insertSubview:self.scrollTopBtn aboveSubview:self.tableView];
     _topView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, IPHONE_W, 64)];
     _topView.backgroundColor = [UIColor clearColor];
     _topView.hidden = NO;
@@ -3013,6 +3017,15 @@ static bofangVC *_instance = nil;
         [_leftBtn setImage:[UIImage imageNamed:@"title_ic_white"] forState:UIControlStateNormal];
          _topView.backgroundColor = [UIColor clearColor];
     }
+    
+    //设置置顶按钮alpha
+    float alpha = scrollView.contentOffset.y/(SCREEN_HEIGHT * 1.5);
+    if (alpha >= 0.75) {
+        alpha = 0.75;
+    }else{
+        alpha = alpha;
+    }
+    _scrollTopBtn.alpha = alpha;
 }
 
 #pragma mark OJLAnimationButtonDelegate
@@ -3140,7 +3153,25 @@ static bofangVC *_instance = nil;
     }
     return _zhengwenTextView;
 }
+#pragma mark --- 置顶按钮方法
+- (UIButton *)scrollTopBtn
+{
+    if (_scrollTopBtn == nil) {
+        CGFloat W = 40.0f;
+        _scrollTopBtn = [[UIButton alloc] initWithFrame:CGRectMake(SCREEN_WIDTH - W, SCREEN_HEIGHT - W - 10 - 109.0/667*IPHONE_H, W, W)];
+        _scrollTopBtn.layer.cornerRadius = 25;
+        [_scrollTopBtn setImage:@"置顶"];
+        [_scrollTopBtn addTarget:self action:@selector(scrollToTop)];
+        _scrollTopBtn.alpha = 0.0;
+    }
+    return _scrollTopBtn;
+}
+- (void)scrollToTop
+{
+    [self.tableView setContentOffset:CGPointZero animated:YES];
+}
 #pragma mark --- 懒加载
+
 - (UITableView *)tableView
 {
     if (!_tableView)

@@ -1028,7 +1028,7 @@ didSelectLinkWithTransitInformation:(NSDictionary *)components {
 
 - (void)shangLaJiaZai {
     numberPage++;
-    [NetWorkTool getMyDynamicsListWithaccessToken:[DSE encryptUseDES:self.user_login] andPage:[NSString stringWithFormat:@"%d",numberPage] andLimit:@"10" sccess:^(NSDictionary *responseObject) {
+    [NetWorkTool getMyDynamicsListWithaccessToken:[DSE encryptUseDES:self.user_login] login_uid:ExdangqianUserUid andPage:[NSString stringWithFormat:@"%d",numberPage]  andLimit:@"10" sccess:^(NSDictionary *responseObject) {
         if ([responseObject[@"results"] isKindOfClass:[NSArray class]]){
             NSMutableArray *array = [FeedBackAndListenFriendModel mj_objectArrayWithKeyValuesArray:responseObject[@"results"]];
             [self.infoArr addObjectsFromArray:[self frameArrayWithDataArray:array]];
@@ -1056,7 +1056,7 @@ didSelectLinkWithTransitInformation:(NSDictionary *)components {
 
 - (void)refreshData {
     
-        [NetWorkTool getMyDynamicsListWithaccessToken:[DSE encryptUseDES:self.user_login] andPage:@"1" andLimit:@"10" sccess:^(NSDictionary *responseObject) {
+        [NetWorkTool getMyDynamicsListWithaccessToken:[DSE encryptUseDES:self.user_login] login_uid:ExdangqianUserUid andPage:@"1" andLimit:@"10" sccess:^(NSDictionary *responseObject) {
             if ([responseObject[@"results"] isKindOfClass:[NSArray class]])
             {
                 [self.infoArr removeAllObjects];
@@ -1138,9 +1138,22 @@ didSelectLinkWithTransitInformation:(NSDictionary *)components {
     FeedBackAndListenFriendFrameModel *blog = self.infoArr[indexPath.row];
     FeedBackAndListenFriendModel *model = blog.model;
     cell.praiseButton.userInteractionEnabled = NO;
-    DefineWeakSelf;
-    [NetWorkTool addAndCancelPraiseWithaccessToken:[DSE encryptUseDES:ExdangqianUser] uid:self.isMypersonalPage?ExdangqianUserUid:model.user.ID comments_id:model.ID sccess:^(NSDictionary *responseObject) {
-        [weakSelf loadData];
+//    DefineWeakSelf;
+    [NetWorkTool addAndCancelPraiseWithaccessToken:[DSE encryptUseDES:ExdangqianUser] comments_id:model.ID sccess:^(NSDictionary *responseObject) {
+//        [weakSelf refreshData];
+        if (iszan == 0) {
+            [cell.praiseButton setImage:[UIImage imageNamed:@"me_mypage_me_list_ic_liked"] forState:UIControlStateNormal];
+            cell.frameModel.model.zan = @"1";
+            cell.frameModel.model.praisenum = [NSString stringWithFormat:@"%d",[cell.frameModel.model.praisenum intValue] + 1];
+            cell.favLabel.text = [NSString stringWithFormat:@"%@人点赞",cell.frameModel.model.praisenum];
+        }
+        else if (iszan == 1){
+            [cell.praiseButton setImage:[UIImage imageNamed:@"me_mypage_me_list_ic_like"] forState:UIControlStateNormal];
+            cell.frameModel.model.zan = @"0";
+            cell.frameModel.model.praisenum = [NSString stringWithFormat:@"%d",[cell.frameModel.model.praisenum intValue] - 1];
+            cell.favLabel.text = [NSString stringWithFormat:@"%@人点赞",cell.frameModel.model.praisenum];
+        }
+
         cell.praiseButton.userInteractionEnabled = YES;
         if (iszan == 1) {
             XWAlerLoginView *xw = [[XWAlerLoginView alloc]initWithTitle:@"取消点赞成功"];

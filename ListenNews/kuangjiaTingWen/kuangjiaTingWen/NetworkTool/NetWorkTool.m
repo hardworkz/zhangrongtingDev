@@ -1008,12 +1008,14 @@ NSMutableDictionary *dic = [[NSMutableDictionary alloc]initWithCapacity:1
 }
 
 + (void)getMyDynamicsListWithaccessToken:(NSString *)accessToken
+                               login_uid:(NSString *)login_uid
                                  andPage:(NSString *)page
                                 andLimit:(NSString *)limit
                                   sccess:(void (^)(NSDictionary *responseObject))success
                                  failure:(void (^)(NSError *error))failure{
     NSMutableDictionary *dic = [[NSMutableDictionary alloc]initWithCapacity:1];
     dic[@"accessToken"] = accessToken;
+    dic[@"login_id"] = login_uid;
     dic[@"page"] = page;
     dic[@"limit"] = limit;
     [self asyncNetworkingUrl:@"/interfaceYou/myDynamics" andDict:dic success:success failure:failure];
@@ -1597,14 +1599,12 @@ NSMutableDictionary *dic = [[NSMutableDictionary alloc]initWithCapacity:1
 }
 
 + (void)addAndCancelPraiseWithaccessToken:(NSString *)accessToken
-                              uid:(NSString *)uid
                               comments_id:(NSString *)comments_id
                                    sccess:(void (^)(NSDictionary *responseObject))success
                                   failure:(void (^)(NSError *error))failure{
     
     NSMutableDictionary *dic = [[NSMutableDictionary alloc]initWithCapacity:1];
     dic[@"accessToken"] = accessToken;
-    dic[@"uid"] = uid;
     dic[@"comments_id"] = comments_id;
     [self asyncNetworkingUrl:@"/interface/addAndCancelPraise" andDict:dic success:success failure:failure];
     

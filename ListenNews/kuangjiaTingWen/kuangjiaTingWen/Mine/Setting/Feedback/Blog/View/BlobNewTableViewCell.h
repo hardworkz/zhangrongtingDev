@@ -29,6 +29,7 @@ typedef void (^addFavBlock)(NSInteger );
 @property (strong, nonatomic) UILabel *nameLabe;
 @property (strong, nonatomic) MultiImageView *photosImageView;
 @property (weak, nonatomic) UIButton *praiseButton;
+@property (weak, nonatomic) UILabel *favLabel;
 @property (weak, nonatomic) UIButton *voiceButton;
 
 @property (assign, nonatomic) BOOL isFeebackBlog;

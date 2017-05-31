@@ -459,6 +459,7 @@
  *  @param failure     错误
  */
 + (void)getMyDynamicsListWithaccessToken:(NSString *)accessToken
+                                     login_uid:(NSString *)login_uid
                                     andPage:(NSString *)page
                                    andLimit:(NSString *)limit
                                      sccess:(void (^)(NSDictionary *responseObject))success
@@ -964,7 +965,6 @@
  *  @param failure     错误
  */
 + (void)addAndCancelPraiseWithaccessToken:(NSString *)accessToken
-                          uid:(NSString *)uid
                               comments_id:(NSString *)comments_id
                                    sccess:(void (^)(NSDictionary *responseObject))success
                                   failure:(void (^)(NSError *error))failure;
