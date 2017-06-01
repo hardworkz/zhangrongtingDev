@@ -15,6 +15,7 @@ target 'kuangjiaTingWen' do
   pod 'UMengAnalytics','~>4.2.4'#标准SDK，含IDFA
   pod 'WechatOpenSDK','~>1.7.7'
   pod 'Reachability','~>3.2'
+  pod 'FDFullscreenPopGesture','~>1.1'
   
   use_frameworks!
 end
