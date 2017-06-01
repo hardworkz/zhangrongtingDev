@@ -1,0 +1,6 @@
+framework module UIKitCategoryAdditions {
+  umbrella header "UIKitCategoryAdditions-umbrella.h"
+
+  export *
+  module * { export * }
+}

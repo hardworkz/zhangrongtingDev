@@ -1,0 +1,18 @@
+platform :ios, '7.0'
+#use_frameworks!个别需要用到它，比如reactiveCocoa
+
+target 'kuangjiaTingWen' do
+  pod 'AFNetworking', '~> 2.6'
+  pod 'UIView+Positioning', '~> 1.1'
+  pod 'UITableView+FDTemplateLayoutCell', '~> 1.3'
+  pod 'MWPhotoBrowser'
+  pod 'UIKitCategoryAdditions', '~> 0.0.1'
+  pod 'UIView+FDCollapsibleConstraints', '~> 1.1'
+  pod 'SAMTextView', '~> 0.2.2'
+  pod 'iAppInfos', '~> 0.1.0'
+  pod 'TTTAttributedLabel'
+  pod 'MJExtension','~>3.0.13'
+  pod 'UMengAnalytics','~>4.2.4'#标准SDK，含IDFA
+  
+  use_frameworks!
+end
