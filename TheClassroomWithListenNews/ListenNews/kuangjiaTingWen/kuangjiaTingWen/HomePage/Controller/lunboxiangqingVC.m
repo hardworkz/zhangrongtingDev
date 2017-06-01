@@ -49,12 +49,7 @@
 - (void)jianliUI
 {
     UIImageView *topImgV = [[UIImageView alloc]initWithFrame:CGRectMake(0, 0, IPHONE_W, 206.25 / 667 * IPHONE_H)];
-    NSString *imgUrl = [NSString stringWithFormat:@"%@",[self.infoArr[0][@"smeta"] stringByReplacingOccurrencesOfString:@"\\" withString:@""]];
-    NSString *imgUrl1 = [imgUrl stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-    NSString *imgUrl2 = [imgUrl1 stringByReplacingOccurrencesOfString:@"thumb:" withString:@""];
-    NSString *imgUrl3 = [imgUrl2 stringByReplacingOccurrencesOfString:@"{" withString:@""];
-    NSString *imgUrl4 = [imgUrl3 stringByReplacingOccurrencesOfString:@"}" withString:@""];
-    [topImgV sd_setImageWithURL:[NSURL URLWithString:imgUrl4] placeholderImage:[UIImage imageNamed:@"thumbnailsdefault"]];
+    [topImgV sd_setImageWithURL:[NSURL URLWithString:NEWSSEMTPHOTOURL(self.infoArr[0][@"smeta"])] placeholderImage:[UIImage imageNamed:@"thumbnailsdefault"]];
     
     UIView *dibuLabView = [[UIView alloc]initWithFrame:CGRectMake(0, topImgV.frame.size.height - 30.0 / 667 * IPHONE_H, IPHONE_W, 30.0 / 667 * IPHONE_H)];
     dibuLabView.backgroundColor = [[UIColor blackColor]colorWithAlphaComponent:0.5f];
@@ -113,38 +108,10 @@
         [bofangVC shareInstance].newsModel.post_mp = self.infoArr[indexPath.row][@"post_mp"];
 
         [bofangVC shareInstance].newsModel.post_time = self.infoArr[indexPath.row][@"post_time"];
-        if ([self.infoArr[indexPath.row][@"post_time"] intValue] / 1000 / 60){
-            
-            if ([self.infoArr[indexPath.row][@"post_time"] intValue] / 1000 / 60 > 9){
-                
-                [bofangVC shareInstance].yinpinzongTime.text = [NSString stringWithFormat:@"%d:%d",[self.infoArr[indexPath.row][@"post_time"] intValue] / 1000 / 60,[self.infoArr[indexPath.row][@"post_time"] intValue] / 1000 % 60];
-            }
-            else{
-                if ([self.infoArr[indexPath.row][@"post_time"] intValue] / 1000 % 60 < 10)
-                {
-                    [bofangVC shareInstance].yinpinzongTime.text = [NSString stringWithFormat:@"0%d:0%d",[self.infoArr[indexPath.row][@"post_time"] intValue] / 1000 / 60,[self.infoArr[indexPath.row][@"post_time"] intValue] / 1000 % 60];
-                }else
-                {
-                    [bofangVC shareInstance].yinpinzongTime.text = [NSString stringWithFormat:@"0%d:%d",[self.infoArr[indexPath.row][@"post_time"] intValue] / 1000 / 60,[self.infoArr[indexPath.row][@"post_time"] intValue] / 1000 % 60];
-                }
-            }
-        }
-        else{
-            if ([self.infoArr[indexPath.row][@"post_time"] intValue] / 1000 > 10){
-                [bofangVC shareInstance].yinpinzongTime.text = [NSString stringWithFormat:@"00:%d",[self.infoArr[indexPath.row][@"post_time"] intValue] / 1000 % 60];
-            }
-            else{
-                [bofangVC shareInstance].yinpinzongTime.text = [NSString stringWithFormat:@"00:0%d",[self.infoArr[indexPath.row][@"post_time"] intValue] / 1000 % 60];
-            }
-        }
+        [bofangVC shareInstance].yinpinzongTime.text = [[bofangVC shareInstance] convertStringWithTime:[self.infoArr[indexPath.row][@"post_time"] intValue] / 1000];
         
         ExcurrentNumber = (int)indexPath.row;
-        NSString *imgUrl = [NSString stringWithFormat:@"%@",[self.infoArr[indexPath.row][@"smeta"] stringByReplacingOccurrencesOfString:@"\\" withString:@""]];
-        NSString *imgUrl1 = [imgUrl stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-        NSString *imgUrl2 = [imgUrl1 stringByReplacingOccurrencesOfString:@"thumb:" withString:@""];
-        NSString *imgUrl3 = [imgUrl2 stringByReplacingOccurrencesOfString:@"{" withString:@""];
-        NSString *imgUrl4 = [imgUrl3 stringByReplacingOccurrencesOfString:@"}" withString:@""];
-        [bofangVC shareInstance].newsModel.ImgStrjiemu = imgUrl4;
+        [bofangVC shareInstance].newsModel.ImgStrjiemu = self.infoArr[indexPath.row][@"smeta"];
         [bofangVC shareInstance].newsModel.ZhengWenjiemu = self.infoArr[indexPath.row][@"post_excerpt"];
         [bofangVC shareInstance].newsModel.praisenum = self.infoArr[indexPath.row][@"praisenum"];
          [bofangVC shareInstance].newsModel.url = self.infoArr[indexPath.row][@"url"];
@@ -182,16 +149,11 @@
     if (IS_IPAD) {
         [imgV setFrame:CGRectMake(SCREEN_WIDTH - 125.0 / 375 * IPHONE_W, 19, 105.0 / 375 * IPHONE_W, 70.0 / 375 *IPHONE_W)];
     }
-    NSString *imgUrl = [NSString stringWithFormat:@"%@",[self.infoArr[indexPath.row][@"smeta"] stringByReplacingOccurrencesOfString:@"\\" withString:@""]];
-    NSString *imgUrl1 = [imgUrl stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-    NSString *imgUrl2 = [imgUrl1 stringByReplacingOccurrencesOfString:@"thumb:" withString:@""];
-    NSString *imgUrl3 = [imgUrl2 stringByReplacingOccurrencesOfString:@"{" withString:@""];
-    NSString *imgUrl4 = [imgUrl3 stringByReplacingOccurrencesOfString:@"}" withString:@""];
-    if ([imgUrl4  rangeOfString:@"http"].location != NSNotFound){
-        [imgV sd_setImageWithURL:[NSURL URLWithString:imgUrl4] placeholderImage:[UIImage imageNamed:@"thumbnailsdefault"]];
+    if ([NEWSSEMTPHOTOURL(self.infoArr[indexPath.row][@"smeta"])  rangeOfString:@"http"].location != NSNotFound){
+        [imgV sd_setImageWithURL:[NSURL URLWithString:NEWSSEMTPHOTOURL(self.infoArr[indexPath.row][@"smeta"])] placeholderImage:[UIImage imageNamed:@"thumbnailsdefault"]];
     }else
     {
-        NSString *str = USERPHOTOHTTPSTRINGZhuBo(imgUrl4);
+        NSString *str = USERPHOTOHTTPSTRINGZhuBo(NEWSSEMTPHOTOURL(self.infoArr[indexPath.row][@"smeta"]));
         [imgV sd_setImageWithURL:[NSURL URLWithString:str] placeholderImage:[UIImage imageNamed:@"thumbnailsdefault"]];
     }
     
@@ -308,6 +270,7 @@
 }
 - (void)viewWillDisappear:(BOOL)animated
 {
+    [super viewWillDisappear:animated];
     self.navigationController.navigationBarHidden=YES;
 }
 

@@ -459,6 +459,7 @@
  *  @param failure     错误
  */
 + (void)getMyDynamicsListWithaccessToken:(NSString *)accessToken
+                                     login_uid:(NSString *)login_uid
                                     andPage:(NSString *)page
                                    andLimit:(NSString *)limit
                                      sccess:(void (^)(NSDictionary *responseObject))success
@@ -958,6 +959,7 @@
  *  	针对新闻评论进行点赞 《点赞》
  *
  *  @param accessToken accessToken description
+ *  @param userAccessToken userAccessToken description
  *  @param act_id      当前评论的ID：
  *  @param success     成功
  *  @param failure     错误
@@ -1463,6 +1465,17 @@
                           act_id:(NSString *)act_id
                           sccess:(void (^)(NSDictionary *responseObject))success
                          failure:(void (^)(NSError *error))failure;
-
+/**
+ *  	删除用户自己的评论
+ *
+ *  @param accessToken      accessToken
+ *  @param comment_id           评论id (必填)
+ *  @param success          成功
+ *  @param failure          错误
+ */
++ (void)postDeleteSelfCommentWithaccessToken:(NSString *)accessToken
+                                  commnet_id:(NSString *)comment_id
+                                      sccess:(void (^)(NSDictionary *responseObject))success
+                                     failure:(void(^)(NSError *error))failure;
 @end
 

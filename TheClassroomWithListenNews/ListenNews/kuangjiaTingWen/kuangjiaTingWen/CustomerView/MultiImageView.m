@@ -165,7 +165,7 @@
             //这边就能拿到图片了
             imgv.frame = CGRectMake(0,0, image.size.width > SCREEN_WIDTH - 100 ? SCREEN_WIDTH - 100 :image.size.width , image.size.height > 150 ? 150 :image.size.height);
             
-            RTLog(@"imageW:%f ---iamgeH:%f",image.size.width,image.size.height);
+//            RTLog(@"imageW:%f ---iamgeH:%f",image.size.width,image.size.height);
             
             imgv.contentMode = UIViewContentModeScaleAspectFit;
             if (image.size.width >= image.size.height) {

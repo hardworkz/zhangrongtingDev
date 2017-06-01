@@ -27,7 +27,12 @@
 }
 - (NSString *)ImgStrjiemu
 {
-    return _ImgStrjiemu == nil?@"":_ImgStrjiemu;
+    NSString *imgUrl = [NSString stringWithFormat:@"%@",[_ImgStrjiemu stringByReplacingOccurrencesOfString:@"\\" withString:@""]];
+    NSString *imgUrl1 = [imgUrl stringByReplacingOccurrencesOfString:@"\"" withString:@""];
+    NSString *imgUrl2 = [imgUrl1 stringByReplacingOccurrencesOfString:@"thumb:" withString:@""];
+    NSString *imgUrl3 = [imgUrl2 stringByReplacingOccurrencesOfString:@"{" withString:@""];
+    NSString *imgUrl4 = [imgUrl3 stringByReplacingOccurrencesOfString:@"}" withString:@""];
+    return _ImgStrjiemu == nil?@"":imgUrl4;
 }
 - (NSString *)ZhengWenjiemu
 {

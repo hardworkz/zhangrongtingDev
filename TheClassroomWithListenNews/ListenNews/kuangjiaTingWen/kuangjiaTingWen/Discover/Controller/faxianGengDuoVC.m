@@ -188,7 +188,7 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     
-    NSDictionary *dic = [NSDictionary new];
+    NSDictionary *dic;
     if (tableView == self.tableView) {
         dic = [[NSDictionary alloc]initWithDictionary:self.infoArr[indexPath.row]];
     }

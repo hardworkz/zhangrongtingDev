@@ -64,15 +64,12 @@
 @end
 
 @implementation BlogViewController
-
 - (void)viewDidLoad{
     [super viewDidLoad];
     [self setupData];
     [self setupView];
 }
-
 - (void)setupData{
-//    [self.blogTableview registerNib:[UINib nibWithNibName:BlogTableViewCellID bundle:nil] forCellReuseIdentifier:BlogTableViewCellID];
     self.blogArray = [NSMutableArray new];
     self.isReplyComment = NO;
     self.replyComment_tuid = @"0";
@@ -142,7 +139,7 @@
     //添加观察者，用来监听播放器的缓冲进度loadedTimeRanges属性
 //    [Explayer addObserver:self forKeyPath:@"loadedTimeRange" options:NSKeyValueObservingOptionNew context:nil];
     //播放完毕后发出通知
-    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(voicePlayEnd:) name:AVPlayerItemDidPlayToEndTimeNotification object:self.voicePlayer.currentItem];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(voicePlayEnd:) name:AVPlayerItemDidPlayToEndTimeNotification object:nil];
     
 }
 
@@ -171,16 +168,11 @@
             [self.blogTableview.tableHeaderView addSubview:self.newMessageButton];
             [self.newMessageTipsLabel setText:[NSString stringWithFormat:@"%ld则新消息",[feedback count]]];
             //头像url处理
-            NSString *imgUrl = [NSString stringWithFormat:@"%@",[[feedback firstObject][@"user"][@"avatar"] stringByReplacingOccurrencesOfString:@"\\" withString:@""]];
-            NSString *imgUrl1 = [imgUrl stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-            NSString *imgUrl2 = [imgUrl1 stringByReplacingOccurrencesOfString:@"thumb:" withString:@""];
-            NSString *imgUrl3 = [imgUrl2 stringByReplacingOccurrencesOfString:@"{" withString:@""];
-            NSString *imgUrl4 = [imgUrl3 stringByReplacingOccurrencesOfString:@"}" withString:@""];
-            if ([imgUrl4  rangeOfString:@"http"].location != NSNotFound){
-                [self.newMessageImage sd_setImageWithURL:[NSURL URLWithString:imgUrl4] placeholderImage:AvatarPlaceHolderImage];
+            if ([NEWSSEMTPHOTOURL([feedback firstObject][@"user"][@"avatar"])  rangeOfString:@"http"].location != NSNotFound){
+                [self.newMessageImage sd_setImageWithURL:[NSURL URLWithString:NEWSSEMTPHOTOURL([feedback firstObject][@"user"][@"avatar"])] placeholderImage:AvatarPlaceHolderImage];
             }
             else{
-                NSString *str = USERPHOTOHTTPSTRING(imgUrl4);
+                NSString *str = USERPHOTOHTTPSTRING(NEWSSEMTPHOTOURL([feedback firstObject][@"user"][@"avatar"]));
                 [self.newMessageImage sd_setImageWithURL:[NSURL URLWithString:str] placeholderImage:AvatarPlaceHolderImage];
             }
         }
@@ -197,16 +189,11 @@
             [self.blogTableview.tableHeaderView addSubview:self.newMessageButton];
             [self.newMessageTipsLabel setText:[NSString stringWithFormat:@"%ld则新消息",[newprompt count]]];
             //头像url处理
-            NSString *imgUrl = [NSString stringWithFormat:@"%@",[[newprompt firstObject][@"user"][@"avatar"] stringByReplacingOccurrencesOfString:@"\\" withString:@""]];
-            NSString *imgUrl1 = [imgUrl stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-            NSString *imgUrl2 = [imgUrl1 stringByReplacingOccurrencesOfString:@"thumb:" withString:@""];
-            NSString *imgUrl3 = [imgUrl2 stringByReplacingOccurrencesOfString:@"{" withString:@""];
-            NSString *imgUrl4 = [imgUrl3 stringByReplacingOccurrencesOfString:@"}" withString:@""];
-            if ([imgUrl4  rangeOfString:@"http"].location != NSNotFound){
-                [self.newMessageImage sd_setImageWithURL:[NSURL URLWithString:imgUrl4] placeholderImage:AvatarPlaceHolderImage];
+            if ([NEWSSEMTPHOTOURL([newprompt firstObject][@"user"][@"avatar"])  rangeOfString:@"http"].location != NSNotFound){
+                [self.newMessageImage sd_setImageWithURL:[NSURL URLWithString:NEWSSEMTPHOTOURL([newprompt firstObject][@"user"][@"avatar"])] placeholderImage:AvatarPlaceHolderImage];
             }
             else{
-                NSString *str = USERPHOTOHTTPSTRING(imgUrl4);
+                NSString *str = USERPHOTOHTTPSTRING(NEWSSEMTPHOTOURL([newprompt firstObject][@"user"][@"avatar"]));
                 [self.newMessageImage sd_setImageWithURL:[NSURL URLWithString:str] placeholderImage:AvatarPlaceHolderImage];
             }
         }
@@ -221,16 +208,14 @@
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
     [IQKeyboardManager sharedManager].enable = NO;
-//    IQKeyboardManager *manager = [IQKeyboardManager sharedManager];
-//    manager.enable = YES;
-//    manager.shouldResignOnTouchOutside = YES;
-//    manager.shouldToolbarUsesTextFieldTintColor = NO;
-//    manager.enableAutoToolbar = NO;
-    
 }
 
 - (void)viewWillDisappear:(BOOL)animated{
     [super viewWillDisappear:animated];
+    
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:AVPlayerItemDidPlayToEndTimeNotification object:nil];
+    [CommonCode writeToUserD:@"NO" andKey:TINGYOUQUANBOFANGWANBI];
+    
     [IQKeyboardManager sharedManager].enable = NO;
     [self dissmissKeyboard];
     [self.voiceImgV removeFromSuperview];
@@ -241,7 +226,7 @@
 }
 
 - (void)viewDidDisappear:(BOOL)animated{
-    [super viewWillDisappear:animated];
+    [super viewDidDisappear:animated];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillShowNotification object:nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillHideNotification object:nil];
 }
@@ -371,7 +356,6 @@
     cell.isUnreadMessage = NO;
     cell.indexRow = indexPath.row;
     FeedBackAndListenFriendFrameModel *frameModel = self.blogArray[indexPath.row];
-//    cell.blogViewController = self;
     cell.frameModel = frameModel;
     cell.selectionStyle = UITableViewCellSelectionStyleNone;
     
@@ -418,6 +402,9 @@
     }];
     [cell.photosImageView setTapImageBlock:^(MultiImageView *view, UIImageView *imgv, NSInteger idx) {
         [weakSelf showPhotos:view.images selectedIndex:idx];
+    }];
+    [cell setDeleteComment:^(BlobNewTableViewCell *cell,NSInteger index,NSInteger commentIndex){
+        [weakSelf reloadFrameArrayWithIndex:index commnetIndex:commentIndex];
     }];
 
     return cell;
@@ -472,38 +459,9 @@
             [bofangVC shareInstance].iszhuboxiangqing = NO;
             [bofangVC shareInstance].newsModel.post_keywords = model.post.post_keywords;
             [bofangVC shareInstance].newsModel.url = model.post.url;
-            if ([model.post.post_time intValue] / 1000 / 60)
-            {
-                if ([model.post.post_time intValue] / 1000 / 60 > 9)
-                {
-                    [bofangVC shareInstance].yinpinzongTime.text = [NSString stringWithFormat:@"%d:%d",[model.post.post_time intValue] / 1000 / 60,[model.post.post_time intValue] / 1000 % 60];
-                }
-                else{
-                    if ([model.post.post_time intValue] / 1000 % 60 < 10)
-                    {
-                        [bofangVC shareInstance].yinpinzongTime.text = [NSString stringWithFormat:@"0%d:0%d",[model.post.post_time intValue] / 1000 / 60,[model.post.post_time intValue] / 1000 % 60];
-                    }else
-                    {
-                        [bofangVC shareInstance].yinpinzongTime.text = [NSString stringWithFormat:@"0%d:%d",[model.post.post_time intValue] / 1000 / 60,[model.post.post_time intValue] / 1000 % 60];
-                    }
-                }
-            }else
-            {
-                if ([model.post.post_time intValue] / 1000 > 10)
-                {
-                    [bofangVC shareInstance].yinpinzongTime.text = [NSString stringWithFormat:@"00:%d",[model.post.post_time intValue] / 1000 % 60];
-                }else
-                {
-                    [bofangVC shareInstance].yinpinzongTime.text = [NSString stringWithFormat:@"00:0%d",[model.post.post_time intValue] / 1000 % 60];
-                }
-            }
+            [bofangVC shareInstance].yinpinzongTime.text = [[bofangVC shareInstance] convertStringWithTime:[model.post.post_time intValue] / 1000];
             ExcurrentNumber = (int)indexPath.row;
-            NSString *imgUrl = [[NSString stringWithFormat:@"%@",model.post.smeta] stringByReplacingOccurrencesOfString:@"\\" withString:@""];
-            NSString *imgUrl1 = [imgUrl stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-            NSString *imgUrl2 = [imgUrl1 stringByReplacingOccurrencesOfString:@"thumb:" withString:@""];
-            NSString *imgUrl3 = [imgUrl2 stringByReplacingOccurrencesOfString:@"{" withString:@""];
-            NSString *imgUrl4 = [imgUrl3 stringByReplacingOccurrencesOfString:@"}" withString:@""];
-            [bofangVC shareInstance].newsModel.ImgStrjiemu = imgUrl4;
+            [bofangVC shareInstance].newsModel.ImgStrjiemu = model.post.smeta;
             [bofangVC shareInstance].newsModel.ZhengWenjiemu = model.post.post_excerpt;
             [bofangVC shareInstance].newsModel.praisenum = model.post.praisenum;
             [[bofangVC shareInstance].tableView reloadData];
@@ -941,12 +899,26 @@
     }
     return frameModelArray;
 }
+- (void)reloadFrameArrayWithIndex:(NSInteger)index commnetIndex:(NSInteger)commentIndex
+{
+    FeedBackAndListenFriendFrameModel *frameModel = [[FeedBackAndListenFriendFrameModel alloc] init];
+    FeedBackAndListenFriendFrameModel *Fmodel = self.blogArray[index];
+//    child_commentModel *model = Fmodel.model.child_comment[commentIndex];
+    [Fmodel.model.child_comment removeObjectAtIndex:commentIndex];
+    
+    frameModel.isFeedbackVC = self.isFeedbackVC;
+    frameModel.model = Fmodel.model;
+    [self.blogArray replaceObjectAtIndex:index withObject:frameModel];
+    
+    [self.blogTableview reloadRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:index inSection:0]] withRowAnimation:UITableViewRowAnimationNone];
+}
+
 - (void)addFavInTableViewCell:(BlobNewTableViewCell *)cell andIszan:(int)iszan{
     NSIndexPath *indexPath = [self.blogTableview indexPathForCell:cell];
     FeedBackAndListenFriendFrameModel *blog = self.blogArray[indexPath.row];
     FeedBackAndListenFriendModel *model = blog.model;
     cell.praiseButton.userInteractionEnabled = NO;
-    DefineWeakSelf;
+     DefineWeakSelf;
     if (self.isFeedbackVC) {
         if ([[CommonCode readFromUserD:@"isLogin"]boolValue] == YES){
             if (iszan == 1){
@@ -989,26 +961,36 @@
         }
     }
     else{
-        if ([[CommonCode readFromUserD:@"isLogin"]boolValue] == YES){
-            [NetWorkTool addAndCancelPraiseWithaccessToken:[DSE encryptUseDES:ExdangqianUser] comments_id:model.ID sccess:^(NSDictionary *responseObject) {
-                [weakSelf loadData];
-                cell.praiseButton.userInteractionEnabled = YES;
-                if (iszan == 1) {
-                    XWAlerLoginView *xw = [[XWAlerLoginView alloc]initWithTitle:@"取消点赞成功"];
-                    [xw show];
-                }else
-                {
-                    XWAlerLoginView *xw = [[XWAlerLoginView alloc]initWithTitle:@"点赞成功"];
-                    [xw show];
-                }
-            } failure:^(NSError *error) {
-                cell.praiseButton.userInteractionEnabled = YES;
-                [SVProgressHUD showErrorWithStatus:@"网络请求失败"];
-                [self performSelector:@selector(SVPDismiss) withObject:nil afterDelay:1.0];
-            }];
-        }else{
-            [self loginFirst];
-        }
+        [NetWorkTool addAndCancelPraiseWithaccessToken:[DSE encryptUseDES:ExdangqianUser] comments_id:model.ID sccess:^(NSDictionary *responseObject) {
+//            [weakSelf loadData];
+            
+            if (iszan == 0) {
+                [cell.praiseButton setImage:[UIImage imageNamed:@"me_mypage_me_list_ic_liked"] forState:UIControlStateNormal];
+                cell.frameModel.model.zan = @"1";
+                cell.frameModel.model.praisenum = [NSString stringWithFormat:@"%d",[cell.frameModel.model.praisenum intValue] + 1];
+                cell.favLabel.text = [NSString stringWithFormat:@"%@人点赞",cell.frameModel.model.praisenum];
+            }
+            else if (iszan == 1){
+                [cell.praiseButton setImage:[UIImage imageNamed:@"me_mypage_me_list_ic_like"] forState:UIControlStateNormal];
+                cell.frameModel.model.zan = @"0";
+                cell.frameModel.model.praisenum = [NSString stringWithFormat:@"%d",[cell.frameModel.model.praisenum intValue] - 1];
+                cell.favLabel.text = [NSString stringWithFormat:@"%@人点赞",cell.frameModel.model.praisenum];
+            }
+            
+            cell.praiseButton.userInteractionEnabled = YES;
+            if (iszan == 1) {
+                XWAlerLoginView *xw = [[XWAlerLoginView alloc]initWithTitle:@"取消点赞成功"];
+                [xw show];
+            }else
+            {
+                XWAlerLoginView *xw = [[XWAlerLoginView alloc]initWithTitle:@"点赞成功"];
+                [xw show];
+            }
+        } failure:^(NSError *error) {
+            cell.praiseButton.userInteractionEnabled = YES;
+            [SVProgressHUD showErrorWithStatus:@"网络请求失败"];
+            [self performSelector:@selector(SVPDismiss) withObject:nil afterDelay:1.0];
+        }];
     }
     
 }
@@ -1250,9 +1232,8 @@
     [qingshuruyonghuming addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
     }]];
     [qingshuruyonghuming addAction:[UIAlertAction actionWithTitle:@"登录" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-        LoginNavC *loginNavC = [LoginNavC new];
         LoginVC *loginFriVC = [LoginVC new];
-        loginNavC = [[LoginNavC alloc]initWithRootViewController:loginFriVC];
+        LoginNavC *loginNavC = [[LoginNavC alloc]initWithRootViewController:loginFriVC];
         [loginNavC.navigationBar setBackgroundColor:[UIColor whiteColor]];
         //        [loginNavC.navigationBar setBackgroundImage:[UIImage imageNamed:@"mian-1"] forBarMetrics:UIBarMetricsDefault];
         loginNavC.navigationBar.tintColor = [UIColor blackColor];
@@ -1427,12 +1408,7 @@
     gerenzhuye.user_id = components[@"id"];
     
     //头像url处理
-    NSString *imgUrl = [NSString stringWithFormat:@"%@",[components[@"avatar"] stringByReplacingOccurrencesOfString:@"\\" withString:@""]];
-    NSString *imgUrl1 = [imgUrl stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-    NSString *imgUrl2 = [imgUrl1 stringByReplacingOccurrencesOfString:@"thumb:" withString:@""];
-    NSString *imgUrl3 = [imgUrl2 stringByReplacingOccurrencesOfString:@"{" withString:@""];
-    NSString *imgUrl4 = [imgUrl3 stringByReplacingOccurrencesOfString:@"}" withString:@""];
-    gerenzhuye.avatar = imgUrl4;
+    gerenzhuye.avatar = NEWSSEMTPHOTOURL(components[@"avatar"]);
     gerenzhuye.fan_num = components[@"fan_num"];
     gerenzhuye.guan_num = components[@"guan_num"];
     self.hidesBottomBarWhenPushed = YES;
@@ -1523,17 +1499,17 @@
         ExisRigester = NO;
     }
     
+    [self.player stop];
     [self.voicePlayer pause];
     [CommonCode writeToUserD:@"YES" andKey:TINGYOUQUANBOFANGWANBI];
     _isPlaying = NO;
 }
 
 - (void)dealloc {
-    RTLog(@"BlogViewController----");
+    RTLog(@"dealloc--------");
     [self.voicePlayer removeObserver:self forKeyPath:@"statu"];
-//    [Explayer removeObserver:self forKeyPath:@"loadedTimeRange"];
-//    [Explayer removeObserver:self forKeyPath:@"status"];
-//    [Explayer removeObserver:self forKeyPath:@"loadedTimeRanges"];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:AVPlayerItemDidPlayToEndTimeNotification object:nil];
+    [CommonCode writeToUserD:@"NO" andKey:TINGYOUQUANBOFANGWANBI];
 }
 
 #pragma mark - UIButtonAction
@@ -1754,5 +1730,6 @@
     unreadVC.pageSource = self.isFeedbackVC ? 2:1;
     [self.navigationController pushViewController:unreadVC animated:YES];
 }
+
 @end
 

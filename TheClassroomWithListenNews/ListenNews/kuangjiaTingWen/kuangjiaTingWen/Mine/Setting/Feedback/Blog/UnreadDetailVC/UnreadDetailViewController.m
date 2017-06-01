@@ -180,7 +180,7 @@
             //听友圈
             [NetWorkTool newPromptGetOneWithaccessToken:AvatarAccessToken parentid:self.parentid path:self.path sccess:^(NSDictionary *responseObject) {
                 
-                NSLog(@"%@",responseObject[@"results"]);
+                RTLog(@"%@",responseObject[@"results"]);
                 
                 if ([[responseObject[@"results"][@"user"] allKeys] containsObject:@"user_login"]) {
                     [weakSelf.infoArr addObject:responseObject[@"results"]];
@@ -202,7 +202,7 @@
             //意见反馈
             [NetWorkTool feedbackGetOneWithaccessToken:AvatarAccessToken feedback_id:self.feedback_id sccess:^(NSDictionary *responseObject) {
                 //
-                NSLog(@"%@",responseObject[@"results"]);
+                RTLog(@"%@",responseObject[@"results"]);
                 if ([responseObject[@"status"] integerValue] == 1) {
                    [weakSelf.infoArr addObject:responseObject[@"results"]];
                     [weakSelf.unreadTableview reloadData];
@@ -472,12 +472,7 @@
     
     
     //头像url处理
-    NSString *imgUrl = [NSString stringWithFormat:@"%@",[components[@"avatar"] stringByReplacingOccurrencesOfString:@"\\" withString:@""]];
-    NSString *imgUrl1 = [imgUrl stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-    NSString *imgUrl2 = [imgUrl1 stringByReplacingOccurrencesOfString:@"thumb:" withString:@""];
-    NSString *imgUrl3 = [imgUrl2 stringByReplacingOccurrencesOfString:@"{" withString:@""];
-    NSString *imgUrl4 = [imgUrl3 stringByReplacingOccurrencesOfString:@"}" withString:@""];
-    gerenzhuye.avatar = imgUrl4;
+    gerenzhuye.avatar = NEWSSEMTPHOTOURL(components[@"avatar"]);
     gerenzhuye.fan_num = components[@"fan_num"];
     gerenzhuye.guan_num = components[@"guan_num"];
     self.hidesBottomBarWhenPushed = YES;
@@ -805,7 +800,7 @@ didSelectLinkWithTransitInformation:(NSDictionary *)components {
             }
             
             [cell.commentLabel setLinkAttributes:@{NSForegroundColorAttributeName : [UIColor blackColor],NSFontAttributeName : gFontMain13}];
-            NSMutableDictionary *CommentInformationDic = [NSMutableDictionary new];
+            NSMutableDictionary *CommentInformationDic;
             CommentInformationDic = [user mutableCopy];
             [CommentInformationDic setObject:@"1" forKey:@"isComment"];
             [CommentInformationDic setObject:[NSString stringWithFormat:@"%ld",(long)indexPath.row] forKey:@"rowIndex"];
@@ -906,38 +901,9 @@ didSelectLinkWithTransitInformation:(NSDictionary *)components {
             [bofangVC shareInstance].iszhuboxiangqing = NO;
             [bofangVC shareInstance].newsModel.post_keywords = self.infoArr[indexPath.row][@"post"][@"post_keywords"];
             [bofangVC shareInstance].newsModel.url = self.infoArr[indexPath.row][@"post"][@"url"];
-            if ([self.infoArr[indexPath.row][@"post"][@"post_time"] intValue] / 1000 / 60)
-            {
-                if ([self.infoArr[indexPath.row][@"post"][@"post_time"] intValue] / 1000 / 60 > 9)
-                {
-                    [bofangVC shareInstance].yinpinzongTime.text = [NSString stringWithFormat:@"%d:%d",[self.infoArr[indexPath.row][@"post"][@"post_time"] intValue] / 1000 / 60,[self.infoArr[indexPath.row][@"post"][@"post_time"] intValue] / 1000 % 60];
-                }
-                else{
-                    if ([self.infoArr[indexPath.row][@"post"][@"post_time"] intValue] / 1000 % 60 < 10)
-                    {
-                        [bofangVC shareInstance].yinpinzongTime.text = [NSString stringWithFormat:@"0%d:0%d",[self.infoArr[indexPath.row][@"post"][@"post_time"] intValue] / 1000 / 60,[self.infoArr[indexPath.row][@"post"][@"post_time"] intValue] / 1000 % 60];
-                    }else
-                    {
-                        [bofangVC shareInstance].yinpinzongTime.text = [NSString stringWithFormat:@"0%d:%d",[self.infoArr[indexPath.row][@"post"][@"post_time"] intValue] / 1000 / 60,[self.infoArr[indexPath.row][@"post"][@"post_time"] intValue] / 1000 % 60];
-                    }
-                }
-            }else
-            {
-                if ([self.infoArr[indexPath.row][@"post"][@"post_time"] intValue] / 1000 > 10)
-                {
-                    [bofangVC shareInstance].yinpinzongTime.text = [NSString stringWithFormat:@"00:%d",[self.infoArr[indexPath.row][@"post"][@"post_time"] intValue] / 1000 % 60];
-                }else
-                {
-                    [bofangVC shareInstance].yinpinzongTime.text = [NSString stringWithFormat:@"00:0%d",[self.infoArr[indexPath.row][@"post"][@"post_time"] intValue] / 1000 % 60];
-                }
-            }
+            [bofangVC shareInstance].yinpinzongTime.text = [[bofangVC shareInstance] convertStringWithTime:[self.infoArr[indexPath.row][@"post"][@"post_time"] intValue] / 1000];
             ExcurrentNumber = (int)indexPath.row;
-            NSString *imgUrl = [NSString stringWithFormat:@"%@",[self.infoArr[indexPath.row][@"post"][@"smeta"] stringByReplacingOccurrencesOfString:@"\\" withString:@""]];
-            NSString *imgUrl1 = [imgUrl stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-            NSString *imgUrl2 = [imgUrl1 stringByReplacingOccurrencesOfString:@"thumb:" withString:@""];
-            NSString *imgUrl3 = [imgUrl2 stringByReplacingOccurrencesOfString:@"{" withString:@""];
-            NSString *imgUrl4 = [imgUrl3 stringByReplacingOccurrencesOfString:@"}" withString:@""];
-            [bofangVC shareInstance].newsModel.ImgStrjiemu = imgUrl4;
+            [bofangVC shareInstance].newsModel.ImgStrjiemu = self.infoArr[indexPath.row][@"post"][@"smeta"];
             [bofangVC shareInstance].newsModel.ZhengWenjiemu = self.infoArr[indexPath.row][@"post"][@"post_excerpt"];
             [bofangVC shareInstance].newsModel.praisenum = self.infoArr[indexPath.row][@"post"][@"praisenum"];
             [[bofangVC shareInstance].tableView reloadData];

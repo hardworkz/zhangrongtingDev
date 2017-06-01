@@ -132,8 +132,8 @@
     }
     //跳转个人主页
     UINavigationController *vc = (UINavigationController *)object;
-//    self.blogViewController.hidesBottomBarWhenPushed=YES;
+    gerenzhuye.hidesBottomBarWhenPushed=YES;
     [vc.navigationController pushViewController:gerenzhuye animated:YES];
-//    self.blogViewController.hidesBottomBarWhenPushed=YES;
+    gerenzhuye.hidesBottomBarWhenPushed=YES;
 }
 @end

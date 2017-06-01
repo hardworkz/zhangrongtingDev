@@ -110,7 +110,10 @@
     NSString* productIdentifier = @"";
     
     if (transaction.originalTransaction) {
+#warning [__NSCFConstantString objectForKeyedSubscript:]: unrecognized selector sent to instance
+//        if ([transaction.originalTransaction.payment.productIdentifier isKindOfClass:[NSDictionary class]]) {
         productIdentifier = transaction.originalTransaction.payment.productIdentifier;
+//        }
     }
     else {
         productIdentifier = transaction.payment.productIdentifier;

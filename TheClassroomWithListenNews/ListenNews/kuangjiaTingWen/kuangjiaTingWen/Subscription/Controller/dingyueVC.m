@@ -119,10 +119,9 @@
     //    self.navigationController.navigationBar.titleTextAttributes = @{NSForegroundColorAttributeName: [UIColor blackColor],
     //                                                                    NSFontAttributeName : [UIFont boldSystemFontOfSize:18]};
     if ([[CommonCode readFromUserD:@"isLogin"]boolValue] == NO){
-        LoginNavC *loginNavC = [LoginNavC new];
         LoginVC *loginFriVC = [LoginVC new];
         loginFriVC.isSubscription = YES;
-        loginNavC = [[LoginNavC alloc]initWithRootViewController:loginFriVC];
+        LoginNavC *loginNavC = [[LoginNavC alloc]initWithRootViewController:loginFriVC];
         [loginNavC.navigationBar setBackgroundColor:[UIColor whiteColor]];
         //        [loginNavC.navigationBar setBackgroundImage:[UIImage imageNamed:@"mian-1"] forBarMetrics:UIBarMetricsDefault];
         loginNavC.navigationBar.tintColor = [UIColor blackColor];
@@ -166,16 +165,11 @@
     if (IS_IPAD) {
         [imgV setFrame:CGRectMake(SCREEN_WIDTH - 125.0 / 375 * IPHONE_W, 19, 105.0 / 375 * IPHONE_W, 70.0 / 375 *IPHONE_W)];
     }
-    NSString *imgUrl = [NSString stringWithFormat:@"%@",[self.infoArr[indexPath.row][@"smeta"] stringByReplacingOccurrencesOfString:@"\\" withString:@""]];
-    NSString *imgUrl1 = [imgUrl stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-    NSString *imgUrl2 = [imgUrl1 stringByReplacingOccurrencesOfString:@"thumb:" withString:@""];
-    NSString *imgUrl3 = [imgUrl2 stringByReplacingOccurrencesOfString:@"{" withString:@""];
-    NSString *imgUrl4 = [imgUrl3 stringByReplacingOccurrencesOfString:@"}" withString:@""];
-    if ([imgUrl4  rangeOfString:@"http"].location != NSNotFound){
-        [imgV sd_setImageWithURL:[NSURL URLWithString:imgUrl4] placeholderImage:[UIImage imageNamed:@"thumbnailsdefault"]];
+    if ([NEWSSEMTPHOTOURL(self.infoArr[indexPath.row][@"smeta"])  rangeOfString:@"http"].location != NSNotFound){
+        [imgV sd_setImageWithURL:[NSURL URLWithString:NEWSSEMTPHOTOURL(self.infoArr[indexPath.row][@"smeta"])] placeholderImage:[UIImage imageNamed:@"thumbnailsdefault"]];
     }else
     {
-        NSString *str = USERPHOTOHTTPSTRINGZhuBo(imgUrl4);
+        NSString *str = USERPHOTOHTTPSTRINGZhuBo(NEWSSEMTPHOTOURL(self.infoArr[indexPath.row][@"smeta"]));
         [imgV sd_setImageWithURL:[NSURL URLWithString:str] placeholderImage:[UIImage imageNamed:@"thumbnailsdefault"]];
     }
     imgV.contentMode = UIViewContentModeScaleAspectFill;
@@ -291,38 +285,9 @@
         [bofangVC shareInstance].iszhuboxiangqing = NO;
         [bofangVC shareInstance].newsModel.post_keywords = self.infoArr[indexPath.row][@"post_keywords"];
         [bofangVC shareInstance].newsModel.url = self.infoArr[indexPath.row][@"url"];
-        if ([self.infoArr[indexPath.row][@"post_time"] intValue] / 1000 / 60)
-        {
-            if ([self.infoArr[indexPath.row][@"post_time"] intValue] / 1000 / 60 > 9)
-            {
-                [bofangVC shareInstance].yinpinzongTime.text = [NSString stringWithFormat:@"%d:%d",[self.infoArr[indexPath.row][@"post_time"] intValue] / 1000 / 60,[self.infoArr[indexPath.row][@"post_time"] intValue] / 1000 % 60];
-            }
-            else{
-                if ([self.infoArr[indexPath.row][@"post_time"] intValue] / 1000 % 60 < 10)
-                {
-                    [bofangVC shareInstance].yinpinzongTime.text = [NSString stringWithFormat:@"0%d:0%d",[self.infoArr[indexPath.row][@"post_time"] intValue] / 1000 / 60,[self.infoArr[indexPath.row][@"post_time"] intValue] / 1000 % 60];
-                }else
-                {
-                    [bofangVC shareInstance].yinpinzongTime.text = [NSString stringWithFormat:@"0%d:%d",[self.infoArr[indexPath.row][@"post_time"] intValue] / 1000 / 60,[self.infoArr[indexPath.row][@"post_time"] intValue] / 1000 % 60];
-                }
-            }
-        }else
-        {
-            if ([self.infoArr[indexPath.row][@"post_time"] intValue] / 1000 > 10)
-            {
-                [bofangVC shareInstance].yinpinzongTime.text = [NSString stringWithFormat:@"00:%d",[self.infoArr[indexPath.row][@"post_time"] intValue] / 1000 % 60];
-            }else
-            {
-                [bofangVC shareInstance].yinpinzongTime.text = [NSString stringWithFormat:@"00:0%d",[self.infoArr[indexPath.row][@"post_time"] intValue] / 1000 % 60];
-            }
-        }
+        [bofangVC shareInstance].yinpinzongTime.text = [[bofangVC shareInstance] convertStringWithTime:[self.infoArr[indexPath.row][@"post_time"] intValue] / 1000];
         ExcurrentNumber = (int)indexPath.row;
-        NSString *imgUrl = [NSString stringWithFormat:@"%@",[self.infoArr[indexPath.row][@"smeta"] stringByReplacingOccurrencesOfString:@"\\" withString:@""]];
-        NSString *imgUrl1 = [imgUrl stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-        NSString *imgUrl2 = [imgUrl1 stringByReplacingOccurrencesOfString:@"thumb:" withString:@""];
-        NSString *imgUrl3 = [imgUrl2 stringByReplacingOccurrencesOfString:@"{" withString:@""];
-        NSString *imgUrl4 = [imgUrl3 stringByReplacingOccurrencesOfString:@"}" withString:@""];
-        [bofangVC shareInstance].newsModel.ImgStrjiemu = imgUrl4;
+        [bofangVC shareInstance].newsModel.ImgStrjiemu = self.infoArr[indexPath.row][@"smeta"];
         [bofangVC shareInstance].newsModel.ZhengWenjiemu = self.infoArr[indexPath.row][@"post_excerpt"];
         [bofangVC shareInstance].newsModel.praisenum = self.infoArr[indexPath.row][@"praisenum"];
         [[bofangVC shareInstance].tableView reloadData];
@@ -563,40 +528,10 @@
     [bofangVC shareInstance].newsModel.post_time = self.pushNewsInfo[@"post_time"];
     [bofangVC shareInstance].newsModel.post_keywords = self.pushNewsInfo[@"post_keywords"];
     [bofangVC shareInstance].iszhuboxiangqing = NO;
+    [bofangVC shareInstance].yinpinzongTime.text = [[bofangVC shareInstance] convertStringWithTime:[self.pushNewsInfo[@"post_time"] intValue] / 1000];
     //        dangqianbofangTable = tableView;
-    if ([self.pushNewsInfo[@"post_time"] intValue] / 1000 / 60)
-    {
-        if ([self.pushNewsInfo[@"post_time"] intValue] / 1000 / 60 > 9)
-        {
-            [bofangVC shareInstance].yinpinzongTime.text = [NSString stringWithFormat:@"%d:%d",[self.pushNewsInfo[@"post_time"] intValue] / 1000 / 60,[self.pushNewsInfo[@"post_time"] intValue] / 1000 % 60];
-        }else
-        {
-            if ([self.pushNewsInfo[@"post_time"] intValue] / 1000 % 60 < 10)
-            {
-                [bofangVC shareInstance].yinpinzongTime.text = [NSString stringWithFormat:@"0%d:0%d",[self.pushNewsInfo[@"post_time"] intValue] / 1000 / 60,[self.pushNewsInfo[@"post_time"] intValue] / 1000 % 60];
-            }else
-            {
-                [bofangVC shareInstance].yinpinzongTime.text = [NSString stringWithFormat:@"0%d:%d",[self.pushNewsInfo[@"post_time"] intValue] / 1000 / 60,[self.pushNewsInfo[@"post_time"] intValue] / 1000 % 60];
-            }
-        }
-    }else
-    {
-        if ([self.pushNewsInfo[@"post_time"] intValue] / 1000 > 10)
-        {
-            [bofangVC shareInstance].yinpinzongTime.text = [NSString stringWithFormat:@"00:%d",[self.pushNewsInfo[@"post_time"] intValue] / 1000 % 60];
-        }else
-        {
-            [bofangVC shareInstance].yinpinzongTime.text = [NSString stringWithFormat:@"00:0%d",[self.pushNewsInfo[@"post_time"] intValue] / 1000 % 60];
-        }
-    }
-    
     //        ExcurrentNumber = (int)indexPath.row;
-    NSString *imgUrl = [NSString stringWithFormat:@"%@",[self.pushNewsInfo[@"smeta"] stringByReplacingOccurrencesOfString:@"\\" withString:@""]];
-    NSString *imgUrl1 = [imgUrl stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-    NSString *imgUrl2 = [imgUrl1 stringByReplacingOccurrencesOfString:@"thumb:" withString:@""];
-    NSString *imgUrl3 = [imgUrl2 stringByReplacingOccurrencesOfString:@"{" withString:@""];
-    NSString *imgUrl4 = [imgUrl3 stringByReplacingOccurrencesOfString:@"}" withString:@""];
-    [bofangVC shareInstance].newsModel.ImgStrjiemu = imgUrl4;
+    [bofangVC shareInstance].newsModel.ImgStrjiemu = self.pushNewsInfo[@"smeta"];
     [bofangVC shareInstance].newsModel.ZhengWenjiemu = self.pushNewsInfo[@"post_excerpt"];
     [bofangVC shareInstance].newsModel.praisenum = self.pushNewsInfo[@"praisenum"];
     //            [[bofangVC shareInstance].newsModel.tableView reloadData];
@@ -678,32 +613,8 @@
     [bofangVC shareInstance].newsModel.post_keywords = dic[@"post_keywords"];
     [bofangVC shareInstance].newsModel.url = dic[@"url"];
     [bofangVC shareInstance].iszhuboxiangqing = NO;
+    [bofangVC shareInstance].yinpinzongTime.text = [[bofangVC shareInstance] convertStringWithTime:[dic[@"post_time"] intValue] / 1000];
     //  dangqianbofangTable = tableView;
-    if ([dic[@"post_time"] intValue] / 1000 / 60)
-    {
-        if ([dic[@"post_time"] intValue] / 1000 / 60 > 9)
-        {
-            [bofangVC shareInstance].yinpinzongTime.text = [NSString stringWithFormat:@"%d:%d",[dic[@"post_time"] intValue] / 1000 / 60,[dic[@"post_time"] intValue] / 1000 % 60];
-        }else
-        {
-            if ([dic[@"post_time"] intValue] / 1000 % 60 < 10)
-            {
-                [bofangVC shareInstance].yinpinzongTime.text = [NSString stringWithFormat:@"0%d:0%d",[dic[@"post_time"] intValue] / 1000 / 60,[dic[@"post_time"] intValue] / 1000 % 60];
-            }else
-            {
-                [bofangVC shareInstance].yinpinzongTime.text = [NSString stringWithFormat:@"0%d:%d",[dic[@"post_time"] intValue] / 1000 / 60,[dic[@"post_time"]intValue] / 1000 % 60];
-            }
-        }
-    }else
-    {
-        if ([dic[@"post_time"] intValue] / 1000 > 10)
-        {
-            [bofangVC shareInstance].yinpinzongTime.text = [NSString stringWithFormat:@"00:%d",[dic[@"post_time"] intValue] / 1000 % 60];
-        }else
-        {
-            [bofangVC shareInstance].yinpinzongTime.text = [NSString stringWithFormat:@"00:0%d",[dic[@"post_time"] intValue] / 1000 % 60];
-        }
-    }
     
     [bofangVC shareInstance].newsModel.ImgStrjiemu = dic[@"ImgStrjiemu"];
     [bofangVC shareInstance].newsModel.ZhengWenjiemu = dic[@"ZhengWenjiemu"];

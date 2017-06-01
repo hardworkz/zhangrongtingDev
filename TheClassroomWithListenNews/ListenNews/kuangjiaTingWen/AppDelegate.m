@@ -9,7 +9,7 @@
 #import "AppDelegate.h"
 #import "bofangVC.h"
 #import <UMSocialCore/UMSocialCore.h>
-#import "UMSocialWechatHandler.h"
+//#import "UMSocialWechatHandler.h"
 #import "UMSocialSinaHandler.h"
 #import "guanggaoVC.h"
 #import "WeiboSDK.h"
@@ -33,6 +33,18 @@
 @end
 
 @implementation AppDelegate
++ (AppDelegate *)delegate {
+    return (AppDelegate *)[UIApplication sharedApplication].delegate;
+}
+#pragma mark - network
+- (void)setNetworkStatus:(NetworkStatus)networkStatus {
+    if (_networkStatus != networkStatus) {
+        _networkStatus = networkStatus;
+        SendNotify(NETWORKSTATUSCHANGE, nil)
+    }else {
+        _networkStatus = networkStatus;
+    }
+}
 
 //-(BOOL)application:(UIApplication *)application willFinishLaunchingWithOptions:(NSDictionary *)launchOptions{
 //    
@@ -49,6 +61,8 @@
     
     [self.window makeKeyAndVisible];
     
+    //监听网络变化
+    [[SuNetworkMonitor monitor] startMonitorNetwork];
     
     //友盟统计
     NSString *version = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];
@@ -270,22 +284,6 @@
     //小米推送
     [self setMIPush];
     
-    //注册远程通知
-//    if ([[UIDevice currentDevice].systemVersion floatValue] < 8.0)
-//    {
-//        UIRemoteNotificationType type = UIRemoteNotificationTypeAlert | UIRemoteNotificationTypeBadge | UIRemoteNotificationTypeSound;
-//        
-//        [application registerForRemoteNotificationTypes:type];
-//    }
-//    else
-//    {
-//        UIUserNotificationType type = UIUserNotificationTypeAlert | UIUserNotificationTypeBadge | UIUserNotificationTypeSound;
-//        
-//        UIUserNotificationSettings *setting = [UIUserNotificationSettings settingsForTypes:type categories:nil];
-//        
-//        [application registerUserNotificationSettings:setting];
-//        
-//    }
     
     //推送唤醒APP的
     NSDictionary *userInfo = launchOptions[UIApplicationLaunchOptionsRemoteNotificationKey];
@@ -640,8 +638,7 @@
  * @param resp具体的回应内容，是自动释放的
  */
 -(void)onResp:(BaseResp*)resp{
-    NSLog(@"%@",resp);
-    
+    NSLog(@"%d",resp.errCode);
     // SendMessageToQQResp应答帮助类
     if ([resp.class isSubclassOfClass: [SendMessageToQQResp class]]) {  //QQ分享回应
         if (_qqDelegate) {

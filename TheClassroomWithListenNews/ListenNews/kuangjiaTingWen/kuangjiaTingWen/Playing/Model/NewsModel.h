@@ -25,6 +25,6 @@
 @property(nonatomic)NSString *jiemuFan_num;/**<节目粉丝数*/
 @property(nonatomic)NSString *jiemuMessage_num;/**<节目消息数*/
 @property(nonatomic)NSString *jiemuIs_fan;/**<是否该节目粉丝*/
-@property(nonatomic)NSString *post_keywords;/**<*/
+@property(nonatomic)NSString *post_keywords;/**<新闻关键词*/
 @property(nonatomic)NSString *url;/**<路径*/
 @end

@@ -7,6 +7,8 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "Reachability.h"
+
 typedef void (^SkipToPlayingVCBlock)(NSString *) ;
 typedef void (^WeibodidReceiveResponse)(NSDictionary *);
 typedef void (^WechatdidReceiveCode)(NSString *);
@@ -32,6 +34,14 @@ typedef void (^WechatdidReceiveCode)(NSString *);
 @property (copy, nonatomic) WechatdidReceiveCode wechatGetLoginCode;
 
 @property (weak  , nonatomic) id<QQShareDelegate> qqDelegate;
+/*
+ * 网络状态
+ */
+@property (nonatomic, assign) NetworkStatus networkStatus;
+/*
+ * 获取app代理
+ */
++ (AppDelegate *)delegate;
 
 @end
 

@@ -20,4 +20,7 @@
 
 #import "PinglundianzanCustomBtn.h"
 
+#import "LoginVC.h"
+#import "LoginNavC.h"
+
 #endif /* PlayingHeader_h */

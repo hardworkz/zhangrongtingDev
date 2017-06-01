@@ -13,8 +13,6 @@
 
 @property (copy, nonatomic) void (^clickRowCellWithReview)(CommentAndReviewTableViewCell *cell,child_commentModel *model);
 
-//@property (strong, nonatomic) UIViewController *blogViewController;
-
 +(CommentAndReviewTableViewCell *)cellWithTableView:(UITableView *)tableView;
 + (NSString *)ID;
 @end

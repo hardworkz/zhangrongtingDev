@@ -14,7 +14,7 @@
             buildForArchiving = "YES">
             <BuildableReference
                BuildableIdentifier = 'primary'
-               BlueprintIdentifier = '8FC0D18F2C3B1D8BB83F096D68242CE8'
+               BlueprintIdentifier = '2C68275DA4D32FA5102F51B4EDD658D4'
                BlueprintName = 'UIKitCategoryAdditions'
                ReferencedContainer = 'container:Pods.xcodeproj'
                BuildableName = 'UIKitCategoryAdditions.framework'>

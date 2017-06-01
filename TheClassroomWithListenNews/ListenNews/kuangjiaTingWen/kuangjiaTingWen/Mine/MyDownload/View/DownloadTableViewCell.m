@@ -86,17 +86,12 @@
 
 - (void)updateCellValueWithDict:(NSMutableDictionary *)mdic {
     
-    NSString *imgUrl = [mdic[@"smeta"] stringByReplacingOccurrencesOfString:@"\\" withString:@""];
-    NSString *imgUrl1 = [imgUrl stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-    NSString *imgUrl2 = [imgUrl1 stringByReplacingOccurrencesOfString:@"thumb:" withString:@""];
-    NSString *imgUrl3 = [imgUrl2 stringByReplacingOccurrencesOfString:@"{" withString:@""];
-    NSString *imgUrl4 = [imgUrl3 stringByReplacingOccurrencesOfString:@"}" withString:@""];
-    if ([imgUrl4  rangeOfString:@"http"].location != NSNotFound)
+    if ([NEWSSEMTPHOTOURL(mdic[@"smeta"])  rangeOfString:@"http"].location != NSNotFound)
     {
-        [self.smetaImageView sd_setImageWithURL:[NSURL URLWithString:imgUrl4] placeholderImage:[UIImage imageNamed:@"thumbnailsdefault"]];
+        [self.smetaImageView sd_setImageWithURL:[NSURL URLWithString:NEWSSEMTPHOTOURL(mdic[@"smeta"])] placeholderImage:[UIImage imageNamed:@"thumbnailsdefault"]];
     }else
     {
-        NSString *str = USERPHOTOHTTPSTRINGZhuBo(imgUrl4);
+        NSString *str = USERPHOTOHTTPSTRINGZhuBo(NEWSSEMTPHOTOURL(mdic[@"smeta"]));
         [self.smetaImageView sd_setImageWithURL:[NSURL URLWithString:str] placeholderImage:[UIImage imageNamed:@"thumbnailsdefault"]];
     }
     [self.titleLabel setText:mdic[@"post_title"]];

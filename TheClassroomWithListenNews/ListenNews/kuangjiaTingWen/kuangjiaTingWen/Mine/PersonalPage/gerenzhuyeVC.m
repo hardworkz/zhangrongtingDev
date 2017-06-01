@@ -28,7 +28,7 @@
 #import "UIActionSheet+MKBlockAdditions.h"
 
 #define IMAGEHEIGHT (273.0)
-@interface gerenzhuyeVC ()<UITableViewDataSource,UITableViewDelegate,UITextViewDelegate,UITextFieldDelegate,UIGestureRecognizerDelegate>
+@interface gerenzhuyeVC ()<UITableViewDataSource,UITableViewDelegate,UITextViewDelegate,UITextFieldDelegate,TTTAttributedLabelDelegate,UIGestureRecognizerDelegate>
 {
     NSMutableArray *arr;
     int numberPage;
@@ -90,7 +90,6 @@
 }
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.hidesBottomBarWhenPushed = YES;
     
     [self setupData];
     [self setupView];
@@ -190,7 +189,6 @@
     
 //    [self TopUI];
     [self.view addSubview:self.zhuyetableView];
-    self.zhuyetableView.tableHeaderView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, IMAGEHEIGHT / 667 * IPHONE_H )];
     
     UISwipeGestureRecognizer *rightSwipe = [[UISwipeGestureRecognizer alloc]initWithTarget:self action:@selector(rightSwipeAction)];
     [rightSwipe setDirection:UISwipeGestureRecognizerDirectionRight];
@@ -239,16 +237,11 @@
             [self.newMessageButton setHidden:NO];
             [self.newMessageTipsLabel setText:[NSString stringWithFormat:@"%ld则新消息",[Addcriticism count]]];
             //头像url处理
-            NSString *imgUrl = [NSString stringWithFormat:@"%@",[[Addcriticism firstObject][@"to_avatar"] stringByReplacingOccurrencesOfString:@"\\" withString:@""]];
-            NSString *imgUrl1 = [imgUrl stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-            NSString *imgUrl2 = [imgUrl1 stringByReplacingOccurrencesOfString:@"thumb:" withString:@""];
-            NSString *imgUrl3 = [imgUrl2 stringByReplacingOccurrencesOfString:@"{" withString:@""];
-            NSString *imgUrl4 = [imgUrl3 stringByReplacingOccurrencesOfString:@"}" withString:@""];
-            if ([imgUrl4  rangeOfString:@"http"].location != NSNotFound){
-                [self.newMessageImage sd_setImageWithURL:[NSURL URLWithString:imgUrl4] placeholderImage:AvatarPlaceHolderImage];
+            if ([NEWSSEMTPHOTOURL([Addcriticism firstObject][@"to_avatar"])  rangeOfString:@"http"].location != NSNotFound){
+                [self.newMessageImage sd_setImageWithURL:[NSURL URLWithString:[Addcriticism firstObject][@"to_avatar"]] placeholderImage:AvatarPlaceHolderImage];
             }
             else{
-                NSString *str = USERPHOTOHTTPSTRING(imgUrl4);
+                NSString *str = USERPHOTOHTTPSTRING([Addcriticism firstObject][@"to_avatar"]);
                 [self.newMessageImage sd_setImageWithURL:[NSURL URLWithString:str] placeholderImage:AvatarPlaceHolderImage];
             }
         }
@@ -312,16 +305,11 @@
         [self.zhuyetableView.tableHeaderView addSubview:self.newMessageButton];
         [self.newMessageTipsLabel setText:[NSString stringWithFormat:@"%ld则新消息",[Addcriticism count]]];
         //头像url处理
-        NSString *imgUrl = [NSString stringWithFormat:@"%@",[[Addcriticism firstObject][@"avatar"] stringByReplacingOccurrencesOfString:@"\\" withString:@""]];
-        NSString *imgUrl1 = [imgUrl stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-        NSString *imgUrl2 = [imgUrl1 stringByReplacingOccurrencesOfString:@"thumb:" withString:@""];
-        NSString *imgUrl3 = [imgUrl2 stringByReplacingOccurrencesOfString:@"{" withString:@""];
-        NSString *imgUrl4 = [imgUrl3 stringByReplacingOccurrencesOfString:@"}" withString:@""];
-        if ([imgUrl4  rangeOfString:@"http"].location != NSNotFound){
-            [self.newMessageImage sd_setImageWithURL:[NSURL URLWithString:imgUrl4] placeholderImage:AvatarPlaceHolderImage];
+        if ([NEWSSEMTPHOTOURL([Addcriticism firstObject][@"avatar"])  rangeOfString:@"http"].location != NSNotFound){
+            [self.newMessageImage sd_setImageWithURL:[NSURL URLWithString:NEWSSEMTPHOTOURL([Addcriticism firstObject][@"avatar"])] placeholderImage:AvatarPlaceHolderImage];
         }
         else{
-            NSString *str = USERPHOTOHTTPSTRING(imgUrl4);
+            NSString *str = USERPHOTOHTTPSTRING(NEWSSEMTPHOTOURL([Addcriticism firstObject][@"avatar"]));
             [self.newMessageImage sd_setImageWithURL:[NSURL URLWithString:str] placeholderImage:AvatarPlaceHolderImage];
         }
     }
@@ -390,16 +378,11 @@
     }
     else{
         //头像url处理
-        NSString *imgUrl = [NSString stringWithFormat:@"%@",[self.avatar stringByReplacingOccurrencesOfString:@"\\" withString:@""]];
-        NSString *imgUrl1 = [imgUrl stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-        NSString *imgUrl2 = [imgUrl1 stringByReplacingOccurrencesOfString:@"thumb:" withString:@""];
-        NSString *imgUrl3 = [imgUrl2 stringByReplacingOccurrencesOfString:@"{" withString:@""];
-        NSString *imgUrl4 = [imgUrl3 stringByReplacingOccurrencesOfString:@"}" withString:@""];
-        if ([imgUrl4  rangeOfString:@"http"].location != NSNotFound){
-            [titleImgV sd_setImageWithURL:[NSURL URLWithString:imgUrl4] placeholderImage:AvatarPlaceHolderImage];
+        if ([NEWSSEMTPHOTOURL(self.avatar)  rangeOfString:@"http"].location != NSNotFound){
+            [titleImgV sd_setImageWithURL:[NSURL URLWithString:NEWSSEMTPHOTOURL(self.avatar)] placeholderImage:AvatarPlaceHolderImage];
         }
         else{
-            NSString *str = USERPHOTOHTTPSTRING(imgUrl4);
+            NSString *str = USERPHOTOHTTPSTRING(NEWSSEMTPHOTOURL(self.avatar));
             [titleImgV sd_setImageWithURL:[NSURL URLWithString:str] placeholderImage:AvatarPlaceHolderImage];
         }
     }
@@ -804,38 +787,10 @@
             [bofangVC shareInstance].iszhuboxiangqing = NO;
             [bofangVC shareInstance].newsModel.post_keywords = model.post.post_keywords;
             [bofangVC shareInstance].newsModel.url = model.post.url;
-            if ([model.post.post_time intValue] / 1000 / 60)
-            {
-                if ([model.post.post_time intValue] / 1000 / 60 > 9)
-                {
-                    [bofangVC shareInstance].yinpinzongTime.text = [NSString stringWithFormat:@"%d:%d",[model.post.post_time intValue] / 1000 / 60,[model.post.post_time intValue] / 1000 % 60];
-                }
-                else{
-                    if ([model.post.post_time intValue] / 1000 % 60 < 10)
-                    {
-                        [bofangVC shareInstance].yinpinzongTime.text = [NSString stringWithFormat:@"0%d:0%d",[model.post.post_time intValue] / 1000 / 60,[model.post.post_time intValue] / 1000 % 60];
-                    }else
-                    {
-                        [bofangVC shareInstance].yinpinzongTime.text = [NSString stringWithFormat:@"0%d:%d",[model.post.post_time intValue] / 1000 / 60,[model.post.post_time intValue] / 1000 % 60];
-                    }
-                }
-            }else
-            {
-                if ([model.post.post_time intValue] / 1000 > 10)
-                {
-                    [bofangVC shareInstance].yinpinzongTime.text = [NSString stringWithFormat:@"00:%d",[model.post.post_time intValue] / 1000 % 60];
-                }else
-                {
-                    [bofangVC shareInstance].yinpinzongTime.text = [NSString stringWithFormat:@"00:0%d",[model.post.post_time intValue] / 1000 % 60];
-                }
-            }
+            [bofangVC shareInstance].yinpinzongTime.text = [[bofangVC shareInstance] convertStringWithTime:[model.post.post_time intValue] / 1000];
+            
             ExcurrentNumber = (int)indexPath.row;
-            NSString *imgUrl = [NSString stringWithFormat:@"%@",[model.post.smeta stringByReplacingOccurrencesOfString:@"\\" withString:@""]];
-            NSString *imgUrl1 = [imgUrl stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-            NSString *imgUrl2 = [imgUrl1 stringByReplacingOccurrencesOfString:@"thumb:" withString:@""];
-            NSString *imgUrl3 = [imgUrl2 stringByReplacingOccurrencesOfString:@"{" withString:@""];
-            NSString *imgUrl4 = [imgUrl3 stringByReplacingOccurrencesOfString:@"}" withString:@""];
-            [bofangVC shareInstance].newsModel.ImgStrjiemu = imgUrl4;
+            [bofangVC shareInstance].newsModel.ImgStrjiemu = model.post.smeta;
             [bofangVC shareInstance].newsModel.ZhengWenjiemu = model.post.post_excerpt;
             [bofangVC shareInstance].newsModel.praisenum = model.post.praisenum;
             [[bofangVC shareInstance].tableView reloadData];
@@ -889,6 +844,34 @@
         
     }
 }
+#pragma mark - 回复评论
+//点击回复评论
+- (void)reviewWithCell:(BlobNewTableViewCell *)cell andModel:(child_commentModel *)model
+{
+    self.replyComment_tuid = model.uid;
+    if ([[CommonCode readFromUserD:@"isLogin"]boolValue] == YES) {
+        //获取当前登录用户ID
+        ExdangqianUserUid = [CommonCode readFromUserD:@"dangqianUserUid"];
+        //判断是否为自己的评论或者回复
+        if ([model.uid isEqualToString:ExdangqianUserUid]) {
+            
+        }else{
+            self.toolBarView.frame = CGRectMake(0, SCREEN_HEIGHT, SCREEN_WIDTH, 46);
+            [[UIApplication sharedApplication].keyWindow addSubview:self.toolBarView];
+            [self.toolBarView setHidden:NO];
+            [self.commentTextField becomeFirstResponder];
+            self.isReplyComment = YES;
+            [self.commentTextField setPlaceholder:[NSString stringWithFormat:@"@%@",model.user.user_nicename]];
+            NSIndexPath *indexPath = [self.zhuyetableView indexPathForCell:cell];
+            [CommonCode writeToUserD:[NSString stringWithFormat:@"%ld",(long)indexPath.row] andKey:@"rowIndex"];
+        }
+    }
+    else{
+        [self loginFirst];
+    }
+    
+}
+
 #pragma mark - UIScrollViewDelegate
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView{
@@ -896,6 +879,49 @@
     [self.toolBarView setHidden:YES];
     [self.commentTextField resignFirstResponder];
     
+}
+
+#pragma mark - TTTAttributedLabelDelegate
+
+- (void)attributedLabel:(TTTAttributedLabel *)label
+didSelectLinkWithTransitInformation:(NSDictionary *)components {
+    
+    if ([components[@"isComment"] isEqualToString:@"1"]) {
+        self.replyComment_tuid = components[@"comment_tuid"];
+        if ([[CommonCode readFromUserD:@"isLogin"]boolValue] == YES) {
+            self.toolBarView.frame = CGRectMake(0, SCREEN_HEIGHT, SCREEN_WIDTH, 46);
+            [[UIApplication sharedApplication].keyWindow addSubview:self.toolBarView];
+            [self.toolBarView setHidden:NO];
+            [self.commentTextField becomeFirstResponder];
+            self.isReplyComment = YES;
+            [self.commentTextField setPlaceholder:[NSString stringWithFormat:@"@%@",components[@"user_nicename"]]];
+            [CommonCode writeToUserD:components[@"rowIndex"] andKey:@"rowIndex"];
+        }
+        else{
+            [self loginFirst];
+        }
+    }
+    else{
+        gerenzhuyeVC *gerenzhuye = [gerenzhuyeVC new];
+        if ([components[@"user_login"] isEqualToString:ExdangqianUser] && [[CommonCode readFromUserD:@"isLogin"]boolValue] == YES) {
+            gerenzhuye.isMypersonalPage = YES;
+        }
+        else{
+            gerenzhuye.isMypersonalPage = NO;
+        }
+        gerenzhuye.isNewsComment = NO;
+        gerenzhuye.user_nicename = components[@"user_nicename"];
+        gerenzhuye.sex = components[@"sex"];
+        gerenzhuye.signature = components[@"signature"];
+        gerenzhuye.user_login = components[@"user_login"];
+        gerenzhuye.avatar = components[@"avatar"];
+        gerenzhuye.fan_num = components[@"fan_num"];
+        gerenzhuye.guan_num = components[@"guan_num"];
+        gerenzhuye.user_id = components[@"id"];
+        self.hidesBottomBarWhenPushed=YES;
+        [self.navigationController pushViewController:gerenzhuye animated:YES];
+        self.hidesBottomBarWhenPushed=YES;
+    }
 }
 
 #pragma mark - Keyboard notifications
@@ -1002,7 +1028,7 @@
 
 - (void)shangLaJiaZai {
     numberPage++;
-    [NetWorkTool getMyDynamicsListWithaccessToken:[DSE encryptUseDES:self.user_login] andPage:[NSString stringWithFormat:@"%d",numberPage] andLimit:@"10" sccess:^(NSDictionary *responseObject) {
+    [NetWorkTool getMyDynamicsListWithaccessToken:[DSE encryptUseDES:self.user_login] login_uid:ExdangqianUserUid andPage:[NSString stringWithFormat:@"%d",numberPage]  andLimit:@"10" sccess:^(NSDictionary *responseObject) {
         if ([responseObject[@"results"] isKindOfClass:[NSArray class]]){
             NSMutableArray *array = [FeedBackAndListenFriendModel mj_objectArrayWithKeyValuesArray:responseObject[@"results"]];
             [self.infoArr addObjectsFromArray:[self frameArrayWithDataArray:array]];
@@ -1030,7 +1056,7 @@
 
 - (void)refreshData {
     
-        [NetWorkTool getMyDynamicsListWithaccessToken:[DSE encryptUseDES:self.user_login] andPage:@"1" andLimit:@"10" sccess:^(NSDictionary *responseObject) {
+        [NetWorkTool getMyDynamicsListWithaccessToken:[DSE encryptUseDES:self.user_login] login_uid:ExdangqianUserUid andPage:@"1" andLimit:@"10" sccess:^(NSDictionary *responseObject) {
             if ([responseObject[@"results"] isKindOfClass:[NSArray class]])
             {
                 [self.infoArr removeAllObjects];
@@ -1106,61 +1132,42 @@
 }
 
 #pragma mark - tableCellBlockMethods
-#pragma mark - 回复评论
-//点击回复评论
-- (void)reviewWithCell:(BlobNewTableViewCell *)cell andModel:(child_commentModel *)model
-{
-    self.replyComment_tuid = model.uid;
-    if ([[CommonCode readFromUserD:@"isLogin"]boolValue] == YES) {
-        //获取当前登录用户ID
-        ExdangqianUserUid = [CommonCode readFromUserD:@"dangqianUserUid"];
-        //判断是否为自己的评论或者回复
-        if ([model.uid isEqualToString:ExdangqianUserUid]) {
-            
-        }else{
-            self.toolBarView.frame = CGRectMake(0, SCREEN_HEIGHT, SCREEN_WIDTH, 46);
-            [[UIApplication sharedApplication].keyWindow addSubview:self.toolBarView];
-            [self.toolBarView setHidden:NO];
-            [self.commentTextField becomeFirstResponder];
-            self.isReplyComment = YES;
-            [self.commentTextField setPlaceholder:[NSString stringWithFormat:@"@%@",model.user.user_nicename]];
-            NSIndexPath *indexPath = [self.zhuyetableView indexPathForCell:cell];
-            [CommonCode writeToUserD:[NSString stringWithFormat:@"%ld",(long)indexPath.row] andKey:@"rowIndex"];
-        }
-    }
-    else{
-        [self loginFirst];
-    }
+- (void)addFavInTableViewCell:(BlobNewTableViewCell *)cell andIszan:(int )iszan{
     
-}
-
-- (void)addFavInTableViewCell:(BlobNewTableViewCell *)cell andIszan:(int )iszan
-{
     NSIndexPath *indexPath = [self.zhuyetableView indexPathForCell:cell];
     FeedBackAndListenFriendFrameModel *blog = self.infoArr[indexPath.row];
     FeedBackAndListenFriendModel *model = blog.model;
     cell.praiseButton.userInteractionEnabled = NO;
-    DefineWeakSelf;
-    if ([[CommonCode readFromUserD:@"isLogin"]boolValue] == YES){
-        [NetWorkTool addAndCancelPraiseWithaccessToken:[DSE encryptUseDES:ExdangqianUser] comments_id:model.ID sccess:^(NSDictionary *responseObject) {
-            [weakSelf refreshData];
-            cell.praiseButton.userInteractionEnabled = YES;
-            if (iszan == 1) {
-                XWAlerLoginView *xw = [[XWAlerLoginView alloc]initWithTitle:@"取消点赞成功"];
-                [xw show];
-            }else
-            {
-                XWAlerLoginView *xw = [[XWAlerLoginView alloc]initWithTitle:@"点赞成功"];
-                [xw show];
-            }
-        } failure:^(NSError *error) {
-            cell.praiseButton.userInteractionEnabled = YES;
-            [SVProgressHUD showErrorWithStatus:@"网络请求失败"];
-            [self performSelector:@selector(SVPDismiss) withObject:nil afterDelay:1.0];
-        }];
-    }else{
-        [self loginFirst];
-    }
+//    DefineWeakSelf;
+    [NetWorkTool addAndCancelPraiseWithaccessToken:[DSE encryptUseDES:ExdangqianUser] comments_id:model.ID sccess:^(NSDictionary *responseObject) {
+//        [weakSelf refreshData];
+        if (iszan == 0) {
+            [cell.praiseButton setImage:[UIImage imageNamed:@"me_mypage_me_list_ic_liked"] forState:UIControlStateNormal];
+            cell.frameModel.model.zan = @"1";
+            cell.frameModel.model.praisenum = [NSString stringWithFormat:@"%d",[cell.frameModel.model.praisenum intValue] + 1];
+            cell.favLabel.text = [NSString stringWithFormat:@"%@人点赞",cell.frameModel.model.praisenum];
+        }
+        else if (iszan == 1){
+            [cell.praiseButton setImage:[UIImage imageNamed:@"me_mypage_me_list_ic_like"] forState:UIControlStateNormal];
+            cell.frameModel.model.zan = @"0";
+            cell.frameModel.model.praisenum = [NSString stringWithFormat:@"%d",[cell.frameModel.model.praisenum intValue] - 1];
+            cell.favLabel.text = [NSString stringWithFormat:@"%@人点赞",cell.frameModel.model.praisenum];
+        }
+
+        cell.praiseButton.userInteractionEnabled = YES;
+        if (iszan == 1) {
+            XWAlerLoginView *xw = [[XWAlerLoginView alloc]initWithTitle:@"取消点赞成功"];
+            [xw show];
+        }else
+        {
+            XWAlerLoginView *xw = [[XWAlerLoginView alloc]initWithTitle:@"点赞成功"];
+            [xw show];
+        }
+    } failure:^(NSError *error) {
+        cell.praiseButton.userInteractionEnabled = YES;
+        [SVProgressHUD showErrorWithStatus:@"网络请求失败"];
+        [self performSelector:@selector(SVPDismiss) withObject:nil afterDelay:1.0];
+    }];
 }
 
 - (void)addCommentInTableViewCell:(UITableViewCell *)cell{
@@ -1231,9 +1238,8 @@
     [qingshuruyonghuming addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
     }]];
     [qingshuruyonghuming addAction:[UIAlertAction actionWithTitle:@"登录" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-        LoginNavC *loginNavC = [LoginNavC new];
         LoginVC *loginFriVC = [LoginVC new];
-        loginNavC = [[LoginNavC alloc]initWithRootViewController:loginFriVC];
+        LoginNavC *loginNavC = [[LoginNavC alloc]initWithRootViewController:loginFriVC];
         [loginNavC.navigationBar setBackgroundColor:[UIColor whiteColor]];
         //        [loginNavC.navigationBar setBackgroundImage:[UIImage imageNamed:@"mian-1"] forBarMetrics:UIBarMetricsDefault];
         loginNavC.navigationBar.tintColor = [UIColor blackColor];
@@ -1301,9 +1307,8 @@
         [qingshuruyonghuming addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
         }]];
         [qingshuruyonghuming addAction:[UIAlertAction actionWithTitle:@"登录" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-            LoginNavC *loginNavC = [LoginNavC new];
             LoginVC *loginFriVC = [LoginVC new];
-            loginNavC = [[LoginNavC alloc]initWithRootViewController:loginFriVC];
+            LoginNavC *loginNavC = [[LoginNavC alloc]initWithRootViewController:loginFriVC];
             [loginNavC.navigationBar setBackgroundColor:[UIColor whiteColor]];
             //        [loginNavC.navigationBar setBackgroundImage:[UIImage imageNamed:@"mian-1"] forBarMetrics:UIBarMetricsDefault];
             loginNavC.navigationBar.tintColor = [UIColor blackColor];
@@ -1351,19 +1356,19 @@
         NSString *tuid = @"0";
         NSString *to_comment_id = @"0";
         NSString *iscomment = @"0";
-        FeedBackAndListenFriendFrameModel *frameModel = self.infoArr[row];
         DefineWeakSelf;
         [SVProgressHUD setDefaultMaskType:SVProgressHUDMaskTypeBlack];
         if (self.isReplyComment) {
             iscomment = @"1";
-            to_comment_id = frameModel.model.ID;
-            tuid = frameModel.model.to_uid;
+            to_comment_id = self.infoArr[row][@"id"];
+            tuid = self.replyComment_tuid;
         }
         else{
             
-            tuid = frameModel.model.uid;
-            to_comment_id = frameModel.model.ID;
+            tuid = self.infoArr[row][@"uid"];
+            to_comment_id = self.infoArr[row][@"id"];
         }
+        FeedBackAndListenFriendFrameModel *frameModel = self.infoArr[indexPath.row];
         if ([frameModel.model.post_id isEqualToString:@"0"]) {
             [NetWorkTool addfriendDynamicsPingLunWithaccessToken:AvatarAccessToken
                                                          post_id:frameModel.model.post_id

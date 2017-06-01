@@ -16,7 +16,7 @@
 #import "ShareAlertView.h"
 #import "AppDelegate.h"
 #import "UIImage+compress.h"
-#import "UMSocialWechatHandler.h"
+//#import "UMSocialWechatHandler.h"
 #import "BatchDownloadTableTableViewController.h"
 #import "NSDate+TimeFormat.h"
 #import "UIView+tap.h"
@@ -918,7 +918,7 @@
         switch (selectedindex) {
             case 0:{
                 //主播头像URL
-                NSString *imageStr = self.jiemuImages;
+                NSString *imageStr;
                 if([self.jiemuImages rangeOfString:@"/data/upload/"].location !=NSNotFound){
                     imageStr = USERPHOTOHTTPSTRINGZhuBo(self.jiemuImages);
                 }
@@ -983,7 +983,7 @@
         return;
     }
     //主播头像URL
-    NSString *imageStr = self.jiemuImages;
+    NSString *imageStr;
     if([self.jiemuImages rangeOfString:@"/data/upload/"].location !=NSNotFound){
         imageStr = USERPHOTOHTTPSTRINGZhuBo(self.jiemuImages);
     }
@@ -1120,9 +1120,8 @@
         [qingshuruyonghuming addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
         }]];
         [qingshuruyonghuming addAction:[UIAlertAction actionWithTitle:@"去登录" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-            LoginNavC *loginNavC = [LoginNavC new];
             LoginVC *loginFriVC = [LoginVC new];
-            loginNavC = [[LoginNavC alloc]initWithRootViewController:loginFriVC];
+            LoginNavC *loginNavC = [[LoginNavC alloc]initWithRootViewController:loginFriVC];
             [loginNavC.navigationBar setBackgroundColor:[UIColor whiteColor]];
             //        [loginNavC.navigationBar setBackgroundImage:[UIImage imageNamed:@"mian-1"] forBarMetrics:UIBarMetricsDefault];
             loginNavC.navigationBar.tintColor = [UIColor blackColor];
@@ -1238,9 +1237,8 @@
     else{
         //先登录
         _isRewardLoginBack = YES;
-        LoginNavC *loginNavC = [LoginNavC new];
         LoginVC *loginFriVC = [LoginVC new];
-        loginNavC = [[LoginNavC alloc]initWithRootViewController:loginFriVC];
+        LoginNavC *loginNavC = [[LoginNavC alloc]initWithRootViewController:loginFriVC];
         [loginNavC.navigationBar setBackgroundColor:[UIColor whiteColor]];
         loginNavC.navigationBar.tintColor = [UIColor blackColor];
         [self presentViewController:loginNavC animated:YES completion:nil];
@@ -1298,9 +1296,8 @@
 
 - (void)rewardLoginfirst{
     
-    LoginNavC *loginNavC = [LoginNavC new];
     LoginVC *loginFriVC = [LoginVC new];
-    loginNavC = [[LoginNavC alloc]initWithRootViewController:loginFriVC];
+    LoginNavC *loginNavC = [[LoginNavC alloc]initWithRootViewController:loginFriVC];
     [loginNavC.navigationBar setBackgroundColor:[UIColor whiteColor]];
     loginNavC.navigationBar.tintColor = [UIColor blackColor];
     [self presentViewController:loginNavC animated:YES completion:nil];
@@ -1830,38 +1827,9 @@
             [bofangVC shareInstance].newsModel.post_time = xinwenArr[indexPath.row][@"post_time"];
             [bofangVC shareInstance].newsModel.post_keywords = xinwenArr[indexPath.row][@"post_keywords"];
             [bofangVC shareInstance].newsModel.url = xinwenArr[indexPath.row][@"url"];
-            if ([xinwenArr[indexPath.row][@"post_time"] intValue] / 1000 / 60)
-            {
-                if ([xinwenArr[indexPath.row][@"post_time"] intValue] / 1000 / 60 > 9)
-                {
-                    [bofangVC shareInstance].yinpinzongTime.text = [NSString stringWithFormat:@"%d:%d",[xinwenArr[indexPath.row][@"post_time"] intValue] / 1000 / 60,[xinwenArr[indexPath.row][@"post_time"] intValue] / 1000 % 60];
-                }else
-                {
-                    if ([xinwenArr[indexPath.row][@"post_time"] intValue] / 1000 % 60 < 10)
-                    {
-                        [bofangVC shareInstance].yinpinzongTime.text = [NSString stringWithFormat:@"0%d:0%d",[xinwenArr[indexPath.row][@"post_time"] intValue] / 1000 / 60,[xinwenArr[indexPath.row][@"post_time"] intValue] / 1000 % 60];
-                    }else
-                    {
-                        [bofangVC shareInstance].yinpinzongTime.text = [NSString stringWithFormat:@"0%d:%d",[xinwenArr[indexPath.row][@"post_time"] intValue] / 1000 / 60,[xinwenArr[indexPath.row][@"post_time"] intValue] / 1000 % 60];
-                    }
-                }
-            }else
-            {
-                if ([xinwenArr[indexPath.row][@"post_time"] intValue] / 1000 > 10)
-                {
-                    [bofangVC shareInstance].yinpinzongTime.text = [NSString stringWithFormat:@"00:%d",[xinwenArr[indexPath.row][@"post_time"] intValue] / 1000 % 60];
-                }else
-                {
-                    [bofangVC shareInstance].yinpinzongTime.text = [NSString stringWithFormat:@"00:0%d",[xinwenArr[indexPath.row][@"post_time"] intValue] / 1000 % 60];
-                }
-            }
+            [bofangVC shareInstance].yinpinzongTime.text = [[bofangVC shareInstance] convertStringWithTime:[xinwenArr[indexPath.row][@"post_time"] intValue] / 1000];
             ExcurrentNumber = (int)indexPath.row;
-            NSString *imgUrl = [NSString stringWithFormat:@"%@",[xinwenArr[indexPath.row][@"smeta"] stringByReplacingOccurrencesOfString:@"\\" withString:@""]];
-            NSString *imgUrl1 = [imgUrl stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-            NSString *imgUrl2 = [imgUrl1 stringByReplacingOccurrencesOfString:@"thumb:" withString:@""];
-            NSString *imgUrl3 = [imgUrl2 stringByReplacingOccurrencesOfString:@"{" withString:@""];
-            NSString *imgUrl4 = [imgUrl3 stringByReplacingOccurrencesOfString:@"}" withString:@""];
-            [bofangVC shareInstance].newsModel.ImgStrjiemu = imgUrl4;
+            [bofangVC shareInstance].newsModel.ImgStrjiemu = xinwenArr[indexPath.row][@"smeta"];
             [bofangVC shareInstance].newsModel.ZhengWenjiemu = xinwenArr[indexPath.row][@"post_excerpt"];
             [bofangVC shareInstance].newsModel.praisenum = xinwenArr[indexPath.row][@"praisenum"];
             [bofangVC shareInstance].iszhuboxiangqing = YES;

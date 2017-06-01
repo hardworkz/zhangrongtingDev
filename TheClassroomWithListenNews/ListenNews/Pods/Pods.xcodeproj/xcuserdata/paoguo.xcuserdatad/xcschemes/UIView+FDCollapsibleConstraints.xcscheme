@@ -14,7 +14,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "587BA84B1D8501481F15550C76C280BD"
+               BlueprintIdentifier = "B022425BC9D3381D6EF45B254AD100B0"
                BuildableName = "UIView_FDCollapsibleConstraints.framework"
                BlueprintName = "UIView+FDCollapsibleConstraints"
                ReferencedContainer = "container:Pods.xcodeproj">
@@ -45,7 +45,7 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "587BA84B1D8501481F15550C76C280BD"
+            BlueprintIdentifier = "B022425BC9D3381D6EF45B254AD100B0"
             BuildableName = "UIView_FDCollapsibleConstraints.framework"
             BlueprintName = "UIView+FDCollapsibleConstraints"
             ReferencedContainer = "container:Pods.xcodeproj">

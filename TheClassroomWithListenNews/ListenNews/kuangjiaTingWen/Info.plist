@@ -7,7 +7,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>zh_CN</string>
 	<key>CFBundleDisplayName</key>
-	<string>听闻测试</string>
+	<string>听闻</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -23,7 +23,7 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>6.8</string>
+	<string>6.9</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleURLTypes</key>
@@ -32,10 +32,10 @@
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>CFBundleURLName</key>
-			<string>com.popwcn.ListenNewsExploreVersion</string>
+			<string>com.popwcn.listenNews</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>wb2998039169</string>
+				<string>wb2382842831</string>
 			</array>
 		</dict>
 		<dict>
@@ -45,27 +45,27 @@
 			<string>weixin</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>wxd5f60a219ecad5d5</string>
+				<string>wx4041964cf987e1e0</string>
 			</array>
 		</dict>
 		<dict>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>CFBundleURLName</key>
-			<string>com.popwcn.ListenNewsExploreVersion</string>
+			<string>com.popwcn.listenNews</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>tencent1105686687</string>
+				<string>tencent1105760468</string>
 			</array>
 		</dict>
 		<dict>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>CFBundleURLName</key>
-			<string>com.popwcn.ListenNewsExploreVersion</string>
+			<string>com.popwcn.listenNews</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>QQ41e7709f</string>
+				<string>QQ41e890d4</string>
 			</array>
 		</dict>
 		<dict>
@@ -93,7 +93,7 @@
 			<string>weixin</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>wxcff5e0171440230a</string>
+				<string>wx4bad076e5dba3fab</string>
 			</array>
 		</dict>
 	</array>
@@ -136,9 +136,9 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>MiSDKAppID</key>
-	<string>2882303761517516882</string>
+	<string>2882303761517514526</string>
 	<key>MiSDKAppKey</key>
-	<string>5321751643882</string>
+	<string>5291751464526</string>
 	<key>MiSDKRun</key>
 	<string>${MiSDKRun}</string>
 	<key>NSAppTransportSecurity</key>

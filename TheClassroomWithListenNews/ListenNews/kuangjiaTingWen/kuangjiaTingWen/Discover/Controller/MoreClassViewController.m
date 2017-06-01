@@ -172,17 +172,12 @@
         }
         [imgLeft.layer setMasksToBounds:YES];
         [imgLeft.layer setCornerRadius:5.0];
-        NSString *imgUrl = [NSString stringWithFormat:@"%@",[self.commentInfoArr[indexPath.row][@"images"] stringByReplacingOccurrencesOfString:@"\\" withString:@""]];
-        NSString *imgUrl1 = [imgUrl stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-        NSString *imgUrl2 = [imgUrl1 stringByReplacingOccurrencesOfString:@"thumb:" withString:@""];
-        NSString *imgUrl3 = [imgUrl2 stringByReplacingOccurrencesOfString:@"{" withString:@""];
-        NSString *imgUrl4 = [imgUrl3 stringByReplacingOccurrencesOfString:@"}" withString:@""];
-        if ([imgUrl4  rangeOfString:@"http"].location != NSNotFound){
-            [imgLeft sd_setImageWithURL:[NSURL URLWithString:imgUrl4]];
+        if ([NEWSSEMTPHOTOURL(self.commentInfoArr[indexPath.row][@"images"])  rangeOfString:@"http"].location != NSNotFound){
+            [imgLeft sd_setImageWithURL:[NSURL URLWithString:NEWSSEMTPHOTOURL(self.commentInfoArr[indexPath.row][@"images"])]];
             //placeholderImage:[UIImage imageNamed:@"thumbnailsdefault"]
         }
         else{
-            NSString *str = USERPOTOAD(imgUrl4);
+            NSString *str = USERPOTOAD(NEWSSEMTPHOTOURL(self.commentInfoArr[indexPath.row][@"images"]));
             [imgLeft sd_setImageWithURL:[NSURL URLWithString:str]];
             //placeholderImage:[UIImage imageNamed:@"thumbnailsdefault"]
         }

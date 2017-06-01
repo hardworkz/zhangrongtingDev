@@ -20,24 +20,23 @@ typedef void (^addFavBlock)(NSInteger );
 @property (copy, nonatomic) void (^longPressHeadView)(BlobNewTableViewCell *cell);
 @property (copy, nonatomic) void (^playVoice)(BlobNewTableViewCell *cell);
 @property (copy, nonatomic) void (^updateVoiceAnimate)(BlobNewTableViewCell *cell);
-//@property (copy, nonatomic) void (^clickNameBtnS)(BlobNewTableViewCell *cell,child_commentModel *model);
+@property (copy, nonatomic) void (^deleteComment)(BlobNewTableViewCell *cell,NSInteger indexRow,NSInteger commentIndexRow);
 
 @property (copy, nonatomic) addFavBlock addFavorite;
 
 @property (strong, nonatomic) FeedBackAndListenFriendFrameModel *frameModel;
 
 @property (strong, nonatomic) UILabel *nameLabe;
-//@property (strong, nonatomic) TTTAttributedLabel *commentLabel;
 @property (strong, nonatomic) MultiImageView *photosImageView;
 @property (weak, nonatomic) UIButton *praiseButton;
+@property (weak, nonatomic) UILabel *favLabel;
 @property (weak, nonatomic) UIButton *voiceButton;
 
 @property (assign, nonatomic) BOOL isFeebackBlog;
 @property (assign, nonatomic) BOOL isUnreadMessage;
 
-@property (assign, nonatomic) NSUInteger indexRow;
-
-//@property (strong, nonatomic) UIViewController *blogViewController;
+@property (assign, nonatomic) NSInteger indexRow;
+@property (assign, nonatomic) NSInteger commentIndexRow;
 
 + (NSString *)ID;
 +(BlobNewTableViewCell *)cellWithTableView:(UITableView *)tableView;

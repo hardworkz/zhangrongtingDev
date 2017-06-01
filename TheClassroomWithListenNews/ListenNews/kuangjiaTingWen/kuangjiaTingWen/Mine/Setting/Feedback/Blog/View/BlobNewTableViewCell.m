@@ -10,6 +10,7 @@
 #import "NSDate+TimeFormat.h"
 
 @interface BlobNewTableViewCell ()<UITableViewDelegate,UITableViewDataSource>
+
 @property (weak, nonatomic) UIImageView *headerImage;
 @property (weak, nonatomic) UILabel *creat_timeLabel;
 @property (weak, nonatomic) UILabel *content;
@@ -21,7 +22,6 @@
 @property (weak, nonatomic) UIButton *deleteBtn;
 @property (weak, nonatomic) UIButton *commentBtn;
 @property (weak, nonatomic) UIImageView *favImage;
-@property (weak, nonatomic) UILabel *favLabel;
 @property (weak, nonatomic) UIImageView *commentBgView;
 @property (weak, nonatomic) UIView *devider;
 
@@ -32,7 +32,10 @@
 @property(strong,nonatomic)UIImageView *voiceImgV;
 @property (strong, nonatomic) UILabel *tipLabel;
 
+@property (strong, nonatomic) CustomAlertView *alertView;
+
 @property (strong, nonatomic) NSMutableArray *dataArray;
+
 @end
 @implementation BlobNewTableViewCell
 - (NSMutableArray *)dataArray
@@ -241,17 +244,12 @@
     //设置头像
     UserModel *user = frameModel.model.user;
     //头像url处理
-    NSString *imgUrl = [NSString stringWithFormat:@"%@",[user.avatar stringByReplacingOccurrencesOfString:@"\\" withString:@""]];
-    NSString *imgUrl1 = [imgUrl stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-    NSString *imgUrl2 = [imgUrl1 stringByReplacingOccurrencesOfString:@"thumb:" withString:@""];
-    NSString *imgUrl3 = [imgUrl2 stringByReplacingOccurrencesOfString:@"{" withString:@""];
-    NSString *imgUrl4 = [imgUrl3 stringByReplacingOccurrencesOfString:@"}" withString:@""];
-    if ([imgUrl4  rangeOfString:@"http"].location != NSNotFound)
+    if ([user.avatar  rangeOfString:@"http"].location != NSNotFound)
     {
-        [_headerImage sd_setImageWithURL:[NSURL URLWithString:imgUrl4] placeholderImage:AvatarPlaceHolderImage];
+        [_headerImage sd_setImageWithURL:[NSURL URLWithString:user.avatar] placeholderImage:AvatarPlaceHolderImage];
     }else
     {
-        NSString *str = USERPHOTOHTTPSTRING(imgUrl4);
+        NSString *str = USERPHOTOHTTPSTRING(user.avatar);
         [_headerImage sd_setImageWithURL:[NSURL URLWithString:str] placeholderImage:AvatarPlaceHolderImage];
     }
     //设置用户昵称
@@ -272,17 +270,11 @@
             self.contentNewsView.hidden = NO;
             self.voiceView.hidden = YES;
             //设置新闻图片
-            NSString *aimgUrl = [NSString stringWithFormat:@"%@",[model.post.smeta stringByReplacingOccurrencesOfString:@"\\" withString:@""]];
-            NSString *bimgUrl1 = [aimgUrl stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-            NSString *cimgUrl2 = [bimgUrl1 stringByReplacingOccurrencesOfString:@"thumb:" withString:@""];
-            NSString *dimgUrl3 = [cimgUrl2 stringByReplacingOccurrencesOfString:@"{" withString:@""];
-            NSString *eimgUrl4 = [dimgUrl3 stringByReplacingOccurrencesOfString:@"}" withString:@""];
-            
-            if ([eimgUrl4  rangeOfString:@"http"].location != NSNotFound){
-                [_newsImage sd_setImageWithURL:[NSURL URLWithString:eimgUrl4] placeholderImage:NewsPlaceHolderImage];
+            if ([NEWSSEMTPHOTOURL(model.post.smeta)  rangeOfString:@"http"].location != NSNotFound){
+                [_newsImage sd_setImageWithURL:[NSURL URLWithString:NEWSSEMTPHOTOURL(model.post.smeta)] placeholderImage:NewsPlaceHolderImage];
             }
             else{
-                NSString *str = USERPHOTOHTTPSTRINGZhuBo(eimgUrl4);
+                NSString *str = USERPHOTOHTTPSTRINGZhuBo(NEWSSEMTPHOTOURL(model.post.smeta));
                 [_newsImage sd_setImageWithURL:[NSURL URLWithString:str] placeholderImage:NewsPlaceHolderImage];
             }
             //设置新闻标题
@@ -354,7 +346,7 @@
     //点赞人数
     [_favImage setImage:[UIImage imageNamed:@"feeback_fav"]];
     if (![_isFeebackBlog ? model.zan_num : model.praisenum isEqualToString:@"0"]) {
-        _favLabel.fd_collapsed = NO;
+//        _favLabel.fd_collapsed = NO;
         _favLabel.text = [NSString stringWithFormat:@"%@人点赞",_isFeebackBlog ? model.zan_num : model.praisenum ];
     }else
     {
@@ -455,14 +447,13 @@
 #pragma mark - table view datasource and delegate
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    return self.frameModel.model.child_comment.count;
+    return self.dataArray.count;
 }
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     CommentAndReviewTableViewCell *cell = [CommentAndReviewTableViewCell cellWithTableView:tableView];
     CommentAndReviewFrameModel *frameModel = self.dataArray[indexPath.row];
     cell.frameModel = frameModel;
-//    cell.blogViewController = _blogViewController;
     
     DefineWeakSelf;
     [cell setClickRowCellWithReview:^(CommentAndReviewTableViewCell *cell, child_commentModel *model) {
@@ -478,10 +469,66 @@
 }
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
+    ExdangqianUserUid = [CommonCode readFromUserD:@"dangqianUserUid"];
     CommentAndReviewFrameModel *frameModel = self.dataArray[indexPath.row];
-    if (self.addReview) {
-        self.addReview(self,frameModel.model);
+    _commentIndexRow = indexPath.row;
+    if ([frameModel.model.uid isEqualToString:ExdangqianUserUid]) {//判断点击评论是否为当前用户
+        _alertView = [[CustomAlertView alloc] initWithCustomView:[self setupDeleteAlertView]];
+        _alertView.alertHeight = 105;
+        _alertView.alertDuration = 0.25;
+        _alertView.coverAlpha = 0.6;
+        [_alertView show];
+    }else{
+        if (self.addReview) {
+            self.addReview(self,frameModel.model);
+        }
     }
+}
+- (UIView *)setupDeleteAlertView
+{
+    UIView *bgView = [[UIView alloc] init];
+    bgView.backgroundColor = HEXCOLOR(0xe3e3e3);
+    bgView.frame = CGRectMake(0, 0, SCREEN_WIDTH, 105);
+    
+    UIButton *deleteBtn = [[UIButton alloc] init];
+    deleteBtn.frame = CGRectMake(0, 0, SCREEN_WIDTH, 50);
+    deleteBtn.backgroundColor = [UIColor whiteColor];
+    [deleteBtn setTitle:@"删除" forState:UIControlStateNormal];
+    [deleteBtn setTitleColor:[UIColor redColor] forState:UIControlStateNormal];
+    deleteBtn.titleLabel.font = [UIFont systemFontOfSize:17];
+    [deleteBtn addTarget:self action:@selector(delete)];
+    [bgView addSubview:deleteBtn];
+    
+    UIButton *cancelBtn = [[UIButton alloc] init];
+    cancelBtn.frame = CGRectMake(0, 55, SCREEN_WIDTH, 50);
+    cancelBtn.backgroundColor = [UIColor whiteColor];
+    [cancelBtn setTitle:@"取消" forState:UIControlStateNormal];
+    [cancelBtn setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+    cancelBtn.titleLabel.font = [UIFont systemFontOfSize:17];
+    [cancelBtn addTarget:self action:@selector(cancel)];
+    [bgView addSubview:cancelBtn];
+    
+    return bgView;
+}
+- (void)delete{//删除本地数据，并请求接口删除对应评论ID
+    [_alertView coverClick];
+    child_commentModel *model = self.frameModel.model.child_comment[_commentIndexRow];
+    [NetWorkTool postDeleteSelfCommentWithaccessToken:AvatarAccessToken commnet_id:model.ID sccess:^(NSDictionary *responseObject) {
+        if ([responseObject[@"status"] intValue] == 1) {
+            if (self.deleteComment) {
+                self.deleteComment(self, _indexRow ,_commentIndexRow);
+            }
+        }else{
+            XWAlerLoginView *xw = [[XWAlerLoginView alloc]initWithTitle:@"删除失败，请重新再试"];
+            [xw show];
+        }
+    } failure:^(NSError *error) {
+        XWAlerLoginView *xw = [[XWAlerLoginView alloc]initWithTitle:@"网络错误"];
+        [xw show];
+    }];
+}
+- (void)cancel{
+    [_alertView coverClick];
 }
 //用户点击评论回复
 - (void)userReviewClickedWithModel:(child_commentModel *)model

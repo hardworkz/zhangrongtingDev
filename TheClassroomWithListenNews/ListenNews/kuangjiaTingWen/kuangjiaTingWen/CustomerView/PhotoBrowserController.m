@@ -78,7 +78,7 @@
     navBar.barStyle = UIBarStyleDefault;
     if ([[UINavigationBar class] respondsToSelector:@selector(appearance)]) {
         [navBar setBackgroundImage:nil forBarMetrics:UIBarMetricsDefault];
-        [navBar setBackgroundImage:nil forBarMetrics:UIBarMetricsLandscapePhone];
+        [navBar setBackgroundImage:nil forBarMetrics:UIBarMetricsCompact];
     }
 }
 
@@ -89,7 +89,7 @@
 - (void)openPhotos:(NSArray *)phs{
     // Browser
     NSMutableArray *photos = [[NSMutableArray alloc] init];
-    NSMutableArray *thumbs = [[NSMutableArray alloc] init];
+//    NSMutableArray *thumbs = [[NSMutableArray alloc] init];
     MWPhoto *photo;
     BOOL displayActionButton = YES;
     BOOL displaySelectionButtons = NO;

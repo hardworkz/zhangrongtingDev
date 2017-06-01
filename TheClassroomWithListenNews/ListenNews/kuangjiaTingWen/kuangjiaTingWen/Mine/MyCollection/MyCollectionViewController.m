@@ -27,8 +27,12 @@
     [super viewDidLoad];
     [self setUpData];
     [self setUpView];
+    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(gaibianyanse:) name:@"gaibianyanse" object:nil];
 }
-
+- (void)gaibianyanse:(NSNotification *)notification
+{
+    [self.helpTableView reloadData];
+}
 - (void)viewWillAppear:(BOOL)animated{
     [super viewWillAppear:animated];
     self.hidesBottomBarWhenPushed = YES;
@@ -126,6 +130,7 @@
     if ([[CommonCode readFromUserD:@"dangqianbofangxinwenID"] isEqualToString:self.dataSourceArr[indexPath.row][@"post_id"]]){
         self.hidesBottomBarWhenPushed = YES;
         [self.navigationController.navigationBar setHidden:YES];
+        [bofangVC shareInstance].isMyCollectionVC = YES;
         [self.navigationController pushViewController:[bofangVC shareInstance] animated:YES];
         [[bofangVC shareInstance].tableView reloadData];
         self.hidesBottomBarWhenPushed = YES;
@@ -154,38 +159,10 @@
         [bofangVC shareInstance].iszhuboxiangqing = NO;
         [bofangVC shareInstance].newsModel.post_keywords = self.dataSourceArr[indexPath.row][@"post_keywords"];
         [bofangVC shareInstance].newsModel.url = self.dataSourceArr[indexPath.row][@"url"];
-        if ([self.dataSourceArr[indexPath.row][@"post_time"] intValue] / 1000 / 60)
-        {
-            if ([self.dataSourceArr[indexPath.row][@"post_time"] intValue] / 1000 / 60 > 9)
-            {
-                [bofangVC shareInstance].yinpinzongTime.text = [NSString stringWithFormat:@"%d:%d",[self.dataSourceArr[indexPath.row][@"post_time"] intValue] / 1000 / 60,[self.dataSourceArr[indexPath.row][@"post_time"] intValue] / 1000 % 60];
-            }
-            else{
-                if ([self.dataSourceArr[indexPath.row][@"post_time"] intValue] / 1000 % 60 < 10)
-                {
-                    [bofangVC shareInstance].yinpinzongTime.text = [NSString stringWithFormat:@"0%d:0%d",[self.dataSourceArr[indexPath.row][@"post_time"] intValue] / 1000 / 60,[self.dataSourceArr[indexPath.row][@"post_time"] intValue] / 1000 % 60];
-                }else
-                {
-                    [bofangVC shareInstance].yinpinzongTime.text = [NSString stringWithFormat:@"0%d:%d",[self.dataSourceArr[indexPath.row][@"post_time"] intValue] / 1000 / 60,[self.dataSourceArr[indexPath.row][@"post_time"] intValue] / 1000 % 60];
-                }
-            }
-        }else
-        {
-            if ([self.dataSourceArr[indexPath.row][@"post_time"] intValue] / 1000 > 10)
-            {
-                [bofangVC shareInstance].yinpinzongTime.text = [NSString stringWithFormat:@"00:%d",[self.dataSourceArr[indexPath.row][@"post_time"] intValue] / 1000 % 60];
-            }else
-            {
-                [bofangVC shareInstance].yinpinzongTime.text = [NSString stringWithFormat:@"00:0%d",[self.dataSourceArr[indexPath.row][@"post_time"] intValue] / 1000 % 60];
-            }
-        }
+        [bofangVC shareInstance].yinpinzongTime.text = [[bofangVC shareInstance] convertStringWithTime:[self.dataSourceArr[indexPath.row][@"post_time"] intValue] / 1000];
+        
         ExcurrentNumber = (int)indexPath.row;
-        NSString *imgUrl = [NSString stringWithFormat:@"%@",[self.dataSourceArr[indexPath.row][@"smeta"] stringByReplacingOccurrencesOfString:@"\\" withString:@""]];
-        NSString *imgUrl1 = [imgUrl stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-        NSString *imgUrl2 = [imgUrl1 stringByReplacingOccurrencesOfString:@"thumb:" withString:@""];
-        NSString *imgUrl3 = [imgUrl2 stringByReplacingOccurrencesOfString:@"{" withString:@""];
-        NSString *imgUrl4 = [imgUrl3 stringByReplacingOccurrencesOfString:@"}" withString:@""];
-        [bofangVC shareInstance].newsModel.ImgStrjiemu = imgUrl4;
+        [bofangVC shareInstance].newsModel.ImgStrjiemu = self.dataSourceArr[indexPath.row][@"smeta"];
         [bofangVC shareInstance].newsModel.ZhengWenjiemu = self.dataSourceArr[indexPath.row][@"post_excerpt"];
         [bofangVC shareInstance].newsModel.praisenum = self.dataSourceArr[indexPath.row][@"praisenum"];
         [[bofangVC shareInstance].tableView reloadData];
@@ -201,6 +178,7 @@
         ExwhichBoFangYeMianStr = @"shouyebofang";
         self.hidesBottomBarWhenPushed = YES;
         [self.navigationController.navigationBar setHidden:YES];
+        [bofangVC shareInstance].isMyCollectionVC = YES;
         [self.navigationController pushViewController:[bofangVC shareInstance] animated:YES];
         [[bofangVC shareInstance].tableView reloadData];
         //        [self.navigationController.navigationBar setHidden:NO];
@@ -209,6 +187,7 @@
         [[NSNotificationCenter defaultCenter] postNotificationName:@"qiehuanxinwen" object:nil];
         [CommonCode writeToUserD:self.dataSourceArr andKey:@"zhuyeliebiao"];
         [CommonCode writeToUserD:self.dataSourceArr[indexPath.row][@"post_id"] andKey:@"dangqianbofangxinwenID"];
+        RTLog(@"saveID:%@",self.dataSourceArr[indexPath.row][@"post_id"]);
         if ([[CommonCode readFromUserD:@"yitingguoxinwenID"] isKindOfClass:[NSArray class]]){
             NSMutableArray *yitingguoArr = [NSMutableArray arrayWithArray:[CommonCode readFromUserD:@"yitingguoxinwenID"]];
             [yitingguoArr addObject:self.dataSourceArr[indexPath.row][@"post_id"]];
@@ -232,21 +211,6 @@
 #pragma mark - UITableViewDataSource
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
-//    if (! [self.dataSourceArr count]) {
-//        if (!_label) {
-//            _label = [[UILabel alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, 20)];
-//            _label.textAlignment = NSTextAlignmentCenter;
-//            _label.text = @"暂无数据";
-//            _label.textColor = [UIColor lightGrayColor];
-//            _label.center = self.helpTableView.center;
-//            [self.helpTableView addSubview:_label];
-//        }else {
-//            [self.helpTableView addSubview:_label];
-//        }
-//    }
-//    else{
-//        [_label removeFromSuperview];
-//    }
     return  [self.dataSourceArr count];
 }
 
@@ -272,17 +236,12 @@
         [imgLeft setFrame:CGRectMake(SCREEN_WIDTH - 125.0 / 375 * IPHONE_W, 19, 105.0 / 375 * IPHONE_W, 70.0 / 375 *IPHONE_W)];
     }
     
-    NSString *imgUrl = [NSString stringWithFormat:@"%@",[self.dataSourceArr[indexPath.row][@"smeta"] stringByReplacingOccurrencesOfString:@"\\" withString:@""]];
-    NSString *imgUrl1 = [imgUrl stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-    NSString *imgUrl2 = [imgUrl1 stringByReplacingOccurrencesOfString:@"thumb:" withString:@""];
-    NSString *imgUrl3 = [imgUrl2 stringByReplacingOccurrencesOfString:@"{" withString:@""];
-    NSString *imgUrl4 = [imgUrl3 stringByReplacingOccurrencesOfString:@"}" withString:@""];
-    if ([imgUrl4  rangeOfString:@"http"].location != NSNotFound){
-        [imgLeft sd_setImageWithURL:[NSURL URLWithString:imgUrl4]];
+    if ([NEWSSEMTPHOTOURL(self.dataSourceArr[indexPath.row][@"smeta"])  rangeOfString:@"http"].location != NSNotFound){
+        [imgLeft sd_setImageWithURL:[NSURL URLWithString:NEWSSEMTPHOTOURL(self.dataSourceArr[indexPath.row][@"smeta"])]];
         //placeholderImage:[UIImage imageNamed:@"thumbnailsdefault"]
     }
     else{
-        NSString *str = USERPHOTOHTTPSTRINGZhuBo(imgUrl4);
+        NSString *str = USERPHOTOHTTPSTRINGZhuBo(NEWSSEMTPHOTOURL(self.dataSourceArr[indexPath.row][@"smeta"]));
         [imgLeft sd_setImageWithURL:[NSURL URLWithString:str]];
         //placeholderImage:[UIImage imageNamed:@"thumbnailsdefault"]
     }
@@ -294,6 +253,7 @@
     UILabel *titleLab = [[UILabel alloc]initWithFrame:CGRectMake(20.0 / 375 * IPHONE_W, 16.0 / 667 * IPHONE_H,  SCREEN_WIDTH - 155.0 / 375 * IPHONE_W, 21.0 / 667 *IPHONE_H)];
     titleLab.text = self.dataSourceArr[indexPath.row][@"post_title"];
     titleLab.textColor = [UIColor blackColor];
+    RTLog(@"dangqianbofangxinwenID:%@-----列表中的ID:%@",[CommonCode readFromUserD:@"dangqianbofangxinwenID"],self.dataSourceArr[indexPath.row][@"post_id"]);
     if ([[CommonCode readFromUserD:@"yitingguoxinwenID"] isKindOfClass:[NSArray class]]){
         NSArray *yitingguoArr = [NSArray arrayWithArray:[CommonCode readFromUserD:@"yitingguoxinwenID"]];
         for (int i = 0; i < yitingguoArr.count - 1; i ++ ){
@@ -385,15 +345,5 @@
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
-
-/*
-#pragma mark - Navigation
-
-// In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
-}
-*/
 
 @end

@@ -50,7 +50,6 @@
 
 @interface bofangVC ()<UITableViewDataSource,UITableViewDelegate,WXApiDelegate,UITextViewDelegate,UITextFieldDelegate,TencentSessionDelegate,OJLAnimationButtonDelegate>
 {
-//    UILabel *riqiLab;
     UIView *xiangqingView;
     double angle;
     UIButton *xuanzhuanBtn;
@@ -78,7 +77,6 @@
     NSMutableArray *arr;
     UIButton *bofangRightBtn;
     BOOL isGuanZhu;
-    UITextView *zhengwenTextView;
     TencentOAuth *tencentOAuth;
 }
 @property(strong,nonatomic)NSDictionary *infoDic;
@@ -103,6 +101,21 @@
 @property (strong, nonatomic) UIView *topView;
 @property (strong, nonatomic) UIButton *leftBtn;
 @property (strong, nonatomic) UIButton *rightBtn;
+@property (strong, nonatomic) UIButton *scrollTopBtn;
+//新闻详情控件
+@property (strong, nonatomic) UITextView *zhengwenTextView;
+@property (strong, nonatomic) UIImageView *zhengwenImg;
+@property (strong, nonatomic) UIImageView *zhuboImg;
+@property (strong, nonatomic) UILabel *zhuboTitleLab;
+@property (strong, nonatomic) UIImageView *mic;
+@property (strong, nonatomic) UIView *achorTouch;
+@property (strong, nonatomic) UIView *seperatorLine;
+@property (strong, nonatomic) UILabel *titleLab;
+@property (strong, nonatomic) UILabel *riqiLab;
+//@property (strong, nonatomic) UIView *rewardView;
+//@property (strong, nonatomic) UIView *rewardBorderView;
+//@property (strong, nonatomic) UILabel *tipLabel;
+//@property (strong, nonatomic) UIView *customRewardView;
 
 @property (strong, nonatomic) UILabel *appreciateNum;//投金币数
 @property (strong, nonatomic) UILabel *commentNum;//评论数
@@ -113,13 +126,27 @@
 
 @property (assign, nonatomic) BOOL isCollected;
 
+@property (strong, nonatomic) AVPlayer *bofangPlayer;
+
 + (instancetype)shareInstance;
 @end
 __weak bofangVC *weakVC;
 __weak AVPlayer *weakPlayer;
 static bofangVC *_instance = nil;
 @implementation bofangVC
-
+- (AVPlayer *)bofangPlayer
+{
+//    static AVPlayer * player;
+//    static dispatch_once_t onceToken;
+//    dispatch_once(&onceToken, ^{
+//        player = [[AVPlayer alloc]init];
+//    });
+//    return player;
+    if (_bofangPlayer == nil) {
+        _bofangPlayer = [[AVPlayer alloc] init];
+    }
+    return _bofangPlayer;
+}
 + (instancetype)shareInstance {
     static dispatch_once_t onceToken ;
     dispatch_once(&onceToken, ^{
@@ -130,6 +157,7 @@ static bofangVC *_instance = nil;
 }
 - (void)viewDidLoad {
     [super viewDidLoad];
+    
     self.view.backgroundColor = [UIColor whiteColor];
     isJiaZaiWan = NO;
     _isCollected = NO;
@@ -137,13 +165,9 @@ static bofangVC *_instance = nil;
 //    self.dateFont = gFontMain14;
     ExdangqianUserUid = [CommonCode readFromUserD:@"dangqianUserUid"];
     angle = 0.0f;
-//    if ([ExwhichBoFangYeMianStr isEqualToString:@"dingyuebofang"]) {
-//        [self.navigationController.navigationBar setHidden:YES];
-//    }
-//    else{
-//        [self.navigationController.navigationBar setHidden:NO];
-//    }
     [self.view addSubview:self.tableView];
+    //置顶按钮
+    [self.view insertSubview:self.scrollTopBtn aboveSubview:self.tableView];
     _topView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, IPHONE_W, 64)];
     _topView.backgroundColor = [UIColor clearColor];
     _topView.hidden = NO;
@@ -181,21 +205,26 @@ static bofangVC *_instance = nil;
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(jiazaichenggong:) name:@"dingyuejiazaichenggong" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(pinglunchenggong:) name:@"pinglunchenggong" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(qiehuanxinwen:) name:@"qiehuanxinwen" object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(houtaibofangxiayishou:) name:@"houtaibofangxiayishou" object:nil];
+//    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(houtaibofangxiayishou:) name:@"houtaibofangxiayishou" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(getActInfoNotification:) name:@"getActInfoNotification" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(getAhocComment:) name:@"getAhocComment" object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(tingyouquanbofangwanbi:) name:@"tingyouquanbofangwanbi" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector       (tingyouquanbofangwanbi:) name:TINGYOUQUANBOFANGWANBI object:nil];
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(PayResultsBack:) name:@"PayResultsBack" object:nil];
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(WechatPayResultsBack:) name:@"WechatPayResultsBack" object:nil];
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(TcoinPayResultsBack:) name:@"TcoinPayResultsBack" object:nil];
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(RewardBack:) name:@"RewardBack" object:nil];
+    //添加通知，拔出耳机后暂停播放
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(routeChange:) name:AVAudioSessionRouteChangeNotification object:nil];
     //监听播放完毕
 //    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(PlayedidEnd:) name:AVPlayerItemDidPlayToEndTimeNotification object:Explayer.currentItem];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(playStop) name:AVPlayerItemPlaybackStalledNotification object:Explayer.currentItem];
     //定时器通知
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(timerStop:) name:@"timerStop" object:nil];
     //手势控制通知
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(captureDevice:) name:UIDeviceProximityStateDidChangeNotification object:[UIDevice currentDevice]];
-    
+    //网络连接状态改变通知
+    RegisterNotify(NETWORKSTATUSCHANGE, @selector(networkChange))
+    //添加手势
     UISwipeGestureRecognizer *rightSwipe = [[UISwipeGestureRecognizer alloc]initWithTarget:self action:@selector(rightSwipeAction:)];
     [rightSwipe setDirection:UISwipeGestureRecognizerDirectionRight];
     [self.view addGestureRecognizer:rightSwipe];
@@ -218,19 +247,21 @@ static bofangVC *_instance = nil;
     self.isRewardBack = NO;
     
 }
-
+//新闻缓冲没有完成播放暂停调用方法
+- (void)playStop
+{
+    RTLog(@"播放停止了");
+    [self performSelector:@selector(bofangRightAction:) withObject:nil afterDelay:0.5f];
+}
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    
+    [self.tableView setContentOffset:CGPointMake(0, 0) animated:NO];
     IQKeyboardManager *manager = [IQKeyboardManager sharedManager];
     manager.enable = YES;
     manager.shouldResignOnTouchOutside = YES;
     manager.shouldToolbarUsesTextFieldTintColor = NO;
     manager.enableAutoToolbar = NO;
     if (!isPlaying) {
-//        if (self.isPushNews) {
-//            [self doPlay:bofangCenterBtn];
-//        }
         [[UIDevice currentDevice] setProximityMonitoringEnabled:NO];
         [[NSNotificationCenter defaultCenter] postNotificationName:@"stopAnimate" object:nil];
     }else {
@@ -240,7 +271,7 @@ static bofangVC *_instance = nil;
     [self.navigationController setNavigationBarHidden:YES animated:YES];
     
     if (![ExwhichBoFangYeMianStr isEqualToString:@"Downloadbofang"]) {
-        [self handleKeyword];
+//        [self handleKeyword];
         [self loadData];
     }
     [CommonCode writeToUserD:@"YES" andKey:@"isPlayingVC"];
@@ -255,6 +286,8 @@ static bofangVC *_instance = nil;
 
 -(void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
+    self.isMyCollectionVC = NO;
+    RTLog(@"viewWillDisappear");
     [IQKeyboardManager sharedManager].enable = NO;
     [self.navigationController setNavigationBarHidden:NO animated:YES];
     if (!isPlaying) {
@@ -314,7 +347,7 @@ static bofangVC *_instance = nil;
     self.sliderProgress.maximumValue = [self.newsModel.post_time intValue] / 1000;
     [self huoqupinglunliebiao];
     [self loadData];
-    [self handleKeyword];
+//    [self handleKeyword];
     [self.tableView reloadData];
 }
 
@@ -511,7 +544,7 @@ static bofangVC *_instance = nil;
         }
         [self.tableView reloadData];
     } failure:^(NSError *error) {
-        NSLog(@"error = %@",error);
+        RTLog(@"error = %@",error);
     }];
 }
 - (NSMutableArray *)pinglunFrameModelArrayWithModelArray:(NSArray *)array
@@ -578,10 +611,8 @@ static bofangVC *_instance = nil;
     [dibuView addSubview:dibuTopLine];
     
     [self bofangqiSet];
-    
-    
 }
-
+#pragma mark - 播放器设置
 - (void)bofangqiSet{
     self.isFirst = YES;
     //程序刚运行时，有播放
@@ -617,15 +648,10 @@ static bofangVC *_instance = nil;
     
     //初始时，禁用播放按钮
     [bofangCenterBtn setEnabled:NO];
-    //    if (Explayer)
-    //    {
-    //        [Explayer replaceCurrentItemWithPlayerItem:[[AVPlayerItem alloc]initWithURL:[NSURL URLWithString:self.newsModel.post_mp]]];
-    //    }else
-    //    {
     if (self.newsModel.post_mp.length > 0){
         
     }
-    Explayer = [[AVPlayer alloc]init];
+    Explayer = self.bofangPlayer;
     //添加观察者，用来监视播放器的状态变化
     [Explayer addObserver:self forKeyPath:@"status" options:NSKeyValueObservingOptionNew context:nil];
     //添加观察者，用来监听播放器的缓冲进度loadedTimeRanges属性
@@ -642,35 +668,7 @@ static bofangVC *_instance = nil;
     self.yinpinzongTime.textColor = nTextColorMain;
     [self.yinpinzongTime setTextAlignment:NSTextAlignmentRight];
     self.yinpinzongTime.font = [UIFont systemFontOfSize:12.0f ];
-    if ([self.newsModel.post_time intValue] / 1000 / 60)
-    {
-        if ([self.newsModel.post_time intValue] / 1000 / 60 > 9)
-        {
-            self.yinpinzongTime.text = [NSString stringWithFormat:@"%d:%d",[self.newsModel.post_time intValue] / 1000 / 60,[self.newsModel.post_time intValue] / 1000 % 60];
-            if ([self.newsModel.post_time intValue] / 1000 % 60 < 10)
-            {
-                self.yinpinzongTime.text = [NSString stringWithFormat:@"%d:0%d",[self.newsModel.post_time intValue] / 1000 / 60,[self.newsModel.post_time intValue] / 1000 % 60];
-            }
-        }else
-        {
-            if ([self.newsModel.post_time intValue] / 1000 % 60 < 10)
-            {
-                self.yinpinzongTime.text = [NSString stringWithFormat:@"0%d:0%d",[self.newsModel.post_time intValue] / 1000 / 60,[self.newsModel.post_time intValue] / 1000 % 60];
-            }else
-            {
-                self.yinpinzongTime.text = [NSString stringWithFormat:@"0%d:%d",[self.newsModel.post_time intValue] / 1000 / 60,[self.newsModel.post_time intValue] / 1000 % 60];
-            }
-        }
-    }else
-    {
-        if ([self.newsModel.post_time intValue] / 1000 > 10)
-        {
-            self.yinpinzongTime.text = [NSString stringWithFormat:@"00:%d",[self.newsModel.post_time intValue] / 1000 % 60];
-        }else
-        {
-            self.yinpinzongTime.text = [NSString stringWithFormat:@"00:0%d",[self.newsModel.post_time intValue] / 1000 % 60];
-        }
-    }
+    [self reloadPlayAllTime];/**<刷新音频总时长*/
     
     [dibuView addSubview:self.yinpinzongTime];
     
@@ -688,19 +686,16 @@ static bofangVC *_instance = nil;
     [dibuView addSubview:dangqianTime];
     
     //播放完毕后监听通知
-    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(PlayedidEnd:) name:AVPlayerItemDidPlayToEndTimeNotification object:Explayer.currentItem];
-    //    self.prgBufferProgress = [[UIProgressView alloc]initWithProgressViewStyle:UIProgressViewStyleDefault];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(PlayedidEnd:) name:AVPlayerItemDidPlayToEndTimeNotification object:Explayer.currentItem];
     
     weakVC = self;
     
     weakPlayer = Explayer;
     
     self.sliderProgress.continuous = YES;
-    //    self.sliderProgress.thumbTintColor = gMainColor;
     [self.sliderProgress setThumbImage:[UIImage imageNamed:@"slider"] forState:UIControlStateNormal];
     self.sliderProgress.minimumTrackTintColor = gMainColor;
     self.sliderProgress.maximumTrackTintColor = [UIColor clearColor];
-
     [self.sliderProgress addTarget:self action:@selector(doChangeProgress:) forControlEvents:UIControlEventValueChanged];
     
     if (IS_IPAD) {
@@ -724,6 +719,10 @@ static bofangVC *_instance = nil;
     
     [dibuView addSubview:bofangCenterBtn];
     
+    if (timeObserver != nil) {
+        [Explayer removeTimeObserver:timeObserver];
+        timeObserver = nil;
+    }
     timeObserver = [Explayer addPeriodicTimeObserverForInterval:CMTimeMake(1, 1) queue:dispatch_get_main_queue() usingBlock:^(CMTime time) {
         //获取当前播放时间
         float currentTime = (float)weakPlayer.currentItem.currentTime.value / (float)weakPlayer.currentItem.currentTime.timescale;
@@ -735,36 +734,7 @@ static bofangVC *_instance = nil;
         }
         NSTimeInterval timeInterval = [weakVC availableDuration];//计算缓冲进度
 
-        if (testTime / 60)
-        {
-            if (testTime / 60 > 9)
-            {
-                dangqianTime.text = [NSString stringWithFormat:@"%d:%d",testTime / 60,testTime % 60];
-                if (testTime % 60 < 10)
-                {
-                    dangqianTime.text = [NSString stringWithFormat:@"%d:0%d",testTime / 60,testTime % 60];
-                }
-            }else
-            {
-                if (testTime % 60 < 10)
-                {
-                    dangqianTime.text = [NSString stringWithFormat:@"0%d:0%d",testTime / 60,testTime % 60];
-                }else
-                {
-                    dangqianTime.text = [NSString stringWithFormat:@"0%d:%d",testTime / 60,testTime % 60];
-                }
-                
-            }
-        }
-        else{
-            if (testTime > 9)
-            {
-                dangqianTime.text = [NSString stringWithFormat:@"00:%d",testTime % 60];
-            }else
-            {
-                dangqianTime.text = [NSString stringWithFormat:@"00:0%d",testTime % 60];
-            }
-        }
+        dangqianTime.text = [self convertStringWithTime:testTime];
         CMTime duration = weakPlayer.currentItem.duration;
         CGFloat totalDuration = CMTimeGetSeconds(duration);
         [weakVC.prgBufferProgress setProgress:timeInterval / totalDuration animated:YES];
@@ -789,11 +759,11 @@ static bofangVC *_instance = nil;
     {
         switch (Explayer.status) {
             case AVPlayerStatusUnknown:
-                NSLog(@"KVO：未知状态，此时不能播放");
+                RTLog(@"KVO：未知状态，此时不能播放");
                 break;
             case AVPlayerStatusReadyToPlay:
                 [bofangCenterBtn setEnabled:YES];
-                NSLog(@"KVO：准备完毕，可以播放");
+                RTLog(@"KVO：准备完毕，可以播放");
                 //自动播放
                 if (self.isFirst == YES){
                     if (self.isPushNews) {
@@ -807,7 +777,7 @@ static bofangVC *_instance = nil;
                 
                 break;
             case AVPlayerStatusFailed:
-                NSLog(@"KVO：加载失败，网络或者服务器出现问题");
+                RTLog(@"KVO：加载失败，网络或者服务器出现问题");
                 [self performSelector:@selector(bofangRightAction:) withObject:nil afterDelay:0.5f];
                 break;
             default:
@@ -819,7 +789,7 @@ static bofangVC *_instance = nil;
         NSArray *array = songItem.loadedTimeRanges;
         CMTimeRange timeRange = [array.firstObject CMTimeRangeValue];//本次缓冲的时间范围
         NSTimeInterval totalBuffer = CMTimeGetSeconds(timeRange.start) + CMTimeGetSeconds(timeRange.duration);//缓冲总长度
-        NSLog(@"共缓冲%.2f",totalBuffer);
+        RTLog(@"共缓冲%.2f",totalBuffer);
     }
 }
 //播放音频
@@ -839,25 +809,20 @@ static bofangVC *_instance = nil;
         [Explayer play];
         [bofangCenterBtn setImage:[UIImage imageNamed:@"home_news_ic_pause"] forState:UIControlStateNormal];
         bofangCenterBtn.accessibilityLabel = @"暂停、播放";
-//        if (!Explayer.currentItem.duration.timescale)
-//        {
-//            NSLog(@"除零错误");
-//        }else
-//        {
-            //获取当前播放音视频的总长度（s秒)
-            self.sliderProgress.maximumValue = [self.newsModel.post_time intValue] / 1000;
-//            NSLog(@"总长度 = %f",self.sliderProgress.maximumValue);
-//        }
+        //获取当前播放音视频的总长度（s秒)
+        self.sliderProgress.maximumValue = [self.newsModel.post_time intValue] / 1000;
+//         RTLog(@"总长度 = %f",self.sliderProgress.maximumValue);
+//
     }
     [self configNowPlayingInfoCenter];
 }
-
+//拖拽播放进度
 - (void)doChangeProgress:(UISlider *)sender{
     
     [Explayer pause];
     //调到指定时间去播放
-//    [Explayer seekToTime:CMTimeMake(self.sliderProgress.value, 1)];
     [Explayer seekToTime:CMTimeMake(self.sliderProgress.value, 1) completionHandler:^(BOOL finished) {
+        RTLog(@"拖拽结果：%d",finished);
         if (finished == YES){
             [Explayer play];
         }
@@ -865,12 +830,191 @@ static bofangVC *_instance = nil;
     [[UIDevice currentDevice] setProximityMonitoringEnabled:[[NSUserDefaults standardUserDefaults] boolForKey:@"shoushi"]];
 }
 //播放完毕时调用的方法
-- (void)PlayedidEnd:(NSNotification *)notice {
-
+- (void)PlayedidEnd:(NSNotification *)notice
+{
     [self performSelector:@selector(bofangwanbi:) withObject:notice afterDelay:0.5f];
 }
 
+#pragma mark - 计算音频总时长方法
+- (void)reloadPlayAllTime
+{
+    self.yinpinzongTime.text = [self convertStringWithTime:[self.newsModel.post_time intValue] / 1000];
+//    if ([self.newsModel.post_time intValue] / 1000 / 60)
+//    {
+//        if ([self.newsModel.post_time intValue] / 1000 / 60 > 9)
+//        {
+//            self.yinpinzongTime.text = [NSString stringWithFormat:@"%d:%d",[self.newsModel.post_time intValue] / 1000 / 60,[self.newsModel.post_time intValue] / 1000 % 60];
+//        }else
+//        {
+//            if ([self.newsModel.post_time intValue] / 1000 % 60 < 10)
+//            {
+//                self.yinpinzongTime.text = [NSString stringWithFormat:@"0%d:0%d",[self.newsModel.post_time intValue] / 1000 / 60,[self.newsModel.post_time intValue] / 1000 % 60];
+//            }else
+//            {
+//                self.yinpinzongTime.text = [NSString stringWithFormat:@"0%d:%d",[self.newsModel.post_time intValue] / 1000 / 60,[self.newsModel.post_time intValue] / 1000 % 60];
+//            }
+//        }
+//    }else
+//    {
+//        if ([self.newsModel.post_time intValue] / 1000 > 10)
+//        {
+//            self.yinpinzongTime.text = [NSString stringWithFormat:@"00:%d",[self.newsModel.post_time intValue] / 1000 % 60];
+//        }else
+//        {
+//            self.yinpinzongTime.text = [NSString stringWithFormat:@"00:0%d",[self.newsModel.post_time intValue] / 1000 % 60];
+//        }
+//    }
+}
+#pragma mark - 私有方法转换时间为时分秒
+- (NSString *)convertStringWithTime:(float)time {
+    if (isnan(time)) time = 0.f;
+    int min = time / 60.0;
+    int sec = time - min * 60;
+    NSString * minStr = min > 9 ? [NSString stringWithFormat:@"%d",min] : [NSString stringWithFormat:@"0%d",min];
+    NSString * secStr = sec > 9 ? [NSString stringWithFormat:@"%d",sec] : [NSString stringWithFormat:@"0%d",sec];
+    NSString * timeStr = [NSString stringWithFormat:@"%@:%@",minStr, secStr];
+    return timeStr;
+}
+#pragma mark - 设置新闻模型数据
+- (void)playActionWithNextIndex:(NSUInteger)index
+{
+    self.newsModel.Titlejiemu = arr[ExcurrentNumber - index][@"post_title"];
+    self.newsModel.RiQijiemu = arr[ExcurrentNumber - index][@"post_date"];
+    self.newsModel.ImgStrjiemu = arr[ExcurrentNumber - index][@"smeta"];
+    self.newsModel.post_lai = arr[ExcurrentNumber - index][@"post_lai"];
+    self.newsModel.post_news = arr[ExcurrentNumber - index][@"post_news"];
+    self.newsModel.post_mp = arr[ExcurrentNumber - index][@"post_mp"];
+    self.newsModel.post_time = arr[ExcurrentNumber - index][@"post_time"];
+    self.newsModel.jiemuImages = arr[ExcurrentNumber - index][@"post_act"][@"images"];
+    self.newsModel.jiemuName = arr[ExcurrentNumber - index][@"post_act"][@"name"];
+    self.newsModel.jiemuDescription = arr[ExcurrentNumber - index][@"post_act"][@"description"];
+    self.newsModel.jiemuFan_num = arr[ExcurrentNumber - index][@"post_act"][@"fan_num"];
+    self.newsModel.jiemuMessage_num = arr[ExcurrentNumber - index][@"post_act"][@"message_num"];
+    self.newsModel.jiemuIs_fan = arr[ExcurrentNumber - index][@"post_act"][@"is_fan"];
+    self.newsModel.post_keywords = arr[ExcurrentNumber - index][@"post_keywords"];
+    self.newsModel.url = arr[ExcurrentNumber - index][@"url"];
+    self.newsModel.ImgStrjiemu = arr[ExcurrentNumber - index][@"smeta"];
+    self.newsModel.ZhengWenjiemu =  arr[ExcurrentNumber - index][@"post_excerpt"];
+    self.newsModel.praisenum =  arr[ExcurrentNumber - index][@"praisenum"];
+}
+#pragma mark - 抽出共用方法
+- (void)sameMethod
+{
+//    [Explayer.currentItem cancelPendingSeeks];
+//    [Explayer.currentItem.asset cancelLoading];
+//    [Explayer replaceCurrentItemWithPlayerItem:nil];/**<清空之前设置的值，改善内存泄露问题*/
+    [self reloadPlayAllTime];/**<刷新音频总时长*/
+    dianzanshu = self.newsModel.praisenum;
+    self.sliderProgress.maximumValue = [self.newsModel.post_time intValue] / 1000;
+//    [self handleKeyword];
+    [self loadData];
+    [self huoqupinglunliebiao];
+    [self configNowPlayingInfoCenter];
+    [self.tableView reloadData];
+    [self.tableView setContentOffset:CGPointMake(0, 0) animated:NO];
+    
+    if ([ExwhichBoFangYeMianStr isEqualToString:@"Downloadbofang"]){
+        [Explayer replaceCurrentItemWithPlayerItem:[[AVPlayerItem alloc]initWithURL:[NSURL fileURLWithPath:self.newsModel.post_mp]]];
+    }
+    else{
+        [Explayer replaceCurrentItemWithPlayerItem:[[AVPlayerItem alloc]initWithURL:[NSURL URLWithString:self.newsModel.post_mp]]];
+    }
+    
+    if (ExisRigester == NO)
+    {
+        //添加观察者，用来监视播放器的状态变化
+        [Explayer addObserver:self forKeyPath:@"status" options:NSKeyValueObservingOptionNew context:nil];
+        //添加观察者，用来监听播放器的缓冲进度loadedTimeRanges属性
+        [Explayer addObserver:self forKeyPath:@"loadedTimeRanges" options:NSKeyValueObservingOptionNew context:nil];
+        ExisRigester = YES;
+    }
+    [bofangRightBtn setEnabled:NO];
+    [bofangLeftBtn setEnabled:NO];
+    [bofangCenterBtn setEnabled:NO];
+    [self doPlay:bofangCenterBtn];
+    [self performSelector:@selector(doplay2) withObject:nil afterDelay:0.5f];
+    
+//    [CommonCode writeToUserD:arr[ExcurrentNumber][@"id"] andKey:@"dangqianbofangxinwenID"];
+    if ([[CommonCode readFromUserD:@"yitingguoxinwenID"] isKindOfClass:[NSArray class]])
+    {
+        NSMutableArray *yitingguoArr = [NSMutableArray arrayWithArray:[CommonCode readFromUserD:@"yitingguoxinwenID"]];
+        [yitingguoArr addObject:arr[ExcurrentNumber][@"id"]];
+        [CommonCode writeToUserD:yitingguoArr andKey:@"yitingguoxinwenID"];
+    }else
+    {
+        NSMutableArray *yitingguoArr = [NSMutableArray array];
+        [yitingguoArr addObject:arr[ExcurrentNumber][@"id"]];
+        [CommonCode writeToUserD:yitingguoArr andKey:@"yitingguoxinwenID"];
+    }
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"gaibianyanse" object:nil];
+}
+#pragma mark - 点击左边按钮
+- (void)bofangLeftAction:(UIButton *)sender{
+    RTLog(@"bofangLeftAction--------");
+    if ([[CommonCode readFromUserD:@"zhuyeliebiao"] isKindOfClass:[NSArray class]]){
+        
+        if (ExcurrentNumber == 0){
+            RTLog(@"后面没有新闻了");
+            [[NSNotificationCenter defaultCenter] postNotificationName:@"gaibianyanse" object:nil];
+            XWAlerLoginView *xw = [[XWAlerLoginView alloc]initWithTitle:@"已经是第一条了"];
+            [xw show];
+        }
+        else{
+            if (ExisRigester == YES){
+                [Explayer removeObserver:self forKeyPath:@"status"];
+                [Explayer removeObserver:self forKeyPath:@"loadedTimeRanges"];
+                ExisRigester = NO;
+            }
+            
+            
+            arr = [NSMutableArray arrayWithArray:[CommonCode readFromUserD:@"zhuyeliebiao"]];
+            if (self.isMyCollectionVC) {
+                if ((ExcurrentNumber - 1) > [arr count] ) {
+                    self.newsModel.jiemuID = [arr firstObject][@"post_id"];
+                    ExcurrentNumber = 1;
+                }
+                else{
+                    self.newsModel.jiemuID = arr[ExcurrentNumber - 1][@"post_id"];
+                }
+            }else{
+                if ((ExcurrentNumber - 1) > [arr count] ) {
+                    self.newsModel.jiemuID = [arr firstObject][@"id"];
+                    ExcurrentNumber = 1;
+                }
+                else{
+                    self.newsModel.jiemuID = arr[ExcurrentNumber - 1][@"id"];
+                }
+            }
+            
+            [CommonCode writeToUserD:self.newsModel.jiemuID andKey:@"dangqianbofangxinwenID"];
+            
+            [NetWorkTool getPaoGuoJieMuPingLunLieBiaoWithJieMuID:[CommonCode readFromUserD:@"dangqianbofangxinwenID"] anduid:ExdangqianUserUid andPage:@"1" andLimit:@"10" sccess:^(NSDictionary *responseObject) {
+                if ([responseObject[@"results"] isKindOfClass:[NSArray class]])
+                {
+                    self.pinglunArr = [NSMutableArray arrayWithArray:[self pinglunFrameModelArrayWithModelArray:[PlayVCCommentModel mj_objectArrayWithKeyValuesArray:responseObject[@"results"]]]];
+                }else
+                {
+                    self.pinglunArr = [NSMutableArray array];
+                }
+                [self.tableView reloadData];
+            } failure:^(NSError *error) {
+                RTLog(@"error = %@",error);
+            }];
+            [CommonCode writeToUserD:arr[ExcurrentNumber - 1] andKey:@"dangqianbofangxinwen"];
+            //设置新闻模型数据
+            [self playActionWithNextIndex:1];
+            ExcurrentNumber --;
+            //公共方法
+            [self sameMethod];
+            //记录上一次浏览的新闻详情
+            [self recordTheLastNews];
+        }
+    }
+    
+    RTLog(@"播放后退");
+}
 - (void)bofangRightAction:(UIButton *)sender {
+    RTLog(@"bofangRightAction--------");
     static NSInteger tishi = 0;
     tishi ++;
     if ([[NSUserDefaults standardUserDefaults]boolForKey:@"shoushitixing"] && tishi == 5 && !IS_IPAD) {
@@ -882,12 +1026,20 @@ static bofangVC *_instance = nil;
         GestureControlAlertView *gestureControlAlert = [[GestureControlAlertView alloc]init];
         AppDelegate *appDelegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
         [appDelegate.window addSubview:gestureControlAlert];
+        GestureControlAlertView *gestureCAView;
+        //获取手势控制提示框设置为弱引用
+        for (UIView *view in appDelegate.window.subviews) {
+            if ([view isKindOfClass:[GestureControlAlertView class]]) {
+                gestureCAView = (GestureControlAlertView *)view;
+                break;
+            }
+        }
+        __weak __typeof(gestureCAView) weakGestureCAView = gestureCAView;
         gestureControlAlert.clickKnowBlock = ^ {
-            [gestureControlAlert removeFromSuperview];
+            [weakGestureCAView removeFromSuperview];
         };
         
     }
-    
     
     arr = [NSMutableArray arrayWithArray:[CommonCode readFromUserD:@"zhuyeliebiao"]];
     if ([[CommonCode readFromUserD:@"zhuyeliebiao"] isKindOfClass:[NSArray class]]){
@@ -913,22 +1065,41 @@ static bofangVC *_instance = nil;
             }
             else if([ExwhichBoFangYeMianStr isEqualToString:@"zhuboxiangqingbofang"]){
                 [[NSNotificationCenter defaultCenter] postNotificationName:@"zhuboxiangqingbofang" object:nil];
+            }else
+                if([ExwhichBoFangYeMianStr isEqualToString:@"我的收藏"]){//播放到最后一条，停止播放
+                    XWAlerLoginView *xw = [[XWAlerLoginView alloc]initWithTitle:@"已经是最后一条了"];
+                    [xw show];
+                    [self doPlay:bofangCenterBtn];
+                    //改变播放新闻列表文字颜色通知
+//                    [[NSNotificationCenter defaultCenter] postNotificationName:@"gaibianyanse" object:nil];
+                    return;
             }
-            
+            //改变播放新闻列表文字颜色通知
             [[NSNotificationCenter defaultCenter] postNotificationName:@"gaibianyanse" object:nil];
             //记录上一次浏览的新闻详情
             [self recordTheLastNews];
-
+            
         }
         else{
-            if ((ExcurrentNumber + 1) <= [arr count] - 1) {
-                self.newsModel.jiemuID = arr[ExcurrentNumber + 1][@"id"];
-            }
-            else{
-                self.newsModel.jiemuID = [arr firstObject][@"id"];
-                ExcurrentNumber = -1;
+            if (self.isMyCollectionVC) {
+                if ((ExcurrentNumber + 1) <= [arr count] - 1) {
+                    self.newsModel.jiemuID = arr[ExcurrentNumber + 1][@"post_id"];
+                }
+                else{
+                    self.newsModel.jiemuID = [arr firstObject][@"post_id"];
+                    ExcurrentNumber = -1;
+                }
+            }else{
+                if ((ExcurrentNumber + 1) <= [arr count] - 1) {
+                    self.newsModel.jiemuID = arr[ExcurrentNumber + 1][@"id"];
+                }
+                else{
+                    self.newsModel.jiemuID = [arr firstObject][@"id"];
+                    ExcurrentNumber = -1;
+                }
             }
             [CommonCode writeToUserD:self.newsModel.jiemuID andKey:@"dangqianbofangxinwenID"];
+            RTLog(@"saveID:%@",self.newsModel.jiemuID);
             [NetWorkTool getPaoGuoJieMuPingLunLieBiaoWithJieMuID:[CommonCode readFromUserD:@"dangqianbofangxinwenID"] anduid:ExdangqianUserUid andPage:@"1" andLimit:@"10" sccess:^(NSDictionary *responseObject) {
                 if ([responseObject[@"results"] isKindOfClass:[NSArray class]])
                 {
@@ -939,251 +1110,18 @@ static bofangVC *_instance = nil;
                 }
                 [self.tableView reloadData];
             } failure:^(NSError *error) {
-                NSLog(@"error = %@",error);
+                RTLog(@"error = %@",error);
             }];
             [CommonCode writeToUserD:arr[ExcurrentNumber + 1] andKey:@"dangqianbofangxinwen"];
-            self.newsModel.Titlejiemu = arr[ExcurrentNumber + 1][@"post_title"];
-            self.newsModel.RiQijiemu = arr[ExcurrentNumber + 1][@"post_date"];
-            self.newsModel.ImgStrjiemu = arr[ExcurrentNumber + 1][@"smeta"];
-            self.newsModel.post_lai = arr[ExcurrentNumber + 1][@"post_lai"];
-            self.newsModel.post_news = arr[ExcurrentNumber + 1][@"post_news"];
-            self.newsModel.post_mp = arr[ExcurrentNumber + 1][@"post_mp"];
-            self.newsModel.jiemuImages = arr[ExcurrentNumber + 1][@"post_act"][@"images"];
-            self.newsModel.jiemuName = arr[ExcurrentNumber + 1][@"post_act"][@"name"];
-            self.newsModel.jiemuDescription = arr[ExcurrentNumber + 1][@"post_act"][@"description"];
-            self.newsModel.jiemuFan_num = arr[ExcurrentNumber + 1][@"post_act"][@"fan_num"];
-            self.newsModel.jiemuMessage_num = arr[ExcurrentNumber + 1][@"post_act"][@"message_num"];
-            self.newsModel.jiemuIs_fan = arr[ExcurrentNumber + 1][@"post_act"][@"is_fan"];
-            self.newsModel.post_keywords = arr[ExcurrentNumber + 1][@"post_keywords"];
-            self.newsModel.url = arr[ExcurrentNumber + 1][@"url"];
-            NSString *imgUrl = [NSString stringWithFormat:@"%@",[arr[ExcurrentNumber + 1][@"smeta"] stringByReplacingOccurrencesOfString:@"\\" withString:@""]];
-            NSString *imgUrl1 = [imgUrl stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-            NSString *imgUrl2 = [imgUrl1 stringByReplacingOccurrencesOfString:@"thumb:" withString:@""];
-            NSString *imgUrl3 = [imgUrl2 stringByReplacingOccurrencesOfString:@"{" withString:@""];
-            NSString *imgUrl4 = [imgUrl3 stringByReplacingOccurrencesOfString:@"}" withString:@""];
-            self.newsModel.ImgStrjiemu = imgUrl4;
-            self.newsModel.ZhengWenjiemu =  arr[ExcurrentNumber + 1][@"post_excerpt"];
-            self.newsModel.praisenum =  arr[ExcurrentNumber + 1][@"praisenum"];
-            self.newsModel.post_time = arr[ExcurrentNumber + 1][@"post_time"];
-            dianzanshu = self.newsModel.praisenum;
-            if ([self.newsModel.post_time intValue] / 1000 / 60)
-            {
-                if ([self.newsModel.post_time intValue] / 1000 / 60 > 9)
-                {
-                    self.yinpinzongTime.text = [NSString stringWithFormat:@"%d:%d",[self.newsModel.post_time intValue] / 1000 / 60,[self.newsModel.post_time intValue] / 1000 % 60];
-                }else
-                {
-                    if ([self.newsModel.post_time intValue] / 1000 % 60 < 10)
-                    {
-                        self.yinpinzongTime.text = [NSString stringWithFormat:@"0%d:0%d",[self.newsModel.post_time intValue] / 1000 / 60,[self.newsModel.post_time intValue] / 1000 % 60];
-                    }else
-                    {
-                        self.yinpinzongTime.text = [NSString stringWithFormat:@"0%d:%d",[self.newsModel.post_time intValue] / 1000 / 60,[self.newsModel.post_time intValue] / 1000 % 60];
-                    }
-                }
-            }else
-            {
-                if ([self.newsModel.post_time intValue] / 1000 > 10)
-                {
-                    self.yinpinzongTime.text = [NSString stringWithFormat:@"00:%d",[self.newsModel.post_time intValue] / 1000 % 60];
-                }else
-                {
-                    self.yinpinzongTime.text = [NSString stringWithFormat:@"00:0%d",[self.newsModel.post_time intValue] / 1000 % 60];
-                }
-                
-            }
-            self.sliderProgress.maximumValue = [self.newsModel.post_time intValue] / 1000;
-            [self handleKeyword];
-            [self loadData];
-            [self huoqupinglunliebiao];
-            [self configNowPlayingInfoCenter];
-            [self.tableView setContentOffset:CGPointMake(0,0) animated:NO];
-            [self.tableView reloadData];
-            
+            //设置新闻模型数据
+            [self playActionWithNextIndex:-1];
             ExcurrentNumber ++;
-            
-            if ([ExwhichBoFangYeMianStr isEqualToString:@"Downloadbofang"]){
-                 [Explayer replaceCurrentItemWithPlayerItem:[[AVPlayerItem alloc]initWithURL:[NSURL fileURLWithPath:self.newsModel.post_mp]]];
-            }
-            else{
-                 [Explayer replaceCurrentItemWithPlayerItem:[[AVPlayerItem alloc]initWithURL:[NSURL URLWithString:self.newsModel.post_mp]]];
-            }
-
-            //播放完毕后发出通知
-//            [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(PlayedidEnd:) name:AVPlayerItemDidPlayToEndTimeNotification object:Explayer.currentItem];
-//            [[NSNotificationCenter defaultCenter] postNotificationName:AVPlayerItemDidPlayToEndTimeNotification object:Explayer.currentItem];
-            if (ExisRigester == NO)
-            {
-                //添加观察者，用来监视播放器的状态变化
-                [Explayer addObserver:self forKeyPath:@"status" options:NSKeyValueObservingOptionNew context:nil];
-                //添加观察者，用来监听播放器的缓冲进度loadedTimeRanges属性
-                [Explayer addObserver:self forKeyPath:@"loadedTimeRanges" options:NSKeyValueObservingOptionNew context:nil];
-                ExisRigester = YES;
-            }
-            
-            [bofangRightBtn setEnabled:NO];
-            [bofangLeftBtn setEnabled:NO];
-            [bofangCenterBtn setEnabled:NO];
-            [self doPlay:bofangCenterBtn];
-            [self performSelector:@selector(doplay2) withObject:nil afterDelay:0.5f];
-            [CommonCode writeToUserD:arr[ExcurrentNumber][@"id"] andKey:@"dangqianbofangxinwenID"];
-            if ([[CommonCode readFromUserD:@"yitingguoxinwenID"] isKindOfClass:[NSArray class]])
-            {
-                NSMutableArray *yitingguoArr = [NSMutableArray arrayWithArray:[CommonCode readFromUserD:@"yitingguoxinwenID"]];
-                [yitingguoArr addObject:arr[ExcurrentNumber][@"id"]];
-                [CommonCode writeToUserD:yitingguoArr andKey:@"yitingguoxinwenID"];
-            }else
-            {
-                NSMutableArray *yitingguoArr = [NSMutableArray array];
-                [yitingguoArr addObject:arr[ExcurrentNumber][@"id"]];
-                [CommonCode writeToUserD:yitingguoArr andKey:@"yitingguoxinwenID"];
-            }
-            [[NSNotificationCenter defaultCenter] postNotificationName:@"gaibianyanse" object:nil];
+            //公共方法
+            [self sameMethod];
             //记录上一次浏览的新闻详情
             [self recordTheLastNews];
         }
     }
-}
-
-- (void)bofangLeftAction:(UIButton *)sender{
-    
-        if ([[CommonCode readFromUserD:@"zhuyeliebiao"] isKindOfClass:[NSArray class]]){
-            
-            if (ExcurrentNumber == 0){
-                NSLog(@"后面没有新闻了");
-                [[NSNotificationCenter defaultCenter] postNotificationName:@"gaibianyanse" object:nil];
-            }
-            else{
-                if (ExisRigester == YES){
-                    [Explayer removeObserver:self forKeyPath:@"status"];
-                    [Explayer removeObserver:self forKeyPath:@"loadedTimeRanges"];
-                    ExisRigester = NO;
-                }
-                
-                
-                arr = [NSMutableArray arrayWithArray:[CommonCode readFromUserD:@"zhuyeliebiao"]];
-                if ((ExcurrentNumber - 1) > [arr count] ) {
-                    self.newsModel.jiemuID = [arr firstObject][@"id"];
-                    ExcurrentNumber = 1;
-                }
-                else{
-                    self.newsModel.jiemuID = arr[ExcurrentNumber - 1][@"id"];
-                }
-                
-                [CommonCode writeToUserD:self.newsModel.jiemuID andKey:@"dangqianbofangxinwenID"];
-                
-                [NetWorkTool getPaoGuoJieMuPingLunLieBiaoWithJieMuID:[CommonCode readFromUserD:@"dangqianbofangxinwenID"] anduid:ExdangqianUserUid andPage:@"1" andLimit:@"10" sccess:^(NSDictionary *responseObject) {
-                    if ([responseObject[@"results"] isKindOfClass:[NSArray class]])
-                    {
-                        self.pinglunArr = [NSMutableArray arrayWithArray:[self pinglunFrameModelArrayWithModelArray:[PlayVCCommentModel mj_objectArrayWithKeyValuesArray:responseObject[@"results"]]]];
-                    }else
-                    {
-                        self.pinglunArr = [NSMutableArray array];
-                    }
-                    [self.tableView reloadData];
-                } failure:^(NSError *error) {
-                    NSLog(@"error = %@",error);
-                }];
-                [CommonCode writeToUserD:arr[ExcurrentNumber - 1] andKey:@"dangqianbofangxinwen"];
-                self.newsModel.Titlejiemu = arr[ExcurrentNumber - 1][@"post_title"];
-                self.newsModel.RiQijiemu = arr[ExcurrentNumber - 1][@"post_date"];
-                self.newsModel.ImgStrjiemu = arr[ExcurrentNumber - 1][@"smeta"];
-                self.newsModel.post_lai = arr[ExcurrentNumber - 1][@"post_lai"];
-                self.newsModel.post_news = arr[ExcurrentNumber - 1][@"post_news"];
-                self.newsModel.post_mp = arr[ExcurrentNumber - 1][@"post_mp"];
-                self.newsModel.post_time = arr[ExcurrentNumber - 1][@"post_time"];
-                self.newsModel.jiemuImages = arr[ExcurrentNumber - 1][@"post_act"][@"images"];
-                self.newsModel.jiemuName = arr[ExcurrentNumber - 1][@"post_act"][@"name"];
-                self.newsModel.jiemuDescription = arr[ExcurrentNumber - 1][@"post_act"][@"description"];
-                self.newsModel.jiemuFan_num = arr[ExcurrentNumber - 1][@"post_act"][@"fan_num"];
-                self.newsModel.jiemuMessage_num = arr[ExcurrentNumber - 1][@"post_act"][@"message_num"];
-                self.newsModel.jiemuIs_fan = arr[ExcurrentNumber - 1][@"post_act"][@"is_fan"];
-                self.newsModel.post_keywords = arr[ExcurrentNumber - 1][@"post_keywords"];
-                self.newsModel.url = arr[ExcurrentNumber - 1][@"url"];
-                NSString *imgUrl = [NSString stringWithFormat:@"%@",[arr[ExcurrentNumber - 1][@"smeta"] stringByReplacingOccurrencesOfString:@"\\" withString:@""]];
-                NSString *imgUrl1 = [imgUrl stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-                NSString *imgUrl2 = [imgUrl1 stringByReplacingOccurrencesOfString:@"thumb:" withString:@""];
-                NSString *imgUrl3 = [imgUrl2 stringByReplacingOccurrencesOfString:@"{" withString:@""];
-                NSString *imgUrl4 = [imgUrl3 stringByReplacingOccurrencesOfString:@"}" withString:@""];
-                self.newsModel.ImgStrjiemu = imgUrl4;
-                self.newsModel.ZhengWenjiemu =  arr[ExcurrentNumber - 1][@"post_excerpt"];
-                self.newsModel.praisenum =  arr[ExcurrentNumber - 1][@"praisenum"];
-                dianzanshu = self.newsModel.praisenum;
-                if ([self.newsModel.post_time intValue] / 1000 / 60)
-                {
-                    if ([self.newsModel.post_time intValue] / 1000 / 60 > 9)
-                    {
-                        self.yinpinzongTime.text = [NSString stringWithFormat:@"%d:%d",[self.newsModel.post_time intValue] / 1000 / 60,[self.newsModel.post_time intValue] / 1000 % 60];
-                    }else
-                    {
-                        if ([self.newsModel.post_time intValue] / 1000 % 60 < 10)
-                        {
-                            self.yinpinzongTime.text = [NSString stringWithFormat:@"0%d:0%d",[self.newsModel.post_time intValue] / 1000 / 60,[self.newsModel.post_time intValue] / 1000 % 60];
-                        }else
-                        {
-                            self.yinpinzongTime.text = [NSString stringWithFormat:@"0%d:%d",[self.newsModel.post_time intValue] / 1000 / 60,[self.newsModel.post_time intValue] / 1000 % 60];
-                        }
-                    }
-                }else
-                {
-                    if ([self.newsModel.post_time intValue] / 1000 > 10)
-                    {
-                        self.yinpinzongTime.text = [NSString stringWithFormat:@"00:%d",[self.newsModel.post_time intValue] / 1000 % 60];
-                    }else
-                    {
-                        self.yinpinzongTime.text = [NSString stringWithFormat:@"00:0%d",[self.newsModel.post_time intValue] / 1000 % 60];
-                    }
-                    
-                }
-                self.sliderProgress.maximumValue = [self.newsModel.post_time intValue] / 1000;
-                [self handleKeyword];
-                [self loadData];
-                [self huoqupinglunliebiao];
-                [self configNowPlayingInfoCenter];
-                [self.tableView setContentOffset:CGPointMake(0,0) animated:NO];
-                [self.tableView reloadData];
-                ExcurrentNumber --;
-                if ([ExwhichBoFangYeMianStr isEqualToString:@"Downloadbofang"]){
-                    [Explayer replaceCurrentItemWithPlayerItem:[[AVPlayerItem alloc]initWithURL:[NSURL fileURLWithPath:self.newsModel.post_mp]]];
-                }
-                else{
-                    [Explayer replaceCurrentItemWithPlayerItem:[[AVPlayerItem alloc]initWithURL:[NSURL URLWithString:self.newsModel.post_mp]]];
-                }
-//                [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(PlayedidEnd:) name:AVPlayerItemDidPlayToEndTimeNotification object:Explayer.currentItem];
-                
-//                [[NSNotificationCenter defaultCenter] postNotificationName:AVPlayerItemDidPlayToEndTimeNotification object:Explayer.currentItem];
-                if (ExisRigester == NO)
-                {
-                    //添加观察者，用来监视播放器的状态变化
-                    [Explayer addObserver:self forKeyPath:@"status" options:NSKeyValueObservingOptionNew context:nil];
-                    //添加观察者，用来监听播放器的缓冲进度loadedTimeRanges属性
-                    [Explayer addObserver:self forKeyPath:@"loadedTimeRanges" options:NSKeyValueObservingOptionNew context:nil];
-                    ExisRigester = YES;
-                }
-                [CommonCode writeToUserD:arr[ExcurrentNumber][@"id"] andKey:@"dangqianbofangxinwenID"];
-                if ([[CommonCode readFromUserD:@"yitingguoxinwenID"] isKindOfClass:[NSArray class]]){
-                    NSMutableArray *yitingguoArr = [NSMutableArray arrayWithArray:[CommonCode readFromUserD:@"yitingguoxinwenID"]];
-                    [yitingguoArr addObject:arr[ExcurrentNumber][@"id"]];
-                    [CommonCode writeToUserD:yitingguoArr andKey:@"yitingguoxinwenID"];
-                }
-                else{
-                    NSMutableArray *yitingguoArr = [NSMutableArray array];
-                    [yitingguoArr addObject:arr[ExcurrentNumber][@"id"]];
-                    [CommonCode writeToUserD:yitingguoArr andKey:@"yitingguoxinwenID"];
-                }
-                [[NSNotificationCenter defaultCenter] postNotificationName:@"gaibianyanse" object:nil];
-                //记录上一次浏览的新闻详情
-                [self recordTheLastNews];
-            }
-        }
-        
-        [bofangRightBtn setEnabled:NO];
-        [bofangLeftBtn setEnabled:NO];
-        [bofangCenterBtn setEnabled:NO];
-        [self doPlay:bofangCenterBtn];
-        [self performSelector:@selector(doplay2) withObject:nil afterDelay:0.5f];
-        
-        NSLog(@"播放后退");
 }
 
 - (void)bofangwanbi:(NSNotification *)notice{
@@ -1213,7 +1151,14 @@ static bofangVC *_instance = nil;
                     ExisRigester = NO;
                 }
             }
-            else{
+            else if ([ExwhichBoFangYeMianStr isEqualToString:@"我的收藏"]){
+                XWAlerLoginView *xw = [[XWAlerLoginView alloc]initWithTitle:@"已经是最后一条了"];
+                [xw show];
+                [self doPlay:bofangCenterBtn];
+                //改变播放新闻列表文字颜色通知
+//                [[NSNotificationCenter defaultCenter] postNotificationName:@"gaibianyanse" object:nil];
+                return;
+            }else{
                 //如果数组中的播放成员播放完毕，就要加载
                 [[NSNotificationCenter defaultCenter] postNotificationName:@"bofangRightyaojiazaishujv" object:nil];
                 [[NSNotificationCenter defaultCenter] postNotificationName:@"gaibianyanse" object:nil];
@@ -1221,109 +1166,33 @@ static bofangVC *_instance = nil;
            
         }
         else{
-            if ((ExcurrentNumber + 1) <= [arr count] - 1) {
-                self.newsModel.jiemuID = arr[ExcurrentNumber + 1][@"id"];
+            if (self.isMyCollectionVC) {
+                if ((ExcurrentNumber + 1) <= [arr count] - 1) {
+                    self.newsModel.jiemuID = arr[ExcurrentNumber + 1][@"post_id"];
+                }
+                else{
+                    self.newsModel.jiemuID = [arr firstObject][@"post_id"];
+                    ExcurrentNumber = -1;
+                }
+            }else{
+                if ((ExcurrentNumber + 1) <= [arr count] - 1) {
+                    self.newsModel.jiemuID = arr[ExcurrentNumber + 1][@"id"];
+                }
+                else{
+                    self.newsModel.jiemuID = [arr firstObject][@"id"];
+                    ExcurrentNumber = -1;
+                }
             }
-            else{
-                self.newsModel.jiemuID = [arr firstObject][@"id"];
-                ExcurrentNumber = -1;
-            }
-            self.newsModel.jiemuID = arr[ExcurrentNumber + 1][@"id"];
             [CommonCode writeToUserD:self.newsModel.jiemuID andKey:@"dangqianbofangxinwenID"];
             [CommonCode writeToUserD:arr[ExcurrentNumber + 1] andKey:@"dangqianbofangxinwen"];
-            self.newsModel.Titlejiemu = arr[ExcurrentNumber + 1][@"post_title"];
-            self.newsModel.RiQijiemu = arr[ExcurrentNumber + 1][@"post_date"];
-            self.newsModel.ImgStrjiemu = arr[ExcurrentNumber + 1][@"smeta"];
-            self.newsModel.post_lai = arr[ExcurrentNumber + 1][@"post_lai"];
-            self.newsModel.post_news = arr[ExcurrentNumber + 1][@"post_news"];
-            self.newsModel.post_mp = arr[ExcurrentNumber + 1][@"post_mp"];
-            self.newsModel.post_time = arr[ExcurrentNumber + 1][@"post_time"];
-            self.newsModel.jiemuImages = arr[ExcurrentNumber + 1][@"post_act"][@"images"];
-            self.newsModel.jiemuName = arr[ExcurrentNumber + 1][@"post_act"][@"name"];
-            self.newsModel.jiemuDescription = arr[ExcurrentNumber + 1][@"post_act"][@"description"];
-            self.newsModel.jiemuFan_num = arr[ExcurrentNumber + 1][@"post_act"][@"fan_num"];
-            self.newsModel.jiemuMessage_num = arr[ExcurrentNumber + 1][@"post_act"][@"message_num"];
-            self.newsModel.jiemuIs_fan = arr[ExcurrentNumber + 1][@"post_act"][@"is_fan"];
-            self.newsModel.post_keywords = arr[ExcurrentNumber + 1][@"post_keywords"];
-            self.newsModel.url = arr[ExcurrentNumber + 1][@"url"];
-            if ([self.newsModel.post_time intValue] / 1000 / 60){
-                if ([self.newsModel.post_time intValue] / 1000 / 60 > 9){
-                    self.yinpinzongTime.text = [NSString stringWithFormat:@"%d:%d",[self.newsModel.post_time intValue] / 1000 / 60,[self.newsModel.post_time intValue] / 1000 % 60];
-                }
-                else{
-                    if ([self.newsModel.post_time intValue] / 1000 % 60 < 10){
-                        self.yinpinzongTime.text = [NSString stringWithFormat:@"0%d:0%d",[self.newsModel.post_time intValue] / 1000 / 60,[self.newsModel.post_time intValue] / 1000 % 60];
-                    }
-                    else{
-                        self.yinpinzongTime.text = [NSString stringWithFormat:@"0%d:%d",[self.newsModel.post_time intValue] / 1000 / 60,[self.newsModel.post_time intValue] / 1000 % 60];
-                    }
-                }
-            }
-            else{
-                if ([self.newsModel.post_time intValue] / 1000 > 10){
-                    self.yinpinzongTime.text = [NSString stringWithFormat:@"00:%d",[self.newsModel.post_time intValue] / 1000 % 60];
-                }
-                else{
-                    self.yinpinzongTime.text = [NSString stringWithFormat:@"00:0%d",[self.newsModel.post_time intValue] / 1000 % 60];
-                }
-                
-            }
-            self.sliderProgress.maximumValue = [self.newsModel.post_time intValue] / 1000;
-            NSString *imgUrl = [NSString stringWithFormat:@"%@",[arr[ExcurrentNumber + 1][@"smeta"] stringByReplacingOccurrencesOfString:@"\\" withString:@""]];
-            NSString *imgUrl1 = [imgUrl stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-            NSString *imgUrl2 = [imgUrl1 stringByReplacingOccurrencesOfString:@"thumb:" withString:@""];
-            NSString *imgUrl3 = [imgUrl2 stringByReplacingOccurrencesOfString:@"{" withString:@""];
-            NSString *imgUrl4 = [imgUrl3 stringByReplacingOccurrencesOfString:@"}" withString:@""];
-            self.newsModel.ImgStrjiemu = imgUrl4;
-            self.newsModel.ZhengWenjiemu =  arr[ExcurrentNumber + 1][@"post_excerpt"];
-            self.newsModel.praisenum =  arr[ExcurrentNumber + 1][@"praisenum"];
-            [self handleKeyword];
-            [self loadData];
-            [self huoqupinglunliebiao];
-            [self configNowPlayingInfoCenter];
-            [self.tableView setContentOffset:CGPointMake(0,0) animated:NO];
-            [self.tableView reloadData];
+            //设置新闻模型数据
+            [self playActionWithNextIndex:-1];
             ExcurrentNumber ++;
-            if ([ExwhichBoFangYeMianStr isEqualToString:@"Downloadbofang"]){
-                [Explayer replaceCurrentItemWithPlayerItem:[[AVPlayerItem alloc]initWithURL:[NSURL fileURLWithPath:self.newsModel.post_mp]]];
-            }
-            else{
-                [Explayer replaceCurrentItemWithPlayerItem:[[AVPlayerItem alloc]initWithURL:[NSURL URLWithString:self.newsModel.post_mp]]];
-            }
-            [Explayer play];
-            if (ExisRigester == NO){
-                //添加观察者，用来监视播放器的状态变化
-                [Explayer addObserver:self forKeyPath:@"status" options:NSKeyValueObservingOptionNew context:nil];
-                //添加观察者，用来监听播放器的缓冲进度loadedTimeRanges属性
-                [Explayer addObserver:self forKeyPath:@"loadedTimeRanges" options:NSKeyValueObservingOptionNew context:nil];
-                ExisRigester = YES;
-            }
+            //公共方法
+            [self sameMethod];
             
-            //播放完毕后发出通知
-//            [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(PlayedidEnd:) name:AVPlayerItemDidPlayToEndTimeNotification object:Explayer.currentItem];
-            
-//            [[NSNotificationCenter defaultCenter] postNotificationName:AVPlayerItemDidPlayToEndTimeNotification object:Explayer.currentItem];
-            [bofangRightBtn setEnabled:NO];
-            [bofangLeftBtn setEnabled:NO];
-            [bofangCenterBtn setEnabled:NO];
-            [self doPlay:bofangCenterBtn];
-            [self performSelector:@selector(doplay2) withObject:nil afterDelay:0.5f];
-            [CommonCode writeToUserD:arr[ExcurrentNumber][@"id"] andKey:@"dangqianbofangxinwenID"];
-            if ([[CommonCode readFromUserD:@"yitingguoxinwenID"] isKindOfClass:[NSArray class]])
-            {
-                NSMutableArray *yitingguoArr = [NSMutableArray arrayWithArray:[CommonCode readFromUserD:@"yitingguoxinwenID"]];
-                [yitingguoArr addObject:arr[ExcurrentNumber][@"id"]];
-                [CommonCode writeToUserD:yitingguoArr andKey:@"yitingguoxinwenID"];
-            }
-            else{
-                NSMutableArray *yitingguoArr = [NSMutableArray array];
-                [yitingguoArr addObject:arr[ExcurrentNumber][@"id"]];
-                [CommonCode writeToUserD:yitingguoArr andKey:@"yitingguoxinwenID"];
-            }
-            [[NSNotificationCenter defaultCenter] postNotificationName:@"gaibianyanse" object:nil];
         }
     }
-   
 }
 
 - (void)jiazaichenggong:(NSNotification *)notification{
@@ -1345,57 +1214,11 @@ static bofangVC *_instance = nil;
             }
             [self.tableView reloadData];
         } failure:^(NSError *error) {
-            NSLog(@"error = %@",error);
+            RTLog(@"error = %@",error);
         }];
-        self.newsModel.Titlejiemu = arr[ExcurrentNumber + 1][@"post_title"];
-        self.newsModel.RiQijiemu = arr[ExcurrentNumber + 1][@"post_date"];
-        self.newsModel.ImgStrjiemu = arr[ExcurrentNumber + 1][@"smeta"];
-        self.newsModel.post_lai = arr[ExcurrentNumber + 1][@"post_lai"];
-        self.newsModel.post_news = arr[ExcurrentNumber + 1][@"post_news"];
-        self.newsModel.post_mp = arr[ExcurrentNumber + 1][@"post_mp"];
-        self.newsModel.jiemuImages = arr[ExcurrentNumber + 1][@"post_act"][@"images"];
-        self.newsModel.jiemuName = arr[ExcurrentNumber + 1][@"post_act"][@"name"];
-        self.newsModel.jiemuDescription = arr[ExcurrentNumber + 1][@"post_act"][@"description"];
-        self.newsModel.jiemuFan_num = arr[ExcurrentNumber + 1][@"post_act"][@"fan_num"];
-        self.newsModel.jiemuMessage_num = arr[ExcurrentNumber + 1][@"post_act"][@"message_num"];
-        self.newsModel.jiemuIs_fan = arr[ExcurrentNumber + 1][@"post_act"][@"is_fan"];
-        self.newsModel.post_keywords = arr[ExcurrentNumber + 1][@"post_keywords"];
-        self.newsModel.url = arr[ExcurrentNumber + 1][@"url"];
-        NSString *imgUrl = [NSString stringWithFormat:@"%@",[arr[ExcurrentNumber + 1][@"smeta"] stringByReplacingOccurrencesOfString:@"\\" withString:@""]];
-        NSString *imgUrl1 = [imgUrl stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-        NSString *imgUrl2 = [imgUrl1 stringByReplacingOccurrencesOfString:@"thumb:" withString:@""];
-        NSString *imgUrl3 = [imgUrl2 stringByReplacingOccurrencesOfString:@"{" withString:@""];
-        NSString *imgUrl4 = [imgUrl3 stringByReplacingOccurrencesOfString:@"}" withString:@""];
-        self.newsModel.ImgStrjiemu = imgUrl4;
-        self.newsModel.ZhengWenjiemu =  arr[ExcurrentNumber + 1][@"post_excerpt"];
-        self.newsModel.praisenum =  arr[ExcurrentNumber + 1][@"praisenum"];
-        self.newsModel.post_time = arr[ExcurrentNumber + 1][@"post_time"];
-        
-        if ([self.newsModel.post_time intValue] / 1000 / 60){
-            if ([self.newsModel.post_time intValue] / 1000 / 60 > 9){
-                self.yinpinzongTime.text = [NSString stringWithFormat:@"%d:%d",[self.newsModel.post_time intValue] / 1000 / 60,[self.newsModel.post_time intValue] / 1000 % 60];
-            }
-            else{
-                if ([self.newsModel.post_time intValue] / 1000 % 60 < 10){
-                    self.yinpinzongTime.text = [NSString stringWithFormat:@"0%d:0%d",[self.newsModel.post_time intValue] / 1000 / 60,[self.newsModel.post_time intValue] / 1000 % 60];
-                }
-                else{
-                    self.yinpinzongTime.text = [NSString stringWithFormat:@"0%d:%d",[self.newsModel.post_time intValue] / 1000 / 60,[self.newsModel.post_time intValue] / 1000 % 60];
-                }
-            }
-        }
-        else{
-            if ([self.newsModel.post_time intValue] / 1000 > 10){
-                self.yinpinzongTime.text = [NSString stringWithFormat:@"00:%d",[self.newsModel.post_time intValue] / 1000 % 60];
-            }
-            else{
-                self.yinpinzongTime.text = [NSString stringWithFormat:@"00:0%d",[self.newsModel.post_time intValue] / 1000 % 60];
-            }
-            
-        }
-        
+        [self playActionWithNextIndex:-1];
+        [self reloadPlayAllTime];/**<刷新音频总时长*/
         [self.tableView reloadData];
-        //        [bofangRightBtn setEnabled:YES];
         ExcurrentNumber ++;
         if ([ExwhichBoFangYeMianStr isEqualToString:@"Downloadbofang"]){
             [Explayer replaceCurrentItemWithPlayerItem:[[AVPlayerItem alloc]initWithURL:[NSURL fileURLWithPath:self.newsModel.post_mp]]];
@@ -1403,9 +1226,6 @@ static bofangVC *_instance = nil;
         else{
             [Explayer replaceCurrentItemWithPlayerItem:[[AVPlayerItem alloc]initWithURL:[NSURL URLWithString:self.newsModel.post_mp]]];
         }
-        //播放完毕后发出通知
-        //        [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(PlayedidEnd:) name:AVPlayerItemDidPlayToEndTimeNotification object:Explayer.currentItem];
-//        [[NSNotificationCenter defaultCenter] postNotificationName:AVPlayerItemDidPlayToEndTimeNotification object:Explayer.currentItem];
         if (ExisRigester == NO){
             //添加观察者，用来监视播放器的状态变化
             [Explayer addObserver:self forKeyPath:@"status" options:NSKeyValueObservingOptionNew context:nil];
@@ -1437,7 +1257,7 @@ static bofangVC *_instance = nil;
                 self.newsModel.jiemuIs_fan = @"1";
                 [self.tableView reloadData];
             } failure:^(NSError *error) {
-                NSLog(@"error = %@",error);
+                RTLog(@"error = %@",error);
             }];
         }
         else{
@@ -1447,7 +1267,7 @@ static bofangVC *_instance = nil;
                 self.newsModel.jiemuIs_fan = @"0";
                 [self.tableView reloadData];
             } failure:^(NSError *error) {
-                NSLog(@"error = %@",error);
+                RTLog(@"error = %@",error);
             }];
         }
         
@@ -1458,11 +1278,9 @@ static bofangVC *_instance = nil;
         }]];
         [qingshuruyonghuming addAction:[UIAlertAction actionWithTitle:@"登录" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
             [self doPlay:bofangCenterBtn];
-            LoginNavC *loginNavC = [LoginNavC new];
             LoginVC *loginFriVC = [LoginVC new];
-            loginNavC = [[LoginNavC alloc]initWithRootViewController:loginFriVC];
+            LoginNavC *loginNavC = [[LoginNavC alloc]initWithRootViewController:loginFriVC];
             [loginNavC.navigationBar setBackgroundColor:[UIColor whiteColor]];
-            //        [loginNavC.navigationBar setBackgroundImage:[UIImage imageNamed:@"mian-1"] forBarMetrics:UIBarMetricsDefault];
             loginNavC.navigationBar.tintColor = [UIColor blackColor];
             [self presentViewController:loginNavC animated:YES completion:nil];
         }]];
@@ -1471,60 +1289,13 @@ static bofangVC *_instance = nil;
     }
 }
 
-- (void)pinglundianzanAction:(UIButton *)sender{
-    
-//    UITableViewCell *cell = (UITableViewCell *)[[sender superview] superview];
-//    NSIndexPath *indexPath = [self.tableView indexPathForCell:cell];
-////    UILabel *dianzanNumlab = (UILabel *)[cell.contentView viewWithTag:indexPath.row + 1000];
-//    PinglundianzanCustomBtn *pinglundianzanBtn = (PinglundianzanCustomBtn *)sender;
-//    UILabel *dianzanNumlab = pinglundianzanBtn.PingLundianzanNumLab;
-//    
-//    if (sender.selected == YES){
-//        [sender setImage:[UIImage imageNamed:@"pinglun-10"] forState:UIControlStateNormal];
-//        if ([dianzanNumlab.text intValue] == 0) {
-//            dianzanNumlab.text = @"0";
-//        }else
-//        {
-//            dianzanNumlab.text = [NSString stringWithFormat:@"%d",[dianzanNumlab.text intValue] - 1];
-//        }
-//        dianzanNumlab.textColor = [UIColor grayColor];
-//        dianzanNumlab.alpha = 0.7f;
-//        sender.selected = NO;
-//        [NetWorkTool addAndCancelPraiseWithaccessToken:[DSE encryptUseDES:ExdangqianUser] comments_id:self.pinglunArr[indexPath.row - 2][@"id"] sccess:^(NSDictionary *responseObject) {
-//            NSLog(@"responseObject = %@",responseObject);
-//            NSLog(@"针对评论取消点赞");
-//        } failure:^(NSError *error) {
-//            NSLog(@"error = %@",error);
-//        }];
-//    }
-//    else{
-//        [sender setImage:[UIImage imageNamed:@"pinglun-yizan"] forState:UIControlStateNormal];
-//        dianzanNumlab.text = [NSString stringWithFormat:@"%d",[dianzanNumlab.text intValue] + 1];
-//        dianzanNumlab.textColor = ColorWithRGBA(0, 159, 240, 1);
-//        dianzanNumlab.alpha = 1.0f;
-//        sender.selected = YES;
-//        [NetWorkTool addAndCancelPraiseWithaccessToken:[DSE encryptUseDES:ExdangqianUser] comments_id:self.pinglunArr[indexPath.row - 2][@"id"] sccess:^(NSDictionary *responseObject) {
-//            NSLog(@"responseObject = %@",responseObject);
-//            NSLog(@"针对评论点赞");
-//        } failure:^(NSError *error) {
-//            NSLog(@"error = %@",error);
-//        }];
-//        [NetWorkTool postPaoGuoXinWenPingLunDianZanWithaccessToken:[DSE encryptUseDES:ExdangqianUser] andact_id:self.pinglunArr[indexPath.row - 2][@"id"] sccess:^(NSDictionary *responseObject) {
-//            NSLog(@"responseObject = %@",responseObject);
-//            NSLog(@"针对评论点赞");
-//        } failure:^(NSError *error) {
-//            NSLog(@"error = %@",error);
-//        }];
-//    }
-}
-
 - (void)dianzanAction:(UIButton *)sender{
     jiaDianZanShuJv = [NSMutableArray arrayWithArray:[CommonCode readFromUserD:@"jiaDianZanShuJv"]];
     UIImageView *image = (UIImageView *)[sender viewWithTag:1];
     UILabel *lab = (UILabel *)[sender viewWithTag:2];
     if (isDianZan == NO){
         
-        NSLog(@"点赞");
+        RTLog(@"点赞");
         for (int i = 0; i < jiaDianZanShuJv.count; i ++){
             NSString *str = jiaDianZanShuJv[i][@"jiemuID"];
             if ([str isEqualToString:self.newsModel.jiemuID])
@@ -1542,7 +1313,7 @@ static bofangVC *_instance = nil;
         [CommonCode writeToUserD:jiaDianZanShuJv andKey:@"jiaDianZanShuJv"];
     }
     else{
-        NSLog(@"取消点赞");
+        RTLog(@"取消点赞");
         
         for (int i = 0; i < jiaDianZanShuJv.count; i ++){
             NSString *str = jiaDianZanShuJv[i][@"jiemuID"];
@@ -1572,7 +1343,6 @@ static bofangVC *_instance = nil;
         self.hidesBottomBarWhenPushed = YES;
         [self.navigationController pushViewController:pinglunye animated:YES];
         self.hidesBottomBarWhenPushed = YES;
-//        [self presentViewController:pinglunye animated:YES completion:nil];
     }
     else{
         UIAlertController *qingshuruyonghuming = [UIAlertController alertControllerWithTitle:@"请先登录" message:nil preferredStyle:UIAlertControllerStyleAlert];
@@ -1580,11 +1350,9 @@ static bofangVC *_instance = nil;
         }]];
         [qingshuruyonghuming addAction:[UIAlertAction actionWithTitle:@"去登录" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
             [self doPlay:bofangCenterBtn];
-            LoginNavC *loginNavC = [LoginNavC new];
             LoginVC *loginFriVC = [LoginVC new];
-            loginNavC = [[LoginNavC alloc]initWithRootViewController:loginFriVC];
+            LoginNavC *loginNavC = [[LoginNavC alloc]initWithRootViewController:loginFriVC];
             [loginNavC.navigationBar setBackgroundColor:[UIColor whiteColor]];
-            //        [loginNavC.navigationBar setBackgroundImage:[UIImage imageNamed:@"mian-1"] forBarMetrics:UIBarMetricsDefault];
             loginNavC.navigationBar.tintColor = [UIColor blackColor];
             [self presentViewController:loginNavC animated:YES completion:nil];
         }]];
@@ -1621,7 +1389,7 @@ static bofangVC *_instance = nil;
 }
 
 - (void)shangAction {
-    NSLog(@"打赏");
+    RTLog(@"打赏");
 }
 
 - (void)zhuboBtnVAction:(UITapGestureRecognizer *)tap {
@@ -1652,27 +1420,6 @@ static bofangVC *_instance = nil;
 //TODO:分享
 - (void)shareNewsBtnAction{
     
-//    [UMSocialUIManager setPreDefinePlatforms:@[@(UMSocialPlatformType_Sina),@(UMSocialPlatformType_QQ),@(UMSocialPlatformType_Qzone),@(UMSocialPlatformType_WechatSession)]];
-//    [UMSocialUIManager showShareMenuViewInWindowWithPlatformSelectionBlock:^(UMSocialPlatformType platformType, NSDictionary *userInfo) {
-//        // 根据获取的platformType确定所选平台进行下一步操作
-//        //创建分享消息对象
-//        UMSocialMessageObject *messageObject = [UMSocialMessageObject messageObject];
-//        //设置文本
-//        messageObject.text = @"社会化组件UShare将各大社交平台接入您的应用，快速武装App。";
-//        //调用分享接口
-//        [[UMSocialManager defaultManager] shareToPlatform:platformType messageObject:messageObject currentViewController:self completion:^(id data, NSError *error) {
-//            if (error) {
-//                NSLog(@"************Share fail with error %@*********",error);
-//            }else{
-//                NSLog(@"response data is %@",data);
-//            }
-//        }];
-//        
-//        
-//        
-//    }];
-//    
-    
     DefineWeakSelf;
     ShareView *shareView = [[ShareView alloc]init];
     AppDelegate *appDelegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
@@ -1695,12 +1442,7 @@ static bofangVC *_instance = nil;
         switch (selectedindex) {
             case 0:
             {
-                NSString *imgUrl = [NSString stringWithFormat:@"%@",[self.newsModel.ImgStrjiemu stringByReplacingOccurrencesOfString:@"\\" withString:@""]];
-                NSString *imgUrl1 = [imgUrl stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-                NSString *imgUrl2 = [imgUrl1 stringByReplacingOccurrencesOfString:@"thumb:" withString:@""];
-                NSString *imgUrl3 = [imgUrl2 stringByReplacingOccurrencesOfString:@"{" withString:@""];
-                NSString *imgUrl4 = [imgUrl3 stringByReplacingOccurrencesOfString:@"}" withString:@""];
-                NSURL *url = [NSURL URLWithString:imgUrl4];
+                NSURL *url = [NSURL URLWithString:self.newsModel.ImgStrjiemu];
                 NSURLRequest *q = [NSURLRequest requestWithURL:url cachePolicy:NSURLRequestUseProtocolCachePolicy timeoutInterval:5];
                 NSData *dataImage = [NSURLConnection sendSynchronousRequest:q returningResponse:nil error:nil];
                 
@@ -1739,11 +1481,11 @@ static bofangVC *_instance = nil;
             }
                 break;
             case 1:{
-                [weakSelf shareToWechatWithscene:0];
+                [weakSelf shareToWechatWithscene:WXSceneSession];
             }
                 break;
             case 2:{
-                [weakSelf shareToWechatWithscene:1];
+                [weakSelf shareToWechatWithscene:WXSceneTimeline];
             }
                 break;
             case 3:{
@@ -1920,6 +1662,7 @@ static bofangVC *_instance = nil;
         accesstoken = nil;
     }
     //postDetail
+    RTLog(@"%@",self.newsModel.jiemuID);
     [NetWorkTool getPostDetailWithaccessToken:accesstoken post_id:self.newsModel.jiemuID sccess:^(NSDictionary *responseObject) {
         RTLog(@"%@",responseObject[@"results"]);
         if ([responseObject[@"results"] isKindOfClass:[NSDictionary class]]){
@@ -1976,7 +1719,7 @@ static bofangVC *_instance = nil;
             }
             else{
                 //TODO:新增关键词
-                [weakSelf addkeywordWithKeyword:self.newsModel.post_keywords];
+                [weakSelf addkeywordWithKeyword:weakSelf.newsModel.post_keywords];
             }
             
         } failure:^(NSError *error) {
@@ -1997,7 +1740,7 @@ static bofangVC *_instance = nil;
                 isAddFrequency = YES;
                 [NetWorkTool frequencykeywordWithaccessToken:[DSE encryptUseDES:ExdangqianUser] k_id:resultArr[j][@"id"] sccess:^(NSDictionary *responseObject) {
                     //
-                    NSLog(@"%@",responseObject);
+                    RTLog(@"%@",responseObject);
                 } failure:^(NSError *error) {
                     //
                 }];
@@ -2020,7 +1763,7 @@ static bofangVC *_instance = nil;
     
     [NetWorkTool addUserKeywordWithaccessToken:[DSE encryptUseDES:ExdangqianUser] keyword:keyword sccess:^(NSDictionary *responseObject) {
         //
-        NSLog(@"%@",responseObject);
+        RTLog(@"%@",responseObject);
     } failure:^(NSError *error) {
         //
     }];
@@ -2036,26 +1779,9 @@ static bofangVC *_instance = nil;
         [al show];
         return;
     }
-//    if (![TencentOAuth iphoneQQInstalled] && ![TencentOAuth iphoneQZoneInstalled] && scene == 1){
-//        UIAlertView *al = [[UIAlertView alloc]initWithTitle:@"提示" message:@"请安装Qzone" delegate:nil cancelButtonTitle:@"知道了" otherButtonTitles: nil];
-//        [al show];
-//        return;
-//    }
     tencentOAuth = [[TencentOAuth alloc]initWithAppId:kAppId_QQ andDelegate:self];
-//    NSArray *permissions = [NSArray arrayWithObjects:
-//                            kOPEN_PERMISSION_GET_USER_INFO,
-//                            kOPEN_PERMISSION_GET_SIMPLE_USER_INFO,
-//                            kOPEN_PERMISSION_ADD_SHARE,
-//                            nil];
-//    [tencentOAuth authorize:permissions inSafari:NO];
     
-    NSString *imgUrl = [NSString stringWithFormat:@"%@",[self.newsModel.ImgStrjiemu stringByReplacingOccurrencesOfString:@"\\" withString:@""]];
-    NSString *imgUrl1 = [imgUrl stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-    NSString *imgUrl2 = [imgUrl1 stringByReplacingOccurrencesOfString:@"thumb:" withString:@""];
-    NSString *imgUrl3 = [imgUrl2 stringByReplacingOccurrencesOfString:@"{" withString:@""];
-    NSString *imgUrl4 = [imgUrl3 stringByReplacingOccurrencesOfString:@"}" withString:@""];
-    
-    [self getImageWithURLStr:imgUrl4 OnSucceed:^(UIImage *image) {
+    [self getImageWithURLStr:self.newsModel.ImgStrjiemu OnSucceed:^(UIImage *image) {
         //压缩图片大小
         CGFloat compression = 0.8f;
         CGFloat maxCompression = 0.1f;
@@ -2091,6 +1817,9 @@ static bofangVC *_instance = nil;
                 {
                     //将内容分享到qq
                     QQApiSendResultCode sent = [QQApiInterface sendReq:req];
+                    if (sent == EQQAPISENDSUCESS) {
+                        RTLog(@"分享QQ成功");
+                    }
 //                    [self handleSendResult:sent];
                 }
                     break;
@@ -2098,6 +1827,9 @@ static bofangVC *_instance = nil;
                 {
                     //将被容分享到qzone
                     QQApiSendResultCode sent = [QQApiInterface SendReqToQZone:req];
+                    if (sent == EQQAPISENDSUCESS) {
+                        RTLog(@"分享QQ空间成功");
+                    }
 //                    [self handleSendResult:sent];
                 }
                     break;
@@ -2109,7 +1841,7 @@ static bofangVC *_instance = nil;
             
         }else{
             
-            [self getImageWithURLStr:imgUrl4 OnSucceed:^(UIImage *image) {
+            [self getImageWithURLStr:self.newsModel.ImgStrjiemu OnSucceed:^(UIImage *image) {
                 
                 //压缩图片大小
                 CGFloat compression = 0.8f;
@@ -2144,6 +1876,9 @@ static bofangVC *_instance = nil;
                         [audioObj setCflag:kQQAPICtrlFlagQQShare];
                         //将内容分享到qq
                         QQApiSendResultCode sent = [QQApiInterface sendReq:req];
+                        if (sent == EQQAPISENDSUCESS) {
+                            RTLog(@"分享QQ成功");
+                        }
 //                        [self handleSendResult:sent];
                     }
                         break;
@@ -2152,6 +1887,9 @@ static bofangVC *_instance = nil;
                          [audioObj setCflag:kQQAPICtrlFlagQZoneShareOnStart];
                         //将被容分享到qzone
                         QQApiSendResultCode sent = [QQApiInterface SendReqToQZone:req];
+                        if (sent == EQQAPISENDSUCESS) {
+                            RTLog(@"分享QQ空间成功");
+                        }
 //                        [self handleSendResult:sent];
                     }
                         break;
@@ -2171,19 +1909,16 @@ static bofangVC *_instance = nil;
     [WXApi registerApp:KweChatappID];
     
     if (![WXApi isWXAppInstalled]){
-        UIAlertView *al = [[UIAlertView alloc]initWithTitle:@"提示" message:@"请安装微信" delegate:nil cancelButtonTitle:@"知道了" otherButtonTitles: nil];
+        UIAlertView *al = [[UIAlertView alloc]initWithTitle:@"提示" message:@"请先安装微信" delegate:nil cancelButtonTitle:@"知道了" otherButtonTitles: nil];
         [al show];
         return;
     }
-    NSString *imgUrl = [NSString stringWithFormat:@"%@",[self.newsModel.ImgStrjiemu stringByReplacingOccurrencesOfString:@"\\" withString:@""]];
-    NSString *imgUrl1 = [imgUrl stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-    NSString *imgUrl2 = [imgUrl1 stringByReplacingOccurrencesOfString:@"thumb:" withString:@""];
-    NSString *imgUrl3 = [imgUrl2 stringByReplacingOccurrencesOfString:@"{" withString:@""];
-    NSString *imgUrl4 = [imgUrl3 stringByReplacingOccurrencesOfString:@"}" withString:@""];
     WXMediaMessage *message = [WXMediaMessage message];
     message.title = self.newsModel.Titlejiemu;
+    NSString *musicUrl = [NSString stringWithFormat:@"https://tingwen.me/index.php/article/yulan/id/%@.html",self.newsModel.jiemuID];
+//    NSString *musicUrl = @"http://jingyan.baidu.com/article/a378c960b49034b3282830db.html";
     
-    [self getImageWithURLStr:imgUrl4 OnSucceed:^(UIImage *image) {
+    [self getImageWithURLStr:self.newsModel.ImgStrjiemu OnSucceed:^(UIImage *image) {
         //压缩图片大小
         CGFloat compression = 0.8f;
         CGFloat maxCompression = 0.1f;
@@ -2202,7 +1937,7 @@ static bofangVC *_instance = nil;
             NSData *thumbImageData = [thumbImage dataWithMaxFileSize:25 * 1024 maxSide:200];
             [message setThumbImage:[UIImage imageWithData:thumbImageData]];
             WXMusicObject *ext = [WXMusicObject object];
-            ext.musicUrl = [NSString stringWithFormat:@"http://tingwen.me/index.php/article/yulan/id/%@.html",self.newsModel.jiemuID];
+            ext.musicUrl = musicUrl;
             ext.musicDataUrl = self.newsModel.post_mp;
             message.mediaObject = ext;
             SendMessageToWXReq* req = [[SendMessageToWXReq alloc] init];
@@ -2210,15 +1945,15 @@ static bofangVC *_instance = nil;
             req.message = message;
             req.scene = scene;
             if ([WXApi sendReq:req]) {
-                NSLog(@"微信发送请求成功");
+                RTLog(@"微信发送请求成功");
             }
             else{
-                NSLog(@"微信发送请求失败");
+                RTLog(@"微信发送请求失败");
             }
             
         }else{
             
-            [self getImageWithURLStr:imgUrl4 OnSucceed:^(UIImage *image) {
+            [self getImageWithURLStr:self.newsModel.ImgStrjiemu OnSucceed:^(UIImage *image) {
                 
                 //压缩图片大小
                 CGFloat compression = 0.8f;
@@ -2231,17 +1966,12 @@ static bofangVC *_instance = nil;
                     compression -= 0.1;
                     imageData = UIImageJPEGRepresentation(image, compression);
                 }
-                //当图片还是大于32K时，则用图标
-//                if ([imageData length] > maxFileSize) {
-//                    
-//                    imageData = UIImageJPEGRepresentation([UIImage imageNamed:@"Icon-60"], 0.9);
-//                }
                 //设置图片
                 UIImage *thumbImage = [UIImage imageWithData:imageData];
                 NSData *thumbImageData = [thumbImage dataWithMaxFileSize:25 * 1024 maxSide:200];
                 [message setThumbImage:[UIImage imageWithData:thumbImageData]];
                 WXMusicObject *ext = [WXMusicObject object];
-                ext.musicUrl = [NSString stringWithFormat:@"http://tingwen.me/index.php/article/yulan/id/%@.html",self.newsModel.jiemuID];
+                ext.musicUrl = musicUrl;
                 ext.musicDataUrl = self.newsModel.post_mp;
                 message.mediaObject = ext;
                 SendMessageToWXReq* req = [[SendMessageToWXReq alloc] init];
@@ -2249,10 +1979,10 @@ static bofangVC *_instance = nil;
                 req.message = message;
                 req.scene = scene;
                 if ([WXApi sendReq:req]) {
-                    NSLog(@"微信发送请求成功");
+                    RTLog(@"微信发送请求成功");
                 }
                 else{
-                    NSLog(@"微信发送请求失败");
+                    RTLog(@"微信发送请求失败");
                 }
             }];
         }
@@ -2309,11 +2039,9 @@ static bofangVC *_instance = nil;
     [qingshuruyonghuming addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
     }]];
     [qingshuruyonghuming addAction:[UIAlertAction actionWithTitle:@"登录" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-        LoginNavC *loginNavC = [LoginNavC new];
         LoginVC *loginFriVC = [LoginVC new];
-        loginNavC = [[LoginNavC alloc]initWithRootViewController:loginFriVC];
+        LoginNavC *loginNavC = [[LoginNavC alloc]initWithRootViewController:loginFriVC];
         [loginNavC.navigationBar setBackgroundColor:[UIColor whiteColor]];
-        //        [loginNavC.navigationBar setBackgroundImage:[UIImage imageNamed:@"mian-1"] forBarMetrics:UIBarMetricsDefault];
         loginNavC.navigationBar.tintColor = [UIColor blackColor];
         [self presentViewController:loginNavC animated:YES completion:nil];
     }]];
@@ -2328,11 +2056,9 @@ static bofangVC *_instance = nil;
         [_finalRewardButton startAnimation];
     }]];
     [alertC addAction:[UIAlertAction actionWithTitle:@"登录" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-        LoginNavC *loginNavC = [LoginNavC new];
         LoginVC *loginFriVC = [LoginVC new];
-        loginNavC = [[LoginNavC alloc]initWithRootViewController:loginFriVC];
+        LoginNavC *loginNavC = [[LoginNavC alloc]initWithRootViewController:loginFriVC];
         [loginNavC.navigationBar setBackgroundColor:[UIColor whiteColor]];
-        //        [loginNavC.navigationBar setBackgroundImage:[UIImage imageNamed:@"mian-1"] forBarMetrics:UIBarMetricsDefault];
         loginNavC.navigationBar.tintColor = [UIColor blackColor];
         [self presentViewController:loginNavC animated:YES completion:nil];
     }]];
@@ -2344,36 +2070,6 @@ static bofangVC *_instance = nil;
         return;
     }
     [YJImageBrowserView showWithImageView:(UIImageView *)tap.view];
-//    //scrollView作为背景
-//    UIScrollView *bgView = [[UIScrollView alloc] init];
-//    bgView.frame = [UIScreen mainScreen].bounds;
-//    bgView.backgroundColor = [UIColor blackColor];
-//    UITapGestureRecognizer *tapBg = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapBgView:)];
-//    [bgView addGestureRecognizer:tapBg];
-//    UIImageView *picView = (UIImageView *)tap.view;
-//    UIImageView *imageView = [[UIImageView alloc] init];
-//    imageView.image = picView.image;
-//    imageView.frame = [bgView convertRect:picView.frame fromView:self.view];
-//    imageView.userInteractionEnabled = YES;
-//    UILongPressGestureRecognizer *longtapImage = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(longtapImage:)];
-//    [imageView addGestureRecognizer:longtapImage];
-//    [bgView addSubview:imageView];
-//    [[[UIApplication sharedApplication] keyWindow] addSubview:bgView];
-//    self.lastImageView = imageView;
-//    self.originalFrame = imageView.frame;
-//    self.scrollView = bgView;
-//    //最大放大比例
-//    self.scrollView.maximumZoomScale = 2.0f;
-//    self.scrollView.showsHorizontalScrollIndicator = NO;
-//    self.scrollView.showsVerticalScrollIndicator = NO;
-//    [UIView animateWithDuration:0.35 animations:^{
-//        CGRect frame = imageView.frame;
-//        frame.size.width = bgView.frame.size.width;
-//        frame.size.height = frame.size.width * (imageView.image.size.height / imageView.image.size.width);
-//        frame.origin.x = 0;
-//        frame.origin.y = (bgView.frame.size.height - frame.size.height) * 0.5;
-//        imageView.frame = frame;
-//    }];
 }
 
 -(void)tapBgView:(UITapGestureRecognizer *)tapBgRecognizer
@@ -2414,33 +2110,6 @@ static bofangVC *_instance = nil;
 -(UIView *)viewForZoomingInScrollView:(UIScrollView *)scrollView{
     return self.lastImageView;
 }
-
-//- (void)clickPinglunImgHead:(UITapGestureRecognizer *)tapG {
-//    NSDictionary *components = self.pinglunArr[tapG.view.tag - 1000];
-//    [self skipToUserVCWihtcomponents:components];
-//}
-
-//- (void)skipToUserVCWihtcomponents:(NSDictionary *)components{
-//    gerenzhuyeVC *gerenzhuye = [gerenzhuyeVC new];
-//    if ([components[@"user_login"] isEqualToString:ExdangqianUser] && [[CommonCode readFromUserD:@"isLogin"]boolValue] == YES) {
-//        gerenzhuye.isMypersonalPage = YES;
-//    }
-//    else{
-//        gerenzhuye.isMypersonalPage = NO;
-//    }
-//    gerenzhuye.isNewsComment = YES;
-//    gerenzhuye.user_nicename = components[@"user_nicename"];
-//    gerenzhuye.sex = components[@"sex"];
-//    gerenzhuye.signature = components[@"signature"];
-//    gerenzhuye.user_login = components[@"user_login"];
-//    gerenzhuye.avatar = components[@"avatar"];
-//    gerenzhuye.fan_num = components[@"fan_num"];
-//    gerenzhuye.guan_num = components[@"guan_num"];
-//    gerenzhuye.user_id = components[@"uid"];
-//    self.hidesBottomBarWhenPushed = YES;
-//    [self.navigationController pushViewController:gerenzhuye animated:YES];
-//    self.hidesBottomBarWhenPushed = YES;
-//}
 
 - (BOOL)canPerformAction:(SEL)action withSender:(id)sender{
     if (action == @selector(copy:) || action == @selector(selectAll:))
@@ -2484,7 +2153,7 @@ static bofangVC *_instance = nil;
     NSRange range;
     range.location = 0;
     range.length = [self.newsModel.ZhengWenjiemu length];
-    zhengwenTextView.selectedRange = range;
+    _zhengwenTextView.selectedRange = range;
     [[UIPasteboard generalPasteboard] setString:self.newsModel.ZhengWenjiemu];
 }
 
@@ -2494,7 +2163,7 @@ static bofangVC *_instance = nil;
 - (void)allselected {
     
 }
-#warning 空值处理防止空值崩溃
+#pragma mark - 空值处理防止空值崩溃
 - (void)recordTheLastNews{
     
     NSMutableDictionary *dic = [NSMutableDictionary new];
@@ -2527,7 +2196,6 @@ static bofangVC *_instance = nil;
         case 0:
         {
             //下载
-//            [self collect];
             [self downloadAction:sender];
         }
             break;
@@ -2581,7 +2249,7 @@ static bofangVC *_instance = nil;
     if ([[CommonCode readFromUserD:@"isLogin"]boolValue] == YES){
         accesstoken = AvatarAccessToken;
         [NetWorkTool getListenMoneyWithaccessToken:accesstoken sccess:^(NSDictionary *responseObject) {
-            NSLog(@"%@",responseObject);
+            RTLog(@"%@",responseObject);
             if ([responseObject[@"status"] integerValue] == 1) {
                 vc.balanceCount = [responseObject[@"results"][@"listen_money"] doubleValue];
                 vc.rewardCount = self.rewardCount;
@@ -2648,19 +2316,21 @@ static bofangVC *_instance = nil;
     [self.tableView reloadData];
 }
 
-#pragma mark - 后台控制
+#pragma mark - 后台系统中断音频控制
 - (void)handleInterruption:(NSNotification *)notification{
     NSDictionary *info = notification.userInfo;
     AVAudioSessionInterruptionType type = [info[AVAudioSessionInterruptionTypeKey] unsignedIntegerValue];
-    if (type == AVAudioSessionInterruptionTypeBegan) {
+    if (type == AVAudioSessionInterruptionTypeBegan) {//进入别的应用
         //Handle InterruptionBegan
-        NSLog(@"interruptionTypeBegan");
+        //系统暂停音频，则设置暂停播放器
+        [self doPlay:bofangCenterBtn];
+        RTLog(@"interruptionTypeBegan");
     }else{
+        RTLog(@"interruptionTypeEnd");
         AVAudioSessionInterruptionOptions options = [info[AVAudioSessionInterruptionOptionKey] unsignedIntegerValue];
         if (options == AVAudioSessionInterruptionOptionShouldResume) {
-            //Handle Resume
-            [Explayer play];
-            [bofangCenterBtn setImage:[UIImage imageNamed:@"home_news_ic_pause"] forState:UIControlStateNormal];
+            //Handle Resume 重新开始播放
+            [self doPlay:bofangCenterBtn];
         }
     }
 }
@@ -2671,14 +2341,8 @@ static bofangVC *_instance = nil;
         return;
     }
     //    设置后台播放时显示的东西，例如歌曲名字，图片等
-    //    <MediaPlayer/MediaPlayer.h>
     
-    NSString *imgUrl = [NSString stringWithFormat:@"%@",[self.newsModel.ImgStrjiemu stringByReplacingOccurrencesOfString:@"\\" withString:@""]];
-    NSString *imgUrl1 = [imgUrl stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-    NSString *imgUrl2 = [imgUrl1 stringByReplacingOccurrencesOfString:@"thumb:" withString:@""];
-    NSString *imgUrl3 = [imgUrl2 stringByReplacingOccurrencesOfString:@"{" withString:@""];
-    NSString *imgUrl4 = [imgUrl3 stringByReplacingOccurrencesOfString:@"}" withString:@""];
-    [self getImageWithURLStr:imgUrl4 OnSucceed:^(UIImage *image) {
+    [self getImageWithURLStr:self.newsModel.ImgStrjiemu OnSucceed:^(UIImage *image) {
         if (image == nil) {
             image = [UIImage imageNamed:@"tingwen_bg_square"];
         }
@@ -2689,13 +2353,13 @@ static bofangVC *_instance = nil;
                               MPMediaItemPropertyArtist:[self.newsModel.jiemuName length] ? self.newsModel.jiemuName : @"听闻",
                               MPMediaItemPropertyArtwork:artWork,
                               MPNowPlayingInfoPropertyPlaybackRate:[NSNumber numberWithFloat:1.0],
-//                              MPNowPlayingInfoPropertyElapsedPlaybackTime:[NSNumber numberWithDouble:self.sliderProgress.value / 10],
                               MPMediaItemPropertyPlaybackDuration:[NSNumber numberWithDouble:[self.newsModel.post_time intValue] / 1000]
                               };
         [[MPNowPlayingInfoCenter defaultCenter] setNowPlayingInfo:dic];
     }];
 
 }
+#pragma mark - 线控方法
 - (void)remoteControlReceivedWithEvent:(UIEvent *)event {
     //判断是否是后台音频
     if (event.type == UIEventTypeRemoteControl) {
@@ -2720,6 +2384,26 @@ static bofangVC *_instance = nil;
         }
     }
 }
+#pragma mark - 拔插耳机线方法
+/**
+ *  一旦输出改变则执行此方法
+ *
+ *  @param notification 输出改变通知对象
+ */
+-(void)routeChange:(NSNotification *)notification{
+    NSDictionary *dic=notification.userInfo;
+    int changeReason= [dic[AVAudioSessionRouteChangeReasonKey] intValue];
+    //等于AVAudioSessionRouteChangeReasonOldDeviceUnavailable表示旧输出不可用
+    if (changeReason==AVAudioSessionRouteChangeReasonOldDeviceUnavailable) {
+        AVAudioSessionRouteDescription *routeDescription=dic[AVAudioSessionRouteChangePreviousRouteKey];
+        AVAudioSessionPortDescription *portDescription= [routeDescription.outputs firstObject];
+        //原设备为耳机则暂停
+        RTLog(@"%@",portDescription.portType);
+        if ([portDescription.portType isEqualToString:@"Headphones"]) {
+            [self doPlay:bofangCenterBtn];
+        }
+    }
+}
 
 #pragma mark - WXApiDelegate
 /*! @brief 收到一个来自微信的请求，第三方应用程序处理完后调用sendResp向微信发送结果
@@ -2729,7 +2413,7 @@ static bofangVC *_instance = nil;
  * @param req 具体请求内容，是自动释放的
  */
 -(void) onReq:(BaseReq*)req{
-    NSLog(@"%@",req);
+    RTLog(@"%@",req);
 }
 
 
@@ -2740,12 +2424,12 @@ static bofangVC *_instance = nil;
  * @param resp具体的回应内容，是自动释放的
  */
 -(void) onResp:(BaseResp*)resp{
-    NSLog(@"%@",resp);
+    RTLog(@"%@",resp);
 }
 
 #pragma mark -TencentSessionDelegate
 - (void)addShareResponse:(APIResponse*) response{
-    NSLog(@"%@",response);
+    RTLog(@"%@",response);
 }
 
 - (void)handleSendResult:(QQApiSendResultCode)sendResult {
@@ -2820,78 +2504,60 @@ static bofangVC *_instance = nil;
         xiangqingView.backgroundColor = [UIColor whiteColor];
         
         //新闻图片
-        UIImageView *zhengwenImg = [[UIImageView alloc]initWithFrame:CGRectMake(0, -20, IPHONE_W, 209.0 / 667 * SCREEN_HEIGHT)];
-        [zhengwenImg setUserInteractionEnabled:YES];
+        self.zhengwenImg.frame = CGRectMake(0, -20, IPHONE_W, 209.0 / 667 * SCREEN_HEIGHT);
         
-        UIBezierPath *maskPath = [UIBezierPath bezierPathWithRoundedRect:zhengwenImg.bounds byRoundingCorners:UIRectCornerBottomRight cornerRadii:CGSizeMake(160.0 / 667 * SCREEN_HEIGHT, 160.0 / 667 * SCREEN_HEIGHT)];
+        UIBezierPath *maskPath = [UIBezierPath bezierPathWithRoundedRect:_zhengwenImg.bounds byRoundingCorners:UIRectCornerBottomRight cornerRadii:CGSizeMake(160.0 / 667 * SCREEN_HEIGHT, 160.0 / 667 * SCREEN_HEIGHT)];
         CAShapeLayer *maskLayer = [[CAShapeLayer alloc] init];
-        maskLayer.frame = zhengwenImg.bounds;
+        maskLayer.frame = _zhengwenImg.bounds;
         maskLayer.path = maskPath.CGPath;
-        zhengwenImg.layer.mask = maskLayer;
+        _zhengwenImg.layer.mask = maskLayer;
         
-        NSString *imgUrl = [NSString stringWithFormat:@"%@",[self.newsModel.ImgStrjiemu stringByReplacingOccurrencesOfString:@"\\" withString:@""]];
-        NSString *imgUrl1 = [imgUrl stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-        NSString *imgUrl2 = [imgUrl1 stringByReplacingOccurrencesOfString:@"thumb:" withString:@""];
-        NSString *imgUrl3 = [imgUrl2 stringByReplacingOccurrencesOfString:@"{" withString:@""];
-        NSString *imgUrl4 = [imgUrl3 stringByReplacingOccurrencesOfString:@"}" withString:@""];
         //生成图片
+        NSString *imgUrl4 = self.newsModel.ImgStrjiemu;
         if ([imgUrl4 rangeOfString:@"userDownLoadPathImage"].location != NSNotFound) {
-            [zhengwenImg sd_setImageWithURL:[NSURL fileURLWithPath:imgUrl4] placeholderImage:[UIImage imageNamed:@"thumbnailsdefault"]];
+            [_zhengwenImg sd_setImageWithURL:[NSURL fileURLWithPath:imgUrl4] placeholderImage:[UIImage imageNamed:@"thumbnailsdefault"]];
         }
         else if ([imgUrl4  rangeOfString:@"http"].location != NSNotFound)
         {
-            [zhengwenImg sd_setImageWithURL:[NSURL URLWithString:imgUrl4] placeholderImage:[UIImage imageNamed:@"thumbnailsdefault"]];
+            [_zhengwenImg sd_setImageWithURL:[NSURL URLWithString:imgUrl4] placeholderImage:[UIImage imageNamed:@"thumbnailsdefault"]];
         }else
         {
             NSString *str = USERPHOTOHTTPSTRINGZhuBo(imgUrl4);
-            [zhengwenImg sd_setImageWithURL:[NSURL URLWithString:str] placeholderImage:[UIImage imageNamed:@"thumbnailsdefault"]];
+            [_zhengwenImg sd_setImageWithURL:[NSURL URLWithString:str] placeholderImage:[UIImage imageNamed:@"thumbnailsdefault"]];
         }
         
         //添加单击手势
         UITapGestureRecognizer *tapZhengwenImg = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(showZoomImageView:)];
-        [zhengwenImg addGestureRecognizer:tapZhengwenImg];
-        zhengwenImg.contentMode = UIViewContentModeScaleAspectFill;
-        zhengwenImg.clipsToBounds = YES;
-        [xiangqingView addSubview:zhengwenImg];
+        [_zhengwenImg addGestureRecognizer:tapZhengwenImg];
+        [xiangqingView addSubview:_zhengwenImg];
         //主播头像
-        UIImageView *zhuboImg = [[UIImageView alloc]initWithFrame:CGRectMake(20.0 / 375 * IPHONE_W, CGRectGetMaxY(zhengwenImg.frame) + 10.0 / 667 * IPHONE_H,  27.0 / 667 * IPHONE_H, 27.0 / 667 * IPHONE_H)];
-        zhuboImg.layer.masksToBounds = YES;
-        zhuboImg.userInteractionEnabled = YES;
-        zhuboImg.layer.cornerRadius = 27.0 / 667 * IPHONE_H / 2;
-        zhuboImg.contentMode = UIViewContentModeScaleAspectFill;
+        self.zhuboImg.frame = CGRectMake(20.0 / 375 * IPHONE_W, CGRectGetMaxY(_zhengwenImg.frame) + 10.0 / 667 * IPHONE_H,  27.0 / 667 * IPHONE_H, 27.0 / 667 * IPHONE_H);
         UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(zhuboBtnVAction:)];
-        [zhuboImg addGestureRecognizer:tap];
+        [_zhuboImg addGestureRecognizer:tap];
         if([self.newsModel.jiemuImages rangeOfString:@"/data/upload/"].location !=NSNotFound)//_roaldSearchText
         {
-            IMAGEVIEWHTTP(zhuboImg, self.newsModel.jiemuImages);
+            IMAGEVIEWHTTP(_zhuboImg, self.newsModel.jiemuImages);
         }
         else
         {
-            IMAGEVIEWHTTP2(zhuboImg, self.newsModel.jiemuImages);
+            IMAGEVIEWHTTP2(_zhuboImg, self.newsModel.jiemuImages);
         }
-        [xiangqingView addSubview:zhuboImg];
+        [xiangqingView addSubview:_zhuboImg];
         //主播名字
-        UILabel *zhuboTitleLab = [[UILabel alloc]initWithFrame:CGRectMake(CGRectGetMaxX(zhuboImg.frame) + 4.0 / 375 * IPHONE_W, zhuboImg.frame.origin.y +  5.0 / 667 * IPHONE_H, 88.0 / 375 * IPHONE_W, 15.0 / 667 * IPHONE_H)];
+        self.zhuboTitleLab.frame = CGRectMake(CGRectGetMaxX(_zhuboImg.frame) + 4.0 / 375 * IPHONE_W, _zhuboImg.frame.origin.y +  5.0 / 667 * IPHONE_H, 88.0 / 375 * IPHONE_W, 15.0 / 667 * IPHONE_H);
+        _zhuboTitleLab.text = self.newsModel.jiemuName;
+        [_zhuboTitleLab addTapGesWithTarget:self action:@selector(zhuboBtnVAction:)];
+        CGSize contentSize = [_zhuboTitleLab sizeThatFits:CGSizeMake(_zhuboTitleLab.frame.size.width, MAXFLOAT)];
+        _zhuboTitleLab.frame = CGRectMake(_zhuboTitleLab.frame.origin.x, _zhuboTitleLab.frame.origin.y,contentSize.width, _zhuboTitleLab.frame.size.height);
+        [xiangqingView addSubview:_zhuboTitleLab];
         
-        zhuboTitleLab.textColor = nTextColorSub;
-//        zhuboTitleLab.font = [UIFont fontWithName:@"Helvetica-Bold" size:16.0f];
-        zhuboTitleLab.font = gFontMain14;
-        zhuboTitleLab.textAlignment = NSTextAlignmentLeft;
-        zhuboTitleLab.text = self.newsModel.jiemuName;
-        [zhuboTitleLab addTapGesWithTarget:self action:@selector(zhuboBtnVAction:)];
-        CGSize contentSize = [zhuboTitleLab sizeThatFits:CGSizeMake(zhuboTitleLab.frame.size.width, MAXFLOAT)];
-        zhuboTitleLab.frame = CGRectMake(zhuboTitleLab.frame.origin.x, zhuboTitleLab.frame.origin.y,contentSize.width, zhuboTitleLab.frame.size.height);
-        [xiangqingView addSubview:zhuboTitleLab];
+        self.mic.frame = CGRectMake(CGRectGetMaxX(_zhuboTitleLab.frame) + 6.0 / 375 * SCREEN_WIDTH, _zhuboTitleLab.frame.origin.y + 1.0 / 667 * SCREEN_HEIGHT, 8.0 /375 * SCREEN_WIDTH, 14.0 / 667 * SCREEN_HEIGHT);
+        [_mic addTapGesWithTarget:self action:@selector(zhuboBtnVAction:)];
+        [xiangqingView addSubview:_mic];
         
-        UIImageView *mic = [[UIImageView alloc]initWithFrame:CGRectMake(CGRectGetMaxX(zhuboTitleLab.frame) + 6.0 / 375 * SCREEN_WIDTH, zhuboTitleLab.frame.origin.y + 1.0 / 667 * SCREEN_HEIGHT, 8.0 /375 * SCREEN_WIDTH, 14.0 / 667 * SCREEN_HEIGHT)];
-        [mic setImage:[UIImage imageNamed:@"home_news_ic_anchor"]];
-        [mic addTapGesWithTarget:self action:@selector(zhuboBtnVAction:)];
-        [xiangqingView addSubview:mic];
-        
-        UIView *achorTouch = [[UIView alloc]initWithFrame:CGRectMake(CGRectGetMaxX(mic.frame), CGRectGetMaxY(zhengwenImg.frame), SCREEN_WIDTH - CGRectGetMaxX(mic.frame) - 80.0 / 375 * IPHONE_W , 47.0 / 667 * SCREEN_HEIGHT)];
-        [achorTouch  addTapGesWithTarget:self action:@selector(zhuboBtnVAction:)];
-        [achorTouch setUserInteractionEnabled:YES];
-        [xiangqingView addSubview:achorTouch];
+        self.achorTouch.frame = CGRectMake(CGRectGetMaxX(_mic.frame), CGRectGetMaxY(_zhengwenImg.frame), SCREEN_WIDTH - CGRectGetMaxX(_mic.frame) - 80.0 / 375 * IPHONE_W , 47.0 / 667 * SCREEN_HEIGHT);
+        [_achorTouch  addTapGesWithTarget:self action:@selector(zhuboBtnVAction:)];
+        [xiangqingView addSubview:_achorTouch];
         
         //主播简介
 //        UILabel *zhuboSignatureLab = [[UILabel alloc]initWithFrame:CGRectMake(CGRectGetMaxX(zhuboImg.frame) + 10.0 / 375 * IPHONE_W, CGRectGetMaxY(zhuboTitleLab.frame) + 10.0 / 667 * IPHONE_H, 250.0 / 375 * IPHONE_W, 15.0 / 667 * IPHONE_H)];
@@ -2904,7 +2570,7 @@ static bofangVC *_instance = nil;
 //        [xiangqingView addSubview:zhuboSignatureLab];
         //关注、取消
         UIButton *guanzhuBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-        guanzhuBtn.frame = CGRectMake(SCREEN_WIDTH - 80.0 / 375 * IPHONE_W, CGRectGetMaxY(zhengwenImg.frame) + 9.0 / 375 * IPHONE_W, 60.0 / 375 * IPHONE_W, 30.0 / 667 * IPHONE_H);
+        guanzhuBtn.frame = CGRectMake(SCREEN_WIDTH - 80.0 / 375 * IPHONE_W, CGRectGetMaxY(_zhengwenImg.frame) + 9.0 / 375 * IPHONE_W, 60.0 / 375 * IPHONE_W, 30.0 / 667 * IPHONE_H);
         if (isGuanZhu == YES)
         {
             [guanzhuBtn setTitle:@"取消" forState:UIControlStateNormal];
@@ -2923,64 +2589,50 @@ static bofangVC *_instance = nil;
         [xiangqingView addSubview:guanzhuBtn];
         
 
-        UIView *seperatorLine = [[UIView alloc]initWithFrame:CGRectMake(20.0 / 375 * SCREEN_WIDTH, CGRectGetMaxY(zhuboImg.frame) +  12.0 / 667 * SCREEN_HEIGHT, SCREEN_WIDTH - 40.0 / 375 * SCREEN_WIDTH, 1.0)];
-        [seperatorLine setBackgroundColor:gThickLineColor];
-        [xiangqingView addSubview:seperatorLine];
+        self.seperatorLine.frame = CGRectMake(20.0 / 375 * SCREEN_WIDTH, CGRectGetMaxY(_zhuboImg.frame) +  12.0 / 667 * SCREEN_HEIGHT, SCREEN_WIDTH - 40.0 / 375 * SCREEN_WIDTH, 1.0);
+        [xiangqingView addSubview:_seperatorLine];
         
         //标题
-        UILabel *titleLab = [[UILabel alloc]initWithFrame:CGRectMake(20.0 / 375 * IPHONE_W,CGRectGetMaxY(seperatorLine.frame) + 20.0 / 667 * SCREEN_HEIGHT, IPHONE_W - 40.0 / 375 * IPHONE_W, 40.0 / 667 * IPHONE_H)];
-        titleLab.text = self.newsModel.Titlejiemu;
-        titleLab.textAlignment = NSTextAlignmentCenter;
-        titleLab.textColor = nTextColorMain;
-        titleLab.font = [UIFont fontWithName:@"Semibold" size:self.titleFontSize];
+        self.titleLab.frame = CGRectMake(20.0 / 375 * IPHONE_W,CGRectGetMaxY(_seperatorLine.frame) + 20.0 / 667 * SCREEN_HEIGHT, IPHONE_W - 40.0 / 375 * IPHONE_W, 40.0 / 667 * IPHONE_H);
+        _titleLab.text = self.newsModel.Titlejiemu;
+        _titleLab.font = [UIFont fontWithName:@"Semibold" size:self.titleFontSize];
         CGFloat titleHight = [self computeTextHeightWithString:self.newsModel.jiemuDescription andWidth:(SCREEN_WIDTH-20) andFontSize:[UIFont systemFontOfSize:self.titleFontSize]];
-        [titleLab setFrame:CGRectMake(20.0 / 375 * IPHONE_W, CGRectGetMaxY(seperatorLine.frame) + 20.0 / 667 * SCREEN_HEIGHT, IPHONE_W - 40.0 / 375 * IPHONE_W, (titleHight + 20) / 667 * IPHONE_H)];
+        [_titleLab setFrame:CGRectMake(20.0 / 375 * IPHONE_W, CGRectGetMaxY(_seperatorLine.frame) + 20.0 / 667 * SCREEN_HEIGHT, IPHONE_W - 40.0 / 375 * IPHONE_W, (titleHight + 20) / 667 * IPHONE_H)];
         
-        [titleLab setNumberOfLines:0];
-        titleLab.lineBreakMode = NSLineBreakByWordWrapping;
-        [xiangqingView addSubview:titleLab];
+        [xiangqingView addSubview:_titleLab];
         //日期
-        UILabel *riqiLab = [[UILabel alloc]initWithFrame:CGRectMake(10.0 / 375 * IPHONE_W, CGRectGetMaxY(titleLab.frame) + 10.0 / 667 * IPHONE_H, IPHONE_W - 20.0 / 375 * IPHONE_W, 10.0 / 667 * IPHONE_H)];
-        riqiLab.textAlignment = NSTextAlignmentCenter;
-        riqiLab.textColor = nTextColorSub;
+        self.riqiLab.frame = CGRectMake(10.0 / 375 * IPHONE_W, CGRectGetMaxY(_titleLab.frame) + 10.0 / 667 * IPHONE_H, IPHONE_W - 20.0 / 375 * IPHONE_W, 10.0 / 667 * IPHONE_H);
         NSDate *date = [NSDate dateFromString:self.newsModel.RiQijiemu];
-        riqiLab.text = [NSString stringWithFormat:@"#来自:%@   %@ ",self.newsModel.post_lai,[date showTimeByTypeA]];
-#warning 设置字体导致崩溃的bug
-        riqiLab.font = gFontMain14;/**<这一行存在bug,导致应用崩溃*/
-        [xiangqingView addSubview:riqiLab];
+        _riqiLab.text = [NSString stringWithFormat:@"#来自:%@   %@ ",self.newsModel.post_lai,[date showTimeByTypeA]];
+        [xiangqingView addSubview:_riqiLab];
         
         //新闻内容
-        zhengwenTextView = [[UITextView alloc]initWithFrame:CGRectMake(20.0 / 375 * IPHONE_W, CGRectGetMaxY(riqiLab.frame) + 24.0 / 667 * IPHONE_H, IPHONE_W - 40.0 / 375 * IPHONE_W, 50.0 / 667 * IPHONE_H)];
-        zhengwenTextView.scrollEnabled = NO;
-        zhengwenTextView.editable = NO;
-        zhengwenTextView.scrollsToTop = NO;
-        zhengwenTextView.delegate = self;
+        self.zhengwenTextView.frame = CGRectMake(20.0 / 375 * IPHONE_W, CGRectGetMaxY(_riqiLab.frame) + 24.0 / 667 * IPHONE_H, IPHONE_W - 40.0 / 375 * IPHONE_W, 50.0 / 667 * IPHONE_H);
         NSString *str1 = [self.newsModel.ZhengWenjiemu stringByReplacingOccurrencesOfString:@"\r" withString:@""];
-        zhengwenTextView.text = str1;
-        zhengwenTextView.font = [UIFont systemFontOfSize:self.titleFontSize];
+        _zhengwenTextView.text = str1;
+        _zhengwenTextView.font = [UIFont systemFontOfSize:self.titleFontSize];
         NSMutableParagraphStyle *paragraphStyle = [[NSMutableParagraphStyle alloc]init];
         [paragraphStyle setLineSpacing:8.0];
         [paragraphStyle setAlignment:NSTextAlignmentLeft];
         [paragraphStyle setFirstLineHeadIndent:5.0];
         [paragraphStyle setLineBreakMode:NSLineBreakByCharWrapping];
-        [zhengwenTextView sizeToFit];
-        if (zhengwenTextView.text.length != 0)
+        [_zhengwenTextView sizeToFit];
+        if (_zhengwenTextView.text.length != 0)
         {
-            NSMutableAttributedString *attributedString =  [[NSMutableAttributedString alloc] initWithString:zhengwenTextView.text attributes:@{NSForegroundColorAttributeName : gTextDownload,NSFontAttributeName : [UIFont systemFontOfSize:self.titleFontSize]}];
-            [attributedString addAttribute:NSParagraphStyleAttributeName value:paragraphStyle range:NSMakeRange(0, zhengwenTextView.text.length)];
-            zhengwenTextView.attributedText = attributedString;
+            NSMutableAttributedString *attributedString =  [[NSMutableAttributedString alloc] initWithString:_zhengwenTextView.text attributes:@{NSForegroundColorAttributeName : gTextDownload,NSFontAttributeName : [UIFont systemFontOfSize:self.titleFontSize]}];
+            [attributedString addAttribute:NSParagraphStyleAttributeName value:paragraphStyle range:NSMakeRange(0, _zhengwenTextView.text.length)];
+            _zhengwenTextView.attributedText = attributedString;
         }
         
-        CGSize size2 = [zhengwenTextView sizeThatFits:CGSizeMake(zhengwenTextView.frame.size.width, MAXFLOAT)];
-        zhengwenTextView.frame = CGRectMake(zhengwenTextView.frame.origin.x, zhengwenTextView.frame.origin.y, zhengwenTextView.frame.size.width, size2.height);
-//        [zhengwenLab addLongPressGesWithTarget:self action:@selector(handleLongPress:)];
-        [xiangqingView addSubview:zhengwenTextView];
+        CGSize size2 = [_zhengwenTextView sizeThatFits:CGSizeMake(_zhengwenTextView.frame.size.width, MAXFLOAT)];
+        _zhengwenTextView.frame = CGRectMake(_zhengwenTextView.frame.origin.x, _zhengwenTextView.frame.origin.y, _zhengwenTextView.frame.size.width, size2.height);
+        [xiangqingView addSubview:_zhengwenTextView];
         
         //阅读原文
-         UIButton *readOriginalEssay = [UIButton buttonWithType:UIButtonTypeCustom];
+        UIButton *readOriginalEssay = [UIButton buttonWithType:UIButtonTypeCustom];
         CGFloat OriginalEssay = 0.0f;
         if ([self.newsModel.url length]) {
-            [readOriginalEssay setFrame:CGRectMake(20, CGRectGetMaxY(zhengwenTextView.frame) + 10, SCREEN_WIDTH - 40, 35.0 / 667 * IPHONE_H)];
+            [readOriginalEssay setFrame:CGRectMake(20, CGRectGetMaxY(_zhengwenTextView.frame) + 10, SCREEN_WIDTH - 40, 35.0 / 667 * IPHONE_H)];
             readOriginalEssay.backgroundColor = gMainColor;
             [readOriginalEssay setTitle:@"阅读原文" forState:UIControlStateNormal];
             [readOriginalEssay.layer setMasksToBounds:YES];
@@ -2990,14 +2642,14 @@ static bofangVC *_instance = nil;
             OriginalEssay = 50.0f;
         }
         else{
-            [readOriginalEssay setFrame:CGRectMake(0, CGRectGetMaxY(zhengwenTextView.frame), SCREEN_WIDTH, 1)];
+            [readOriginalEssay setFrame:CGRectMake(0, CGRectGetMaxY(_zhengwenTextView.frame), SCREEN_WIDTH, 1)];
             readOriginalEssay.userInteractionEnabled = NO;
             OriginalEssay = 0.0f;
         }
         [xiangqingView addSubview:readOriginalEssay];
         
         //
-        UIView *topLine = [[UIView alloc]initWithFrame:CGRectMake(0, CGRectGetMaxY(zhengwenTextView.frame) + OriginalEssay + 15.0 / 667 * IPHONE_H, IPHONE_W, 1)];
+        UIView *topLine = [[UIView alloc]initWithFrame:CGRectMake(0, CGRectGetMaxY(_zhengwenTextView.frame) + OriginalEssay + 15.0 / 667 * IPHONE_H, IPHONE_W, 1)];
         topLine.backgroundColor = [UIColor lightGrayColor];
         topLine.alpha = 0.5f;
         [xiangqingView addSubview:topLine];
@@ -3038,8 +2690,6 @@ static bofangVC *_instance = nil;
             }
         }
         
-        
-        
         UIView *downLine = [[UIView alloc]initWithFrame:CGRectMake(0, CGRectGetMaxY(topLine.frame) + 70, IPHONE_W, 1)];
         downLine.backgroundColor = [UIColor lightGrayColor];
         downLine.alpha = 0.5f;
@@ -3052,12 +2702,12 @@ static bofangVC *_instance = nil;
         [xiangqingView addSubview:payTopLine];
         
         //TODO:打赏入口
-        UIView *rewardView = [[UIView alloc]initWithFrame:CGRectMake(-5, CGRectGetMaxY(payTopLine.frame) ,  SCREEN_WIDTH + 10, 170)];
+        UIView *rewardView = [[UIView alloc] initWithFrame:CGRectMake(-5, CGRectGetMaxY(payTopLine.frame) ,  SCREEN_WIDTH + 10, 170)];
+        
         [rewardView setUserInteractionEnabled:YES];
         [rewardView setBackgroundColor:[UIColor whiteColor]];
         [rewardView.layer setBorderWidth:0.5];
         [rewardView.layer setBorderColor:[UIColor lightGrayColor].CGColor];
-        
         UIView *rewardBorderView = [[UIView alloc]initWithFrame:CGRectMake(15, 55, SCREEN_WIDTH - 30, 100)];
         [rewardBorderView setUserInteractionEnabled:YES];
         [rewardBorderView.layer setBorderWidth:1.0];
@@ -3117,7 +2767,7 @@ static bofangVC *_instance = nil;
                 }
             }
             
-            UIView *customRewardView = [[UIView alloc]initWithFrame:CGRectMake(15, 55, rewardBorderView.frame.size.width - 30, 50)];
+            UIView *customRewardView = [[UIView alloc] initWithFrame:CGRectMake(15, 55, rewardBorderView.frame.size.width - 30, 50)];
             [customRewardView setUserInteractionEnabled:YES];
             [customRewardView.layer setBorderWidth:1.0];
             [customRewardView.layer setBorderColor:gTextRewardColor.CGColor];
@@ -3262,157 +2912,6 @@ static bofangVC *_instance = nil;
     }
     else{
         RTLog(@"indexPath-------------%ld",indexPath.row);
-//        static NSString *pinglunIdentify = @"pinglunIdentify";
-//        UITableViewCell *cell = [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:pinglunIdentify];
-//        if (!cell)
-//        {
-//            cell = [tableView dequeueReusableCellWithIdentifier:pinglunIdentify];
-//        }
-//        UIImageView *pinglunImg = [[UIImageView alloc]initWithFrame:CGRectMake(5.0 / 375 * IPHONE_W, 8.0 / 667 * IPHONE_H, 50.0 / 667 * IPHONE_H, 50.0 / 667 * IPHONE_H)];
-//        if ([self.pinglunArr[indexPath.row - 2][@"avatar"]  rangeOfString:@"http"].location != NSNotFound){
-//            [pinglunImg sd_setImageWithURL:[NSURL URLWithString:self.pinglunArr[indexPath.row - 2][@"avatar"]] placeholderImage:[UIImage imageNamed:@"right-1"]];
-//        }
-//        else{
-//            [pinglunImg sd_setImageWithURL:[NSURL URLWithString:USERPHOTOHTTPSTRING(self.pinglunArr[indexPath.row - 2][@"avatar"])] placeholderImage:[UIImage imageNamed:@"right-1"]];
-//        }
-//        pinglunImg.userInteractionEnabled = YES;
-//        pinglunImg.tag = 1000 + indexPath.row - 2;
-//        UITapGestureRecognizer *TapG = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(clickPinglunImgHead:)];
-//        [pinglunImg addGestureRecognizer:TapG];
-//        
-//        pinglunImg.contentMode = UIViewContentModeScaleAspectFill;
-//        pinglunImg.layer.masksToBounds = YES;
-//        pinglunImg.layer.cornerRadius = 25.0 / 667 * IPHONE_H;
-//        [cell.contentView addSubview:pinglunImg];
-//        
-//        UILabel *pinglunTitle = [[UILabel alloc]initWithFrame:CGRectMake(CGRectGetMaxX(pinglunImg.frame) + 8.0 / 375 * IPHONE_W, 10.0 / 667 * IPHONE_H, 200.0 / 375 * IPHONE_W, 20.0 / 667 * IPHONE_H)];
-//        pinglunTitle.text = self.pinglunArr[indexPath.row - 2][@"full_name"];
-//        pinglunTitle.textAlignment = NSTextAlignmentLeft;
-//        pinglunTitle.textColor = [UIColor blackColor];
-//        pinglunTitle.font = [UIFont systemFontOfSize:16.0f];
-//        [cell.contentView addSubview:pinglunTitle];
-//        
-//        UILabel *pinglunshijian = [[UILabel alloc]initWithFrame:CGRectMake(CGRectGetMaxX(pinglunImg.frame) + 8.0 / 375 * IPHONE_W, CGRectGetMaxY(pinglunTitle.frame) + 5.0 / 667 * IPHONE_H, 200.0 / 375 * IPHONE_W, 20.0 / 667 * IPHONE_H)];
-//        pinglunshijian.text = self.pinglunArr[indexPath.row - 2][@"createtime"];
-//        pinglunshijian.textAlignment = NSTextAlignmentLeft;
-//        pinglunshijian.textColor = [UIColor grayColor];
-//        pinglunshijian.font = [UIFont systemFontOfSize:13.0f];
-//        [cell.contentView addSubview:pinglunshijian];
-//        //评论
-//        TTTAttributedLabel *pinglunLab = [[TTTAttributedLabel alloc]initWithFrame:CGRectMake(CGRectGetMaxX(pinglunImg.frame) - 3.0 / 375 * IPHONE_W, CGRectGetMaxY(pinglunshijian.frame) + 10.0 / 667 * IPHONE_H, IPHONE_W - 80.0 / 375 * IPHONE_W, 20.0 / 667 * IPHONE_H)];
-//        pinglunLab.text = self.pinglunArr[indexPath.row - 2][@"content"];
-//        pinglunLab.textColor = [UIColor blackColor];
-//        pinglunLab.font = [UIFont systemFontOfSize:16.0f];
-//        pinglunLab.textAlignment = NSTextAlignmentLeft;
-//        pinglunLab.tag = indexPath.row + 11;
-//        pinglunLab.numberOfLines = 0;
-//        pinglunLab.lineSpacing = 5;
-//        pinglunLab.fd_collapsed = NO;
-//        pinglunLab.lineBreakMode = NSLineBreakByWordWrapping;
-//        if ([self.pinglunArr[indexPath.row - 2][@"content"] rangeOfString:@"[e1]"].location != NSNotFound && [self.pinglunArr[indexPath.row - 2][@"content"] rangeOfString:@"[/e1]"].location != NSNotFound){
-//            if ([self.pinglunArr[indexPath.row - 2][@"to_user_login"] length]) {
-//                pinglunLab.text = [NSString stringWithFormat:@"回复@%@:%@",[self.pinglunArr[indexPath.row - 2][@"to_user_nicename"] length] ? self.pinglunArr[indexPath.row - 2][@"to_user_nicename"]:self.pinglunArr[indexPath.row - 2][@"to_user_login"],[CommonCode jiemiEmoji:self.pinglunArr[indexPath.row - 2][@"content"]]];
-//                NSMutableDictionary *to_user = [NSMutableDictionary new];
-//                [to_user setValue:self.pinglunArr[indexPath.row - 2][@"to_user_nicename"] forKey:@"user_nicename"];
-//                [to_user setValue:self.pinglunArr[indexPath.row - 2][@"to_sex"] forKey:@"sex"];
-//                [to_user setValue:self.pinglunArr[indexPath.row - 2][@"to_signature"] forKey:@"signature"];
-//                [to_user setValue:self.pinglunArr[indexPath.row - 2][@"to_user_login"] forKey:@"user_login"];
-//                [to_user setValue:self.pinglunArr[indexPath.row - 2][@"to_avatar"] forKey:@"avatar"];
-//                //        [to_user setValue:liuyanArr[indexPath.row][@"to_user_nicename"] forKey:@"fan_num"];
-//                //        [to_user setValue:liuyanArr[indexPath.row][@"to_user_nicename"] forKey:@"guan_num"];
-//                [to_user setValue:self.pinglunArr[indexPath.row - 2][@"to_uid"] forKey:@"id"];
-//                
-//                NSRange nameRange = NSMakeRange(2, [self.pinglunArr[indexPath.row - 2][@"to_user_nicename"] length] ? [self.pinglunArr[indexPath.row - 2][@"to_user_nicename"] length] + 1 : [self.pinglunArr[indexPath.row - 2][@"to_user_login"] length] + 1);
-//                [pinglunLab setLinkAttributes:@{NSForegroundColorAttributeName : gMainColor,NSFontAttributeName :gFontMajor16}];
-//                [pinglunLab setActiveLinkAttributes:@{NSForegroundColorAttributeName : gMainColor,NSFontAttributeName :gFontMajor16}];
-//                [pinglunLab addLinkToTransitInformation:to_user withRange:nameRange];
-//                [pinglunLab setDelegate:self];
-//                
-//            }
-//            else{
-//                pinglunLab.text = [CommonCode jiemiEmoji:self.pinglunArr[indexPath.row - 2][@"content"]];
-//            }
-//            
-//        }
-//        else{
-//            if ([self.pinglunArr[indexPath.row - 2][@"to_user_login"] length]) {
-//                pinglunLab.text = [NSString stringWithFormat:@"回复@%@:%@",[self.pinglunArr[indexPath.row - 2][@"to_user_nicename"] length] ? self.pinglunArr[indexPath.row - 2][@"to_user_nicename"]:self.pinglunArr[indexPath.row - 2][@"to_user_login"],self.pinglunArr[indexPath.row - 2][@"content"]];
-//                NSMutableDictionary *to_user = [NSMutableDictionary new];
-//                [to_user setValue:self.pinglunArr[indexPath.row - 2][@"to_user_nicename"] forKey:@"user_nicename"];
-//                [to_user setValue:self.pinglunArr[indexPath.row - 2][@"to_sex"] forKey:@"sex"];
-//                [to_user setValue:self.pinglunArr[indexPath.row - 2][@"to_signature"] forKey:@"signature"];
-//                [to_user setValue:self.pinglunArr[indexPath.row - 2][@"to_user_login"] forKey:@"user_login"];
-//                [to_user setValue:self.pinglunArr[indexPath.row - 2][@"to_avatar"] forKey:@"avatar"];
-//                //        [to_user setValue:liuyanArr[indexPath.row][@"to_user_nicename"] forKey:@"fan_num"];
-//                //        [to_user setValue:liuyanArr[indexPath.row][@"to_user_nicename"] forKey:@"guan_num"];
-//                [to_user setValue:self.pinglunArr[indexPath.row - 2][@"to_uid"] forKey:@"id"];
-//                
-//                NSRange nameRange = NSMakeRange(2,  [self.pinglunArr[indexPath.row - 2][@"to_user_nicename"] length] ? [self.pinglunArr[indexPath.row - 2][@"to_user_nicename"] length] + 1 : [self.pinglunArr[indexPath.row - 2][@"to_user_login"] length] + 1);
-//                [pinglunLab setLinkAttributes:@{NSForegroundColorAttributeName : gMainColor,NSFontAttributeName :gFontMajor16}];
-//                [pinglunLab setActiveLinkAttributes:@{NSForegroundColorAttributeName : gMainColor,NSFontAttributeName :gFontMajor16}];
-//                [pinglunLab addLinkToTransitInformation:to_user withRange:nameRange];
-//                [pinglunLab setDelegate:self];
-//            }
-//            else{
-//                pinglunLab.text = self.pinglunArr[indexPath.row - 2][@"content"];
-//            }
-//        }
-//        //获取tttLabel的高度
-//        //先通过NSMutableAttributedString设置和上面tttLabel一样的属性,例如行间距,字体
-//        NSMutableAttributedString *attrString = [[NSMutableAttributedString alloc] initWithString:pinglunLab.text];
-//        //自定义str和TTTAttributedLabel一样的行间距
-//        NSMutableParagraphStyle *paragrapStyle = [[NSMutableParagraphStyle alloc] init];
-//        [paragrapStyle setLineSpacing:5];
-//        //设置行间距
-//        [attrString addAttribute:NSParagraphStyleAttributeName value:paragrapStyle range:NSMakeRange(0, [pinglunLab.text length])];
-//        //设置字体
-//        [attrString addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:16] range:NSMakeRange(0, [pinglunLab.text length])];
-//        //得到自定义行间距的UILabel的高度
-//        //CGSizeMake(300,MAXFLOAt)中的300,代表是UILable控件的宽度,它和初始化TTTAttributedLabel的宽度是一样的.
-//        CGFloat height = [TTTAttributedLabel sizeThatFitsAttributedString:attrString withConstraints:CGSizeMake(pinglunLab.frame.size.width, MAXFLOAT) limitedToNumberOfLines:0].height;
-//        //重新改变tttLabel的frame高度
-//        CGRect rect = pinglunLab.frame;
-//        rect.size.height = height + 10 ;
-//        pinglunLab.frame = rect;
-//        [cell.contentView addSubview:pinglunLab];
-//        cell.tag = indexPath.row + 10;
-//        cell.selectionStyle = UITableViewCellSelectionStyleNone;
-//        
-//        PinglundianzanCustomBtn *PingLundianzanBtn = [PinglundianzanCustomBtn buttonWithType:UIButtonTypeCustom];
-//        PingLundianzanBtn.frame = CGRectMake(IPHONE_W - 60.0 / 375 * IPHONE_W, 20.0 / 667 * IPHONE_H, 50.0 / 375 * IPHONE_W, 20.0 / 667 * IPHONE_H);
-////        [PingLundianzanBtn setBackgroundColor:[UIColor redColor]];
-//        
-//        [cell.contentView addSubview:PingLundianzanBtn];
-//        [PingLundianzanBtn addTarget:self action:@selector(pinglundianzanAction:) forControlEvents:UIControlEventTouchUpInside];
-//        
-//        
-//        PingLundianzanNumLab = [[UILabel alloc]initWithFrame:CGRectMake(CGRectGetMaxX(PingLundianzanBtn.frame) - 30.0 / 375 * IPHONE_W, PingLundianzanBtn.frame.origin.y + 1.0 / 667 * IPHONE_H, 20.0 / 375 * IPHONE_W, 20.0 / 667 * IPHONE_H)];
-//        PingLundianzanNumLab.text = self.pinglunArr[indexPath.row - 2][@"praisenum"];
-////        [PingLundianzanNumLab addTapGesWithTarget:self action:@selector(pinglundianzanAction:)];
-//        PingLundianzanNumLab.textAlignment = NSTextAlignmentCenter;
-//        PingLundianzanNumLab.font = [UIFont systemFontOfSize:16.0f / 375 * IPHONE_W];
-////        PingLundianzanNumLab.tag = indexPath.row + 1000;
-//        [cell.contentView addSubview:PingLundianzanNumLab];
-//        PingLundianzanBtn.PingLundianzanNumLab = PingLundianzanNumLab;
-//        
-//        if ([[NSString stringWithFormat:@"%@",self.pinglunArr[indexPath.row - 2][@"praiseFlag"]] isEqualToString:@"1"]){
-//            [PingLundianzanBtn setImage:[UIImage imageNamed:@"pinglun-10"] forState:UIControlStateNormal];
-//            PingLundianzanBtn.selected = NO;
-//            PingLundianzanNumLab.textColor = [UIColor grayColor];
-//            PingLundianzanNumLab.alpha = 0.7f;
-//        }
-//        else if([[NSString stringWithFormat:@"%@",self.pinglunArr[indexPath.row - 2][@"praiseFlag"]] isEqualToString:@"2"]){
-//            [PingLundianzanBtn setImage:[UIImage imageNamed:@"pinglun-yizan"] forState:UIControlStateNormal];
-//            PingLundianzanBtn.selected = YES;
-//            PingLundianzanNumLab.textColor = ColorWithRGBA(0, 159, 240, 1);
-//            PingLundianzanNumLab.alpha = 1.0f;
-//        }
-//        else {
-//            [PingLundianzanBtn setImage:[UIImage imageNamed:@"pinglun-10"] forState:UIControlStateNormal];
-//            PingLundianzanBtn.selected = NO;
-//            PingLundianzanNumLab.textColor = [UIColor grayColor];
-//            PingLundianzanNumLab.alpha = 0.7f;
-//        }
         PlayVCCommentTableViewCell *cell = [PlayVCCommentTableViewCell cellWithTableView:tableView];
         PlayVCCommentFrameModel *frameModel = self.pinglunArr[indexPath.row - 2];
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
@@ -3431,10 +2930,6 @@ static bofangVC *_instance = nil;
     else{
         PlayVCCommentFrameModel *frameModel = self.pinglunArr[indexPath.row - PINGLUN_ROW];
         return frameModel.cellHeight;
-//        UITableViewCell *cell = (UITableViewCell *)[tableView viewWithTag:indexPath.row + 10];
-//        UILabel *lab = (UILabel *)[cell viewWithTag:indexPath.row + 11];
-//        return CGRectGetMaxY(lab.frame) + 10.0 / 667 * IPHONE_H;
-        //        return 110.0;
     }
     
 }
@@ -3457,7 +2952,7 @@ static bofangVC *_instance = nil;
 
                     } failure:^(NSError *error) {
                         //
-                        NSLog(@"delete error");
+                        RTLog(@"delete error");
                     }];
                 }
                 else{
@@ -3522,64 +3017,161 @@ static bofangVC *_instance = nil;
         [_leftBtn setImage:[UIImage imageNamed:@"title_ic_white"] forState:UIControlStateNormal];
          _topView.backgroundColor = [UIColor clearColor];
     }
+    
+    //设置置顶按钮alpha
+    float alpha = scrollView.contentOffset.y/(SCREEN_HEIGHT * 1.5);
+    if (alpha >= 0.75) {
+        alpha = 0.75;
+    }else{
+        alpha = alpha;
+    }
+    _scrollTopBtn.alpha = alpha;
 }
 
 #pragma mark OJLAnimationButtonDelegate
 
 -(void)OJLAnimationButtonDidStartAnimation:(OJLAnimationButton *)OJLAnimationButton{
-    NSLog(@"start");
+    RTLog(@"start");
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.8 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         [OJLAnimationButton stopAnimation];
     });
 }
 
 -(void)OJLAnimationButtonDidFinishAnimation:(OJLAnimationButton *)OJLAnimationButton{
-    NSLog(@"stop");
+    RTLog(@"stop");
 }
 
 -(void)OJLAnimationButtonWillFinishAnimation:(OJLAnimationButton *)OJLAnimationButton{
      [self rewarding];
-//    if (OJLAnimationButton == self.button1) {
-//        
-//        SecondViewController* vc = [[SecondViewController alloc] init];
-//        [((OJLNavigationController*)self.navigationController) pushViewController:vc withCenterButton:OJLAnimationButton];
-//    }
 }
-
-#pragma mark - TTTAttributedLabelDelegate
-
-//- (void)attributedLabel:(TTTAttributedLabel *)label
-//didSelectLinkWithTransitInformation:(NSDictionary *)components {
-//    
-//    gerenzhuyeVC *gerenzhuye = [gerenzhuyeVC new];
-//    if ([components[@"user_login"] isEqualToString:ExdangqianUser] && [[CommonCode readFromUserD:@"isLogin"]boolValue] == YES) {
-//        gerenzhuye.isMypersonalPage = YES;
-//    }
-//    else{
-//        gerenzhuye.isMypersonalPage = NO;
-//    }
-//    gerenzhuye.isNewsComment = YES;
-//    gerenzhuye.user_nicename = components[@"user_nicename"];
-//    gerenzhuye.sex = components[@"sex"];
-//    gerenzhuye.signature = components[@"signature"];
-//    gerenzhuye.user_login = components[@"user_login"];
-//    gerenzhuye.avatar = components[@"avatar"];
-//    //        gerenzhuye.fan_num = components[@"fan_num"];
-//    //        gerenzhuye.guan_num = components[@"guan_num"];
-//    gerenzhuye.user_id = components[@"id"];
-//    self.hidesBottomBarWhenPushed=YES;
-//    [self.navigationController pushViewController:gerenzhuye animated:YES];
-//    self.hidesBottomBarWhenPushed=YES;
-//}
-
 #pragma mark - UITextFieldDelegate
 
 - (BOOL)textFieldShouldEndEditing:(UITextField *)textField{
     self.rewardCount = [textField.text floatValue];
     return YES;
 }
+#pragma mark - 网络状态改变通知
+- (void)networkChange
+{
+    if ([[SuNetworkMonitor monitor] isWiFiEnable]) {//网络切换为WiFi
+//        [Explayer replaceCurrentItemWithPlayerItem:[[AVPlayerItem alloc]initWithURL:[NSURL fileURLWithPath:self.newsModel.post_mp]]];
+//        [self doplay2];
+    }else if([[SuNetworkMonitor monitor] isNetworkEnable]){//网络切换为手机网络
+//        [Explayer replaceCurrentItemWithPlayerItem:[[AVPlayerItem alloc]initWithURL:[NSURL fileURLWithPath:self.newsModel.post_mp]]];
+//        [self doplay2];
+    }else{
+//        [self doPlay:bofangCenterBtn];
+    }
+}
+#pragma mark - 懒加载新闻详情控件
 
+- (UIImageView *)zhengwenImg
+{
+    if (_zhengwenImg == nil) {
+        _zhengwenImg = [[UIImageView alloc] init];
+        [_zhengwenImg setUserInteractionEnabled:YES];
+        _zhengwenImg.contentMode = UIViewContentModeScaleAspectFill;
+        _zhengwenImg.clipsToBounds = YES;
+    }
+    return _zhengwenImg;
+}
+- (UIImageView *)zhuboImg
+{
+    if (_zhuboImg == nil) {
+        _zhuboImg = [[UIImageView alloc] init];
+        _zhuboImg.layer.masksToBounds = YES;
+        _zhuboImg.userInteractionEnabled = YES;
+        _zhuboImg.layer.cornerRadius = 27.0 / 667 * IPHONE_H / 2;
+        _zhuboImg.contentMode = UIViewContentModeScaleAspectFill;
+    }
+    return _zhuboImg;
+}
+- (UILabel *)zhuboTitleLab
+{
+    if (_zhuboTitleLab == nil) {
+        _zhuboTitleLab = [[UILabel alloc] init];
+        _zhuboTitleLab.textColor = nTextColorSub;
+        _zhuboTitleLab.font = gFontMain14;
+        _zhuboTitleLab.textAlignment = NSTextAlignmentLeft;
+    }
+    return _zhuboTitleLab;
+}
+- (UIImageView *)mic
+{
+    if (_mic == nil) {
+        _mic = [[UIImageView alloc] init];
+        [_mic setImage:[UIImage imageNamed:@"home_news_ic_anchor"]];
+    }
+    return _mic;
+}
+- (UIView *)achorTouch
+{
+    if (_achorTouch == nil) {
+        _achorTouch = [[UIView alloc] init];
+        [_achorTouch setUserInteractionEnabled:YES];
+    }
+    return _achorTouch;
+}
+- (UIView *)seperatorLine
+{
+    if (_seperatorLine == nil) {
+        _seperatorLine = [[UIView alloc] init];
+        [_seperatorLine setBackgroundColor:gThickLineColor];
+    }
+    return _seperatorLine;
+}
+- (UILabel *)titleLab
+{
+    if (_titleLab == nil) {
+        _titleLab = [[UILabel alloc] init];
+        _titleLab.textAlignment = NSTextAlignmentCenter;
+        _titleLab.textColor = nTextColorMain;
+        _titleLab.lineBreakMode = NSLineBreakByWordWrapping;
+        [_titleLab setNumberOfLines:0];
+    }
+    return _titleLab;
+}
+- (UILabel *)riqiLab
+{
+    if (_riqiLab == nil) {
+        _riqiLab = [[UILabel alloc] init];
+        _riqiLab.textAlignment = NSTextAlignmentCenter;
+        _riqiLab.textColor = nTextColorSub;
+        //TODO: 设置字体导致崩溃的bug
+        _riqiLab.font = gFontMain14;/**<这一行存在bug,导致应用崩溃*/
+    }
+    return _riqiLab;
+}
+- (UITextView *)zhengwenTextView
+{
+    if (_zhengwenTextView == nil) {
+        _zhengwenTextView = [[UITextView alloc] init];
+        _zhengwenTextView.scrollEnabled = NO;
+        _zhengwenTextView.editable = NO;
+        _zhengwenTextView.scrollsToTop = NO;
+        _zhengwenTextView.delegate = self;
+    }
+    return _zhengwenTextView;
+}
+#pragma mark --- 置顶按钮方法
+- (UIButton *)scrollTopBtn
+{
+    if (_scrollTopBtn == nil) {
+        CGFloat W = 40.0f;
+        _scrollTopBtn = [[UIButton alloc] initWithFrame:CGRectMake(SCREEN_WIDTH - W, SCREEN_HEIGHT - W - 10 - 109.0/667*IPHONE_H, W, W)];
+        _scrollTopBtn.layer.cornerRadius = 25;
+        [_scrollTopBtn setImage:@"置顶"];
+        [_scrollTopBtn addTarget:self action:@selector(scrollToTop)];
+        _scrollTopBtn.alpha = 0.0;
+    }
+    return _scrollTopBtn;
+}
+- (void)scrollToTop
+{
+    [self.tableView setContentOffset:CGPointZero animated:YES];
+}
 #pragma mark --- 懒加载
+
 - (UITableView *)tableView
 {
     if (!_tableView)
@@ -3665,19 +3257,11 @@ static bofangVC *_instance = nil;
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
-
-/*
-#pragma mark - Navigation
-
-// In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
-}
-*/
 - (void)dealloc
 {
+    RTLog(@"dealloc");
     [[NSNotificationCenter defaultCenter] removeObserver:self name:AVPlayerItemDidPlayToEndTimeNotification object:Explayer.currentItem];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:AVAudioSessionRouteChangeNotification object:nil];
 }
 
 @end

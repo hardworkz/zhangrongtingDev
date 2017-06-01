@@ -60,10 +60,10 @@ static NSInteger selectIndex2 = -1;
 - (void)setEditing:(BOOL)editing animated:(BOOL)animated {
     [super setEditing:editing animated:animated];
     [[NSNotificationCenter defaultCenter]postNotificationName:@"bianji" object:nil];
-    UIViewController *v;
+//    UIViewController *v;
     if ([self isKindOfClass:[UINavigationController class]]) {
-        UINavigationController * nav = (UINavigationController *)self;
-        v =  nav.topViewController;
+//        UINavigationController * nav = (UINavigationController *)self;
+//        v =  nav.topViewController;
     };
     ////    UIViewController *v = [self.view getVisalViewController];
     //    UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
@@ -212,36 +212,11 @@ static NSInteger selectIndex2 = -1;
             [bofangVC shareInstance].newsModel.post_keywords = obj.post_keywords;
             [bofangVC shareInstance].newsModel.url = obj.url;
             [bofangVC shareInstance].iszhuboxiangqing = NO;
-            if ([obj.post_time intValue] / 1000 / 60){
-                if ([obj.post_time intValue] / 1000 / 60 > 9){
-                    [bofangVC shareInstance].yinpinzongTime.text = [NSString stringWithFormat:@"%d:%d",[obj.post_time intValue] / 1000 / 60,[obj.post_time intValue] / 1000 % 60];
-                }
-                else{
-                    if ([obj.post_time intValue] / 1000 % 60 < 10)
-                    {
-                        [bofangVC shareInstance].yinpinzongTime.text = [NSString stringWithFormat:@"0%d:0%d",[obj.post_time intValue] / 1000 / 60,[obj.post_time intValue] / 1000 % 60];
-                    }
-                    else{
-                        [bofangVC shareInstance].yinpinzongTime.text = [NSString stringWithFormat:@"0%d:%d",[obj.post_time intValue] / 1000 / 60,[obj.post_time intValue] / 1000 % 60];
-                    }
-                }
-            }
-            else{
-                if ([obj.post_time intValue] / 1000 > 10){
-                    [bofangVC shareInstance].yinpinzongTime.text = [NSString stringWithFormat:@"00:%d",[obj.post_time intValue] / 1000 % 60];
-                }
-                else{
-                    [bofangVC shareInstance].yinpinzongTime.text = [NSString stringWithFormat:@"00:0%d",[obj.post_time intValue] / 1000 % 60];
-                }
-            }
-            ExcurrentNumber = 0;
-            NSString *imgUrl = [NSString stringWithFormat:@"%@",[obj.smeta stringByReplacingOccurrencesOfString:@"\\" withString:@""]];
-            NSString *imgUrl1 = [imgUrl stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-            NSString *imgUrl2 = [imgUrl1 stringByReplacingOccurrencesOfString:@"thumb:" withString:@""];
-            NSString *imgUrl3 = [imgUrl2 stringByReplacingOccurrencesOfString:@"{" withString:@""];
-            NSString *imgUrl4 = [imgUrl3 stringByReplacingOccurrencesOfString:@"}" withString:@""];
+            [bofangVC shareInstance].yinpinzongTime.text = [[bofangVC shareInstance] convertStringWithTime:[obj.post_time intValue] / 1000];
             
-            [bofangVC shareInstance].newsModel.ImgStrjiemu = imgUrl4;
+            ExcurrentNumber = 0;
+            
+            [bofangVC shareInstance].newsModel.ImgStrjiemu = obj.smeta;
             [bofangVC shareInstance].newsModel.ZhengWenjiemu = obj.post_excerpt;
             [bofangVC shareInstance].newsModel.praisenum = obj.praisenum;
             [bofangVC shareInstance].newsModel.post_keywords = obj.post_keywords;
@@ -416,8 +391,7 @@ static NSInteger selectIndex2 = -1;
     }
     if (_downloadArray.count) {
         
-        NewObj *obj = [NewObj new];
-        obj = _downloadArray[indexPath.row];
+        NewObj *obj = _downloadArray[indexPath.row];
         NSLog(@"post_act%@",obj.post_act);
         
         //        Post_actor *actor = [Post_actor new];
@@ -458,36 +432,11 @@ static NSInteger selectIndex2 = -1;
         [bofangVC shareInstance].newsModel.post_keywords = obj.post_keywords;
         [bofangVC shareInstance].newsModel.url = obj.url;
         [bofangVC shareInstance].iszhuboxiangqing = NO;
-        if ([obj.post_time intValue] / 1000 / 60){
-            if ([obj.post_time intValue] / 1000 / 60 > 9){
-                [bofangVC shareInstance].yinpinzongTime.text = [NSString stringWithFormat:@"%d:%d",[obj.post_time intValue] / 1000 / 60,[obj.post_time intValue] / 1000 % 60];
-            }
-            else{
-                if ([obj.post_time intValue] / 1000 % 60 < 10)
-                {
-                    [bofangVC shareInstance].yinpinzongTime.text = [NSString stringWithFormat:@"0%d:0%d",[obj.post_time intValue] / 1000 / 60,[obj.post_time intValue] / 1000 % 60];
-                }
-                else{
-                    [bofangVC shareInstance].yinpinzongTime.text = [NSString stringWithFormat:@"0%d:%d",[obj.post_time intValue] / 1000 / 60,[obj.post_time intValue] / 1000 % 60];
-                }
-            }
-        }
-        else{
-            if ([obj.post_time intValue] / 1000 > 10){
-                [bofangVC shareInstance].yinpinzongTime.text = [NSString stringWithFormat:@"00:%d",[obj.post_time intValue] / 1000 % 60];
-            }
-            else{
-                [bofangVC shareInstance].yinpinzongTime.text = [NSString stringWithFormat:@"00:0%d",[obj.post_time intValue] / 1000 % 60];
-            }
-        }
-        ExcurrentNumber = (int)indexPath.row;
-        NSString *imgUrl = [NSString stringWithFormat:@"%@",[obj.smeta stringByReplacingOccurrencesOfString:@"\\" withString:@""]];
-        NSString *imgUrl1 = [imgUrl stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-        NSString *imgUrl2 = [imgUrl1 stringByReplacingOccurrencesOfString:@"thumb:" withString:@""];
-        NSString *imgUrl3 = [imgUrl2 stringByReplacingOccurrencesOfString:@"{" withString:@""];
-        NSString *imgUrl4 = [imgUrl3 stringByReplacingOccurrencesOfString:@"}" withString:@""];
+        [bofangVC shareInstance].yinpinzongTime.text = [[bofangVC shareInstance] convertStringWithTime:[obj.post_time intValue] / 1000];
         
-        [bofangVC shareInstance].newsModel.ImgStrjiemu = imgUrl4;
+        ExcurrentNumber = (int)indexPath.row;
+        
+        [bofangVC shareInstance].newsModel.ImgStrjiemu = obj.smeta;
         [bofangVC shareInstance].newsModel.ZhengWenjiemu = obj.post_excerpt;
         [bofangVC shareInstance].newsModel.praisenum = obj.praisenum;
         [bofangVC shareInstance].newsModel.post_keywords = obj.post_keywords;

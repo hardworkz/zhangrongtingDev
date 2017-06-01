@@ -162,7 +162,7 @@
     }else{
         imageSize = CGSizeMake(0, 0);
     }
-    CGSize labelSize;
+    CGSize labelSize = CGSizeZero;
     if (self.titleLabel!=nil) {
         labelSize = CGSizeMake((self.bounds.size.width*0.9 - imageSize.width), self.bounds.size.height*0.9);
         self.titleLabel.frame = CGRectMake(CGRectGetMaxX(self.iconIamageView.frame), self.bounds.size.height*0.05, labelSize.width, labelSize.height);

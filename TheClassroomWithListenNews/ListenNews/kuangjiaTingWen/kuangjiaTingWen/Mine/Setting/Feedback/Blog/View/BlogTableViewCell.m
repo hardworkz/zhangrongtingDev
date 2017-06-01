@@ -137,17 +137,12 @@ static NSString *const kUserNameKey = @"UserName";
     self.isUnreadMessage = isUnreadMessage;
     NSDictionary *user = self.blog[@"user"];
     //头像url处理
-    NSString *imgUrl = [NSString stringWithFormat:@"%@",[user[@"avatar"] stringByReplacingOccurrencesOfString:@"\\" withString:@""]];
-    NSString *imgUrl1 = [imgUrl stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-    NSString *imgUrl2 = [imgUrl1 stringByReplacingOccurrencesOfString:@"thumb:" withString:@""];
-    NSString *imgUrl3 = [imgUrl2 stringByReplacingOccurrencesOfString:@"{" withString:@""];
-    NSString *imgUrl4 = [imgUrl3 stringByReplacingOccurrencesOfString:@"}" withString:@""];
-    if ([imgUrl4  rangeOfString:@"http"].location != NSNotFound)
+    if ([NEWSSEMTPHOTOURL(user[@"avatar"])  rangeOfString:@"http"].location != NSNotFound)
     {
-        [_headImageView sd_setImageWithURL:[NSURL URLWithString:imgUrl4] placeholderImage:AvatarPlaceHolderImage];
+        [_headImageView sd_setImageWithURL:[NSURL URLWithString:NEWSSEMTPHOTOURL(user[@"avatar"])] placeholderImage:AvatarPlaceHolderImage];
     }else
     {
-        NSString *str = USERPHOTOHTTPSTRING(imgUrl4);
+        NSString *str = USERPHOTOHTTPSTRING(NEWSSEMTPHOTOURL(user[@"avatar"]));
         [_headImageView sd_setImageWithURL:[NSURL URLWithString:str] placeholderImage:AvatarPlaceHolderImage];
     }
     _nameLabe.text = [user[@"user_nicename"] length] ? user[@"user_nicename"] :user[@"user_login"];
