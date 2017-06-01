@@ -654,7 +654,16 @@
 + (void)getSlideListWithcat_idname:(NSString *)cat_idname
                             sccess:(void (^)(NSDictionary *responseObject))success
                            failure:(void(^)(NSError *error))failure;
-
+/**
+ *  获取幻灯片广告列表
+ *
+ *  @param accessToken 对应幻灯片表中的accessToken字段 (必填)
+ *  @param success    成功
+ *  @param failure    错误
+ */
++ (void)getNewSlideListWithaccessToken:(NSString *)accessToken
+                                sccess:(void (^)(NSDictionary *responseObject))success
+                               failure:(void(^)(NSError *error))failure;
 ///获取随机用户信息（推荐好友列表）
 + (void)getPaoGuoSuiJiYongHuXinXiWithaccessToken:(NSString *)accessToken andPage:(NSString *)page andLimit:(NSString *)limit sccess:(void (^)(NSDictionary *responseObject))success failure:(void(^)(NSError *error))failure;
 

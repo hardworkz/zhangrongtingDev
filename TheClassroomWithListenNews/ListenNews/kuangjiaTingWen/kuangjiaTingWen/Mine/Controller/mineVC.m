@@ -536,7 +536,9 @@ typedef void(^animateBlock)();
                 [self getUnreadMessage];
             }
             else {
-                [SVProgressHUD showErrorWithStatus:responseObject[@"msg"]];
+                XWAlerLoginView *alert = [[XWAlerLoginView alloc] initWithTitle:responseObject[@"msg"]];
+                [alert show];
+//                [SVProgressHUD showErrorWithStatus:responseObject[@"msg"]];
             }
         } failure:^(NSError *error) {
             //
@@ -1275,20 +1277,5 @@ typedef void(^animateBlock)();
     }
     return _signInImageView;
 }
-
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
-}
-
-/*
-#pragma mark - Navigation
-
-// In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
-}
-*/
 
 @end

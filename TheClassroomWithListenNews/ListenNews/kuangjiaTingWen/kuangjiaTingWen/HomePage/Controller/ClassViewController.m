@@ -23,6 +23,8 @@
     UIView *xiangqingView;
     UITextView *zhengwenTextView;
     UILabel *PingLundianzanNumLab;
+    NSInteger playIndex;
+    NSString *currentClassID;
 }
 
 @property (nonatomic, strong) UITableView *helpTableView;
@@ -53,6 +55,14 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    currentClassID = [CommonCode readFromUserD:@"currentClassID"];
+    if ([currentClassID isEqualToString:self.act_id]) {
+        playIndex = [[CommonCode readFromUserD:@"playIndex"] integerValue];
+    }else{
+        playIndex = 0;
+    }
+    //接收播放完毕后发出的通知
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(voicePlayEnd:) name:AVPlayerItemDidPlayToEndTimeNotification object:Explayer.currentItem];
     [self setUpData];
     [self setUpView];
 }
@@ -176,7 +186,7 @@
  */
 - (CGFloat)computeTextHeightWithString:(NSString *)string andWidth:(CGFloat)width andFontSize:(UIFont *)fontSize{
     
-    CGRect rect  = [string boundingRectWithSize:CGSizeMake(width, 10000)
+    CGRect rect  = [string boundingRectWithSize:CGSizeMake(width, MAXFLOAT)
                                         options: NSStringDrawingUsesFontLeading |NSStringDrawingUsesLineFragmentOrigin
                                      attributes:@{NSFontAttributeName:fontSize}
                                         context:nil];
@@ -201,6 +211,7 @@
         } completed:^(UIImage *image, NSData *data, NSError *error, BOOL finished) {
             //这边就能拿到图片了
             NSDictionary *dic = @{@"width":@(image.size.width),@"height":@(image.size.height)};
+            RTLog(@"width:%f------height:%f",image.size.width,image.size.height);
             [_ImageSizeArr addObject:dic];
             if (i == ([photos count] -1)) {
 //                [self.helpTableView reloadData];
@@ -299,8 +310,10 @@
         if ([_ImageSizeArr count]) {
             if ([photos count]) {
                 for (int i = 0; i < [_ImageSizeArr count]; i ++) {
-                    CGFloat imageHeight = ([_ImageSizeArr[i][@"height"] floatValue] * IMAGEWIDTH ) / ([_ImageSizeArr[i][@"width"] floatValue]);
+                    CGFloat imageHeight = ([_ImageSizeArr[i][@"width"] floatValue] / IMAGEWIDTH ) * ([_ImageSizeArr[i][@"height"] floatValue]);
+                    RTLog(@"imageHeight:%f-----IMAGEWIDTH:%f-------height:%f-------width:%f",imageHeight,IMAGEWIDTH,[_ImageSizeArr[i][@"height"] floatValue],[_ImageSizeArr[i][@"width"] floatValue]);
                     UIImageView *image = [UIImageView new];
+                    image.backgroundColor = [UIColor redColor];
                     [image setFrame:CGRectMake(zhengwenTextView.frame.origin.x, CGRectGetMaxY(zhengwenTextView.frame) + (imageContentHeight + 5) + 5.0 *667.0 / SCREEN_HEIGHT , IMAGEWIDTH, imageHeight)];
                     imageContentHeight += imageHeight;
                     image.contentMode = UIViewContentModeScaleAspectFit;
@@ -359,10 +372,9 @@
                 
                 UIButton *playTestMp = [UIButton buttonWithType:UIButtonTypeCustom];
                 [playTestMp setFrame:CGRectMake(SCREEN_WIDTH - 50.0 / 375 * SCREEN_WIDTH, titleLab.frame.origin.y, 40, 40)];
-                [playTestMp setImage:[UIImage imageNamed:@"classplay"] forState:UIControlStateNormal];
-                [playTestMp setImage:[UIImage imageNamed:@"classpause"] forState:UIControlStateSelected];
-                [playTestMp setTag:(100+ i)];
-                [playTestMp setSelected:NO];
+                [playTestMp setImage:[UIImage imageNamed:@"classpause"] forState:UIControlStateNormal];
+                [playTestMp setImage:[UIImage imageNamed:@"classplay"] forState:UIControlStateSelected];
+                playTestMp.tag = i;
                 [self.buttons addObject:playTestMp];
                 [playTestMp addTarget:self action:@selector(playTestMp:) forControlEvents:UIControlEventTouchUpInside];
                 [xiangqingView addSubview:playTestMp];
@@ -559,7 +571,8 @@
 }
 
 - (void)dealloc {
-//    [Explayer removeObserver:self forKeyPath:@"statu"];
+    [CommonCode writeToUserD:self.act_id andKey:@"currentClassID"];
+    [CommonCode writeToUserD:[NSString stringWithFormat:@"%ld",playIndex] andKey:@"playIndex"];
 }
 
 #pragma mark - UIButtonAction
@@ -567,34 +580,29 @@
     XWAlerLoginView *xw = [[XWAlerLoginView alloc]initWithTitle:@"购买了才能订阅哦~"];
     [xw show];
 }
-
+//点击底部试听按钮
 - (void)auditionnBtnAction:(UIButton *)sender{
-    if (self.auditionnBtn.selected) {
+    if (sender.selected == YES) {//选中状态，为播放状态,则将列表按钮设置全部设置为暂停
         sender.selected = NO;
-        [self.auditionnBtn setImage:[UIImage imageNamed:@"classplay"] forState:UIControlStateNormal];
         for ( int i = 0 ; i < self.buttons.count; i ++ ) {
                 UIButton *anotherButton = self.buttons[i];
                 anotherButton.selected = NO;
-                [anotherButton setImage:[UIImage imageNamed:@"classplay"] forState:UIControlStateNormal];
                 continue;
         }
         [Explayer pause];
         _isPlaying = NO;
     }
-    else{
+    else{//未选中状态，为暂停状态,判断当前播放第几个按钮，设置播放状态
         sender.selected = YES;
-        [self.auditionnBtn setImage:[UIImage imageNamed:@"classpause"] forState:UIControlStateNormal];
         for ( int i = 0 ; i < self.buttons.count; i ++ ) {
             if (i == 0) {
                 UIButton *allDoneButton = [self.buttons firstObject];
                 allDoneButton.selected = YES;
-                [allDoneButton setImage:[UIImage imageNamed:@"classpause"] forState:UIControlStateNormal];
                 continue;
             }
             else{
                 UIButton *anotherButton = self.buttons[i];
                 anotherButton.selected = NO;
-                [anotherButton setImage:[UIImage imageNamed:@"classplay"] forState:UIControlStateNormal];
                 continue;
             }
         }
@@ -608,23 +616,14 @@
         [Explayer pause];
         if (Explayer == nil) {
             Explayer = [[AVPlayer alloc]init];
-            //添加观察者，用来监视播放器的状态变化
-//            [Explayer addObserver:self forKeyPath:@"statu" options:NSKeyValueObservingOptionNew context:nil];
-            //添加观察者，用来监听播放器的缓冲进度loadedTimeRanges属性
-            //            [Explayer addObserver:self forKeyPath:@"loadedTimeRanges" options:NSKeyValueObservingOptionNew context:nil];
         }
         [Explayer replaceCurrentItemWithPlayerItem:[[AVPlayerItem alloc]initWithURL:[NSURL URLWithString:[self.auditionResult[@"shiting"] firstObject][@"s_mpurl"]]]];
-        //播放完毕后发出通知
-        [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(voicePlayEnd:) name:AVPlayerItemDidPlayToEndTimeNotification object:Explayer.currentItem];
+        
         [Explayer play];
         _isPlaying = YES;
         _playingIndex = 0;
         [CommonCode writeToUserD:@"YES" andKey:TINGYOUQUANBOFANGWANBI];
         if (ExisRigester == NO){
-            //添加观察者，用来监视播放器的状态变化
-//            [Explayer addObserver:self forKeyPath:@"statu" options:NSKeyValueObservingOptionNew context:nil];
-            //添加观察者，用来监听播放器的缓冲进度loadedTimeRanges属性
-            //[Explayer addObserver:self forKeyPath:@"loadedTimeRange" options:NSKeyValueObservingOptionNew context:nil];
             ExisRigester = YES;
         }
     }
@@ -657,38 +656,31 @@
         [self loginFirst];
     }
 }
-
+//列表试听按钮点击
 - (void)playTestMp:(UIButton *)sender{
-    BOOL isTestMpPlay = NO;
+    BOOL isTestMpPlay = NO;//判断是否在试听列表里面有选中的按钮正在播放
     for ( int i = 0 ; i < self.buttons.count; i ++ ) {
-        if (i == sender.tag - 100 ) {
-            UIButton *allDoneButton = self.buttons[i];
-            if (allDoneButton.selected) {
-                allDoneButton.selected = NO;
-                [allDoneButton setImage:[UIImage imageNamed:@"classplay"] forState:UIControlStateNormal];
-            }
-            else{
-                allDoneButton.selected = YES;
-                [allDoneButton setImage:[UIImage imageNamed:@"classpause"] forState:UIControlStateNormal];
+        UIButton *allDoneButton = self.buttons[i];
+        if (sender.tag == i) {
+            allDoneButton.selected = !allDoneButton.selected;
+            if (allDoneButton.selected == NO) {
+                isTestMpPlay = NO;
+            }else{
                 isTestMpPlay = YES;
             }
-            continue;
         }
         else{
-            UIButton *anotherButton = self.buttons[i];
-            anotherButton.selected = NO;
-            [anotherButton setImage:[UIImage imageNamed:@"classplay"] forState:UIControlStateNormal];
-            continue;
+            allDoneButton.selected = NO;
         }
     }
     if (isTestMpPlay) {
-        [self.auditionnBtn setImage:[UIImage imageNamed:@"classpause"] forState:UIControlStateNormal];
+        [self.auditionnBtn setSelected:YES];
     }
     else{
-        [self.auditionnBtn setImage:[UIImage imageNamed:@"classplay"] forState:UIControlStateNormal];
+        [self.auditionnBtn setSelected:NO];
     }
     //播放试听音频
-    if (_isPlaying && (_playingIndex == sender.tag -100)) {
+    if (_isPlaying && (_playingIndex == sender.tag)) {
         [Explayer pause];
         _isPlaying = NO;
     }
@@ -707,12 +699,10 @@
             //添加观察者，用来监听播放器的缓冲进度loadedTimeRanges属性
             //            [Explayer addObserver:self forKeyPath:@"loadedTimeRanges" options:NSKeyValueObservingOptionNew context:nil];
         }
-        [Explayer replaceCurrentItemWithPlayerItem:[[AVPlayerItem alloc]initWithURL:[NSURL URLWithString:self.auditionResult[@"shiting"][sender.tag - 100][@"s_mpurl"]]]];
-        //播放完毕后发出通知
-        [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(voicePlayEnd:) name:AVPlayerItemDidPlayToEndTimeNotification object:Explayer.currentItem];
+        [Explayer replaceCurrentItemWithPlayerItem:[[AVPlayerItem alloc]initWithURL:[NSURL URLWithString:self.auditionResult[@"shiting"][sender.tag][@"s_mpurl"]]]];
         [Explayer play];
         _isPlaying = YES;
-        _playingIndex = sender.tag - 100;
+        _playingIndex = sender.tag;
         [CommonCode writeToUserD:@"YES" andKey:TINGYOUQUANBOFANGWANBI];
         if (ExisRigester == NO){
             //添加观察者，用来监视播放器的状态变化
@@ -1047,8 +1037,8 @@ didSelectLinkWithTransitInformation:(NSDictionary *)components {
     if (!_auditionnBtn) {
         _auditionnBtn = [UIButton buttonWithType:UIButtonTypeCustom];
         [_auditionnBtn setFrame:CGRectMake(SCREEN_WIDTH / 4, SCREEN_HEIGHT - 49, SCREEN_WIDTH / 4, 49)];
-        [_auditionnBtn setImage:[UIImage imageNamed:@"classplay"] forState:UIControlStateNormal];
-        [_auditionnBtn setSelected:NO];
+        [_auditionnBtn setImage:[UIImage imageNamed:@"classpause"] forState:UIControlStateNormal];
+        [_auditionnBtn setImage:[UIImage imageNamed:@"classplay"] forState:UIControlStateSelected];
         [_auditionnBtn setTitle:@"试听" forState:UIControlStateNormal];
         [_auditionnBtn setTitleColor:nTextColorMain forState:UIControlStateNormal];
         [_auditionnBtn addTarget:self action:@selector(auditionnBtnAction:) forControlEvents:UIControlEventTouchUpInside];
@@ -1107,15 +1097,4 @@ didSelectLinkWithTransitInformation:(NSDictionary *)components {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
-
-/*
-#pragma mark - Navigation
-
-// In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
-}
-*/
-
 @end

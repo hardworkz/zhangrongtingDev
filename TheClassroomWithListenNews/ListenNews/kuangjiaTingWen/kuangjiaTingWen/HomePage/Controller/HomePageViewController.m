@@ -124,7 +124,6 @@
         }
     };
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(zidongjiazai:) name:@"bofangRightyaojiazaishujv" object:nil];
-    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(lunboxiangqingVCAction:) name:@"lunboxiangqingVCAction" object:nil];
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(gaibianyanse:) name:@"gaibianyanse" object:nil];
 }
 
@@ -709,87 +708,6 @@
     }
 }
 
-- (void)lunboxiangqingVCAction:(NSNotification *)notification{
-    
-    if ([notification.object firstObject][@"slide_url"] != nil) {
-        NSString *URLString = [notification.object firstObject][@"slide_url"];
-        //调用系统浏览器
-        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:URLString]];
-    }
-    else{
-        lunboxiangqingVC *lunboVC = [lunboxiangqingVC new];
-        if ([notification.object isKindOfClass:[NSArray class]]){
-            lunboVC.infoArr = [NSArray arrayWithArray:notification.object];
-            if ([lunboVC.infoArr count] > 1) {
-                self.hidesBottomBarWhenPushed=YES;
-                [self.navigationController pushViewController:lunboVC animated:YES];
-                self.hidesBottomBarWhenPushed=NO;
-            }
-            else{
-                if ([[CommonCode readFromUserD:@"dangqianbofangxinwenID"] isEqualToString:[lunboVC.infoArr firstObject][@"id"]]){
-                    self.hidesBottomBarWhenPushed = YES;
-                    [self.navigationController.navigationBar setHidden:YES];
-                    [self.navigationController pushViewController:[bofangVC shareInstance ] animated:YES];
-                    self.hidesBottomBarWhenPushed = NO;
-                }
-                else{
-                    [bofangVC shareInstance].newsModel.jiemuID = [lunboVC.infoArr firstObject][@"id"];
-                    [bofangVC shareInstance].newsModel.Titlejiemu = [lunboVC.infoArr firstObject][@"post_title"];
-                    [bofangVC shareInstance].newsModel.RiQijiemu = [lunboVC.infoArr firstObject][@"post_date"];
-                    [bofangVC shareInstance].newsModel.ImgStrjiemu = [lunboVC.infoArr firstObject][@"smeta"];
-                    [bofangVC shareInstance].newsModel.post_lai = [lunboVC.infoArr firstObject][@"post_lai"];
-                    [bofangVC shareInstance].newsModel.post_news = [lunboVC.infoArr firstObject][@"post_act"][@"id"];
-                    [bofangVC shareInstance].newsModel.jiemuName = [lunboVC.infoArr firstObject][@"post_act"][@"name"];
-                    [bofangVC shareInstance].newsModel.jiemuDescription = [lunboVC.infoArr firstObject][@"post_act"][@"description"];
-                    [bofangVC shareInstance].newsModel.jiemuImages = [lunboVC.infoArr firstObject][@"post_act"][@"images"];
-                    [bofangVC shareInstance].newsModel.jiemuFan_num = [lunboVC.infoArr firstObject][@"post_act"][@"fan_num"];
-                    [bofangVC shareInstance].newsModel.jiemuMessage_num = [lunboVC.infoArr firstObject][@"post_act"][@"message_num"];
-                    [bofangVC shareInstance].newsModel.jiemuIs_fan = [lunboVC.infoArr firstObject][@"post_act"][@"is_fan"];
-                    [bofangVC shareInstance].newsModel.post_mp = [lunboVC.infoArr firstObject][@"post_mp"];
-                    
-                    [bofangVC shareInstance].newsModel.post_time = [lunboVC.infoArr firstObject][@"post_time"];
-                    [bofangVC shareInstance].yinpinzongTime.text = [[bofangVC shareInstance] convertStringWithTime:[[lunboVC.infoArr firstObject][@"post_time"] intValue] / 1000];
-                    
-                    ExcurrentNumber = 0;
-                    NSString *imgUrl = [NSString stringWithFormat:@"%@",[[lunboVC.infoArr firstObject][@"smeta"] stringByReplacingOccurrencesOfString:@"\\" withString:@""]];
-                    NSString *imgUrl1 = [imgUrl stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-                    NSString *imgUrl2 = [imgUrl1 stringByReplacingOccurrencesOfString:@"thumb:" withString:@""];
-                    NSString *imgUrl3 = [imgUrl2 stringByReplacingOccurrencesOfString:@"{" withString:@""];
-                    NSString *imgUrl4 = [imgUrl3 stringByReplacingOccurrencesOfString:@"}" withString:@""];
-                    [bofangVC shareInstance].newsModel.ImgStrjiemu = imgUrl4;
-                    [bofangVC shareInstance].newsModel.ZhengWenjiemu = [lunboVC.infoArr firstObject][@"post_excerpt"];
-                    [bofangVC shareInstance].newsModel.praisenum = [lunboVC.infoArr firstObject][@"praisenum"];
-                    [bofangVC shareInstance].newsModel.url = [lunboVC.infoArr firstObject][@"url"];
-                    [bofangVC shareInstance].newsModel.post_keywords = [lunboVC.infoArr firstObject][@"post_keywords"];
-                    [bofangVC shareInstance].newsModel.url = [lunboVC.infoArr firstObject][@"url"];
-                    [bofangVC shareInstance].iszhuboxiangqing = NO;
-                    [[bofangVC shareInstance].tableView reloadData];
-                    
-                    [Explayer replaceCurrentItemWithPlayerItem:[[AVPlayerItem alloc]initWithURL:[NSURL URLWithString:[lunboVC.infoArr firstObject][@"post_mp"]]]];
-                    ExisRigester = YES;
-                    ExIsKaiShiBoFang = YES;
-                    ExwhichBoFangYeMianStr = @"shouyebofang";
-                    self.hidesBottomBarWhenPushed = YES;
-                    [self.navigationController.navigationBar setHidden:YES];
-                    [self.navigationController pushViewController:[bofangVC shareInstance ] animated:YES];
-                    self.hidesBottomBarWhenPushed = NO;
-                    [[NSNotificationCenter defaultCenter] postNotificationName:@"yuanpanzhuan" object:nil];
-                    [[NSNotificationCenter defaultCenter] postNotificationName:@"qiehuanxinwen" object:nil];
-                    [CommonCode writeToUserD:[lunboVC.infoArr firstObject][@"id"] andKey:@"dangqianbofangxinwenID"];
-                }
-            }
-        }
-        else{
-            lunboVC.infoArr = [NSArray array];
-            self.hidesBottomBarWhenPushed=YES;
-            [self.navigationController pushViewController:lunboVC animated:YES];
-            self.hidesBottomBarWhenPushed=NO;
-        }
-        [[NSNotificationCenter defaultCenter] postNotificationName:@"gaibianyanse" object:nil];
-        [[NSNotificationCenter defaultCenter] postNotificationName:@"dianjihougaibiangezhongyanse" object:nil];
-    }
-}
-
 - (void)zidongjiazai:(NSNotification *)notification{
     DefineWeakSelf;
     if (self.segmentedControl.selectedSegmentIndex == 0) {
@@ -810,15 +728,6 @@
 }
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView{
-//    CGFloat offsetX  = self.scrollView.contentOffset.x;
-//    NSInteger leftIndex  = offsetX / SCREEN_WIDTH;
-//    NSInteger rightIdex  = leftIndex + 1;
-//    CGFloat scaleR  = offsetX / SCREEN_WIDTH - leftIndex;
-//    CGFloat scaleL  = 1 - scaleR;
-//    CGFloat transScale = 1 - 1;
-//    self.lineView.transform = CGAffineTransformMakeTranslation((offsetX*(SCREEN_WIDTH / 3)), 0);
-    //    CGFloat w = SCREEN_WIDTH/self.titlesArr.count / 2;
-    //    [self.lineView setFrame:CGRectMake((offsetX*(self.titleScrollView.contentSize.width / self.contentScrollView.contentSize.width)), titleH - 2, w, 2)];
 }
 
 #pragma mark - UITableViewDataSource
@@ -1281,138 +1190,64 @@
     
 }
 
-
 - (void)getAD{
     //获取轮播图数据
-    [self.ztADResult removeAllObjects];
-    NSString *term_id = nil;
-    NSString *keyword = @"头条";
-    NSString *pindaoID = @"1";
-    dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
-    dispatch_group_t group = dispatch_group_create();
-    dispatch_group_enter(group);
-    dispatch_group_async(group, queue, ^{
-        [NetWorkTool getSlideListWithcat_idname:pindaoID sccess:^(NSDictionary *responseObject) {
-            if ([responseObject[@"results"] isKindOfClass:[NSArray class]]){
-                
-                self.slideADResult = responseObject[@"results"];
-            }
-            else{
-                self.slideADResult = [NSMutableArray array];
-            }
-            dispatch_group_leave(group);
+//    [self.ztADResult removeAllObjects];
+    [NetWorkTool getNewSlideListWithaccessToken:ExdangqianUser?[DSE encryptUseDES:ExdangqianUser]:@"" sccess:^(NSDictionary *responseObject) {
+        RTLog(@"%@",responseObject);
+        if ([responseObject[@"results"] isKindOfClass:[NSArray class]]){
             
-        } failure:^(NSError *error) {
-            NSLog(@"%@",error);
-            dispatch_group_leave(group);
-        }];
-    });
-    dispatch_group_enter(group);
-    dispatch_group_async(group, queue, ^{
-        [NetWorkTool getPaoGuoPinDaoHuanDengPianXinXiWithterm_id:term_id andkeyword:keyword sccess:^(NSDictionary *responseObject) {
-            if ([responseObject[@"results"] isKindOfClass:[NSArray class]]){
-                NSArray *arr = [NSArray arrayWithArray:responseObject[@"results"]];
-                NSMutableArray *mArr = [[NSMutableArray alloc]init];
-                NSString *str;
-                for (NSDictionary *dic in arr){
-                    if (mArr.count == 0){
-                        [mArr addObject:dic[@"zhutitle"]];
-                        str = [NSString stringWithFormat:@"%@,",arr[0][@"zhutitle"]];
-                    }
-                    else{
-                        for (int i = 0; i < mArr.count; i ++ ){
-                            if ([str rangeOfString:dic[@"zhutitle"]].location == NSNotFound){
-                                [mArr addObject:dic[@"zhutitle"]];
-                                str = [NSString stringWithFormat:@"%@,%@",str,dic[@"zhutitle"]];
-                            }
-                        }
-                    }
-                }
-                [self.ztADResult removeAllObjects];
-                for (NSString *str in mArr){
-                    NSMutableArray *cArr = [[NSMutableArray alloc]init];
-                    for (int i = 0; i < arr.count; i ++ ){
-                        if ([str isEqualToString:arr[i][@"zhutitle"]]){
-                            [cArr addObject:arr[i]];
-                        }
-                    }
-                    [self.ztADResult addObject:cArr];
-                }
-            }
-            else{
-                self.ztADResult = [NSMutableArray array];
-            }
-            dispatch_group_leave(group);
-        } failure:^(NSError *error) {
-            dispatch_group_leave(group);
-        }];
-    });
-    
-    dispatch_group_notify(group, dispatch_get_main_queue(), ^{
-        
-        if ([self.ztADResult count]) {
-            if ([self.slideADResult count]) {
-                [self.ztADResult addObject:self.slideADResult];
-            }
+            self.slideADResult = responseObject[@"results"];
+            [self setupTBCView];
         }
         else{
-            [self.ztADResult removeAllObjects];
-            if([self.slideADResult count]){
-                [self.ztADResult addObject:self.slideADResult];
-            }
+            self.slideADResult = [NSMutableArray array];
+            [self setupTBCView];
         }
-        //TODO:设置轮播图
-        if ([self.ztADResult count]){
-            TBCircleScrollView *tbScView = [[TBCircleScrollView alloc]initWithFrame:CGRectMake(20.0 / 375 * IPHONE_W, 0, IPHONE_W - 40.0 / 375 * IPHONE_W, 162.0 / 667 * SCREEN_HEIGHT) andArr:self.ztADResult];
-            tbScView.scrollView.scrollsToTop = NO;
-            tbScView.biaozhiStr = @"头条";
-            NSMutableArray *imgArr = [[NSMutableArray alloc]init];
-            if ([self.slideADResult count]) {
-                for (int i = 0; i < self.ztADResult.count - self.slideADResult.count; i ++ ){
-                    NSString *imgUrl = [NSString stringWithFormat:@"%@",[self.ztADResult[i][0][@"smeta"] stringByReplacingOccurrencesOfString:@"\\" withString:@""]];
-                    NSString *imgUrl1 = [imgUrl stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-                    NSString *imgUrl2 = [imgUrl1 stringByReplacingOccurrencesOfString:@"thumb:" withString:@""];
-                    NSString *imgUrl3 = [imgUrl2 stringByReplacingOccurrencesOfString:@"{" withString:@""];
-                    NSString *imgUrl4 = [imgUrl3 stringByReplacingOccurrencesOfString:@"}" withString:@""];
-                    [imgArr addObject:imgUrl4];
-                }
-                tbScView.ztADCount = [imgArr count];
-                for (int i = 0 ; i < [self.slideADResult count]; i ++) {
-                    [imgArr addObject:USERPOTOAD(self.slideADResult[i][@"slide_pic"]]) ;
-                     }
-                     }
-                     else{
-                         for (int i = 0; i < self.ztADResult.count; i ++ ){
-                             NSString *imgUrl = [NSString stringWithFormat:@"%@",[self.ztADResult[i][0][@"smeta"] stringByReplacingOccurrencesOfString:@"\\" withString:@""]];
-                             NSString *imgUrl1 = [imgUrl stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-                             NSString *imgUrl2 = [imgUrl1 stringByReplacingOccurrencesOfString:@"thumb:" withString:@""];
-                             NSString *imgUrl3 = [imgUrl2 stringByReplacingOccurrencesOfString:@"{" withString:@""];
-                             NSString *imgUrl4 = [imgUrl3 stringByReplacingOccurrencesOfString:@"}" withString:@""];
-                             [imgArr addObject:imgUrl4];
-                         }
-                         tbScView.ztADCount = [imgArr count];
-                     }
-                     tbScView.imageArray = [NSArray arrayWithArray:imgArr];
-                     self.newsTableView.tableHeaderView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, 162.0 / 667 * SCREEN_HEIGHT)];
-                     [self.newsTableView.tableHeaderView addSubview:tbScView];
-                     [self.newsTableView reloadData];
-                     }
-                     });
+        
+    } failure:^(NSError *error) {
+        NSLog(@"%@",error);
+    }];
 }
-
+- (void)setupTBCView{
+    /*
+     {
+     is_fan=0,
+     images=2017-04-13/crop_58ef1953ef484.jpg,
+     cate=3,
+     name=10步成为巴菲特式投资天才,
+     des=刘建位复旦大学国际金融硕士上海社会科学院经济学博士巴菲特价值投资研究与传播者,
+     fan_num=110,
+     picture={
+     "thumb": "http:\/\/admin.tingwen.me\/Uploads\/2017-04-13\/crop_58ef1dc74e102.jpg"
+     },
+     description=10步成为巴菲特式投资天才,
+     message_num=8,
+     is_free=0,
+     url=260
+     }
+     */
+    if (self.slideADResult.count != 0) {
+        TBCircleScrollView *tbScView = [[TBCircleScrollView alloc] initWithFrame:CGRectMake(20.0 / 375 * IPHONE_W, 0, IPHONE_W - 40.0 / 375 * IPHONE_W, 162.0 / 667 * SCREEN_HEIGHT) andArr:self.slideADResult];
+        tbScView.scrollView.scrollsToTop = NO;
+        tbScView.biaozhiStr = @"头条";
+        NSMutableArray *imgArr = [[NSMutableArray alloc]init];
+        for (int i = 0; i <self.slideADResult.count; i++ ){
+            [imgArr addObject:NEWSSEMTPHOTOURL(self.slideADResult[i][@"picture"])];
+        }
+        tbScView.ztADCount = [imgArr count];
+        tbScView.imageArray = [NSArray arrayWithArray:imgArr];
+        self.newsTableView.tableHeaderView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, 162.0 / 667 * SCREEN_HEIGHT)];
+        [self.newsTableView.tableHeaderView addSubview:tbScView];
+        [self.newsTableView reloadData];
+    }else{
+        self.newsTableView.tableHeaderView = [[UIView alloc] init];
+        [self.newsTableView.tableHeaderView removeFromSuperview];
+        [self.newsTableView reloadData];
+    }
+}
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
-
-/*
-#pragma mark - Navigation
-
-// In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
-}
-*/
-
 @end

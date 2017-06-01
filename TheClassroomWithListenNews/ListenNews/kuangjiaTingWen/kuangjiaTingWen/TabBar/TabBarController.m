@@ -42,8 +42,8 @@
 - (void)viewDidLoad{
     [super viewDidLoad];
     _itemArray = [NSMutableArray array];
-    shouyeVC *shouye = [[shouyeVC alloc]init];
-//    HomePageViewController *shouye =  [[HomePageViewController alloc]init];
+//    shouyeVC *shouye = [[shouyeVC alloc]init];
+    HomePageViewController *shouye =  [[HomePageViewController alloc]init];
     dingyueVC *dingyue = [[dingyueVC alloc]init];
     faxianVC *faxian = [[faxianVC alloc]init];
     mineVC *mine = [[mineVC alloc]init];

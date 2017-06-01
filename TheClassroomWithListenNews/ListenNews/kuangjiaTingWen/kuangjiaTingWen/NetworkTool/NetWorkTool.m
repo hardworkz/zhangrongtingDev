@@ -1194,7 +1194,7 @@ NSMutableDictionary *dic = [[NSMutableDictionary alloc]initWithCapacity:1
 {
     NSMutableDictionary *dic = [[NSMutableDictionary alloc]initWithCapacity:1];
     dic[@"str"] = str;
-    [self asyncNetworkingUrl:@"/interfaceYou/findIndex" andDict:dic success:success failure:failure];
+    [self asyncNetworkingUrl:@"/interfaceNew/findIndex" andDict:dic success:success failure:failure];
 }
 ///根据主播ID以及用户accessToken进行对主播的关注
 + (void)postPaoGuoGuanZhuWithaccessToken:(NSString *)accessToken andact_id:(NSString *)act_id sccess:(void (^)(NSDictionary *responseObject))success failure:(void (^)(NSError *error))failure
@@ -1303,7 +1303,7 @@ NSMutableDictionary *dic = [[NSMutableDictionary alloc]initWithCapacity:1
     dic[@"keyword"] = keyword;
     [self asyncNetworkingUrl:@"/interface/ztList" andDict:dic success:success failure:failure];
 }
-
+///获取首页轮播图数据
 + (void)getSlideListWithcat_idname:(NSString *)cat_idname
                             sccess:(void (^)(NSDictionary *responseObject))success
                            failure:(void(^)(NSError *error))failure{
@@ -1311,7 +1311,14 @@ NSMutableDictionary *dic = [[NSMutableDictionary alloc]initWithCapacity:1
     dic[@"cat_idname"] = cat_idname;
     [self asyncNetworkingUrl:@"/interface/slideList" andDict:dic success:success failure:failure];
 }
-
+///获取首页轮播图数据
++ (void)getNewSlideListWithaccessToken:(NSString *)accessToken
+                            sccess:(void (^)(NSDictionary *responseObject))success
+                           failure:(void(^)(NSError *error))failure{
+    NSMutableDictionary *dic = [[NSMutableDictionary alloc]initWithCapacity:1];
+    dic[@"accessToken"] = accessToken;
+    [self asyncNetworkingUrl:@"/interfaceNew/ads" andDict:dic success:success failure:failure];
+}
 ///获取随机用户信息（推荐好友列表）
 + (void)getPaoGuoSuiJiYongHuXinXiWithaccessToken:(NSString *)accessToken andPage:(NSString *)page andLimit:(NSString *)limit sccess:(void (^)(NSDictionary *responseObject))success failure:(void(^)(NSError *error))failure
 {

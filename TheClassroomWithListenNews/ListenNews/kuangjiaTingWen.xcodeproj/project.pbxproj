@@ -1935,14 +1935,14 @@
 				69C712161EC0740E00F2729E /* CommentViewController.m */,
 				69C712171EC0740E00F2729E /* guanggaoVC.h */,
 				69C712181EC0740E00F2729E /* guanggaoVC.m */,
-				69C712191EC0740E00F2729E /* HomePageViewController.h */,
-				69C7121A1EC0740E00F2729E /* HomePageViewController.m */,
 				69C7121B1EC0740E00F2729E /* lunboxiangqingVC.h */,
 				69C7121C1EC0740E00F2729E /* lunboxiangqingVC.m */,
 				69C7121D1EC0740E00F2729E /* NewReportViewController.h */,
 				69C7121E1EC0740E00F2729E /* NewReportViewController.m */,
 				69C7121F1EC0740E00F2729E /* shouyeVC.h */,
 				69C712201EC0740E00F2729E /* shouyeVC.m */,
+				69C712191EC0740E00F2729E /* HomePageViewController.h */,
+				69C7121A1EC0740E00F2729E /* HomePageViewController.m */,
 			);
 			path = Controller;
 			sourceTree = "<group>";

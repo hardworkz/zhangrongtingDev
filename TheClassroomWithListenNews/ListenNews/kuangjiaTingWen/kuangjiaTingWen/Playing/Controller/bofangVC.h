@@ -8,6 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
+@class NewsModel;
 @interface bofangVC : UIViewController
 + (instancetype)shareInstance;
 

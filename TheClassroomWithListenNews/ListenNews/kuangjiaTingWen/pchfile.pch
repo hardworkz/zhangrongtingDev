@@ -7,6 +7,8 @@
 //
 
 #ifndef pchfile_pch
+
+#import "bofangVC.h"
 #import "NetWorkTool.h"
 #import "CommonCode.h"
 #import "EXtern.h"

@@ -9,6 +9,9 @@
 #import "TBCircleScrollView.h"
 #import "UIImageView+WebCache.h"
 #import "UIButton+WebCache.h"
+#import "ClassViewController.h"
+#import "HomePageViewController.h"
+
 #define c_width (self.bounds.size.width) //两张图片之前有10点的间隔
 #define c_height (self.bounds.size.height)
 
@@ -46,9 +49,6 @@
         _pageControl.hidesForSinglePage = YES;
         _pageControl.currentPageIndicatorTintColor = ColorWithRGBA(0, 159, 240, 1);
         _pageControl.pageIndicatorTintColor = [UIColor whiteColor];
-//        [_pageControl setValue:[UIImage imageNamed:@"page3W"] forKey:@"_pageImage"];
-//        [_pageControl setValue:[UIImage imageNamed:@"page3B"] forKey:@"_currentPageImage"];
-//        [_pageControl setValue:[NSString stringWithFormat:@"3.0f"] forKey:@"_lastUserInterfaceIdiom"];
         //初始化数据，当前图片默认位置是0
         _curImageArray = [[NSMutableArray alloc] initWithCapacity:0];
         _curPage = 0;
@@ -75,12 +75,7 @@
         else{
             self.dibuLab.font = [UIFont systemFontOfSize:10.0];
         }
-        if ([newArr[0][0][@"post_title"] length]) {
-            self.dibuLab.text = [NSString stringWithFormat:@"%@",newArr[0][0][@"post_title"]];
-        }
-        else{
-            self.dibuLab.text = [NSString stringWithFormat:@"%@",newArr[0][0][@"slide_name"]];
-        }
+        self.dibuLab.text = [NSString stringWithFormat:@"%@",newArr[0][@"description"]];
         
         [self.dibuLab setNumberOfLines:1];
         self.dibuLab.lineBreakMode = NSLineBreakByWordWrapping;
@@ -88,7 +83,6 @@
         CGSize size = [self.dibuLab sizeThatFits:CGSizeMake(self.dibuLab.frame.size.width, MAXFLOAT)];
         self.dibuLab.frame = CGRectMake(self.dibuLab.frame.origin.x, self.dibuLab.frame.origin.y, self.dibuLab.frame.size.width, size.height);
         [dibuLabView addSubview:self.dibuLab];
-//        [dibuLabView addSubview:_pageControl];
         
         chuanchuquArr = [[NSMutableArray alloc]init];
     }
@@ -127,11 +121,6 @@
         [scrollView setContentOffset:CGPointMake(c_width, 0)];
         [lineView setFrame:CGRectMake(w * _curPage + 3, self.bounds.size.height - 2, w - 6, 2)];
     }
-    
-    
-//    CGFloat offsetX  = self.scrollView.contentOffset.x;
-//    lineView.transform = CGAffineTransformMakeTranslation((offsetX*(self.scrollView.contentSize.width / self.scrollView.contentSize.width)), 0);
-    
 }
 
 //停止滚动的时候回调
@@ -140,8 +129,6 @@
     //设置scrollView偏移位置
     [scrollView setContentOffset:CGPointMake(c_width, 0) animated:YES];
 }
-
-
 
 - (void)setImageArray:(NSMutableArray *)imageArray
 {
@@ -190,14 +177,9 @@
 - (void)reloadData{
     //设置页数
     _pageControl.currentPage = _curPage;
-    if ([newArr[_curPage][0][@"post_title"] length]) {
-        self.dibuLab.text = [NSString stringWithFormat:@"%@",newArr[_curPage][0][@"post_title"]];
-    }
-    else{
-        self.dibuLab.text = [NSString stringWithFormat:@"%@",newArr[_curPage][0][@"slide_name"]];
-    }
+    self.dibuLab.text = [NSString stringWithFormat:@"%@",newArr[_curPage][@"description"]];
     [chuanchuquArr removeAllObjects];
-    [chuanchuquArr addObjectsFromArray:newArr[_curPage]];
+    [chuanchuquArr addObjectsFromArray:[NSArray arrayWithObjects:newArr[_curPage], nil]];
     //根据当前页取出图片
     [self getDisplayImagesWithCurpage:_curPage];
     
@@ -209,30 +191,9 @@
     
     //创建imageView
     for (int i = 0; i < 3; i++) {
-        //==========
-//        UIButton *imgBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-//        imgBtn.frame = CGRectMake(c_width * i, 0, self.bounds.size.width, c_height);
-//        [imgBtn sd_setBackgroundImageWithURL:[NSURL URLWithString:_curImageArray[i]] forState:UIControlStateNormal placeholderImage:[UIImage imageNamed:@""]];
-//        imgBtn.tag = 30000 + i;
-//        [imgBtn addTarget:self action:@selector(imgBtnAction:) forControlEvents:UIControlEventTouchUpInside
-//         ];
-//        [self.scrollView addSubview:imgBtn];
-        //==========
         UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake(c_width*i, 0, self.bounds.size.width, c_height)];
         [imageView.layer setMasksToBounds:YES];
         [imageView.layer setCornerRadius:4.0];
-       
-        
-//        UIView *view = [[UIView alloc]initWithFrame:CGRectMake(0, 0, imageView.bounds.size.width, imageView.bounds.size.height)];
-//        //贝塞尔曲线
-//        CAShapeLayer *layer = [CAShapeLayer layer];
-//        UIBezierPath *path = [UIBezierPath bezierPathWithRoundedRect:view.bounds byRoundingCorners:UIRectCornerBottomRight cornerRadii:CGSizeMake(view.bounds.size.width, imageView.bounds.size.height)];
-//        layer.path = path.CGPath;
-//        layer.fillColor = [UIColor clearColor].CGColor;
-//        layer.strokeColor = [UIColor orangeColor].CGColor;
-//        [view.layer addSublayer:layer];
-//        [imageView addSubview:view];
-    
         imageView.userInteractionEnabled = YES;
         [self.scrollView addSubview:imageView];
         imageView.contentMode = UIViewContentModeScaleAspectFill;
@@ -240,7 +201,6 @@
         
         imageView.tag = i+20000;
         //设置网络图片
-//        NSURL *url = [NSURL URLWithString:_curImageArray[i]];
         if ([_curImageArray[i] rangeOfString:@"http"].location != NSNotFound){
             [imageView sd_setImageWithURL:[NSURL URLWithString:_curImageArray[i]] placeholderImage:[UIImage imageNamed:@"thumbnailsdefault"]];
         }
@@ -286,16 +246,87 @@
     //设置scrollView偏移位置
     [self.scrollView setContentOffset:CGPointMake(c_width*2, 0) animated:YES];
 }
-
-- (void)imgBtnAction:(UIButton *)sender
-{
-    NSInteger index = sender.tag - 30000;
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"lunboxiangqingVCAction" object:newArr[index]];
-}
 //点击轮播图片
 - (void)tapImage:(UITapGestureRecognizer *)tap
 {
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"lunboxiangqingVCAction" object:chuanchuquArr];
+    if ([newArr[_curPage][@"cate"] intValue] == 1) {//当前为新闻，跳转新闻播放器页面
+        id object = [self nextResponder];
+        
+        while (![object isKindOfClass:[UIViewController class]] &&
+               object != nil) {
+            object = [object nextResponder];
+        }
+        HomePageViewController *homePageVC = (HomePageViewController *)object;
+        UINavigationController *nav = homePageVC.navigationController;
+        if ([[CommonCode readFromUserD:@"dangqianbofangxinwenID"] isEqualToString:newArr[_curPage][@"post_list"][@"id"]]){
+            [bofangVC shareInstance].hidesBottomBarWhenPushed = YES;
+            [nav.navigationBar setHidden:YES];
+            [nav pushViewController:[bofangVC shareInstance] animated:YES];
+            [bofangVC shareInstance].hidesBottomBarWhenPushed = NO;
+        }
+        else{
+            [bofangVC shareInstance].newsModel.jiemuID = newArr[_curPage][@"post_list"][@"id"];
+            [bofangVC shareInstance].newsModel.Titlejiemu = newArr[_curPage][@"post_list"][@"post_title"];
+            [bofangVC shareInstance].newsModel.RiQijiemu = newArr[_curPage][@"post_list"][@"post_date"];
+            [bofangVC shareInstance].newsModel.ImgStrjiemu = newArr[_curPage][@"post_list"][@"smeta"];
+            [bofangVC shareInstance].newsModel.post_lai = newArr[_curPage][@"post_list"][@"post_lai"];
+            [bofangVC shareInstance].newsModel.post_news = newArr[_curPage][@"post_list"][@"post_act"][@"id"];
+            [bofangVC shareInstance].newsModel.jiemuName = newArr[_curPage][@"post_list"][@"post_act"][@"name"];
+            [bofangVC shareInstance].newsModel.jiemuDescription = newArr[_curPage][@"post_list"][@"post_act"][@"description"];
+            [bofangVC shareInstance].newsModel.jiemuImages = newArr[_curPage][@"post_list"][@"post_act"][@"images"];
+            [bofangVC shareInstance].newsModel.jiemuFan_num = newArr[_curPage][@"post_list"][@"post_act"][@"fan_num"];
+            [bofangVC shareInstance].newsModel.jiemuMessage_num = newArr[_curPage][@"post_list"][@"post_act"][@"message_num"];
+            [bofangVC shareInstance].newsModel.jiemuIs_fan = newArr[_curPage][@"post_list"][@"post_act"][@"is_fan"];
+            [bofangVC shareInstance].newsModel.post_mp = newArr[_curPage][@"post_list"][@"post_mp"];
+            
+            [bofangVC shareInstance].newsModel.post_time = newArr[_curPage][@"post_list"][@"post_time"];
+            [bofangVC shareInstance].yinpinzongTime.text = [[bofangVC shareInstance] convertStringWithTime:[newArr[_curPage][@"post_list"][@"post_time"] intValue] / 1000];
+            
+            ExcurrentNumber = 0;
+            
+            [bofangVC shareInstance].newsModel.ImgStrjiemu = newArr[_curPage][@"post_list"][@"smeta"];
+            [bofangVC shareInstance].newsModel.ZhengWenjiemu = newArr[_curPage][@"post_list"][@"post_excerpt"];
+            [bofangVC shareInstance].newsModel.praisenum = newArr[_curPage][@"post_list"][@"praisenum"];
+            [bofangVC shareInstance].newsModel.url = newArr[_curPage][@"post_list"][@"url"];
+            [bofangVC shareInstance].newsModel.post_keywords = newArr[_curPage][@"post_list"][@"post_keywords"];
+            [bofangVC shareInstance].newsModel.url = newArr[_curPage][@"post_list"][@"url"];
+            [bofangVC shareInstance].iszhuboxiangqing = NO;
+            [[bofangVC shareInstance].tableView reloadData];
+            
+            [Explayer replaceCurrentItemWithPlayerItem:[[AVPlayerItem alloc]initWithURL:[NSURL URLWithString:newArr[_curPage][@"post_list"][@"post_mp"]]]];
+            ExisRigester = YES;
+            ExIsKaiShiBoFang = YES;
+            ExwhichBoFangYeMianStr = @"shouyebofang";
+            [bofangVC shareInstance].hidesBottomBarWhenPushed = YES;
+            [nav.navigationBar setHidden:YES];
+            [nav pushViewController:[bofangVC shareInstance ] animated:YES];
+            [bofangVC shareInstance].hidesBottomBarWhenPushed = NO;
+            [[NSNotificationCenter defaultCenter] postNotificationName:@"yuanpanzhuan" object:nil];
+            [[NSNotificationCenter defaultCenter] postNotificationName:@"qiehuanxinwen" object:nil];
+            [CommonCode writeToUserD:newArr[_curPage][@"post_list"][@"id"] andKey:@"dangqianbofangxinwenID"];
+        }
+        
+    }else if ([newArr[_curPage][@"cate"] intValue] == 2) {//当前为URL，打开手机系统浏览器
+        NSString *URLString = newArr[_curPage][@"url"];
+        //调用系统浏览器
+        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:URLString]];
+    }else if ([newArr[_curPage][@"cate"] intValue] == 3) {//当前为课堂，跳转课堂界面
+        
+        id object = [self nextResponder];
+        while (![object isKindOfClass:[UIViewController class]] &&
+               object != nil) {
+            object = [object nextResponder];
+        }
+        HomePageViewController *homePageVC = (HomePageViewController *)object;
+        UINavigationController *nav = homePageVC.navigationController;
+        ClassViewController *classVC = [ClassViewController new];
+        classVC.act_id = newArr[_curPage][@"url"];
+        classVC.hidesBottomBarWhenPushed = YES;
+        [nav.navigationBar setHidden:YES];
+        [nav pushViewController:classVC animated:YES];
+        classVC.hidesBottomBarWhenPushed = NO;
+    }
+//    [[NSNotificationCenter defaultCenter] postNotificationName:@"lunboxiangqingVCAction" object:chuanchuquArr];
 }
 - (void)dealloc
 {
