@@ -21,17 +21,19 @@
 
 @interface ClassViewController ()<UITableViewDelegate,UITableViewDataSource,UITextViewDelegate,TTTAttributedLabelDelegate>{
     UIView *xiangqingView;
-    UITextView *zhengwenTextView;
     UILabel *PingLundianzanNumLab;
     NSInteger playIndex;
     NSString *currentClassID;
+    UITextView *zhengwenTextView;
 }
 
 @property (nonatomic, strong) UITableView *helpTableView;
 @property (nonatomic, strong) NSMutableArray *buttons;
 @property (nonatomic, strong) NSMutableArray *dataSourceArr;
 @property (nonatomic, strong) NSMutableArray *pinglunArr;
-@property (nonatomic, strong) NSMutableDictionary *auditionResult;
+//@property (nonatomic, strong) NSMutableDictionary *auditionResult;
+@property (strong, nonatomic) ClassModel *classModel;
+@property (strong, nonatomic) NSMutableArray *frameArray;
 @property (nonatomic, strong) UILabel *label;
 @property (strong, nonatomic) UIView *topView;
 @property (strong, nonatomic) UIButton *leftBtn;
@@ -61,8 +63,6 @@
     }else{
         playIndex = 0;
     }
-    //接收播放完毕后发出的通知
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(voicePlayEnd:) name:AVPlayerItemDidPlayToEndTimeNotification object:Explayer.currentItem];
     [self setUpData];
     [self setUpView];
 }
@@ -82,7 +82,6 @@
 - (void)setUpData{
     _pinglunArr = [NSMutableArray new];
     _dataSourceArr = [NSMutableArray new];
-    _auditionResult = [NSMutableDictionary new];
     _ImageSizeArr = [NSMutableArray new];
     [self loadData];
     
@@ -99,9 +98,9 @@
     [self.session setActive:YES error:&error];
     //添加观察者，用来监视播放器的状态变化
 //    [Explayer addObserver:self forKeyPath:@"statu" options:NSKeyValueObservingOptionNew context:nil];
-    //播放完毕后发出通知
-//    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(voicePlayEnd:) name:AVPlayerItemDidPlayToEndTimeNotification object:Explayer.currentItem];
-     
+    //接收播放完毕后发出的通知
+    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(voicePlayEnd:) name:AVPlayerItemDidPlayToEndTimeNotification object:Explayer.currentItem];
+    
 }
 
 - (void)setUpView{
@@ -151,9 +150,10 @@
     [NetWorkTool getAuditionListWithaccessToken:accessToken act_id:self.act_id sccess:^(NSDictionary *responseObject) {
         if ([responseObject[@"status"] integerValue] == 1) {
             ExisRigester = NO;
-            self.auditionResult = [responseObject[@"results"] mutableCopy];
-            self.pinglunArr = [responseObject[@"results"][@"comments"] mutableCopy];
-            [self handleResultData];
+            self.classModel = [ClassModel mj_objectWithKeyValues:responseObject[@"results"]];
+            self.frameArray = [self frameArrayWithClassModel:self.classModel];
+            self.pinglunArr = [self pinglunFrameModelArrayWithModelArray:[PlayVCCommentModel mj_objectArrayWithKeyValuesArray:responseObject[@"results"][@"comments"]]];
+            [self setTableHeadView];
             [self.helpTableView reloadData];
             
             NSString *textStr = [NSString stringWithFormat:@"￥%@ ",responseObject[@"results"][@"sprice"]];
@@ -169,7 +169,43 @@
         [weakSelf loadData];
     }];
 }
-
+/*
+ * 设置frameArray数组
+ */
+- (NSMutableArray *)frameArrayWithClassModel:(ClassModel *)classModel
+{
+    NSMutableArray *array = [NSMutableArray array];
+    //课堂内容frame
+    ClassContentCellFrameModel *contentFrameModel = [ClassContentCellFrameModel new];
+    contentFrameModel.excerpt = classModel.excerpt;
+    [array addObject:contentFrameModel];
+    //课堂图片frame
+    for (int i = 0; i<classModel.imagesArray.count; i++) {
+        ClassImageViewCellFrameModel *imageFrameModel = [ClassImageViewCellFrameModel new];
+        imageFrameModel.downLoadImageSuccess = ^(UIImage *image) {
+            //刷新对应行的cell
+            [self.helpTableView reloadRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:1 + i inSection:0]] withRowAnimation:UITableViewRowAnimationNone];
+        };
+        imageFrameModel.imageUrl = classModel.imagesArray[i];
+        [array addObject:imageFrameModel];
+    }
+    //试听列表frame
+    ClassAuditionCellFrameModel *auditionFrameModel = [ClassAuditionCellFrameModel new];
+    auditionFrameModel.auditionArray = classModel.shiting;
+    [array addObject:auditionFrameModel];
+    
+    return array;
+}
+- (NSMutableArray *)pinglunFrameModelArrayWithModelArray:(NSArray *)array
+{
+    NSMutableArray *frameArray = [NSMutableArray array];
+    for (PlayVCCommentModel *model in array) {
+        PlayVCCommentFrameModel *frameModel = [[PlayVCCommentFrameModel alloc] init];
+        frameModel.model = model;
+        [frameArray addObject:frameModel];
+    }
+    return frameArray;
+}
 - (void)back {
 //    [Explayer pause];
     [self.navigationController popViewControllerAnimated:YES];
@@ -193,35 +229,6 @@
     return ceil(rect.size.height);
 }
 
-- (void)handleResultData{
-    //缓存图片的高度
-    NSMutableArray *urls = [NSMutableArray new];
-    if (![self.auditionResult[@"images"] isEqualToString:@""]){
-        NSArray *array = [self.auditionResult[@"images"] componentsSeparatedByString:@","];
-        for (int i = 0 ; i < array.count ; i ++ ) {
-            [urls addObject:[NSURL URLWithString:array[i]]];
-        }
-    }
-    NSArray *photos = urls;
-    _ImageSizeArr = [NSMutableArray new];
-    for (int i = 0; i < [photos count]; i ++) {
-        NSString *pat = [NSString stringWithFormat:@"%@", photos[i]];
-        NSURL *url = URL(pat);
-        [[SDWebImageDownloader sharedDownloader]downloadImageWithURL:url options:SDWebImageDownloaderUseNSURLCache progress:^(NSInteger receivedSize, NSInteger expectedSize) {
-        } completed:^(UIImage *image, NSData *data, NSError *error, BOOL finished) {
-            //这边就能拿到图片了
-            NSDictionary *dic = @{@"width":@(image.size.width),@"height":@(image.size.height)};
-            RTLog(@"width:%f------height:%f",image.size.width,image.size.height);
-            [_ImageSizeArr addObject:dic];
-            if (i == ([photos count] -1)) {
-//                [self.helpTableView reloadData];
-                //                [self performSelector:@selector(reloadData) withObject:nil afterDelay:1.0];
-                [self setTableHeadView];
-            }
-        }];
-    }
-}
-
 - (void)setTableHeadView{
     xiangqingView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, IPHONE_W, IPHONE_H)];
     xiangqingView.backgroundColor = [UIColor whiteColor];
@@ -236,15 +243,15 @@
     zhengwenImg.layer.mask = maskLayer;
     
     //生成图片
-    if ([NEWSSEMTPHOTOURL(self.auditionResult[@"smeta"]) rangeOfString:@"userDownLoadPathImage"].location != NSNotFound) {
-        [zhengwenImg sd_setImageWithURL:[NSURL fileURLWithPath:NEWSSEMTPHOTOURL(self.auditionResult[@"smeta"])] placeholderImage:[UIImage imageNamed:@"thumbnailsdefault"]];
+    if ([NEWSSEMTPHOTOURL(self.classModel.smeta) rangeOfString:@"userDownLoadPathImage"].location != NSNotFound) {
+        [zhengwenImg sd_setImageWithURL:[NSURL fileURLWithPath:NEWSSEMTPHOTOURL(self.classModel.smeta)] placeholderImage:[UIImage imageNamed:@"thumbnailsdefault"]];
     }
-    else if ([NEWSSEMTPHOTOURL(self.auditionResult[@"smeta"])  rangeOfString:@"http"].location != NSNotFound)
+    else if ([NEWSSEMTPHOTOURL(self.classModel.smeta)  rangeOfString:@"http"].location != NSNotFound)
     {
-        [zhengwenImg sd_setImageWithURL:[NSURL URLWithString:NEWSSEMTPHOTOURL(self.auditionResult[@"smeta"])] placeholderImage:[UIImage imageNamed:@"thumbnailsdefault"]];
+        [zhengwenImg sd_setImageWithURL:[NSURL URLWithString:NEWSSEMTPHOTOURL(self.classModel.smeta)] placeholderImage:[UIImage imageNamed:@"thumbnailsdefault"]];
     }
     else{
-        NSString *str = USERPHOTOHTTPSTRINGZhuBo(NEWSSEMTPHOTOURL(self.auditionResult[@"smeta"]));
+        NSString *str = USERPHOTOHTTPSTRINGZhuBo(NEWSSEMTPHOTOURL(self.classModel.smeta));
         [zhengwenImg sd_setImageWithURL:[NSURL URLWithString:str] placeholderImage:[UIImage imageNamed:@"thumbnailsdefault"]];
     }
     
@@ -257,11 +264,11 @@
     
     //标题
     UILabel *titleLab = [[UILabel alloc]initWithFrame:CGRectMake(20.0 / 375 * IPHONE_W,CGRectGetMaxY(zhengwenImg.frame) + 20.0 / 667 * SCREEN_HEIGHT, IPHONE_W - 40.0 / 375 * IPHONE_W, 40.0 / 667 * IPHONE_H)];
-    titleLab.text = self.auditionResult[@"title"];
+    titleLab.text = self.classModel.title;
     titleLab.textAlignment = NSTextAlignmentCenter;
     titleLab.textColor = nTextColorMain;
     titleLab.font = [UIFont fontWithName:@"Semibold" size:19];
-    CGFloat titleHight = [self computeTextHeightWithString:self.auditionResult[@"title"] andWidth:(SCREEN_WIDTH-20) andFontSize:gFontMain14];
+    CGFloat titleHight = [self computeTextHeightWithString:self.classModel.title andWidth:(SCREEN_WIDTH-20) andFontSize:gFontMain14];
     [titleLab setFrame:CGRectMake(20.0 / 375 * IPHONE_W, CGRectGetMaxY(zhengwenImg.frame) + 20.0 / 667 * SCREEN_HEIGHT, IPHONE_W - 40.0 / 375 * IPHONE_W, (titleHight + 20) / 667 * IPHONE_H)];
     [titleLab setNumberOfLines:0];
     titleLab.lineBreakMode = NSLineBreakByWordWrapping;
@@ -271,134 +278,19 @@
     UIView *seperatorLine = [[UIView alloc]initWithFrame:CGRectMake(20.0 / 375 * SCREEN_WIDTH, CGRectGetMaxY(titleLab.frame) +  12.0 / 667 * SCREEN_HEIGHT, SCREEN_WIDTH - 40.0 / 375 * SCREEN_WIDTH, 1.0)];
     [seperatorLine setBackgroundColor:gThickLineColor];
     [xiangqingView addSubview:seperatorLine];
-    dispatch_async(dispatch_get_main_queue(), ^{
-        //新闻内容
-        zhengwenTextView = [[UITextView alloc]initWithFrame:CGRectMake(20.0 / 375 * IPHONE_W, CGRectGetMaxY(seperatorLine.frame) + 24.0 / 667 * IPHONE_H, IPHONE_W - 40.0 / 375 * IPHONE_W, 50.0 / 667 * IPHONE_H)];
-        zhengwenTextView.scrollEnabled = NO;
-        zhengwenTextView.editable = NO;
-        zhengwenTextView.scrollsToTop = NO;
-        zhengwenTextView.delegate = self;
-        NSString *str1 = [self.auditionResult[@"excerpt"] stringByReplacingOccurrencesOfString:@"\r" withString:@""];
-        zhengwenTextView.text = str1;
-        zhengwenTextView.font = gFontMain14;
-        NSMutableParagraphStyle *paragraphStyle = [[NSMutableParagraphStyle alloc]init];
-        [paragraphStyle setLineSpacing:8.0];
-        [paragraphStyle setAlignment:NSTextAlignmentLeft];
-        [paragraphStyle setFirstLineHeadIndent:5.0];
-        [paragraphStyle setLineBreakMode:NSLineBreakByCharWrapping];
-        [zhengwenTextView sizeToFit];
-        if (zhengwenTextView.text.length != 0){
-            NSMutableAttributedString *attributedString =  [[NSMutableAttributedString alloc] initWithString:zhengwenTextView.text attributes:@{NSForegroundColorAttributeName : gTextDownload,NSFontAttributeName : gFontMain14}];
-            [attributedString addAttribute:NSParagraphStyleAttributeName value:paragraphStyle range:NSMakeRange(0, zhengwenTextView.text.length)];
-            zhengwenTextView.attributedText = attributedString;
-        }
-        CGSize size2 = [zhengwenTextView sizeThatFits:CGSizeMake(zhengwenTextView.frame.size.width, MAXFLOAT)];
-        zhengwenTextView.frame = CGRectMake(zhengwenTextView.frame.origin.x, zhengwenTextView.frame.origin.y, zhengwenTextView.frame.size.width, size2.height);
-        [xiangqingView addSubview:zhengwenTextView];
-        
-        //images
-        CGFloat imageContentHeight = 0;
-        NSMutableArray *urls = [NSMutableArray new];
-        if (![self.auditionResult[@"images"] isEqualToString:@""]){
-            NSArray *array = [self.auditionResult[@"images"] componentsSeparatedByString:@","];
-            for (int i = 0 ; i < array.count ; i ++ ) {
-                [urls addObject:[NSURL URLWithString:array[i]]];
-            }
-        }
-        NSArray *photos = urls;
-        CGFloat IMAGEWIDTH = zhengwenTextView.frame.size.width;
-        if ([_ImageSizeArr count]) {
-            if ([photos count]) {
-                for (int i = 0; i < [_ImageSizeArr count]; i ++) {
-                    CGFloat imageHeight = ([_ImageSizeArr[i][@"width"] floatValue] / IMAGEWIDTH ) * ([_ImageSizeArr[i][@"height"] floatValue]);
-                    RTLog(@"imageHeight:%f-----IMAGEWIDTH:%f-------height:%f-------width:%f",imageHeight,IMAGEWIDTH,[_ImageSizeArr[i][@"height"] floatValue],[_ImageSizeArr[i][@"width"] floatValue]);
-                    UIImageView *image = [UIImageView new];
-                    image.backgroundColor = [UIColor redColor];
-                    [image setFrame:CGRectMake(zhengwenTextView.frame.origin.x, CGRectGetMaxY(zhengwenTextView.frame) + (imageContentHeight + 5) + 5.0 *667.0 / SCREEN_HEIGHT , IMAGEWIDTH, imageHeight)];
-                    imageContentHeight += imageHeight;
-                    image.contentMode = UIViewContentModeScaleAspectFit;
-                    image.clipsToBounds = YES;
-                    [image sd_setImageWithURL:photos[i] placeholderImage:[UIImage imageNamed:@"thumbnailsdefault"]];
-                    [image addTapGesWithTarget:self action:@selector(showZoomImageView:)];
-                    [xiangqingView addSubview:image];
-                }
-            }
-        }
-        else{
-            if ([photos count]) {
-                CGFloat imageHeight = 200.0;
-                imageContentHeight = imageHeight * [photos count];
-                for (int i = 0; i < [photos count]; i ++) {
-                    UIImageView *image = [UIImageView new];
-                    [image setFrame:CGRectMake(zhengwenTextView.frame.origin.x, CGRectGetMaxY(zhengwenTextView.frame) +  i * (imageHeight + 5) + 5.0 *667.0 / SCREEN_HEIGHT , IMAGEWIDTH, imageHeight)];
-                    image.contentMode = UIViewContentModeScaleAspectFit;
-                    image.clipsToBounds = YES;
-                    [image sd_setImageWithURL:photos[i] placeholderImage:[UIImage imageNamed:@"thumbnailsdefault"]];
-                    [xiangqingView addSubview:image];
-                }
-            }
-        }
-        
-        //免费试听
-        UILabel *auditionLabel = [[UILabel alloc]initWithFrame:CGRectMake(zhengwenTextView.frame.origin.x,CGRectGetMaxY(zhengwenTextView.frame) + imageContentHeight + 15.0 / 667 * IPHONE_H,zhengwenTextView.frame.size.width, 30)];
-        [auditionLabel setText:@"免费试听"];
-        [auditionLabel setTextColor:nTextColorMain];
-        [auditionLabel setTextAlignment:NSTextAlignmentLeft];
-        [xiangqingView addSubview:auditionLabel];
-        UIView *topLine = [[UIView alloc]initWithFrame:CGRectMake(0, CGRectGetMaxY(auditionLabel.frame), IPHONE_W, 1)];
-        topLine.backgroundColor = [UIColor lightGrayColor];
-        topLine.alpha = 0.5f;
-        [xiangqingView addSubview:topLine];
-        
-        if ([self.buttons count]) {
-            [self.buttons removeAllObjects];
-        }
-        CGFloat ShitingContentHeight = 0;
-        if ([self.auditionResult[@"shiting"] count]) {
-            for (int i= 0 ; i < [self.auditionResult[@"shiting"] count]; i++) {
-                //试听标题
-                UILabel *titleLab = [[UILabel alloc]initWithFrame:CGRectMake(20.0 / 375 * IPHONE_W,CGRectGetMaxY(topLine.frame) + ShitingContentHeight + 20.0 / 667 * SCREEN_HEIGHT, IPHONE_W - 70.0 / 375 * IPHONE_W, 40.0 / 667 * IPHONE_H)];
-                titleLab.text = self.auditionResult[@"shiting"][i][@"s_title"];
-                titleLab.textAlignment = NSTextAlignmentLeft;
-                titleLab.textColor = nTextColorMain;
-                //  titleLab.font = [UIFont fontWithName:@"Semibold" size:14];
-                titleLab.font = gFontMain14;
-                CGFloat titleHight = [self computeTextHeightWithString:self.self.auditionResult[@"shiting"][i][@"s_title"] andWidth:(SCREEN_WIDTH- 60.0 / 375 * IPHONE_W) andFontSize:gFontMain14];
-                [titleLab setFrame:CGRectMake(20.0 / 375 * IPHONE_W, CGRectGetMaxY(topLine.frame) + ShitingContentHeight + 10.0 / 667 * SCREEN_HEIGHT, IPHONE_W - 70.0 / 375 * IPHONE_W, (titleHight + 20) / 667 * IPHONE_H)];
-                [titleLab setNumberOfLines:0];
-                ShitingContentHeight += titleHight + 20.0 / 667 * SCREEN_HEIGHT;
-                titleLab.lineBreakMode = NSLineBreakByWordWrapping;
-                [xiangqingView addSubview:titleLab];
-                
-                UIButton *playTestMp = [UIButton buttonWithType:UIButtonTypeCustom];
-                [playTestMp setFrame:CGRectMake(SCREEN_WIDTH - 50.0 / 375 * SCREEN_WIDTH, titleLab.frame.origin.y, 40, 40)];
-                [playTestMp setImage:[UIImage imageNamed:@"classpause"] forState:UIControlStateNormal];
-                [playTestMp setImage:[UIImage imageNamed:@"classplay"] forState:UIControlStateSelected];
-                playTestMp.tag = i;
-                [self.buttons addObject:playTestMp];
-                [playTestMp addTarget:self action:@selector(playTestMp:) forControlEvents:UIControlEventTouchUpInside];
-                [xiangqingView addSubview:playTestMp];
-            }
-        }
-        //用户评价
-        UILabel *CommentLabel = [[UILabel alloc]initWithFrame:CGRectMake(zhengwenTextView.frame.origin.x, CGRectGetMaxY(topLine.frame) + ShitingContentHeight + 20.0 / 667 * SCREEN_HEIGHT,zhengwenTextView.frame.size.width, 30)];
-        [CommentLabel setText:@"用户评价"];
-        [CommentLabel setTextColor:nTextColorMain];
-        [CommentLabel setTextAlignment:NSTextAlignmentLeft];
-        [xiangqingView addSubview:CommentLabel];
-        UIView *downLine = [[UIView alloc]initWithFrame:CGRectMake(0, CGRectGetMaxY(CommentLabel.frame), IPHONE_W, 1)];
-        downLine.backgroundColor = [UIColor lightGrayColor];
-        downLine.alpha = 0.5f;
-        [xiangqingView addSubview:downLine];
-        
-        UIView *payTopLine = [[UIView alloc]initWithFrame:CGRectMake(0, CGRectGetMaxY(downLine.frame) , IPHONE_W, 5)];
-        payTopLine.backgroundColor = [UIColor colorWithRed:0.95 green:0.96 blue:0.98 alpha:1.00];
-        payTopLine.alpha = 0.5f;
-        [xiangqingView addSubview:payTopLine];
-        xiangqingView.frame = CGRectMake(xiangqingView.frame.origin.x, xiangqingView.frame.origin.y, xiangqingView.frame.size.width, CGRectGetMaxY(payTopLine.frame));
-        self.helpTableView.tableHeaderView = xiangqingView;
-        [self.helpTableView reloadData];
-    });
+    
+    xiangqingView.frame = CGRectMake(xiangqingView.frame.origin.x, xiangqingView.frame.origin.y, xiangqingView.frame.size.width, CGRectGetMaxY(seperatorLine.frame));
+    self.helpTableView.tableHeaderView = xiangqingView;
+    //footer
+    UIButton *moreComment = [UIButton buttonWithType:UIButtonTypeCustom];
+    [moreComment setFrame:CGRectMake(0, 0, SCREEN_WIDTH, 44)];
+    [moreComment setTitle:@"查看更多评价" forState:UIControlStateNormal];
+    [moreComment.titleLabel setFont:gFontMain14];
+    [moreComment setTitleColor:gTextColorSub forState:UIControlStateNormal];
+    [moreComment addTarget:self action:@selector(morecommetAction:) forControlEvents:UIControlEventTouchUpInside];
+    self.helpTableView.tableFooterView = moreComment;
+    
+    [self.helpTableView reloadData];
 }
 
 - (void)reloadData{
@@ -410,36 +302,6 @@
         return;
     }
     [YJImageBrowserView showWithImageView:(UIImageView *)tap.view];
-//    UIScrollView *bgView = [[UIScrollView alloc] init];
-//    bgView.frame = [UIScreen mainScreen].bounds;
-//    bgView.backgroundColor = [UIColor blackColor];
-//    UITapGestureRecognizer *tapBg = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapBgView:)];
-//    [bgView addGestureRecognizer:tapBg];
-//    UIImageView *picView = (UIImageView *)tap.view;
-//    UIImageView *imageView = [[UIImageView alloc] init];
-//    imageView.image = picView.image;
-//    imageView.frame = [bgView convertRect:picView.frame fromView:self.view];
-//    imageView.userInteractionEnabled = YES;
-//    UILongPressGestureRecognizer *longtapImage = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(longtapImage:)];
-//    [imageView addGestureRecognizer:longtapImage];
-//    [bgView addSubview:imageView];
-//    [[[UIApplication sharedApplication] keyWindow] addSubview:bgView];
-//    self.lastImageView = imageView;
-//    self.originalFrame = imageView.frame;
-//    self.scrollView = bgView;
-//    self.scrollView.scrollEnabled = YES;
-//    //最大放大比例
-//    self.scrollView.maximumZoomScale = 2.0f;
-//    self.scrollView.showsHorizontalScrollIndicator = NO;
-//    self.scrollView.showsVerticalScrollIndicator = YES;
-//    [UIView animateWithDuration:0.35 animations:^{
-//        CGRect frame = imageView.frame;
-//        frame.size.width = bgView.frame.size.width;
-//        frame.size.height = frame.size.width * (imageView.image.size.height / imageView.image.size.width);
-//        frame.origin.x = 0;
-//        frame.origin.y = (bgView.frame.size.height - frame.size.height) * 0.5;
-//        imageView.frame = frame;
-//    }];
 }
 
 - (void)longtapImage:(UILongPressGestureRecognizer *)longtapImageReconizer{
@@ -548,7 +410,7 @@
 
 #pragma mark - NSNotification
 - (void)voicePlayEnd:(NSNotification *)notice {
-    if (_playingIndex < [self.auditionResult[@"shiting"] count] - 1) {
+    if (_playingIndex < [self.classModel.shiting count] - 1) {
         UIButton *nextTextMPButton = self.buttons[_playingIndex + 1];
         [self playTestMp:nextTextMPButton];
     }
@@ -617,7 +479,8 @@
         if (Explayer == nil) {
             Explayer = [[AVPlayer alloc]init];
         }
-        [Explayer replaceCurrentItemWithPlayerItem:[[AVPlayerItem alloc]initWithURL:[NSURL URLWithString:[self.auditionResult[@"shiting"] firstObject][@"s_mpurl"]]]];
+        ClassAuditionListModel *auditionModel = [self.classModel.shiting firstObject];
+        [Explayer replaceCurrentItemWithPlayerItem:[[AVPlayerItem alloc]initWithURL:[NSURL URLWithString:auditionModel.s_mpurl]]];
         
         [Explayer play];
         _isPlaying = YES;
@@ -699,7 +562,9 @@
             //添加观察者，用来监听播放器的缓冲进度loadedTimeRanges属性
             //            [Explayer addObserver:self forKeyPath:@"loadedTimeRanges" options:NSKeyValueObservingOptionNew context:nil];
         }
-        [Explayer replaceCurrentItemWithPlayerItem:[[AVPlayerItem alloc]initWithURL:[NSURL URLWithString:self.auditionResult[@"shiting"][sender.tag][@"s_mpurl"]]]];
+        
+        ClassAuditionListModel *auditionModel = self.classModel.shiting[sender.tag];
+        [Explayer replaceCurrentItemWithPlayerItem:[[AVPlayerItem alloc]initWithURL:[NSURL URLWithString:auditionModel.s_mpurl]]];
         [Explayer play];
         _isPlaying = YES;
         _playingIndex = sender.tag;
@@ -751,7 +616,7 @@
 
 -(void)morecommetAction:(UIButton *)sender{
     CommentViewController *vc = [CommentViewController new];
-    vc.act_id = self.auditionResult[@"act_id"];
+    vc.act_id = self.classModel.act_id;
     self.hidesBottomBarWhenPushed = YES;
     [self.navigationController pushViewController:vc animated:YES];
 }
@@ -788,28 +653,14 @@ didSelectLinkWithTransitInformation:(NSDictionary *)components {
 
 #pragma mark - UITableViewDataSource
 
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
-    //    if (! [self.dataSourceArr count]) {
-    //        if (!_label) {
-    //            _label = [[UILabel alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, 20)];
-    //            _label.textAlignment = NSTextAlignmentCenter;
-    //            _label.text = @"暂无数据";
-    //            _label.textColor = [UIColor lightGrayColor];
-    //            _label.center = self.helpTableView.center;
-    //            [self.helpTableView addSubview:_label];
-    //        }else {
-    //            [self.helpTableView addSubview:_label];
-    //        }
-    //    }
-    //    else{
-    //        [_label removeFromSuperview];
-    //    }
-    if ([self.auditionResult[@"comments"] isKindOfClass:[NSArray class]]){
-        if ([self.auditionResult[@"comments"] count] >= 3) {
-            return 4;
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+    if ([self.classModel.comments isKindOfClass:[NSArray class]]){
+        if ([self.classModel.comments count] >= 3) {
+            return 5 + self.classModel.imagesArray.count;
         }
         else{
-            return  [self.auditionResult[@"comments"] count];
+            return  [self.classModel.comments count] + self.classModel.imagesArray.count + 2;
         }
     }
     else{
@@ -818,179 +669,53 @@ didSelectLinkWithTransitInformation:(NSDictionary *)components {
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath{
-    UITableViewCell *cell = (UITableViewCell *)[tableView viewWithTag:indexPath.row + 10];
-    UILabel *lab = (UILabel *)[cell viewWithTag:indexPath.row + 11];
-    if (indexPath.row == 3) {
-        return 44;
-    }
-    else{
-        return CGRectGetMaxY(lab.frame) + 10.0 / 667 * IPHONE_H;
+    if (indexPath.row == 0) {
+        ClassContentCellFrameModel *frameModel = self.frameArray[indexPath.row];
+        return frameModel.cellHeight;
+    }else if(indexPath.row > 0 && indexPath.row <= self.classModel.imagesArray.count){
+        ClassImageViewCellFrameModel *frameModel = self.frameArray[indexPath.row];
+        return frameModel.cellHeight;
+    }else if(indexPath.row > self.classModel.imagesArray.count && (indexPath.row <= self.classModel.imagesArray.count + 1)){
+        ClassAuditionCellFrameModel *frameModel = self.frameArray[indexPath.row];
+        return frameModel.cellHeight;
+    }else{
+        PlayVCCommentFrameModel *frameModel = self.pinglunArr[indexPath.row - 2 - self.classModel.imagesArray.count];
+        return frameModel.cellHeight;
     }
 }
-
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView{
-    return 1;
-}
-
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
-    static NSString *pinglunIdentify = @"pinglunIdentify";
-    UITableViewCell *cell = [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:pinglunIdentify];
-    if (!cell){
-        cell = [tableView dequeueReusableCellWithIdentifier:pinglunIdentify];
-    }
-    
-    if (indexPath.row == 3) {
-        UIButton *moreComment = [UIButton buttonWithType:UIButtonTypeCustom];
-        [moreComment setFrame:CGRectMake(0, 0, SCREEN_WIDTH, 44)];
-        [moreComment setTitle:@"查看更多评价" forState:UIControlStateNormal];
-        [moreComment.titleLabel setFont:gFontMain14];
-        [moreComment setTitleColor:gTextColorSub forState:UIControlStateNormal];
-        [moreComment addTarget:self action:@selector(morecommetAction:) forControlEvents:UIControlEventTouchUpInside];
-        [cell.contentView addSubview:moreComment];
-    }
-    else{
-        //头像
-        UIImageView *pinglunImg = [[UIImageView alloc]initWithFrame:CGRectMake(20.0 / 375 * IPHONE_W, 8.0 / 667 * IPHONE_H, 50.0 / 667 * IPHONE_H, 50.0 / 667 * IPHONE_H)];
-        if ([self.pinglunArr[indexPath.row][@"avatar"]  rangeOfString:@"http"].location != NSNotFound){
-            [pinglunImg sd_setImageWithURL:[NSURL URLWithString:self.pinglunArr[indexPath.row][@"avatar"]] placeholderImage:[UIImage imageNamed:@"right-1"]];
-        }
-        else{
-            [pinglunImg sd_setImageWithURL:[NSURL URLWithString:USERPHOTOHTTPSTRING(self.pinglunArr[indexPath.row][@"avatar"])] placeholderImage:[UIImage imageNamed:@"right-1"]];
-        }
-        pinglunImg.userInteractionEnabled = YES;
-        pinglunImg.tag = 1000 + indexPath.row;
-        UITapGestureRecognizer *TapG = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(clickPinglunImgHead:)];
-        [pinglunImg addGestureRecognizer:TapG];
-        pinglunImg.contentMode = UIViewContentModeScaleAspectFill;
-        pinglunImg.layer.masksToBounds = YES;
-        pinglunImg.layer.cornerRadius = 25.0 / 667 * IPHONE_H;
-        [cell.contentView addSubview:pinglunImg];
-        //
-        UILabel *pinglunTitle = [[UILabel alloc]initWithFrame:CGRectMake(CGRectGetMaxX(pinglunImg.frame) + 8.0 / 375 * IPHONE_W, 10.0 / 667 * IPHONE_H, 200.0 / 375 * IPHONE_W, 20.0 / 667 * IPHONE_H)];
-        pinglunTitle.text = self.pinglunArr[indexPath.row][@"full_name"];
-        pinglunTitle.textAlignment = NSTextAlignmentLeft;
-        pinglunTitle.textColor = [UIColor blackColor];
-        pinglunTitle.font = [UIFont systemFontOfSize:16.0f];
-        [cell.contentView addSubview:pinglunTitle];
-        //时间
-        UILabel *pinglunshijian = [[UILabel alloc]initWithFrame:CGRectMake(CGRectGetMaxX(pinglunImg.frame) + 8.0 / 375 * IPHONE_W, CGRectGetMaxY(pinglunTitle.frame) + 5.0 / 667 * IPHONE_H, 200.0 / 375 * IPHONE_W, 20.0 / 667 * IPHONE_H)];
-        pinglunshijian.text = self.pinglunArr[indexPath.row][@"createtime"];
-        pinglunshijian.textAlignment = NSTextAlignmentLeft;
-        pinglunshijian.textColor = [UIColor grayColor];
-        pinglunshijian.font = [UIFont systemFontOfSize:13.0f];
-        [cell.contentView addSubview:pinglunshijian];
-        //评论
-        TTTAttributedLabel *pinglunLab = [[TTTAttributedLabel alloc]initWithFrame:CGRectMake(CGRectGetMaxX(pinglunImg.frame) - 3.0 / 375 * IPHONE_W, CGRectGetMaxY(pinglunshijian.frame) + 10.0 / 667 * IPHONE_H, IPHONE_W - 80.0 / 375 * IPHONE_W, 20.0 / 667 * IPHONE_H)];
-        pinglunLab.text = self.pinglunArr[indexPath.row][@"content"];
-        pinglunLab.textColor = [UIColor blackColor];
-        pinglunLab.font = [UIFont systemFontOfSize:16.0f];
-        pinglunLab.textAlignment = NSTextAlignmentLeft;
-        pinglunLab.tag = indexPath.row + 11;
-        pinglunLab.numberOfLines = 0;
-        pinglunLab.lineSpacing = 5;
-        pinglunLab.fd_collapsed = NO;
-        pinglunLab.lineBreakMode = NSLineBreakByWordWrapping;
-        if ([self.pinglunArr[indexPath.row][@"content"] rangeOfString:@"[e1]"].location != NSNotFound && [self.pinglunArr[indexPath.row][@"content"] rangeOfString:@"[/e1]"].location != NSNotFound){
-            if ([self.pinglunArr[indexPath.row][@"to_user_login"] length]) {
-                pinglunLab.text = [NSString stringWithFormat:@"回复@%@:%@",[self.pinglunArr[indexPath.row][@"to_user_nicename"] length] ? self.pinglunArr[indexPath.row][@"to_user_nicename"]:self.pinglunArr[indexPath.row][@"to_user_login"],[CommonCode jiemiEmoji:self.pinglunArr[indexPath.row][@"content"]]];
-                NSMutableDictionary *to_user = [NSMutableDictionary new];
-                [to_user setValue:self.pinglunArr[indexPath.row][@"to_user_nicename"] forKey:@"user_nicename"];
-                [to_user setValue:self.pinglunArr[indexPath.row][@"to_sex"] forKey:@"sex"];
-                [to_user setValue:self.pinglunArr[indexPath.row][@"to_signature"] forKey:@"signature"];
-                [to_user setValue:self.pinglunArr[indexPath.row][@"to_user_login"] forKey:@"user_login"];
-                [to_user setValue:self.pinglunArr[indexPath.row][@"to_avatar"] forKey:@"avatar"];
-                //        [to_user setValue:liuyanArr[indexPath.row][@"to_user_nicename"] forKey:@"fan_num"];
-                //        [to_user setValue:liuyanArr[indexPath.row][@"to_user_nicename"] forKey:@"guan_num"];
-                [to_user setValue:self.pinglunArr[indexPath.row][@"to_uid"] forKey:@"id"];
-                NSRange nameRange = NSMakeRange(2, [self.pinglunArr[indexPath.row][@"to_user_nicename"] length] ? [self.pinglunArr[indexPath.row][@"to_user_nicename"] length] + 1 : [self.pinglunArr[indexPath.row][@"to_user_login"] length] + 1);
-                [pinglunLab setLinkAttributes:@{NSForegroundColorAttributeName : gMainColor,NSFontAttributeName :gFontMajor16}];
-                [pinglunLab setActiveLinkAttributes:@{NSForegroundColorAttributeName : gMainColor,NSFontAttributeName :gFontMajor16}];
-                [pinglunLab addLinkToTransitInformation:to_user withRange:nameRange];
-                [pinglunLab setDelegate:self];
-                
-            }
-            else{
-                pinglunLab.text = [CommonCode jiemiEmoji:self.pinglunArr[indexPath.row][@"content"]];
-            }
-        }
-        else{
-            if ([self.pinglunArr[indexPath.row][@"to_user_login"] length]) {
-                pinglunLab.text = [NSString stringWithFormat:@"回复@%@:%@",[self.pinglunArr[indexPath.row][@"to_user_nicename"] length] ? self.pinglunArr[indexPath.row][@"to_user_nicename"]:self.pinglunArr[indexPath.row][@"to_user_login"],self.pinglunArr[indexPath.row][@"content"]];
-                NSMutableDictionary *to_user = [NSMutableDictionary new];
-                [to_user setValue:self.pinglunArr[indexPath.row][@"to_user_nicename"] forKey:@"user_nicename"];
-                [to_user setValue:self.pinglunArr[indexPath.row][@"to_sex"] forKey:@"sex"];
-                [to_user setValue:self.pinglunArr[indexPath.row][@"to_signature"] forKey:@"signature"];
-                [to_user setValue:self.pinglunArr[indexPath.row][@"to_user_login"] forKey:@"user_login"];
-                [to_user setValue:self.pinglunArr[indexPath.row][@"to_avatar"] forKey:@"avatar"];
-                //        [to_user setValue:liuyanArr[indexPath.row][@"to_user_nicename"] forKey:@"fan_num"];
-                //        [to_user setValue:liuyanArr[indexPath.row][@"to_user_nicename"] forKey:@"guan_num"];
-                [to_user setValue:self.pinglunArr[indexPath.row][@"to_uid"] forKey:@"id"];
-                NSRange nameRange = NSMakeRange(2,  [self.pinglunArr[indexPath.row][@"to_user_nicename"] length] ? [self.pinglunArr[indexPath.row][@"to_user_nicename"] length] + 1 : [self.pinglunArr[indexPath.row][@"to_user_login"] length] + 1);
-                [pinglunLab setLinkAttributes:@{NSForegroundColorAttributeName : gMainColor,NSFontAttributeName :gFontMajor16}];
-                [pinglunLab setActiveLinkAttributes:@{NSForegroundColorAttributeName : gMainColor,NSFontAttributeName :gFontMajor16}];
-                [pinglunLab addLinkToTransitInformation:to_user withRange:nameRange];
-                [pinglunLab setDelegate:self];
-            }
-            else{
-                pinglunLab.text = self.pinglunArr[indexPath.row][@"content"];
-            }
-        }
-        //获取tttLabel的高度
-        //先通过NSMutableAttributedString设置和上面tttLabel一样的属性,例如行间距,字体
-        NSMutableAttributedString *attrString = [[NSMutableAttributedString alloc] initWithString:pinglunLab.text];
-        //自定义str和TTTAttributedLabel一样的行间距
-        NSMutableParagraphStyle *paragrapStyle = [[NSMutableParagraphStyle alloc] init];
-        [paragrapStyle setLineSpacing:5];
-        //设置行间距
-        [attrString addAttribute:NSParagraphStyleAttributeName value:paragrapStyle range:NSMakeRange(0, [pinglunLab.text length])];
-        //设置字体
-        [attrString addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:16] range:NSMakeRange(0, [pinglunLab.text length])];
-        
-        //得到自定义行间距的UILabel的高度
-        //CGSizeMake(300,MAXFLOAt)中的300,代表是UILable控件的宽度,它和初始化TTTAttributedLabel的宽度是一样的.
-        CGFloat height = [TTTAttributedLabel sizeThatFitsAttributedString:attrString withConstraints:CGSizeMake(pinglunLab.frame.size.width, MAXFLOAT) limitedToNumberOfLines:0].height;
-        //重新改变tttLabel的frame高度
-        CGRect rect = pinglunLab.frame;
-        rect.size.height = height + 10 ;
-        pinglunLab.frame = rect;
-        [cell.contentView addSubview:pinglunLab];
-        
-        cell.tag = indexPath.row + 10;
+    if (indexPath.row == 0) {
+        ClassContentTableViewCell *cell = [ClassContentTableViewCell cellWithTableView:tableView];
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
-        UIButton *PingLundianzanBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-        PingLundianzanBtn.frame = CGRectMake(IPHONE_W - 60.0 / 375 * IPHONE_W, 20.0 / 667 * IPHONE_H, 20.0 / 375 * IPHONE_W, 20.0 / 667 * IPHONE_H);
-        [cell.contentView addSubview:PingLundianzanBtn];
-        [PingLundianzanBtn addTarget:self action:@selector(pinglundianzanAction:) forControlEvents:UIControlEventTouchUpInside];
-        
-        PingLundianzanNumLab = [[UILabel alloc]initWithFrame:CGRectMake(CGRectGetMaxX(PingLundianzanBtn.frame) + 8.0 / 375 * IPHONE_W, PingLundianzanBtn.frame.origin.y + 1.0 / 667 * IPHONE_H, 20.0 / 375 * IPHONE_W, 20.0 / 667 * IPHONE_H)];
-        PingLundianzanNumLab.text = self.pinglunArr[indexPath.row][@"praisenum"];
-        
-        PingLundianzanNumLab.textAlignment = NSTextAlignmentCenter;
-        PingLundianzanNumLab.font = [UIFont systemFontOfSize:16.0f / 375 * IPHONE_W];
-        PingLundianzanNumLab.tag = indexPath.row + 2000;
-        [cell.contentView addSubview:PingLundianzanNumLab];
-        
-        if ([[NSString stringWithFormat:@"%@",self.pinglunArr[indexPath.row][@"praiseFlag"]] isEqualToString:@"1"]){
-            [PingLundianzanBtn setBackgroundImage:[UIImage imageNamed:@"pinglun-10"] forState:UIControlStateNormal];
-            PingLundianzanBtn.selected = NO;
-            PingLundianzanNumLab.textColor = [UIColor grayColor];
-            PingLundianzanNumLab.alpha = 0.7f;
-        }
-        else if([[NSString stringWithFormat:@"%@",self.pinglunArr[indexPath.row][@"praiseFlag"]] isEqualToString:@"2"]){
-            [PingLundianzanBtn setBackgroundImage:[UIImage imageNamed:@"pinglun-yizan"] forState:UIControlStateNormal];
-            PingLundianzanBtn.selected = YES;
-            PingLundianzanNumLab.textColor = ColorWithRGBA(0, 159, 240, 1);
-            PingLundianzanNumLab.alpha = 1.0f;
-        }
-        else {
-            [PingLundianzanBtn setBackgroundImage:[UIImage imageNamed:@"pinglun-10"] forState:UIControlStateNormal];
-            PingLundianzanBtn.selected = NO;
-            PingLundianzanNumLab.textColor = [UIColor grayColor];
-            PingLundianzanNumLab.alpha = 0.7f;
-        }
-
-    }
+        cell.frameModel = self.frameArray[indexPath.row];
         return cell;
+    }else if(indexPath.row > 0 && indexPath.row <= self.classModel.imagesArray.count){
+        ClassImageViewTableViewCell *cell = [ClassImageViewTableViewCell cellWithTableView:tableView];
+        cell.selectionStyle = UITableViewCellSelectionStyleNone;
+        cell.frameModel = self.frameArray[indexPath.row];
+        cell.tapImage = ^(UITapGestureRecognizer *tap) {
+            [self showZoomImageView:tap];
+        };
+        return cell;
+    }else if(indexPath.row > self.classModel.imagesArray.count && (indexPath.row <= self.classModel.imagesArray.count + 1)){
+        ClassAuditionTableViewCell *cell = [ClassAuditionTableViewCell cellWithTableView:tableView];
+        cell.selectionStyle = UITableViewCellSelectionStyleNone;
+        cell.frameModel = self.frameArray[indexPath.row];
+        self.buttons = cell.buttons;
+        MJWeakSelf
+        cell.playAudition = ^(UIButton *button, NSMutableArray *buttons) {
+            //点击试听列表按钮
+            [weakSelf playTestMp:button];
+        };
+        return cell;
+    }else{
+        PlayVCCommentTableViewCell *cell = [PlayVCCommentTableViewCell cellWithTableView:tableView];
+        cell.selectionStyle = UITableViewCellSelectionStyleNone;
+        PlayVCCommentFrameModel *frameModel = self.pinglunArr[indexPath.row - 2 - self.classModel.imagesArray.count];
+        cell.selectionStyle = UITableViewCellSelectionStyleNone;
+        cell.frameModel = frameModel;
+        return cell;
+    }
 }
 
 #pragma mark - UIScrollViewDelegate
@@ -1011,6 +736,7 @@ didSelectLinkWithTransitInformation:(NSDictionary *)components {
         _helpTableView = [[UITableView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT - 49) style:UITableViewStylePlain];
         [_helpTableView setDelegate:self];
         [_helpTableView setDataSource:self];
+        _helpTableView.separatorStyle = UITableViewCellSeparatorStyleNone;
     }
     return _helpTableView;
 }
@@ -1092,7 +818,13 @@ didSelectLinkWithTransitInformation:(NSDictionary *)components {
     }
     return _dataSourceArr;
 }
-
+- (NSMutableArray *)frameArray
+{
+    if (_frameArray == nil) {
+        _frameArray = [NSMutableArray array];
+    }
+    return _frameArray;
+}
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.

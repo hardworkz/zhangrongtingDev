@@ -94,7 +94,7 @@
     // 获取点击的索引 --> 对应tabBar的索引
     self.selectedIndex = index;
     if (index == 3 && [[CommonCode readFromUserD:@"isLogin"]boolValue] == NO) {
-        [[NSNotificationCenter defaultCenter] postNotificationName:@"loginAlert" object:nil];
+//        [[NSNotificationCenter defaultCenter] postNotificationName:@"loginAlert" object:nil];
     }
 }
 

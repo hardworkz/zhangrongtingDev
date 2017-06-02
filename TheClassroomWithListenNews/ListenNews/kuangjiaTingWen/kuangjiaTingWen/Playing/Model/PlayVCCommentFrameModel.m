@@ -12,7 +12,7 @@
 - (void)setModel:(PlayVCCommentModel *)model
 {
     _model = model;
-    _pinglunImgF = CGRectMake(5.0 / 375 * IPHONE_W, 8.0 / 667 * IPHONE_H, 50.0 / 667 * IPHONE_H, 50.0 / 667 * IPHONE_H);
+    _pinglunImgF = CGRectMake(10.0 / 375 * IPHONE_W, 8.0 / 667 * IPHONE_H, 50.0 / 667 * IPHONE_H, 50.0 / 667 * IPHONE_H);
     
     _pinglunTitleF = CGRectMake(CGRectGetMaxX(_pinglunImgF) + 8.0 / 375 * IPHONE_W, 10.0 / 667 * IPHONE_H, 200.0 / 375 * IPHONE_W, 20.0 / 667 * IPHONE_H);
     
@@ -34,9 +34,9 @@
             nbspStr = [nbspStr stringByAppendingString:@" "];
         }
         
-        CGSize contentSize = [[NSString stringWithFormat:@"%@ : %@",nbspStr,model.content] boundingRectWithSize:CGSizeMake(SCREEN_WIDTH - _pinglunLabF.origin.x, MAXFLOAT) options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:[UIFont systemFontOfSize:16.0f]} context:nil].size;
+        CGSize contentSize = [[NSString stringWithFormat:@"%@  : %@",nbspStr,model.content] boundingRectWithSize:CGSizeMake(SCREEN_WIDTH - _pinglunLabF.origin.x, MAXFLOAT) options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:[UIFont systemFontOfSize:16.0f]} context:nil].size;
         
-        _content = [NSString stringWithFormat:@"%@ : %@",nbspStr,model.content];
+        _content = [NSString stringWithFormat:@"%@  : %@",nbspStr,model.content];
         _contentF = CGRectMake(CGRectGetMaxX(_pinglunImgF) - 3.0 / 375 * IPHONE_W, CGRectGetMaxY(_pinglunshijianF) + 10.0 / 667 * IPHONE_H,contentSize.width, contentSize.height);
     }
     else{
@@ -45,6 +45,7 @@
         _content = model.content;
         _contentF = CGRectMake(CGRectGetMaxX(_pinglunImgF) - 3.0 / 375 * IPHONE_W, CGRectGetMaxY(_pinglunshijianF) + 10.0 / 667 * IPHONE_H,contentSize.width, contentSize.height);
     }
+    _deviderF = CGRectMake(10, CGRectGetMaxY(_contentF) + 10 - 0.5, SCREEN_WIDTH, 0.5);
     _cellHeight = CGRectGetMaxY(_contentF) + 10;
 }
 @end

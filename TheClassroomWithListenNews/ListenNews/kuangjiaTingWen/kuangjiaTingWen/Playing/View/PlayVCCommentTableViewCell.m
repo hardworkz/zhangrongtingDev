@@ -18,6 +18,7 @@
     UILabel *content;
     PinglundianzanCustomBtn *PingLundianzanBtn;
     UILabel *PingLundianzanNumLab;
+    UIView *devider;
 }
 
 @end
@@ -90,6 +91,10 @@
         PingLundianzanNumLab.font = [UIFont systemFontOfSize:16.0f / 375 * IPHONE_W];
         [self.contentView addSubview:PingLundianzanNumLab];
         PingLundianzanBtn.PingLundianzanNumLab = PingLundianzanNumLab;
+        
+        devider = [[UIView alloc] init];
+        devider.backgroundColor = [UIColor lightGrayColor];
+        [self.contentView addSubview:devider];
     }
     return self;
 }
@@ -100,6 +105,7 @@
     pinglunTitle.frame = frameModel.pinglunTitleF;
     pinglunshijian.frame = frameModel.pinglunshijianF;
     content.frame = frameModel.contentF;
+    devider.frame = frameModel.deviderF;
     //设置头像
     if ([frameModel.model.avatar  rangeOfString:@"http"].location != NSNotFound){
         [pinglunImg sd_setImageWithURL:[NSURL URLWithString:frameModel.model.avatar] placeholderImage:[UIImage imageNamed:@"right-1"]];

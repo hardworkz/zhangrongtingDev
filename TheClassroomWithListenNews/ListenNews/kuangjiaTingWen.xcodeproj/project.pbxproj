@@ -153,6 +153,17 @@
 		6985B9321D7404EF0081BCBD /* SAMTextView.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6985B9301D7404EE0081BCBD /* SAMTextView.framework */; };
 		6985B9341D740F6A0081BCBD /* TTTAttributedLabel.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6985B9331D740F690081BCBD /* TTTAttributedLabel.framework */; };
 		698CBDAA1ECE7C7200040108 /* Foundation+Log.m in Sources */ = {isa = PBXBuildFile; fileRef = 698CBDA91ECE7C7200040108 /* Foundation+Log.m */; };
+		6991651C1EE0F83A001914EB /* ClassContentTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 6991651B1EE0F83A001914EB /* ClassContentTableViewCell.m */; };
+		6991651F1EE0F863001914EB /* ClassImageViewTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 6991651E1EE0F863001914EB /* ClassImageViewTableViewCell.m */; };
+		699165221EE0F891001914EB /* ClassAuditionTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 699165211EE0F891001914EB /* ClassAuditionTableViewCell.m */; };
+		699165261EE0F933001914EB /* ClassCommentTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 699165251EE0F933001914EB /* ClassCommentTableViewCell.m */; };
+		6991652A1EE0FDF9001914EB /* ClassContentCellFrameModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 699165291EE0FDF9001914EB /* ClassContentCellFrameModel.m */; };
+		6991652D1EE0FE0C001914EB /* ClassImageViewCellFrameModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 6991652C1EE0FE0C001914EB /* ClassImageViewCellFrameModel.m */; };
+		699165331EE0FE55001914EB /* ClassCommentCellFrameModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 699165321EE0FE55001914EB /* ClassCommentCellFrameModel.m */; };
+		699165361EE0FF80001914EB /* ClassModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 699165351EE0FF80001914EB /* ClassModel.m */; };
+		699165391EE0FF90001914EB /* ClassAuditionListModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 699165381EE0FF90001914EB /* ClassAuditionListModel.m */; };
+		6991653C1EE0FFA5001914EB /* ClassCommentListModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 6991653B1EE0FFA5001914EB /* ClassCommentListModel.m */; };
+		6991653F1EE10E9B001914EB /* ClassAuditionCellFrameModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 6991653E1EE10E9B001914EB /* ClassAuditionCellFrameModel.m */; };
 		69919FBB1ED2CB1400E31757 /* CustomAlertView.m in Sources */ = {isa = PBXBuildFile; fileRef = 69919FBA1ED2CB1400E31757 /* CustomAlertView.m */; };
 		69919FC21ED2D17100E31757 /* UIButton+Extension.m in Sources */ = {isa = PBXBuildFile; fileRef = 69919FBD1ED2D17100E31757 /* UIButton+Extension.m */; };
 		69919FC31ED2D17100E31757 /* UIImage+Extension.m in Sources */ = {isa = PBXBuildFile; fileRef = 69919FBF1ED2D17100E31757 /* UIImage+Extension.m */; };
@@ -743,6 +754,29 @@
 		6985B9301D7404EE0081BCBD /* SAMTextView.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SAMTextView.framework; path = "Pods/../build/Debug-iphoneos/SAMTextView/SAMTextView.framework"; sourceTree = "<group>"; };
 		6985B9331D740F690081BCBD /* TTTAttributedLabel.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = TTTAttributedLabel.framework; path = "Pods/../build/Debug-iphoneos/TTTAttributedLabel/TTTAttributedLabel.framework"; sourceTree = "<group>"; };
 		698CBDA91ECE7C7200040108 /* Foundation+Log.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "Foundation+Log.m"; sourceTree = "<group>"; };
+		6991651A1EE0F83A001914EB /* ClassContentTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ClassContentTableViewCell.h; sourceTree = "<group>"; };
+		6991651B1EE0F83A001914EB /* ClassContentTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ClassContentTableViewCell.m; sourceTree = "<group>"; };
+		6991651D1EE0F863001914EB /* ClassImageViewTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ClassImageViewTableViewCell.h; sourceTree = "<group>"; };
+		6991651E1EE0F863001914EB /* ClassImageViewTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ClassImageViewTableViewCell.m; sourceTree = "<group>"; };
+		699165201EE0F891001914EB /* ClassAuditionTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ClassAuditionTableViewCell.h; sourceTree = "<group>"; };
+		699165211EE0F891001914EB /* ClassAuditionTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ClassAuditionTableViewCell.m; sourceTree = "<group>"; };
+		699165231EE0F8B0001914EB /* HomePageHeader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HomePageHeader.h; sourceTree = "<group>"; };
+		699165241EE0F933001914EB /* ClassCommentTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ClassCommentTableViewCell.h; sourceTree = "<group>"; };
+		699165251EE0F933001914EB /* ClassCommentTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ClassCommentTableViewCell.m; sourceTree = "<group>"; };
+		699165281EE0FDF9001914EB /* ClassContentCellFrameModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ClassContentCellFrameModel.h; sourceTree = "<group>"; };
+		699165291EE0FDF9001914EB /* ClassContentCellFrameModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ClassContentCellFrameModel.m; sourceTree = "<group>"; };
+		6991652B1EE0FE0C001914EB /* ClassImageViewCellFrameModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ClassImageViewCellFrameModel.h; sourceTree = "<group>"; };
+		6991652C1EE0FE0C001914EB /* ClassImageViewCellFrameModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ClassImageViewCellFrameModel.m; sourceTree = "<group>"; };
+		699165311EE0FE55001914EB /* ClassCommentCellFrameModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ClassCommentCellFrameModel.h; sourceTree = "<group>"; };
+		699165321EE0FE55001914EB /* ClassCommentCellFrameModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ClassCommentCellFrameModel.m; sourceTree = "<group>"; };
+		699165341EE0FF80001914EB /* ClassModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ClassModel.h; sourceTree = "<group>"; };
+		699165351EE0FF80001914EB /* ClassModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ClassModel.m; sourceTree = "<group>"; };
+		699165371EE0FF90001914EB /* ClassAuditionListModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ClassAuditionListModel.h; sourceTree = "<group>"; };
+		699165381EE0FF90001914EB /* ClassAuditionListModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ClassAuditionListModel.m; sourceTree = "<group>"; };
+		6991653A1EE0FFA5001914EB /* ClassCommentListModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ClassCommentListModel.h; sourceTree = "<group>"; };
+		6991653B1EE0FFA5001914EB /* ClassCommentListModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ClassCommentListModel.m; sourceTree = "<group>"; };
+		6991653D1EE10E9B001914EB /* ClassAuditionCellFrameModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ClassAuditionCellFrameModel.h; sourceTree = "<group>"; };
+		6991653E1EE10E9B001914EB /* ClassAuditionCellFrameModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ClassAuditionCellFrameModel.m; sourceTree = "<group>"; };
 		69919FB91ED2CB1400E31757 /* CustomAlertView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CustomAlertView.h; sourceTree = "<group>"; };
 		69919FBA1ED2CB1400E31757 /* CustomAlertView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CustomAlertView.m; sourceTree = "<group>"; };
 		69919FBC1ED2D17100E31757 /* UIButton+Extension.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIButton+Extension.h"; sourceTree = "<group>"; };
@@ -1764,6 +1798,36 @@
 			path = UIKit;
 			sourceTree = "<group>";
 		};
+		699165191EE0F818001914EB /* ClassCells */ = {
+			isa = PBXGroup;
+			children = (
+				6991651A1EE0F83A001914EB /* ClassContentTableViewCell.h */,
+				6991651B1EE0F83A001914EB /* ClassContentTableViewCell.m */,
+				6991651D1EE0F863001914EB /* ClassImageViewTableViewCell.h */,
+				6991651E1EE0F863001914EB /* ClassImageViewTableViewCell.m */,
+				699165201EE0F891001914EB /* ClassAuditionTableViewCell.h */,
+				699165211EE0F891001914EB /* ClassAuditionTableViewCell.m */,
+				699165241EE0F933001914EB /* ClassCommentTableViewCell.h */,
+				699165251EE0F933001914EB /* ClassCommentTableViewCell.m */,
+			);
+			path = ClassCells;
+			sourceTree = "<group>";
+		};
+		699165271EE0FDD5001914EB /* ClassCellsFrame */ = {
+			isa = PBXGroup;
+			children = (
+				699165281EE0FDF9001914EB /* ClassContentCellFrameModel.h */,
+				699165291EE0FDF9001914EB /* ClassContentCellFrameModel.m */,
+				6991652B1EE0FE0C001914EB /* ClassImageViewCellFrameModel.h */,
+				6991652C1EE0FE0C001914EB /* ClassImageViewCellFrameModel.m */,
+				6991653D1EE10E9B001914EB /* ClassAuditionCellFrameModel.h */,
+				6991653E1EE10E9B001914EB /* ClassAuditionCellFrameModel.m */,
+				699165311EE0FE55001914EB /* ClassCommentCellFrameModel.h */,
+				699165321EE0FE55001914EB /* ClassCommentCellFrameModel.m */,
+			);
+			path = ClassCellsFrame;
+			sourceTree = "<group>";
+		};
 		699581FD1EC5599D0037E9A4 /* Model */ = {
 			isa = PBXGroup;
 			children = (
@@ -1920,6 +1984,7 @@
 				69C712101EC0740E00F2729E /* Controller */,
 				69C712211EC0740E00F2729E /* Model */,
 				69C712221EC0740E00F2729E /* View */,
+				699165231EE0F8B0001914EB /* HomePageHeader.h */,
 			);
 			path = HomePage;
 			sourceTree = "<group>";
@@ -1929,8 +1994,6 @@
 			children = (
 				69C712111EC0740E00F2729E /* CitySelectedViewController.h */,
 				69C712121EC0740E00F2729E /* CitySelectedViewController.m */,
-				69C712131EC0740E00F2729E /* ClassViewController.h */,
-				69C712141EC0740E00F2729E /* ClassViewController.m */,
 				69C712151EC0740E00F2729E /* CommentViewController.h */,
 				69C712161EC0740E00F2729E /* CommentViewController.m */,
 				69C712171EC0740E00F2729E /* guanggaoVC.h */,
@@ -1943,6 +2006,8 @@
 				69C712201EC0740E00F2729E /* shouyeVC.m */,
 				69C712191EC0740E00F2729E /* HomePageViewController.h */,
 				69C7121A1EC0740E00F2729E /* HomePageViewController.m */,
+				69C712131EC0740E00F2729E /* ClassViewController.h */,
+				69C712141EC0740E00F2729E /* ClassViewController.m */,
 			);
 			path = Controller;
 			sourceTree = "<group>";
@@ -1950,6 +2015,12 @@
 		69C712211EC0740E00F2729E /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				699165341EE0FF80001914EB /* ClassModel.h */,
+				699165351EE0FF80001914EB /* ClassModel.m */,
+				699165371EE0FF90001914EB /* ClassAuditionListModel.h */,
+				699165381EE0FF90001914EB /* ClassAuditionListModel.m */,
+				6991653A1EE0FFA5001914EB /* ClassCommentListModel.h */,
+				6991653B1EE0FFA5001914EB /* ClassCommentListModel.m */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -1957,6 +2028,8 @@
 		69C712221EC0740E00F2729E /* View */ = {
 			isa = PBXGroup;
 			children = (
+				699165271EE0FDD5001914EB /* ClassCellsFrame */,
+				699165191EE0F818001914EB /* ClassCells */,
 				69C712231EC0740E00F2729E /* NewsTableViewCell.h */,
 				69C712241EC0740E00F2729E /* NewsTableViewCell.m */,
 				69C712251EC0740E00F2729E /* NewsTableViewCell.xib */,
@@ -3244,6 +3317,7 @@
 				69C7136E1EC0740F00F2729E /* DownloadNewCell.m in Sources */,
 				63B690B51D2F84150013961E /* SDBrowserImageView.m in Sources */,
 				69C713AE1EC0740F00F2729E /* dingyueVC.m in Sources */,
+				6991652A1EE0FDF9001914EB /* ClassContentCellFrameModel.m in Sources */,
 				69C713B61EC0740F00F2729E /* NSDate+TKCategory.m in Sources */,
 				63B690B61D2F84150013961E /* SDPhotoBrowser.m in Sources */,
 				E96ACDD91D6C6C41009856B1 /* NSDate+TimeInterval.m in Sources */,
@@ -3310,6 +3384,7 @@
 				69C7136D1EC0740F00F2729E /* DownloadingTableViewCell.m in Sources */,
 				636B58AE1D34D87600290681 /* IQBarButtonItem.m in Sources */,
 				695745AF1D5C7384001022AD /* UIView+Night.m in Sources */,
+				699165391EE0FF90001914EB /* ClassAuditionListModel.m in Sources */,
 				69711B0B1EBC140C00A01728 /* base64.m in Sources */,
 				69C7139E1EC0740F00F2729E /* PayOnlineViewController.m in Sources */,
 				634372211D324C3A0040D055 /* CTPopOutMenu.m in Sources */,
@@ -3328,6 +3403,7 @@
 				691907941D3F6AFA0012A42E /* AIDatePickerController.m in Sources */,
 				633C2BEC1D2CA58000476CBD /* PinyinFormatter.m in Sources */,
 				E91D53A71D93719A008B8564 /* MJRefreshHeader.m in Sources */,
+				6991653C1EE0FFA5001914EB /* ClassCommentListModel.m in Sources */,
 				69C713371EC0740F00F2729E /* WHC_Download.m in Sources */,
 				695745981D5C7384001022AD /* DKDeallocBlockExecutor.m in Sources */,
 				69C713A71EC0740F00F2729E /* OJLAnimationButton.m in Sources */,
@@ -3410,6 +3486,7 @@
 				6300DB3C1D05648F00B82C42 /* SDWebImageDownloader.m in Sources */,
 				6300DB5F1D0565B300B82C42 /* AFHTTPRequestOperation.m in Sources */,
 				6300DB671D0565B300B82C42 /* AFURLSessionManager.m in Sources */,
+				699165261EE0F933001914EB /* ClassCommentTableViewCell.m in Sources */,
 				69C713A01EC0740F00F2729E /* RewardListTableViewCell.m in Sources */,
 				69C713401EC0740F00F2729E /* faxianGengDuoVC.m in Sources */,
 				695745AA1D5C7384001022AD /* UITabBar+Night.m in Sources */,
@@ -3424,22 +3501,27 @@
 				69C713341EC0740F00F2729E /* CommonCode.m in Sources */,
 				69C713A91EC0740F00F2729E /* OtherItem.m in Sources */,
 				69C713521EC0740F00F2729E /* FriendsNewsViewController.m in Sources */,
+				699165361EE0FF80001914EB /* ClassModel.m in Sources */,
 				69601E6D1EC98C5400445561 /* CommentAndReviewTableViewCell.m in Sources */,
+				6991652D1EE0FE0C001914EB /* ClassImageViewCellFrameModel.m in Sources */,
 				E91D53A31D93719A008B8564 /* MJRefreshAutoFooter.m in Sources */,
 				634EA5071D139EC200108A51 /* TYTitlePageTabBar.m in Sources */,
 				69C713601EC0740F00F2729E /* GZ_Cell.m in Sources */,
 				69C7137E1EC0740F00F2729E /* PersonalUnreadTableViewCell.m in Sources */,
 				69C713541EC0740F00F2729E /* HelpCenterViewController.m in Sources */,
 				695745A81D5C7384001022AD /* UISlider+Night.m in Sources */,
+				699165221EE0F891001914EB /* ClassAuditionTableViewCell.m in Sources */,
 				6300DB3F1D05648F00B82C42 /* SDWebImagePrefetcher.m in Sources */,
 				69C713B81EC0740F00F2729E /* NSMutableString+TagReplace.m in Sources */,
 				69C7135C1EC0740F00F2729E /* zhuceVC.m in Sources */,
 				69C7135E1EC0740F00F2729E /* HUProgressView.m in Sources */,
+				699165331EE0FE55001914EB /* ClassCommentCellFrameModel.m in Sources */,
 				69C713B91EC0740F00F2729E /* NSString+Check.m in Sources */,
 				636B58AF1D34D87600290681 /* IQTitleBarButtonItem.m in Sources */,
 				E91A53431E8E3455005D2F68 /* ViewController+MASAdditions.m in Sources */,
 				63B690BD1D2F8B8D0013961E /* FMActionSheet.m in Sources */,
 				633C2BF01D2CA58000476CBD /* ZYPinYinSearch.m in Sources */,
+				6991651C1EE0F83A001914EB /* ClassContentTableViewCell.m in Sources */,
 				69C7139D1EC0740F00F2729E /* bofangVC.m in Sources */,
 				E956E03D1E66B9DB00444F06 /* IAPHelper.m in Sources */,
 				69C7134F1EC0740F00F2729E /* YJImageBrowserView.m in Sources */,
@@ -3458,6 +3540,7 @@
 				69C713451EC0740F00F2729E /* ClassViewController.m in Sources */,
 				6300DB391D05648F00B82C42 /* SDImageCache.m in Sources */,
 				69C7139C1EC0740F00F2729E /* pinglunyeVC.m in Sources */,
+				6991651F1EE0F863001914EB /* ClassImageViewTableViewCell.m in Sources */,
 				695745AB1D5C7384001022AD /* UITableView+Night.m in Sources */,
 				6300DB631D0565B300B82C42 /* AFSecurityPolicy.m in Sources */,
 				6300DB3D1D05648F00B82C42 /* SDWebImageDownloaderOperation.m in Sources */,
@@ -3491,6 +3574,7 @@
 				69C713921EC0740F00F2729E /* Post_actor.m in Sources */,
 				69A7BABA1ED4177C0094E0BA /* SuNetworkMonitor.m in Sources */,
 				E91D53A81D93719A008B8564 /* MJRefreshAutoGifFooter.m in Sources */,
+				6991653F1EE10E9B001914EB /* ClassAuditionCellFrameModel.m in Sources */,
 				69C7138C1EC0740F00F2729E /* FontViewController.m in Sources */,
 				69C7135F1EC0740F00F2729E /* tianjiaGuanZhuVC.m in Sources */,
 				69C713B31EC0740F00F2729E /* TabbarView.m in Sources */,
