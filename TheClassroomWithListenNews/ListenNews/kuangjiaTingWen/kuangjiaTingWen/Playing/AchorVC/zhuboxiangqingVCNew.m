@@ -658,7 +658,11 @@
     [headerView addSubview:shadowView];
     
 //    topHeaderV = [[UIView alloc]initWithFrame:CGRectMake(0, 64.0 / 667 *SCREEN_HEIGHT , IPHONE_W, 100.0 / 667 *SCREEN_HEIGHT)];
-    downHeaderV = [[UIView alloc]initWithFrame:CGRectMake(0, 223.0 / 667 *SCREEN_HEIGHT, IPHONE_W, 50.0 / 667 *SCREEN_HEIGHT)];
+    if (!self.isClass) {
+        downHeaderV = [[UIView alloc]initWithFrame:CGRectMake(0, 223.0 / 667 *SCREEN_HEIGHT, IPHONE_W, 50.0 / 667 *SCREEN_HEIGHT)];
+    }else{
+        downHeaderV = [[UIView alloc]initWithFrame:CGRectMake(0, 223.0 / 667 *SCREEN_HEIGHT, IPHONE_W, 0.0 / 667 *SCREEN_HEIGHT)];
+    }
     [downHeaderV setBackgroundColor:[UIColor whiteColor]];
     //返回按钮
     UIButton *leftBtn = [UIButton buttonWithType:UIButtonTypeCustom];
@@ -711,7 +715,13 @@
     [img addGestureRecognizer:tap];
     
     //姓名
-    UILabel *name = [[UILabel alloc]initWithFrame:CGRectMake(CGRectGetMaxX(imgBorderView.frame) + 12, imgBorderView.frame.origin.y + 20.0 / 667 * IPHONE_H, 150, 20.0 / 667 * IPHONE_H)];
+    UILabel *name = [[UILabel alloc]init];
+    if (!self.isClass) {
+        name.frame = CGRectMake(CGRectGetMaxX(imgBorderView.frame) + 12, imgBorderView.frame.origin.y + 20.0 / 667 * IPHONE_H, 150, 20.0 / 667 * IPHONE_H);
+    }else{//课堂
+        name.frame = CGRectMake(CGRectGetMaxX(imgBorderView.frame) + 12, imgBorderView.frame.origin.y + 20.0 / 667 * IPHONE_H, SCREEN_WIDTH - CGRectGetMaxX(imgBorderView.frame) - 12 - 20, 60.0 / 667 * IPHONE_H);
+    }
+    name.numberOfLines = 0;
     name.textColor = nTextColorMain;
 //    name.font = [UIFont fontWithName:@"Helvetica-Bold" size:17.0f ];
     name.font = gFontMajor17;
@@ -720,7 +730,13 @@
     [headerView addSubview:name];
     
     //简介
-    UILabel *fensiliuyan = [[UILabel alloc]initWithFrame:CGRectMake(name.frame.origin.x,CGRectGetMaxY(imgBorderView.frame) - 30.0 / 667 *SCREEN_HEIGHT, SCREEN_WIDTH - name.frame.origin.x - 80.0 / 375 * SCREEN_WIDTH, 40.0 / 667 * IPHONE_H)];
+    UILabel *fensiliuyan = [[UILabel alloc]init];
+    
+    if (!self.isClass) {
+        fensiliuyan.frame = CGRectMake(name.frame.origin.x,CGRectGetMaxY(imgBorderView.frame) - 30.0 / 667 *SCREEN_HEIGHT, SCREEN_WIDTH - name.frame.origin.x - 80.0 / 375 * SCREEN_WIDTH, 40.0 / 667 * IPHONE_H);
+    }else{//课堂
+        fensiliuyan.frame = CGRectMake(name.frame.origin.x,CGRectGetMaxY(name.frame) + 20.0 / 667 *SCREEN_HEIGHT, SCREEN_WIDTH - name.frame.origin.x - 80.0 / 375 * SCREEN_WIDTH, 40.0 / 667 * IPHONE_H);
+    }
     fensiliuyan.textColor = gTextColorSub;
 //    fensiliuyan.alpha = 0.5f;
     fensiliuyan.font = gFontMain14;
@@ -729,61 +745,63 @@
     [headerView addSubview:fensiliuyan];
     fensiliuyan.text = [NSString stringWithFormat:@"%@",self.jiemuDescription];
     
-    UIButton *guanzhuBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    guanzhuBtn.frame = CGRectMake(SCREEN_WIDTH - 80.0 / 375 * IPHONE_W,161.0 / 667 * IPHONE_H, 80.0 / 375 * IPHONE_W, 20.0 / 667 * IPHONE_H);
-    if (isGuanZhu == YES)
-    {
-        [guanzhuBtn setTitle:@"取消" forState:UIControlStateNormal];
+    if (!self.isClass) {//课堂详情隐藏控件
+        UIButton *guanzhuBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+        guanzhuBtn.frame = CGRectMake(SCREEN_WIDTH - 80.0 / 375 * IPHONE_W,161.0 / 667 * IPHONE_H, 80.0 / 375 * IPHONE_W, 20.0 / 667 * IPHONE_H);
+        if (isGuanZhu == YES)
+        {
+            [guanzhuBtn setTitle:@"取消" forState:UIControlStateNormal];
+        }
+        else{
+            [guanzhuBtn setTitle:@"+ 关注" forState:UIControlStateNormal];
+        }
+        [guanzhuBtn setTitleColor:gMainColor forState:UIControlStateNormal];
+        guanzhuBtn.titleLabel.font                  = [UIFont systemFontOfSize:11.0];
+        [guanzhuBtn setBackgroundColor:[UIColor clearColor]];
+        guanzhuBtn.layer.cornerRadius               = 4;
+        guanzhuBtn.layer.masksToBounds              = YES;
+        guanzhuBtn.layer.borderColor = gMainColor.CGColor;
+        guanzhuBtn.layer.borderWidth = .3f;
+        guanzhuBtn.bounds     = CGRectMake(0, 0, 50, 30);
+        [guanzhuBtn addTarget:self action:@selector(guanzhuBtnAction:) forControlEvents:UIControlEventTouchUpInside];
+        [headerView addSubview:guanzhuBtn];
+        
+        //粉丝
+        UIButton *fansButton = [UIButton buttonWithType:UIButtonTypeCustom];
+        [fansButton setFrame:CGRectMake(0, 25.0 / 667 * SCREEN_HEIGHT, SCREEN_WIDTH /2 , 25.0 / 667 * SCREEN_HEIGHT)];
+        [fansButton setBackgroundColor:[UIColor clearColor]];
+        [fansButton.titleLabel setFont:[UIFont systemFontOfSize:16.0]];
+        [fansButton setTitle:[NSString stringWithFormat:@"%@",self.jiemuFan_num] forState:UIControlStateNormal];
+        [fansButton setTitleColor:nTextColorMain forState:UIControlStateNormal];
+        [fansButton addTarget:self action:@selector(fansButtonAction:) forControlEvents:UIControlEventTouchUpInside];
+        fansButton.accessibilityLabel = [NSString stringWithFormat:@"粉丝 %@",self.jiemuFan_num];
+        UILabel *fansLabel = [[UILabel alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH / 2, 25.0 / 667 * SCREEN_HEIGHT)];
+        [fansLabel setText:@"粉丝"];
+        [fansLabel setFont:gFontMain12];
+        [fansLabel setTextAlignment:NSTextAlignmentCenter];
+        [fansLabel setTextColor:gTextColorSub];
+        fansLabel.accessibilityLabel = [NSString stringWithFormat:@"粉丝 %@",self.jiemuFan_num];
+        [downHeaderV addSubview:fansLabel];
+        [downHeaderV addSubview:fansButton];
+        
+        //留言
+        UIButton *messageButton = [UIButton buttonWithType:UIButtonTypeCustom];
+        [messageButton setFrame:CGRectMake(SCREEN_WIDTH /2, 25.0 / 667 * SCREEN_HEIGHT, SCREEN_WIDTH /2 , 25.0 / 667 * SCREEN_HEIGHT)];
+        [messageButton setBackgroundColor:[UIColor clearColor]];
+        [messageButton.titleLabel setFont:[UIFont systemFontOfSize:16.0]];
+        [messageButton setTitle:[NSString stringWithFormat:@"%@",self.jiemuMessage_num] forState:UIControlStateNormal];
+        [messageButton setTitleColor:nTextColorMain forState:UIControlStateNormal];
+        [messageButton addTarget:self action:@selector(fansButtonAction:) forControlEvents:UIControlEventTouchUpInside];
+        messageButton.accessibilityLabel = [NSString stringWithFormat:@"留言 %@",self.jiemuMessage_num];
+        UILabel *messageLabel = [[UILabel alloc]initWithFrame:CGRectMake(SCREEN_WIDTH /2,0, SCREEN_WIDTH / 2, 25.0 / 667 * SCREEN_HEIGHT)];
+        [messageLabel setText:@"留言"];
+        [messageLabel setFont:gFontMain12];
+        [messageLabel setTextAlignment:NSTextAlignmentCenter];
+        [messageLabel setTextColor:gTextColorSub];
+        messageLabel.accessibilityLabel = [NSString stringWithFormat:@"留言 %@",self.jiemuMessage_num];
+        [downHeaderV addSubview:messageLabel];
+        [downHeaderV addSubview:messageButton];
     }
-    else{
-        [guanzhuBtn setTitle:@"+ 关注" forState:UIControlStateNormal];
-    }
-    [guanzhuBtn setTitleColor:gMainColor forState:UIControlStateNormal];
-    guanzhuBtn.titleLabel.font                  = [UIFont systemFontOfSize:11.0];
-    [guanzhuBtn setBackgroundColor:[UIColor clearColor]];
-    guanzhuBtn.layer.cornerRadius               = 4;
-    guanzhuBtn.layer.masksToBounds              = YES;
-    guanzhuBtn.layer.borderColor = gMainColor.CGColor;
-    guanzhuBtn.layer.borderWidth = .3f;
-    guanzhuBtn.bounds     = CGRectMake(0, 0, 50, 30);
-    [guanzhuBtn addTarget:self action:@selector(guanzhuBtnAction:) forControlEvents:UIControlEventTouchUpInside];
-    [headerView addSubview:guanzhuBtn];
-    
-    //粉丝
-    UIButton *fansButton = [UIButton buttonWithType:UIButtonTypeCustom];
-    [fansButton setFrame:CGRectMake(0, 25.0 / 667 * SCREEN_HEIGHT, SCREEN_WIDTH /2 , 25.0 / 667 * SCREEN_HEIGHT)];
-    [fansButton setBackgroundColor:[UIColor clearColor]];
-    [fansButton.titleLabel setFont:[UIFont systemFontOfSize:16.0]];
-    [fansButton setTitle:[NSString stringWithFormat:@"%@",self.jiemuFan_num] forState:UIControlStateNormal];
-    [fansButton setTitleColor:nTextColorMain forState:UIControlStateNormal];
-    [fansButton addTarget:self action:@selector(fansButtonAction:) forControlEvents:UIControlEventTouchUpInside];
-    fansButton.accessibilityLabel = [NSString stringWithFormat:@"粉丝 %@",self.jiemuFan_num];
-    UILabel *fansLabel = [[UILabel alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH / 2, 25.0 / 667 * SCREEN_HEIGHT)];
-    [fansLabel setText:@"粉丝"];
-    [fansLabel setFont:gFontMain12];
-    [fansLabel setTextAlignment:NSTextAlignmentCenter];
-    [fansLabel setTextColor:gTextColorSub];
-    fansLabel.accessibilityLabel = [NSString stringWithFormat:@"粉丝 %@",self.jiemuFan_num];
-    [downHeaderV addSubview:fansLabel];
-    [downHeaderV addSubview:fansButton];
-    
-    //留言
-    UIButton *messageButton = [UIButton buttonWithType:UIButtonTypeCustom];
-    [messageButton setFrame:CGRectMake(SCREEN_WIDTH /2, 25.0 / 667 * SCREEN_HEIGHT, SCREEN_WIDTH /2 , 25.0 / 667 * SCREEN_HEIGHT)];
-    [messageButton setBackgroundColor:[UIColor clearColor]];
-    [messageButton.titleLabel setFont:[UIFont systemFontOfSize:16.0]];
-    [messageButton setTitle:[NSString stringWithFormat:@"%@",self.jiemuMessage_num] forState:UIControlStateNormal];
-    [messageButton setTitleColor:nTextColorMain forState:UIControlStateNormal];
-    [messageButton addTarget:self action:@selector(fansButtonAction:) forControlEvents:UIControlEventTouchUpInside];
-    messageButton.accessibilityLabel = [NSString stringWithFormat:@"留言 %@",self.jiemuMessage_num];
-    UILabel *messageLabel = [[UILabel alloc]initWithFrame:CGRectMake(SCREEN_WIDTH /2,0, SCREEN_WIDTH / 2, 25.0 / 667 * SCREEN_HEIGHT)];
-    [messageLabel setText:@"留言"];
-    [messageLabel setFont:gFontMain12];
-    [messageLabel setTextAlignment:NSTextAlignmentCenter];
-    [messageLabel setTextColor:gTextColorSub];
-    messageLabel.accessibilityLabel = [NSString stringWithFormat:@"留言 %@",self.jiemuMessage_num];
-    [downHeaderV addSubview:messageLabel];
-    [downHeaderV addSubview:messageButton];
     
     [headerView addSubview:downHeaderV];
     [ZhuscrollView addSubview:headerView];
@@ -954,11 +972,11 @@
             }
                 break;
             case 1:{
-                [self shareToWechatWithscene:0];
+                [self shareToWechatWithscene:WXSceneSession];
             }
                 break;
             case 2:{
-                [self shareToWechatWithscene:1];
+                [self shareToWechatWithscene:WXSceneTimeline];
             }
                 break;
             default:
@@ -1323,7 +1341,11 @@
 - (void)SVPDismiss {
     [SVProgressHUD dismiss];
 }
-
+//点击播放按钮
+- (void)playBtnPlay:(UIButton *)button
+{
+    
+}
 #pragma mark - UITableViewDelegate
 
 //-(CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
@@ -1423,7 +1445,12 @@
         if (!cell){
             cell = [tableView dequeueReusableCellWithIdentifier:zhuboxiangqingxinwenIdentify forIndexPath:indexPath];
         }
-        UILabel *titleLab = [[UILabel alloc]initWithFrame:CGRectMake(72.0 / 375 * IPHONE_W, 12.0 / 667 * IPHONE_H, SCREEN_WIDTH - 87.0 / 375 * IPHONE_W, 21 * 3)];
+        UILabel *titleLab = [[UILabel alloc]init];
+        if (self.isClass) {
+            titleLab.frame = CGRectMake(72.0 / 375 * IPHONE_W, 12.0 / 667 * IPHONE_H, SCREEN_WIDTH - 137.0 / 375 * IPHONE_W, 21 * 3);
+        }else{
+            titleLab.frame = CGRectMake(72.0 / 375 * IPHONE_W, 12.0 / 667 * IPHONE_H, SCREEN_WIDTH - 87.0 / 375 * IPHONE_W, 21 * 3);
+        }
         titleLab.text = xinwenArr[indexPath.row][@"post_title"];
         if ([[CommonCode readFromUserD:@"yitingguoxinwenID"] isKindOfClass:[NSArray class]]){
             NSArray *yitingguoArr = [NSArray arrayWithArray:[CommonCode readFromUserD:@"yitingguoxinwenID"]];
@@ -1450,6 +1477,7 @@
         {
             titleLab.textColor = gMainColor;
         }
+        titleLab.numberOfLines = 0;
         titleLab.textAlignment = NSTextAlignmentLeft;
         titleLab.font = [UIFont boldSystemFontOfSize:17.0f];
         [cell.contentView addSubview:titleLab];
@@ -1469,25 +1497,28 @@
             [cell.contentView addSubview:detailNews];
         }
         
-//        UILabel *daxiao = [[UILabel alloc]initWithFrame:CGRectMake(15.0 / 375 * IPHONE_W, 74.0 / 667 * SCREEN_HEIGHT, 35.0 / 375 * IPHONE_W, 14.0 / 667 * SCREEN_HEIGHT)];
-//        daxiao.text = @"大小";
-//        daxiao.font = [UIFont systemFontOfSize:13.0f ];
-//        daxiao.textColor = [UIColor whiteColor];
-//        daxiao.textAlignment = NSTextAlignmentCenter;
-//        daxiao.backgroundColor = ColorWithRGBA(38, 191, 252, 1);
-//        [cell.contentView addSubview:daxiao];
         //大小
-        UIButton *dataLab = [UIButton buttonWithType:UIButtonTypeCustom];
-        [dataLab setFrame:CGRectMake(SCREEN_WIDTH -  70.0 / 375 * IPHONE_W, 64.0 / 667 * SCREEN_HEIGHT, 35.0 / 375 * IPHONE_W, 15.0 / 667 * SCREEN_HEIGHT)];
-        [dataLab setTitle:[NSString stringWithFormat:@"%.1lf%@",[xinwenArr[indexPath.row][@"post_size"] intValue] / 1024.0 / 1024.0,@"M"] forState:UIControlStateNormal];
-        dataLab.backgroundColor = [UIColor whiteColor];
-        [dataLab.layer setBorderWidth:0.5f];
-        [dataLab.layer setBorderColor:nTextColorSub.CGColor];
-        [dataLab.layer setMasksToBounds:YES];
-        [dataLab.layer setCornerRadius:4.0f];
-        [dataLab setTitleColor:nTextColorSub forState:UIControlStateNormal];
-        [dataLab.titleLabel setFont:[UIFont systemFontOfSize:10.0f]];
-        [cell.contentView addSubview:dataLab];
+        if (!self.class) {
+            UIButton *dataLab = [UIButton buttonWithType:UIButtonTypeCustom];
+            [dataLab setFrame:CGRectMake(SCREEN_WIDTH -  55.0 / 375 * IPHONE_W, 64.0 / 667 * SCREEN_HEIGHT, 35.0 / 375 * IPHONE_W, 15.0 / 667 * SCREEN_HEIGHT)];
+            [dataLab setTitle:[NSString stringWithFormat:@"%.1lf%@",[xinwenArr[indexPath.row][@"post_size"] intValue] / 1024.0 / 1024.0,@"M"] forState:UIControlStateNormal];
+            dataLab.backgroundColor = [UIColor whiteColor];
+            [dataLab.layer setBorderWidth:0.5f];
+            [dataLab.layer setBorderColor:nTextColorSub.CGColor];
+            [dataLab.layer setMasksToBounds:YES];
+            [dataLab.layer setCornerRadius:4.0f];
+            [dataLab setTitleColor:nTextColorSub forState:UIControlStateNormal];
+            [dataLab.titleLabel setFont:[UIFont systemFontOfSize:10.0f]];
+            [cell.contentView addSubview:dataLab];
+        }
+        
+        //播放按钮
+        UIButton *playBtn = [[UIButton alloc] initWithFrame:CGRectMake(SCREEN_WIDTH - 50 - 10, 10, 50, 50)];
+        [playBtn setImage:[UIImage imageNamed:@"classpause"] forState:UIControlStateNormal];
+        [playBtn setImage:[UIImage imageNamed:@"classplay"] forState:UIControlStateSelected];
+        playBtn.tag = indexPath.row;
+        [playBtn addTarget:self action:@selector(playBtnPlay:) forControlEvents:UIControlEventTouchUpInside];
+        [cell.contentView addSubview:playBtn];
         
         TTTAttributedLabel *riqiLab = [[TTTAttributedLabel alloc]initWithFrame:CGRectMake(20.0 / 375 * IPHONE_W, 12.0 / 667 * SCREEN_HEIGHT, 52.0 / 375 * IPHONE_W, 30.0 / 667 * SCREEN_HEIGHT)];
         riqiLab.text = xinwenArr[indexPath.row][@"post_modified"];
@@ -1769,7 +1800,11 @@
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     if (tableView.tag == 3){
-        return 99.0 / 667 * SCREEN_HEIGHT;
+        if (self.isClass) {
+            return 70.0 / 667 * SCREEN_HEIGHT;
+        }else{
+            return 99.0 / 667 * SCREEN_HEIGHT;
+        }
     }
     else if (tableView.tag == 4){
         if (indexPath.row == 0 || indexPath.row == 1 || indexPath.row == 2){

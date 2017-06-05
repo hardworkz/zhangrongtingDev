@@ -1915,8 +1915,8 @@ static bofangVC *_instance = nil;
     }
     WXMediaMessage *message = [WXMediaMessage message];
     message.title = self.newsModel.Titlejiemu;
-    NSString *musicUrl = [NSString stringWithFormat:@"https://tingwen.me/index.php/article/yulan/id/%@.html",self.newsModel.jiemuID];
-//    NSString *musicUrl = @"http://jingyan.baidu.com/article/a378c960b49034b3282830db.html";
+    NSString *musicUrl = [NSString stringWithFormat:@"http://admin.tingwen.me/index.php/article/yulan/id/%@.html",self.newsModel.jiemuID];
+//    NSString *musicUrl = @"http://music.163.com/#/song?id=5240776&userid=96395677&from=singlemessage&isappinstalled=1";
     
     [self getImageWithURLStr:self.newsModel.ImgStrjiemu OnSucceed:^(UIImage *image) {
         //压缩图片大小

@@ -578,36 +578,30 @@
         }
     }
 }
-
-- (void)pinglundianzanAction:(UIButton *)sender{
-    UITableViewCell *cell = (UITableViewCell *)[[sender superview] superview];
-    NSIndexPath *indexPath = [self.helpTableView indexPathForCell:cell];
-    UILabel *dianzanNumlab = (UILabel *)[cell.contentView viewWithTag:indexPath.row + 2000];
-    if (sender.selected == YES){
-        [sender setImage:[UIImage imageNamed:@"pinglun-10"] forState:UIControlStateNormal];
-        dianzanNumlab.text = [NSString stringWithFormat:@"%d",[dianzanNumlab.text intValue] - 1];
-        dianzanNumlab.textColor = [UIColor grayColor];
-        dianzanNumlab.alpha = 0.7f;
-        sender.selected = NO;
-        [NetWorkTool postPaoGuoXinWenPingLunDianZanWithaccessToken:[DSE encryptUseDES:ExdangqianUser]
-                                                         andact_id:self.pinglunArr[indexPath.row][@"id"]
-                                                            sccess:^(NSDictionary *responseObject) {
-                                                                NSLog(@"responseObject = %@",responseObject);
-                                                                NSLog(@"针对评论取消点赞");
-                                                            }
-                                                           failure:^(NSError *error) {
-                                                               NSLog(@"error = %@",error);
-                                                           }];
+- (void)pinglundianzanAction:(PinglundianzanCustomBtn *)pinglundianzanBtn frameModel:(PlayVCCommentFrameModel *)frameModel
+{
+    PlayVCCommentModel *model = frameModel.model;
+    UILabel *dianzanNumlab = pinglundianzanBtn.PingLundianzanNumLab;
+    if (pinglundianzanBtn.selected == YES){
+        [NetWorkTool postPaoGuoXinWenPingLunDianZanWithaccessToken:[DSE encryptUseDES:ExdangqianUser] andact_id:model.playCommentID sccess:^(NSDictionary *responseObject) {
+            NSLog(@"responseObject = %@",responseObject);
+            NSLog(@"针对评论取消点赞");
+            dianzanNumlab.text = [NSString stringWithFormat:@"%d",[dianzanNumlab.text intValue] - 1];
+            dianzanNumlab.textColor = [UIColor grayColor];
+            dianzanNumlab.alpha = 0.7f;
+            pinglundianzanBtn.selected = NO;
+        } failure:^(NSError *error) {
+            NSLog(@"error = %@",error);
+        }];
     }
     else{
-        [sender setImage:[UIImage imageNamed:@"pinglun-yizan"] forState:UIControlStateNormal];
-        dianzanNumlab.text = [NSString stringWithFormat:@"%d",[dianzanNumlab.text intValue] + 1];
-        dianzanNumlab.textColor = ColorWithRGBA(0, 159, 240, 1);
-        dianzanNumlab.alpha = 1.0f;
-        sender.selected = YES;
-        [NetWorkTool postPaoGuoXinWenPingLunDianZanWithaccessToken:[DSE encryptUseDES:ExdangqianUser] andact_id:self.pinglunArr[indexPath.row][@"id"] sccess:^(NSDictionary *responseObject) {
+        [NetWorkTool postPaoGuoXinWenPingLunDianZanWithaccessToken:[DSE encryptUseDES:ExdangqianUser] andact_id:model.playCommentID sccess:^(NSDictionary *responseObject) {
             NSLog(@"responseObject = %@",responseObject);
             NSLog(@"针对评论点赞");
+            dianzanNumlab.text = [NSString stringWithFormat:@"%d",[dianzanNumlab.text intValue] + 1];
+            dianzanNumlab.textColor = ColorWithRGBA(0, 159, 240, 1);
+            dianzanNumlab.alpha = 1.0f;
+            pinglundianzanBtn.selected = YES;
         } failure:^(NSError *error) {
             NSLog(@"error = %@",error);
         }];
@@ -620,31 +614,6 @@
     self.hidesBottomBarWhenPushed = YES;
     [self.navigationController pushViewController:vc animated:YES];
 }
-
-#pragma mark - TTTAttributedLabelDelegate
-
-- (void)attributedLabel:(TTTAttributedLabel *)label
-didSelectLinkWithTransitInformation:(NSDictionary *)components {
-    gerenzhuyeVC *gerenzhuye = [gerenzhuyeVC new];
-    if ([components[@"user_login"] isEqualToString:ExdangqianUser] && [[CommonCode readFromUserD:@"isLogin"]boolValue] == YES) {
-        gerenzhuye.isMypersonalPage = YES;
-    }
-    else{
-        gerenzhuye.isMypersonalPage = NO;
-    }
-    gerenzhuye.isNewsComment = NO;
-    gerenzhuye.user_nicename = components[@"user_nicename"];
-    gerenzhuye.sex = components[@"sex"];
-    gerenzhuye.signature = components[@"signature"];
-    gerenzhuye.user_login = components[@"user_login"];
-    gerenzhuye.avatar = components[@"avatar"];
-    gerenzhuye.user_id = components[@"id"];
-    self.hidesBottomBarWhenPushed=YES;
-    [self.navigationController pushViewController:gerenzhuye animated:YES];
-    self.hidesBottomBarWhenPushed=YES;
-}
-
-
 #pragma mark - UITableViewDelegate
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
@@ -710,10 +679,15 @@ didSelectLinkWithTransitInformation:(NSDictionary *)components {
         return cell;
     }else{
         PlayVCCommentTableViewCell *cell = [PlayVCCommentTableViewCell cellWithTableView:tableView];
+        cell.isClassComment = YES;
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
         PlayVCCommentFrameModel *frameModel = self.pinglunArr[indexPath.row - 2 - self.classModel.imagesArray.count];
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
         cell.frameModel = frameModel;
+        MJWeakSelf;
+        cell.zanClicked = ^(PinglundianzanCustomBtn *zanButton, PlayVCCommentFrameModel *frameModel) {
+            [weakSelf pinglundianzanAction:zanButton frameModel:frameModel];
+        };
         return cell;
     }
 }

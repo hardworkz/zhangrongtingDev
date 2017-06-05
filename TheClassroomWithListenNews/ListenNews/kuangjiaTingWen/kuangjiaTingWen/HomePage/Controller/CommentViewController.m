@@ -12,7 +12,7 @@
 #import "LoginNavC.h"
 #import "gerenzhuyeVC.h"
 
-@interface CommentViewController ()<UITableViewDelegate,UITableViewDataSource,UITextFieldDelegate,TTTAttributedLabelDelegate>
+@interface CommentViewController ()<UITableViewDelegate,UITableViewDataSource,UITextFieldDelegate>
 {
     UILabel *PingLundianzanNumLab;
 }
@@ -44,11 +44,6 @@
 - (void)viewWillAppear:(BOOL)animated{
     [super viewWillAppear:animated];
     [self.navigationController.navigationBar setHidden:YES];
-//    IQKeyboardManager *manager = [IQKeyboardManager sharedManager];
-//    manager.enable = YES;
-//    manager.shouldResignOnTouchOutside = YES;
-//    manager.shouldToolbarUsesTextFieldTintColor = NO;
-//    manager.enableAutoToolbar = NO;
 }
 
 - (void)viewWillDisappear:(BOOL)animated{
@@ -166,24 +161,31 @@
 - (void)loadData{
     DefineWeakSelf;
     [NetWorkTool getPaoguoJieMuOrZhuBoPingLunLieBiaoWithact_id:self.act_id andpage:[NSString stringWithFormat:@"%ld",(long)self.commentIndex] andlimit:[NSString stringWithFormat:@"%ld",(long)self.commentPageSize] sccess:^(NSDictionary *responseObject) {
+        RTLog(@"%@",responseObject[@"results"]);
+        [weakSelf endRefreshing];
         if ([responseObject[@"results"] isKindOfClass:[NSArray class]]){
             if (weakSelf.commentIndex == 1) {
                 [weakSelf.commentInfoArr removeAllObjects];
             }
-            else{
-        
-            }
-            [weakSelf.commentInfoArr addObjectsFromArray:responseObject[@"results"]];
-            weakSelf.commentInfoArr = [[NSMutableArray alloc]initWithArray:weakSelf.commentInfoArr];
+            [weakSelf.commentInfoArr addObjectsFromArray:[PlayVCCommentModel mj_objectArrayWithKeyValuesArray:responseObject[@"results"]]];
+            weakSelf.commentInfoArr = [[NSMutableArray alloc]initWithArray:[self pinglunFrameModelArrayWithModelArray:weakSelf.commentInfoArr]];
             [weakSelf.commentTableView reloadData];
-            [weakSelf endRefreshing];
-        }
-        else{
             [weakSelf endRefreshing];
         }
     } failure:^(NSError *error) {
         [weakSelf endRefreshing];
     }];
+}
+///评论model转为frameModel
+- (NSMutableArray *)pinglunFrameModelArrayWithModelArray:(NSArray *)array
+{
+    NSMutableArray *frameArray = [NSMutableArray array];
+    for (PlayVCCommentModel *model in array) {
+        PlayVCCommentFrameModel *frameModel = [[PlayVCCommentFrameModel alloc] init];
+        frameModel.model = model;
+        [frameArray addObject:frameModel];
+    }
+    return frameArray;
 }
 
 - (void)endRefreshing{
@@ -242,39 +244,35 @@
 }
 
 #pragma mark - UIButtonAction
-- (void)pinglundianzanAction:(UIButton *)sender{
-    UITableViewCell *cell = (UITableViewCell *)[[sender superview] superview];
-    NSIndexPath *indexPath = [self.commentTableView indexPathForCell:cell];
-    UILabel *dianzanNumlab = (UILabel *)[cell.contentView viewWithTag:indexPath.row + 2000];
-    if (sender.selected == YES){
-        [sender setBackgroundImage:[UIImage imageNamed:@"pinglun-10"] forState:UIControlStateNormal];
-        dianzanNumlab.text = [NSString stringWithFormat:@"%d",[dianzanNumlab.text intValue] - 1];
-        dianzanNumlab.textColor = [UIColor grayColor];
-        dianzanNumlab.alpha = 0.7f;
-        sender.selected = NO;
-        [NetWorkTool postPaoGuoXinWenPingLunDianZanWithaccessToken:[DSE encryptUseDES:ExdangqianUser]
-                                                         andact_id:self.commentInfoArr[indexPath.row][@"id"]
-                                                            sccess:^(NSDictionary *responseObject) {
-                                                                NSLog(@"responseObject = %@",responseObject);
-                                                                NSLog(@"针对评论取消点赞");
-                                                            }
-                                                           failure:^(NSError *error) {
-                                                               NSLog(@"error = %@",error);
-                                                           }];
-    }
-    else{
-        [sender setBackgroundImage:[UIImage imageNamed:@"pinglun-yizan"] forState:UIControlStateNormal];
-        dianzanNumlab.text = [NSString stringWithFormat:@"%d",[dianzanNumlab.text intValue] + 1];
-        dianzanNumlab.textColor = ColorWithRGBA(0, 159, 240, 1);
-        dianzanNumlab.alpha = 1.0f;
-        sender.selected = YES;
-        [NetWorkTool postPaoGuoXinWenPingLunDianZanWithaccessToken:[DSE encryptUseDES:ExdangqianUser] andact_id:self.commentInfoArr[indexPath.row][@"id"] sccess:^(NSDictionary *responseObject) {
+- (void)pinglundianzanAction:(PinglundianzanCustomBtn *)pinglundianzanBtn frameModel:(PlayVCCommentFrameModel *)frameModel
+{
+    PlayVCCommentModel *model = frameModel.model;
+    UILabel *dianzanNumlab = pinglundianzanBtn.PingLundianzanNumLab;
+    if (pinglundianzanBtn.selected == YES){
+        [NetWorkTool postPaoGuoXinWenPingLunDianZanWithaccessToken:[DSE encryptUseDES:ExdangqianUser] andact_id:model.playCommentID sccess:^(NSDictionary *responseObject) {
             NSLog(@"responseObject = %@",responseObject);
-            NSLog(@"针对评论点赞");
+            NSLog(@"针对评论取消点赞");
+            dianzanNumlab.text = [NSString stringWithFormat:@"%d",[dianzanNumlab.text intValue] - 1];
+            dianzanNumlab.textColor = [UIColor grayColor];
+            dianzanNumlab.alpha = 0.7f;
+            pinglundianzanBtn.selected = NO;
         } failure:^(NSError *error) {
             NSLog(@"error = %@",error);
         }];
     }
+    else{
+        [NetWorkTool postPaoGuoXinWenPingLunDianZanWithaccessToken:[DSE encryptUseDES:ExdangqianUser] andact_id:model.playCommentID sccess:^(NSDictionary *responseObject) {
+            NSLog(@"responseObject = %@",responseObject);
+            NSLog(@"针对评论点赞");
+            dianzanNumlab.text = [NSString stringWithFormat:@"%d",[dianzanNumlab.text intValue] + 1];
+            dianzanNumlab.textColor = ColorWithRGBA(0, 159, 240, 1);
+            dianzanNumlab.alpha = 1.0f;
+            pinglundianzanBtn.selected = YES;
+        } failure:^(NSError *error) {
+            NSLog(@"error = %@",error);
+        }];
+    }
+    
 }
 
 - (void)sentCommentAction:(UIButton *)sender {
@@ -381,29 +379,14 @@
 
 #pragma mark - UITableViewDataSource
 
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
-    //    if (! [self.dataSourceArr count]) {
-    //        if (!_label) {
-    //            _label = [[UILabel alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, 20)];
-    //            _label.textAlignment = NSTextAlignmentCenter;
-    //            _label.text = @"暂无数据";
-    //            _label.textColor = [UIColor lightGrayColor];
-    //            _label.center = self.helpTableView.center;
-    //            [self.helpTableView addSubview:_label];
-    //        }else {
-    //            [self.helpTableView addSubview:_label];
-    //        }
-    //    }
-    //    else{
-    //        [_label removeFromSuperview];
-    //    }
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
    return  [self.commentInfoArr count];
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath{
-    UITableViewCell *cell = (UITableViewCell *)[tableView viewWithTag:indexPath.row + 10];
-    UILabel *lab = (UILabel *)[cell viewWithTag:indexPath.row + 11];
-    return CGRectGetMaxY(lab.frame) + 10.0 / 667 * IPHONE_H;
+    PlayVCCommentFrameModel *frameModel = self.commentInfoArr[indexPath.row];
+    return frameModel.cellHeight;
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView{
@@ -411,174 +394,18 @@
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
-    static NSString *pinglunIdentify = @"pinglunIdentify";
-    UITableViewCell *cell = [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:pinglunIdentify];
-    if (!cell){
-        cell = [tableView dequeueReusableCellWithIdentifier:pinglunIdentify];
-    }
-    //头像
-    UIImageView *pinglunImg = [[UIImageView alloc]initWithFrame:CGRectMake(20.0 / 375 * IPHONE_W, 8.0 / 667 * IPHONE_H, 50.0 / 667 * IPHONE_H, 50.0 / 667 * IPHONE_H)];
-    if ([self.commentInfoArr[indexPath.row][@"avatar"]  rangeOfString:@"http"].location != NSNotFound){
-        [pinglunImg sd_setImageWithURL:[NSURL URLWithString:self.commentInfoArr[indexPath.row][@"avatar"]] placeholderImage:[UIImage imageNamed:@"right-1"]];
-    }
-    else{
-        [pinglunImg sd_setImageWithURL:[NSURL URLWithString:USERPHOTOHTTPSTRING(self.commentInfoArr[indexPath.row][@"avatar"])] placeholderImage:[UIImage imageNamed:@"right-1"]];
-    }
-    pinglunImg.userInteractionEnabled = YES;
-    pinglunImg.tag = 1000 + indexPath.row;
-    UITapGestureRecognizer *TapG = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(clickPinglunImgHead:)];
-    [pinglunImg addGestureRecognizer:TapG];
-    pinglunImg.contentMode = UIViewContentModeScaleAspectFill;
-    pinglunImg.layer.masksToBounds = YES;
-    pinglunImg.layer.cornerRadius = 25.0 / 667 * IPHONE_H;
-    [cell.contentView addSubview:pinglunImg];
-    //
-    UILabel *pinglunTitle = [[UILabel alloc]initWithFrame:CGRectMake(CGRectGetMaxX(pinglunImg.frame) + 8.0 / 375 * IPHONE_W, 10.0 / 667 * IPHONE_H, 200.0 / 375 * IPHONE_W, 20.0 / 667 * IPHONE_H)];
-    pinglunTitle.text = self.commentInfoArr[indexPath.row][@"full_name"];
-    pinglunTitle.textAlignment = NSTextAlignmentLeft;
-    pinglunTitle.textColor = [UIColor blackColor];
-    pinglunTitle.font = [UIFont systemFontOfSize:16.0f];
-    [cell.contentView addSubview:pinglunTitle];
-    //时间
-    UILabel *pinglunshijian = [[UILabel alloc]initWithFrame:CGRectMake(CGRectGetMaxX(pinglunImg.frame) + 8.0 / 375 * IPHONE_W, CGRectGetMaxY(pinglunTitle.frame) + 5.0 / 667 * IPHONE_H, 200.0 / 375 * IPHONE_W, 20.0 / 667 * IPHONE_H)];
-    pinglunshijian.text = self.commentInfoArr[indexPath.row][@"createtime"];
-    pinglunshijian.textAlignment = NSTextAlignmentLeft;
-    pinglunshijian.textColor = [UIColor grayColor];
-    pinglunshijian.font = [UIFont systemFontOfSize:13.0f];
-    [cell.contentView addSubview:pinglunshijian];
-    //评论
-    TTTAttributedLabel *pinglunLab = [[TTTAttributedLabel alloc]initWithFrame:CGRectMake(CGRectGetMaxX(pinglunImg.frame) - 3.0 / 375 * IPHONE_W, CGRectGetMaxY(pinglunshijian.frame) + 10.0 / 667 * IPHONE_H, IPHONE_W - 80.0 / 375 * IPHONE_W, 20.0 / 667 * IPHONE_H)];
-    pinglunLab.text = self.commentInfoArr[indexPath.row][@"content"];
-    pinglunLab.textColor = [UIColor blackColor];
-    pinglunLab.font = [UIFont systemFontOfSize:16.0f];
-    pinglunLab.textAlignment = NSTextAlignmentLeft;
-    pinglunLab.tag = indexPath.row + 11;
-    pinglunLab.numberOfLines = 0;
-    pinglunLab.lineSpacing = 5;
-    pinglunLab.fd_collapsed = NO;
-    pinglunLab.lineBreakMode = NSLineBreakByWordWrapping;
-    if ([self.commentInfoArr[indexPath.row][@"content"] rangeOfString:@"[e1]"].location != NSNotFound && [self.commentInfoArr[indexPath.row][@"content"] rangeOfString:@"[/e1]"].location != NSNotFound){
-        if ([self.commentInfoArr[indexPath.row][@"to_user_login"] length]) {
-            pinglunLab.text = [NSString stringWithFormat:@"回复@%@:%@",[self.commentInfoArr[indexPath.row][@"to_user_nicename"] length] ? self.commentInfoArr[indexPath.row][@"to_user_nicename"]:self.commentInfoArr[indexPath.row][@"to_user_login"],[CommonCode jiemiEmoji:self.commentInfoArr[indexPath.row][@"content"]]];
-            NSMutableDictionary *to_user = [NSMutableDictionary new];
-            [to_user setValue:self.commentInfoArr[indexPath.row][@"to_user_nicename"] forKey:@"user_nicename"];
-            [to_user setValue:self.commentInfoArr[indexPath.row][@"to_sex"] forKey:@"sex"];
-            [to_user setValue:self.commentInfoArr[indexPath.row][@"to_signature"] forKey:@"signature"];
-            [to_user setValue:self.commentInfoArr[indexPath.row][@"to_user_login"] forKey:@"user_login"];
-            [to_user setValue:self.commentInfoArr[indexPath.row][@"to_avatar"] forKey:@"avatar"];
-            //        [to_user setValue:liuyanArr[indexPath.row][@"to_user_nicename"] forKey:@"fan_num"];
-            //        [to_user setValue:liuyanArr[indexPath.row][@"to_user_nicename"] forKey:@"guan_num"];
-            [to_user setValue:self.commentInfoArr[indexPath.row][@"to_uid"] forKey:@"id"];
-            NSRange nameRange = NSMakeRange(2, [self.commentInfoArr[indexPath.row][@"to_user_nicename"] length] ? [self.commentInfoArr[indexPath.row][@"to_user_nicename"] length] + 1 : [self.commentInfoArr[indexPath.row][@"to_user_login"] length] + 1);
-            [pinglunLab setLinkAttributes:@{NSForegroundColorAttributeName : gMainColor,NSFontAttributeName :gFontMajor16}];
-            [pinglunLab setActiveLinkAttributes:@{NSForegroundColorAttributeName : gMainColor,NSFontAttributeName :gFontMajor16}];
-            [pinglunLab addLinkToTransitInformation:to_user withRange:nameRange];
-            [pinglunLab setDelegate:self];
-            
-        }
-        else{
-            pinglunLab.text = [CommonCode jiemiEmoji:self.commentInfoArr[indexPath.row][@"content"]];
-        }
-    }
-    else{
-        if ([self.commentInfoArr[indexPath.row][@"to_user_login"] length]) {
-            pinglunLab.text = [NSString stringWithFormat:@"回复@%@:%@",[self.commentInfoArr[indexPath.row][@"to_user_nicename"] length] ? self.commentInfoArr[indexPath.row][@"to_user_nicename"]:self.commentInfoArr[indexPath.row][@"to_user_login"],self.commentInfoArr[indexPath.row][@"content"]];
-            NSMutableDictionary *to_user = [NSMutableDictionary new];
-            [to_user setValue:self.commentInfoArr[indexPath.row][@"to_user_nicename"] forKey:@"user_nicename"];
-            [to_user setValue:self.commentInfoArr[indexPath.row][@"to_sex"] forKey:@"sex"];
-            [to_user setValue:self.commentInfoArr[indexPath.row][@"to_signature"] forKey:@"signature"];
-            [to_user setValue:self.commentInfoArr[indexPath.row][@"to_user_login"] forKey:@"user_login"];
-            [to_user setValue:self.commentInfoArr[indexPath.row][@"to_avatar"] forKey:@"avatar"];
-            //        [to_user setValue:liuyanArr[indexPath.row][@"to_user_nicename"] forKey:@"fan_num"];
-            //        [to_user setValue:liuyanArr[indexPath.row][@"to_user_nicename"] forKey:@"guan_num"];
-            [to_user setValue:self.commentInfoArr[indexPath.row][@"to_uid"] forKey:@"id"];
-            NSRange nameRange = NSMakeRange(2,  [self.commentInfoArr[indexPath.row][@"to_user_nicename"] length] ? [self.commentInfoArr[indexPath.row][@"to_user_nicename"] length] + 1 : [self.commentInfoArr[indexPath.row][@"to_user_login"] length] + 1);
-            [pinglunLab setLinkAttributes:@{NSForegroundColorAttributeName : gMainColor,NSFontAttributeName :gFontMajor16}];
-            [pinglunLab setActiveLinkAttributes:@{NSForegroundColorAttributeName : gMainColor,NSFontAttributeName :gFontMajor16}];
-            [pinglunLab addLinkToTransitInformation:to_user withRange:nameRange];
-            [pinglunLab setDelegate:self];
-        }
-        else{
-            pinglunLab.text = self.commentInfoArr[indexPath.row][@"content"];
-        }
-    }
-    //获取tttLabel的高度
-    //先通过NSMutableAttributedString设置和上面tttLabel一样的属性,例如行间距,字体
-    NSMutableAttributedString *attrString = [[NSMutableAttributedString alloc] initWithString:pinglunLab.text];
-    //自定义str和TTTAttributedLabel一样的行间距
-    NSMutableParagraphStyle *paragrapStyle = [[NSMutableParagraphStyle alloc] init];
-    [paragrapStyle setLineSpacing:5];
-    //设置行间距
-    [attrString addAttribute:NSParagraphStyleAttributeName value:paragrapStyle range:NSMakeRange(0, [pinglunLab.text length])];
-    //设置字体
-    [attrString addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:16] range:NSMakeRange(0, [pinglunLab.text length])];
-    
-    //得到自定义行间距的UILabel的高度
-    //CGSizeMake(300,MAXFLOAt)中的300,代表是UILable控件的宽度,它和初始化TTTAttributedLabel的宽度是一样的.
-    CGFloat height = [TTTAttributedLabel sizeThatFitsAttributedString:attrString withConstraints:CGSizeMake(pinglunLab.frame.size.width, MAXFLOAT) limitedToNumberOfLines:0].height;
-    //重新改变tttLabel的frame高度
-    CGRect rect = pinglunLab.frame;
-    rect.size.height = height + 10 ;
-    pinglunLab.frame = rect;
-    [cell.contentView addSubview:pinglunLab];
-    
-    cell.tag = indexPath.row + 10;
+    PlayVCCommentTableViewCell *cell = [PlayVCCommentTableViewCell cellWithTableView:tableView];
+    cell.isClassComment = YES;
     cell.selectionStyle = UITableViewCellSelectionStyleNone;
-    UIButton *PingLundianzanBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    PingLundianzanBtn.frame = CGRectMake(IPHONE_W - 60.0 / 375 * IPHONE_W, 20.0 / 667 * IPHONE_H, 20.0 / 375 * IPHONE_W, 20.0 / 667 * IPHONE_H);
-    [cell.contentView addSubview:PingLundianzanBtn];
-    [PingLundianzanBtn addTarget:self action:@selector(pinglundianzanAction:) forControlEvents:UIControlEventTouchUpInside];
-    
-    PingLundianzanNumLab = [[UILabel alloc]initWithFrame:CGRectMake(CGRectGetMaxX(PingLundianzanBtn.frame) + 8.0 / 375 * IPHONE_W, PingLundianzanBtn.frame.origin.y + 1.0 / 667 * IPHONE_H, 20.0 / 375 * IPHONE_W, 20.0 / 667 * IPHONE_H)];
-    PingLundianzanNumLab.text = self.commentInfoArr[indexPath.row][@"praisenum"];
-    
-    PingLundianzanNumLab.textAlignment = NSTextAlignmentCenter;
-    PingLundianzanNumLab.font = [UIFont systemFontOfSize:16.0f / 375 * IPHONE_W];
-    PingLundianzanNumLab.tag = indexPath.row + 2000;
-    [cell.contentView addSubview:PingLundianzanNumLab];
-    
-    if ([[NSString stringWithFormat:@"%@",self.commentInfoArr[indexPath.row][@"praiseFlag"]] isEqualToString:@"1"]){
-        [PingLundianzanBtn setBackgroundImage:[UIImage imageNamed:@"pinglun-10"] forState:UIControlStateNormal];
-        PingLundianzanBtn.selected = NO;
-        PingLundianzanNumLab.textColor = [UIColor grayColor];
-        PingLundianzanNumLab.alpha = 0.7f;
-    }
-    else if([[NSString stringWithFormat:@"%@",self.commentInfoArr[indexPath.row][@"praiseFlag"]] isEqualToString:@"2"]){
-        [PingLundianzanBtn setBackgroundImage:[UIImage imageNamed:@"pinglun-yizan"] forState:UIControlStateNormal];
-        PingLundianzanBtn.selected = YES;
-        PingLundianzanNumLab.textColor = ColorWithRGBA(0, 159, 240, 1);
-        PingLundianzanNumLab.alpha = 1.0f;
-    }
-    else {
-        [PingLundianzanBtn setBackgroundImage:[UIImage imageNamed:@"pinglun-10"] forState:UIControlStateNormal];
-        PingLundianzanBtn.selected = NO;
-        PingLundianzanNumLab.textColor = [UIColor grayColor];
-        PingLundianzanNumLab.alpha = 0.7f;
-    }
+    PlayVCCommentFrameModel *frameModel = self.commentInfoArr[indexPath.row];
+    cell.selectionStyle = UITableViewCellSelectionStyleNone;
+    cell.frameModel = frameModel;
+    MJWeakSelf;
+    cell.zanClicked = ^(PinglundianzanCustomBtn *zanButton, PlayVCCommentFrameModel *frameModel) {
+        [weakSelf pinglundianzanAction:zanButton frameModel:frameModel];
+    };
     return cell;
-}
 
-#pragma mark - TTTAttributedLabelDelegate
-
-- (void)attributedLabel:(TTTAttributedLabel *)label
-didSelectLinkWithTransitInformation:(NSDictionary *)components {
-    gerenzhuyeVC *gerenzhuye = [gerenzhuyeVC new];
-    if ([components[@"user_login"] isEqualToString:ExdangqianUser] && [[CommonCode readFromUserD:@"isLogin"]boolValue] == YES) {
-        gerenzhuye.isMypersonalPage = YES;
-    }
-    else{
-        gerenzhuye.isMypersonalPage = NO;
-    }
-    gerenzhuye.isNewsComment = NO;
-    gerenzhuye.user_nicename = components[@"user_nicename"];
-    gerenzhuye.sex = components[@"sex"];
-    gerenzhuye.signature = components[@"signature"];
-    gerenzhuye.user_login = components[@"user_login"];
-    gerenzhuye.avatar = components[@"avatar"];
-    gerenzhuye.user_id = components[@"id"];
-    self.hidesBottomBarWhenPushed=YES;
-    [self.navigationController pushViewController:gerenzhuye animated:YES];
-    self.hidesBottomBarWhenPushed=YES;
 }
 
 #pragma mark - UITextFieldDelegate
@@ -595,22 +422,5 @@ didSelectLinkWithTransitInformation:(NSDictionary *)components {
     _isReplyComment = NO;
     self.commentTextField.placeholder = @"输入评论";
 }
-
-
-
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
-}
-
-/*
-#pragma mark - Navigation
-
-// In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
-}
-*/
 
 @end

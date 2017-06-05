@@ -8,10 +8,11 @@
 
 #import <UIKit/UIKit.h>
 
-
+@class PinglundianzanCustomBtn;
 @interface PlayVCCommentTableViewCell : UITableViewCell
+@property (copy, nonatomic) void (^zanClicked)(PinglundianzanCustomBtn *zanButton,PlayVCCommentFrameModel *frameModel);
 @property (strong, nonatomic) PlayVCCommentFrameModel *frameModel;
-
+@property (assign, nonatomic) BOOL isClassComment;
 + (NSString *)ID;
 
 +(PlayVCCommentTableViewCell *)cellWithTableView:(UITableView *)tableView;

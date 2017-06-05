@@ -12,6 +12,7 @@
 @interface ClassImageViewTableViewCell : UITableViewCell
 
 @property (copy, nonatomic) void (^tapImage)(UITapGestureRecognizer *tap);
+
 @property (strong, nonatomic) ClassImageViewCellFrameModel *frameModel;
 +(ClassImageViewTableViewCell *)cellWithTableView:(UITableView *)tableView;
 @end

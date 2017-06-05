@@ -9,6 +9,8 @@
 #ifndef HomePageHeader_h
 #define HomePageHeader_h
 
+#import "zhuboxiangqingVCNew.h"
+
 #import "ClassContentTableViewCell.h"
 #import "ClassAuditionTableViewCell.h"
 #import "ClassImageViewTableViewCell.h"

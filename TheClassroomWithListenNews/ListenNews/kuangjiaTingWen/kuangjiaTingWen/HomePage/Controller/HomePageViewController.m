@@ -763,17 +763,13 @@
             if (IS_IPAD) {
                 [imgLeft setFrame:CGRectMake(SCREEN_WIDTH - 125.0 / 375 * IPHONE_W, 19 + offsetY, 105.0 / 375 * IPHONE_W, 70.0 / 375 *IPHONE_W)];
             }
-            NSString *imgUrl = [NSString stringWithFormat:@"%@",[self.columnInfoArr[indexPath.row][@"smeta"] stringByReplacingOccurrencesOfString:@"\\" withString:@""]];
-            NSString *imgUrl1 = [imgUrl stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-            NSString *imgUrl2 = [imgUrl1 stringByReplacingOccurrencesOfString:@"thumb:" withString:@""];
-            NSString *imgUrl3 = [imgUrl2 stringByReplacingOccurrencesOfString:@"{" withString:@""];
-            NSString *imgUrl4 = [imgUrl3 stringByReplacingOccurrencesOfString:@"}" withString:@""];
-            if ([imgUrl4  rangeOfString:@"http"].location != NSNotFound){
-                [imgLeft sd_setImageWithURL:[NSURL URLWithString:imgUrl4]];
+            
+            if ([NEWSSEMTPHOTOURL(self.columnInfoArr[indexPath.row][@"smeta"])  rangeOfString:@"http"].location != NSNotFound){
+                [imgLeft sd_setImageWithURL:[NSURL URLWithString:NEWSSEMTPHOTOURL(self.columnInfoArr[indexPath.row][@"smeta"])]];
                 //placeholderImage:[UIImage imageNamed:@"thumbnailsdefault"]
             }
             else{
-                NSString *str = USERPHOTOHTTPSTRINGZhuBo(imgUrl4);
+                NSString *str = USERPHOTOHTTPSTRINGZhuBo(NEWSSEMTPHOTOURL(self.columnInfoArr[indexPath.row][@"smeta"]));
                 [imgLeft sd_setImageWithURL:[NSURL URLWithString:str]];
                 //placeholderImage:[UIImage imageNamed:@"thumbnailsdefault"]
             }
@@ -1121,12 +1117,8 @@
             [bofangVC shareInstance].yinpinzongTime.text = [[bofangVC shareInstance] convertStringWithTime:[arr[indexPath.row][@"post_time"] intValue] / 1000];
             
             ExcurrentNumber = (int)indexPath.row;
-            NSString *imgUrl = [NSString stringWithFormat:@"%@",[arr[indexPath.row][@"smeta"] stringByReplacingOccurrencesOfString:@"\\" withString:@""]];
-            NSString *imgUrl1 = [imgUrl stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-            NSString *imgUrl2 = [imgUrl1 stringByReplacingOccurrencesOfString:@"thumb:" withString:@""];
-            NSString *imgUrl3 = [imgUrl2 stringByReplacingOccurrencesOfString:@"{" withString:@""];
-            NSString *imgUrl4 = [imgUrl3 stringByReplacingOccurrencesOfString:@"}" withString:@""];
-            [bofangVC shareInstance].newsModel.ImgStrjiemu = imgUrl4;
+            
+            [bofangVC shareInstance].newsModel.ImgStrjiemu = arr[indexPath.row][@"smeta"];
             [bofangVC shareInstance].newsModel.ZhengWenjiemu = arr[indexPath.row][@"post_excerpt"];
             [bofangVC shareInstance].newsModel.praisenum = arr[indexPath.row][@"praisenum"];
             [bofangVC shareInstance].newsModel.post_keywords = arr[indexPath.row][@"post_keywords"];
@@ -1173,9 +1165,26 @@
 
     }
     else if (tableView == self.classroomTableView){
-        if ([self.classroomInfoArr[indexPath.row][@"is_free"] isEqualToString:@"1"]) {
-            XWAlerLoginView *xw = [[XWAlerLoginView alloc]initWithTitle:@"已购买界面正在开发中"];
-            [xw show];
+//        if ([self.classroomInfoArr[indexPath.row][@"is_free"] isEqualToString:@"1"]) {
+//            XWAlerLoginView *xw = [[XWAlerLoginView alloc]initWithTitle:@"已购买界面正在开发中"];
+//            [xw show];
+//        }
+        if (indexPath.row == 0) {
+            NSDictionary *dic = self.classroomInfoArr[indexPath.row];
+            zhuboxiangqingVCNew *faxianzhuboVC = [[zhuboxiangqingVCNew alloc]init];
+            faxianzhuboVC.jiemuDescription = dic[@"description"];
+            faxianzhuboVC.jiemuFan_num = dic[@"fan_num"];
+            faxianzhuboVC.jiemuID = dic[@"id"];
+            faxianzhuboVC.jiemuImages = dic[@"images"];
+            faxianzhuboVC.jiemuIs_fan = dic[@"is_fan"];
+            faxianzhuboVC.jiemuMessage_num = dic[@"message_num"];
+            faxianzhuboVC.jiemuName = dic[@"name"];
+            faxianzhuboVC.isfaxian = YES;
+            faxianzhuboVC.isClass = YES;
+            self.hidesBottomBarWhenPushed=YES;
+            [self.navigationController pushViewController:faxianzhuboVC animated:YES];
+            self.hidesBottomBarWhenPushed=NO;
+
         }
         else if ([self.classroomInfoArr[indexPath.row][@"is_free"] isEqualToString:@"0"]){
             ClassViewController *vc = [ClassViewController new];

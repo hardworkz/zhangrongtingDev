@@ -947,12 +947,12 @@
     faxianzhuboVC.jiemuIs_fan = dic[@"is_fan"];
     faxianzhuboVC.jiemuMessage_num = dic[@"message_num"];
     faxianzhuboVC.jiemuName = dic[@"name"];
-    if (indexPath.row > 0){
-        faxianzhuboVC.act_table = @"act";
-    }
-    else{
-        faxianzhuboVC.act_table = @"posts";
-    }
+//    if (indexPath.row > 0){
+//        faxianzhuboVC.act_table = @"act";
+//    }
+//    else{
+//        faxianzhuboVC.act_table = @"posts";
+//    }
     self.hidesBottomBarWhenPushed=YES;
     [self.navigationController pushViewController:faxianzhuboVC animated:YES];
     self.hidesBottomBarWhenPushed=NO;

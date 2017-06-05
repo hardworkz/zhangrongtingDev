@@ -83,6 +83,8 @@
         PingLundianzanBtn = [PinglundianzanCustomBtn buttonWithType:UIButtonTypeCustom];
         PingLundianzanBtn.frame = CGRectMake(IPHONE_W - 60.0 / 375 * IPHONE_W, 20.0 / 667 * IPHONE_H, 50.0 / 375 * IPHONE_W, 20.0 / 667 * IPHONE_H);
         [self.contentView addSubview:PingLundianzanBtn];
+        [PingLundianzanBtn setImage:[UIImage imageNamed:@"pinglun-yizan"] forState:UIControlStateSelected];
+        [PingLundianzanBtn setImage:[UIImage imageNamed:@"pinglun-10"] forState:UIControlStateNormal];
         [PingLundianzanBtn addTarget:self action:@selector(pinglundianzanAction:) forControlEvents:UIControlEventTouchUpInside];
         
         //点赞label
@@ -132,65 +134,68 @@
     //点赞按钮和赞人数
     PingLundianzanNumLab.text = frameModel.model.praisenum;
     if ([[NSString stringWithFormat:@"%@",frameModel.model.praiseFlag] isEqualToString:@"1"]){
-        [PingLundianzanBtn setImage:[UIImage imageNamed:@"pinglun-10"] forState:UIControlStateNormal];
         PingLundianzanBtn.selected = NO;
         PingLundianzanNumLab.textColor = [UIColor grayColor];
         PingLundianzanNumLab.alpha = 0.7f;
     }
     else if([[NSString stringWithFormat:@"%@",frameModel.model.praiseFlag] isEqualToString:@"2"]){
-        [PingLundianzanBtn setImage:[UIImage imageNamed:@"pinglun-yizan"] forState:UIControlStateNormal];
         PingLundianzanBtn.selected = YES;
         PingLundianzanNumLab.textColor = ColorWithRGBA(0, 159, 240, 1);
         PingLundianzanNumLab.alpha = 1.0f;
     }
     else {
-        [PingLundianzanBtn setImage:[UIImage imageNamed:@"pinglun-10"] forState:UIControlStateNormal];
         PingLundianzanBtn.selected = NO;
         PingLundianzanNumLab.textColor = [UIColor grayColor];
         PingLundianzanNumLab.alpha = 0.7f;
     }
 
 }
-- (void)pinglundianzanAction:(UIButton *)sender{
-    
-//    NSIndexPath *indexPath = [self.tableView indexPathForCell:self];
+- (void)pinglundianzanAction:(UIButton *)sender
+{
     PinglundianzanCustomBtn *pinglundianzanBtn = (PinglundianzanCustomBtn *)sender;
     UILabel *dianzanNumlab = pinglundianzanBtn.PingLundianzanNumLab;
-    if ([[CommonCode readFromUserD:@"isLogin"]boolValue] == YES) {
-        if (sender.selected == YES){
-            [sender setImage:[UIImage imageNamed:@"pinglun-10"] forState:UIControlStateNormal];
-            if ([dianzanNumlab.text intValue] == 0) {
-                dianzanNumlab.text = @"0";
-            }else
-            {
-                dianzanNumlab.text = [NSString stringWithFormat:@"%d",[dianzanNumlab.text intValue] - 1];
+    if (!self.isClassComment) {//新闻评论点赞
+        
+        //    NSIndexPath *indexPath = [self.tableView indexPathForCell:self];
+        if ([[CommonCode readFromUserD:@"isLogin"]boolValue] == YES) {
+            if (sender.selected == YES){
+                if ([dianzanNumlab.text intValue] == 0) {
+                    dianzanNumlab.text = @"0";
+                }else
+                {
+                    dianzanNumlab.text = [NSString stringWithFormat:@"%d",[dianzanNumlab.text intValue] - 1];
+                }
+                dianzanNumlab.textColor = [UIColor grayColor];
+                dianzanNumlab.alpha = 0.7f;
+                sender.selected = NO;
+                [NetWorkTool addAndCancelPraiseWithaccessToken:[DSE encryptUseDES:ExdangqianUser] comments_id:_frameModel.model.playCommentID sccess:^(NSDictionary *responseObject) {
+                    NSLog(@"responseObject = %@",responseObject);
+                    NSLog(@"针对评论取消点赞");
+                } failure:^(NSError *error) {
+                    NSLog(@"error = %@",error);
+                }];
             }
-            dianzanNumlab.textColor = [UIColor grayColor];
-            dianzanNumlab.alpha = 0.7f;
-            sender.selected = NO;
-            [NetWorkTool addAndCancelPraiseWithaccessToken:[DSE encryptUseDES:ExdangqianUser] comments_id:_frameModel.model.playCommentID sccess:^(NSDictionary *responseObject) {
-                NSLog(@"responseObject = %@",responseObject);
-                NSLog(@"针对评论取消点赞");
-            } failure:^(NSError *error) {
-                NSLog(@"error = %@",error);
-            }];
+            else{
+                dianzanNumlab.text = [NSString stringWithFormat:@"%d",[dianzanNumlab.text intValue] + 1];
+                dianzanNumlab.textColor = ColorWithRGBA(0, 159, 240, 1);
+                dianzanNumlab.alpha = 1.0f;
+                sender.selected = YES;
+                [NetWorkTool addAndCancelPraiseWithaccessToken:[DSE encryptUseDES:ExdangqianUser] comments_id:_frameModel.model.playCommentID sccess:^(NSDictionary *responseObject) {
+                    NSLog(@"responseObject = %@",responseObject);
+                    NSLog(@"针对评论点赞");
+                } failure:^(NSError *error) {
+                    NSLog(@"error = %@",error);
+                }];
+            }
+            
+        }else{
+            [self loginFirst];
         }
-        else{
-            [sender setImage:[UIImage imageNamed:@"pinglun-yizan"] forState:UIControlStateNormal];
-            dianzanNumlab.text = [NSString stringWithFormat:@"%d",[dianzanNumlab.text intValue] + 1];
-            dianzanNumlab.textColor = ColorWithRGBA(0, 159, 240, 1);
-            dianzanNumlab.alpha = 1.0f;
-            sender.selected = YES;
-            [NetWorkTool addAndCancelPraiseWithaccessToken:[DSE encryptUseDES:ExdangqianUser] comments_id:_frameModel.model.playCommentID sccess:^(NSDictionary *responseObject) {
-                NSLog(@"responseObject = %@",responseObject);
-                NSLog(@"针对评论点赞");
-            } failure:^(NSError *error) {
-                NSLog(@"error = %@",error);
-            }];
+    }else//课堂评论点赞
+    {
+        if (self.zanClicked) {
+            self.zanClicked(pinglundianzanBtn, self.frameModel);
         }
-
-    }else{
-        [self loginFirst];
     }
 }
 - (void)loginFirst {

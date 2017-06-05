@@ -16,7 +16,9 @@
 @property(nonatomic)NSString *jiemuFan_num;
 @property(nonatomic)NSString *jiemuMessage_num;
 @property(nonatomic)NSString *jiemuIs_fan;
-@property(nonatomic)NSString *act_table;
-@property(nonatomic)BOOL isbofangye;
-@property(nonatomic)BOOL isfaxian;
+
+//@property(nonatomic)NSString *act_table;
+@property(nonatomic)BOOL isClass;/**<是否为课堂详情*/
+@property(nonatomic)BOOL isbofangye;/**<是否从播放器进入主播详情*/
+@property(nonatomic)BOOL isfaxian;/**<是否从发现页面进入*/
 @end

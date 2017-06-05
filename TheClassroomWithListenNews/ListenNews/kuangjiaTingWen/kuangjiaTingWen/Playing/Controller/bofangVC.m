@@ -1915,9 +1915,8 @@ static bofangVC *_instance = nil;
     }
     WXMediaMessage *message = [WXMediaMessage message];
     message.title = self.newsModel.Titlejiemu;
-    NSString *musicUrl = [NSString stringWithFormat:@"https://tingwen.me/index.php/article/yulan/id/%@.html",self.newsModel.jiemuID];
-//    NSString *musicUrl = @"http://jingyan.baidu.com/article/a378c960b49034b3282830db.html";
-    
+//    NSString *musicUrl = [NSString stringWithFormat:@"http://tingwen.me/index.php/article/yulan/id/%@.html",self.newsModel.jiemuID];
+    NSString *musicUrl = @"https://zhidao.baidu.com/question/2143697514695119428.html";
     [self getImageWithURLStr:self.newsModel.ImgStrjiemu OnSucceed:^(UIImage *image) {
         //压缩图片大小
         CGFloat compression = 0.8f;
@@ -1938,7 +1937,9 @@ static bofangVC *_instance = nil;
             [message setThumbImage:[UIImage imageWithData:thumbImageData]];
             WXMusicObject *ext = [WXMusicObject object];
             ext.musicUrl = musicUrl;
+            ext.musicLowBandUrl = ext.musicUrl;
             ext.musicDataUrl = self.newsModel.post_mp;
+            ext.musicLowBandDataUrl = ext.musicDataUrl;
             message.mediaObject = ext;
             SendMessageToWXReq* req = [[SendMessageToWXReq alloc] init];
             req.bText = NO;
