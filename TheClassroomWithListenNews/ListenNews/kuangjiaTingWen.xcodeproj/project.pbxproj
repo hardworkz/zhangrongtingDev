@@ -175,6 +175,7 @@
 		6995820D1EC563240037E9A4 /* child_commentModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 6995820C1EC563240037E9A4 /* child_commentModel.m */; };
 		699582101EC569A50037E9A4 /* UserDetailModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 6995820F1EC569A50037E9A4 /* UserDetailModel.m */; };
 		699582131EC5B40E0037E9A4 /* UIView+Extension.m in Sources */ = {isa = PBXBuildFile; fileRef = 699582121EC5B40E0037E9A4 /* UIView+Extension.m */; };
+		6997589E1EE656160022D1F3 /* zhuboxiangqingNewVCPlayBtn.m in Sources */ = {isa = PBXBuildFile; fileRef = 6997589D1EE656160022D1F3 /* zhuboxiangqingNewVCPlayBtn.m */; };
 		69A7BABA1ED4177C0094E0BA /* SuNetworkMonitor.m in Sources */ = {isa = PBXBuildFile; fileRef = 69A7BAB91ED4177C0094E0BA /* SuNetworkMonitor.m */; };
 		69C713341EC0740F00F2729E /* CommonCode.m in Sources */ = {isa = PBXBuildFile; fileRef = 69C711E51EC0740E00F2729E /* CommonCode.m */; };
 		69C713351EC0740F00F2729E /* CommonEnums.m in Sources */ = {isa = PBXBuildFile; fileRef = 69C711E71EC0740E00F2729E /* CommonEnums.m */; };
@@ -800,6 +801,8 @@
 		6995820F1EC569A50037E9A4 /* UserDetailModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UserDetailModel.m; sourceTree = "<group>"; };
 		699582111EC5B40E0037E9A4 /* UIView+Extension.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIView+Extension.h"; sourceTree = "<group>"; };
 		699582121EC5B40E0037E9A4 /* UIView+Extension.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIView+Extension.m"; sourceTree = "<group>"; };
+		6997589C1EE656160022D1F3 /* zhuboxiangqingNewVCPlayBtn.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = zhuboxiangqingNewVCPlayBtn.h; sourceTree = "<group>"; };
+		6997589D1EE656160022D1F3 /* zhuboxiangqingNewVCPlayBtn.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = zhuboxiangqingNewVCPlayBtn.m; sourceTree = "<group>"; };
 		69A7BAB81ED4177C0094E0BA /* SuNetworkMonitor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SuNetworkMonitor.h; sourceTree = "<group>"; };
 		69A7BAB91ED4177C0094E0BA /* SuNetworkMonitor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SuNetworkMonitor.m; sourceTree = "<group>"; };
 		69C711E41EC0740E00F2729E /* CommonCode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CommonCode.h; sourceTree = "<group>"; };
@@ -2562,6 +2565,8 @@
 				69C713051EC0740F00F2729E /* UIImage+CH.m */,
 				69C713061EC0740F00F2729E /* UIView+AK.h */,
 				69C713071EC0740F00F2729E /* UIView+AK.m */,
+				6997589C1EE656160022D1F3 /* zhuboxiangqingNewVCPlayBtn.h */,
+				6997589D1EE656160022D1F3 /* zhuboxiangqingNewVCPlayBtn.m */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -3401,6 +3406,7 @@
 				695745911D5C7384001022AD /* DKColorTable.m in Sources */,
 				6300DB691D0565B300B82C42 /* Reachability.m in Sources */,
 				691907941D3F6AFA0012A42E /* AIDatePickerController.m in Sources */,
+				6997589E1EE656160022D1F3 /* zhuboxiangqingNewVCPlayBtn.m in Sources */,
 				633C2BEC1D2CA58000476CBD /* PinyinFormatter.m in Sources */,
 				E91D53A71D93719A008B8564 /* MJRefreshHeader.m in Sources */,
 				6991653C1EE0FFA5001914EB /* ClassCommentListModel.m in Sources */,

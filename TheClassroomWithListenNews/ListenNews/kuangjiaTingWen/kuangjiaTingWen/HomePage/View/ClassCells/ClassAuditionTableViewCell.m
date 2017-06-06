@@ -130,7 +130,9 @@
                 titleLab = self.titles[i];
                 playTestMp = self.buttons[i];
             }
-            
+            if (_playingIndex == i) {
+                playTestMp.selected = YES;
+            }
             titleLab.text = model.s_title;
             titleLab.frame = [frameModel.titlesFrameArray[i] CGRectValue];
             [playTestMp setFrame:[frameModel.buttonsFrameArray[i] CGRectValue]];

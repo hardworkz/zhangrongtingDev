@@ -17,6 +17,7 @@
 #import "PlayVCCommentFrameModel.h"
 
 #import "PlayVCCommentTableViewCell.h"
+#import "zhuboxiangqingNewVCPlayBtn.h"
 
 #import "PinglundianzanCustomBtn.h"
 

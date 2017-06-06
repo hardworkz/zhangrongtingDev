@@ -12,7 +12,9 @@
 @interface ClassAuditionTableViewCell : UITableViewCell
 
 @property (copy, nonatomic) void (^playAudition)(UIButton *button,NSMutableArray *buttons);
+@property (assign, nonatomic) NSInteger playingIndex;//当前播放index
 @property (strong, nonatomic) ClassAuditionCellFrameModel *frameModel;
+
 @property (nonatomic, strong) NSMutableArray *buttons;
 @property (nonatomic, strong) NSMutableArray *titles;
 +(ClassAuditionTableViewCell *)cellWithTableView:(UITableView *)tableView;

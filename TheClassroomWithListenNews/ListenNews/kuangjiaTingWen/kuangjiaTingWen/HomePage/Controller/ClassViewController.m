@@ -77,6 +77,9 @@
     [super viewWillDisappear:animated];
     [self.navigationController setNavigationBarHidden:NO animated:YES];
 //    [Explayer pause];
+    if (_isPlaying) {
+        [self auditionnBtnAction:_auditionnBtn];
+    }
 }
 
 - (void)setUpData{
@@ -668,6 +671,7 @@
         return cell;
     }else if(indexPath.row > self.classModel.imagesArray.count && (indexPath.row <= self.classModel.imagesArray.count + 1)){
         ClassAuditionTableViewCell *cell = [ClassAuditionTableViewCell cellWithTableView:tableView];
+        cell.playingIndex = _playingIndex;
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
         cell.frameModel = self.frameArray[indexPath.row];
         self.buttons = cell.buttons;

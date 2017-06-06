@@ -274,8 +274,9 @@
         _isRewardLoginBack = NO;
         [self rewardAlert];
     }
-    UITableView *fansBoardTableView = (UITableView *)[TwoScrollV viewWithTag:4];
-    [fansBoardTableView.mj_header beginRefreshing];
+    [self btnAction:[CenterView viewWithTag:10]];
+//    UITableView *fansBoardTableView = (UITableView *)[TwoScrollV viewWithTag:4];
+//    [fansBoardTableView.mj_header beginRefreshing];
 }
 
 - (void)viewWillDisappear:(BOOL)animated{
@@ -533,9 +534,25 @@
     [sender ChangeBlackToBlue:[UIImage imageNamed:[NSString stringWithFormat:@"mentButton%ld",(long)sender.tag - 9]]];
     NSInteger i = sender.tag - 10;
     [TwoScrollV setContentOffset:CGPointMake(IPHONE_W * i, 0) animated:YES];
-    UITableView *tableView = (UITableView *)[[[sender superview] superview]viewWithTag:sender.tag - 7];
-    
-    [tableView.mj_header beginRefreshing];
+//    UITableView *tableView = (UITableView *)[[[sender superview] superview]viewWithTag:sender.tag - 7];
+
+    UITableView *selectTableView;
+    for (UITableView *tableView in TwoScrollV.subviews) {
+        if (sender.tag - 7 == 3) {
+            if ([xinwenshuaxinTableView isEqual:tableView]) {
+                selectTableView = tableView;
+            }
+        }else if (sender.tag - 7 == 5){
+            if ([fansWallTableView isEqual:tableView]) {
+                selectTableView = tableView;
+            }
+        }else if (sender.tag - 7 == 5){
+            if ([pinglunhoushuaxinTableView isEqual:tableView]) {
+                selectTableView = tableView;
+            }
+        }
+    }
+    [selectTableView.mj_header beginRefreshing];
     //TODO:主播详情界面内容未超过一页时 不能上滑
     
 //    NSLog(@"tableView.frame.size.height%f",tableView.frame.size.height);
@@ -1342,9 +1359,95 @@
     [SVProgressHUD dismiss];
 }
 //点击播放按钮
-- (void)playBtnPlay:(UIButton *)button
+- (void)playBtnPlay:(zhuboxiangqingNewVCPlayBtn *)button
 {
-    
+    NSIndexPath *indexPath = button.indexPath;
+    if ([[CommonCode readFromUserD:@"dangqianbofangxinwenID"] isEqualToString:xinwenArr[indexPath.row][@"id"]]){
+        
+        if (self.isfaxian) {
+            self.hidesBottomBarWhenPushed = YES;
+            [self.navigationController.navigationBar setHidden:NO];
+//            [self.navigationController pushViewController:[bofangVC shareInstance ] animated:YES];
+            [[NSNotificationCenter defaultCenter]postNotificationName:@"getAhocComment" object:xinwenArr[indexPath.row][@"id"]];
+        }
+        else{
+            [self.navigationController popViewControllerAnimated:YES];
+            [[NSNotificationCenter defaultCenter]postNotificationName:@"getAhocComment" object:xinwenArr[indexPath.row][@"id"]];
+        }
+        if ([bofangVC shareInstance].isPlay) {
+//            [[bofangVC shareInstance] doPlay:[bofangVC shareInstance].centerBtn];
+            RTLog(@"bofangVC--isPlay");
+        }
+        else{
+            [[bofangVC shareInstance] doplay2];
+            button.selected = YES;
+        }
+    }
+    else{
+        
+        [bofangVC shareInstance].newsModel.jiemuID = xinwenArr[indexPath.row][@"id"];
+        [bofangVC shareInstance].newsModel.Titlejiemu = xinwenArr[indexPath.row][@"post_title"];
+        [bofangVC shareInstance].newsModel.RiQijiemu = xinwenArr[indexPath.row][@"post_date"];
+        [bofangVC shareInstance].newsModel.ImgStrjiemu = xinwenArr[indexPath.row][@"smeta"];
+        [bofangVC shareInstance].newsModel.post_lai = xinwenArr[indexPath.row][@"post_lai"];
+        [bofangVC shareInstance].newsModel.post_news = self.jiemuID;
+        [bofangVC shareInstance].newsModel.jiemuName = self.jiemuName;
+        [bofangVC shareInstance].newsModel.jiemuDescription = self.jiemuDescription;
+        [bofangVC shareInstance].newsModel.jiemuImages = self.jiemuImages;
+        [bofangVC shareInstance].newsModel.jiemuFan_num = self.jiemuFan_num;
+        [bofangVC shareInstance].newsModel.jiemuMessage_num = self.jiemuMessage_num;
+        [bofangVC shareInstance].newsModel.jiemuIs_fan = self.jiemuIs_fan;
+        [bofangVC shareInstance].newsModel.post_mp = xinwenArr[indexPath.row][@"post_mp"];
+        [bofangVC shareInstance].newsModel.post_time = xinwenArr[indexPath.row][@"post_time"];
+        [bofangVC shareInstance].newsModel.post_keywords = xinwenArr[indexPath.row][@"post_keywords"];
+        [bofangVC shareInstance].newsModel.url = xinwenArr[indexPath.row][@"url"];
+        [bofangVC shareInstance].yinpinzongTime.text = [[bofangVC shareInstance] convertStringWithTime:[xinwenArr[indexPath.row][@"post_time"] intValue] / 1000];
+        ExcurrentNumber = (int)indexPath.row;
+        [bofangVC shareInstance].newsModel.ImgStrjiemu = xinwenArr[indexPath.row][@"smeta"];
+        [bofangVC shareInstance].newsModel.ZhengWenjiemu = xinwenArr[indexPath.row][@"post_excerpt"];
+        [bofangVC shareInstance].newsModel.praisenum = xinwenArr[indexPath.row][@"praisenum"];
+        [bofangVC shareInstance].iszhuboxiangqing = YES;
+        [[bofangVC shareInstance].tableView reloadData];
+        //        Explayer = [[AVPlayer alloc]initWithPlayerItem:[[AVPlayerItem alloc]initWithURL:[NSURL URLWithString:arr[indexPath.row][@"post_mp"]]]];
+        [Explayer replaceCurrentItemWithPlayerItem:[[AVPlayerItem alloc]initWithURL:[NSURL URLWithString:xinwenArr[indexPath.row][@"post_mp"]]]];
+        if ([bofangVC shareInstance].isPlay || ExIsKaiShiBoFang == NO) {
+            //            [[bofangVC shareInstance] doPlay:[bofangVC shareInstance].centerBtn];
+            RTLog(@"bofangVC--isPlay");
+        }
+        else{
+            [[bofangVC shareInstance] doplay2];
+            button.selected = YES;
+        }
+        ExisRigester = YES;
+        ExIsKaiShiBoFang = YES;
+        ExwhichBoFangYeMianStr = @"zhuboxiangqingbofang";
+        if (self.isfaxian) {
+//            self.hidesBottomBarWhenPushed = YES;
+//            [self.navigationController.navigationBar setHidden:NO];
+//            [self.navigationController pushViewController:[bofangVC shareInstance ] animated:YES];
+            [[NSNotificationCenter defaultCenter]postNotificationName:@"getAhocComment" object:xinwenArr[indexPath.row][@"id"]];
+        }
+        else{
+            [self.navigationController popViewControllerAnimated:YES];
+            [[NSNotificationCenter defaultCenter]postNotificationName:@"getAhocComment" object:xinwenArr[indexPath.row][@"id"]];
+        }
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"yuanpanzhuan" object:nil];
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"qiehuanxinwen" object:nil];
+        [CommonCode writeToUserD:xinwenArr andKey:@"zhuyeliebiao"];
+        [CommonCode writeToUserD:xinwenArr[indexPath.row][@"id"] andKey:@"dangqianbofangxinwenID"];
+        if ([[CommonCode readFromUserD:@"yitingguoxinwenID"] isKindOfClass:[NSArray class]])
+        {
+            NSMutableArray *yitingguoArr = [NSMutableArray arrayWithArray:[CommonCode readFromUserD:@"yitingguoxinwenID"]];
+            [yitingguoArr addObject:xinwenArr[indexPath.row][@"id"]];
+            [CommonCode writeToUserD:yitingguoArr andKey:@"yitingguoxinwenID"];
+        }else
+        {
+            NSMutableArray *yitingguoArr = [NSMutableArray array];
+            [yitingguoArr addObject:xinwenArr[indexPath.row][@"id"]];
+            [CommonCode writeToUserD:yitingguoArr andKey:@"yitingguoxinwenID"];
+        }
+        [xinwenshuaxinTableView reloadData];
+    }
 }
 #pragma mark - UITableViewDelegate
 
@@ -1446,8 +1549,17 @@
             cell = [tableView dequeueReusableCellWithIdentifier:zhuboxiangqingxinwenIdentify forIndexPath:indexPath];
         }
         UILabel *titleLab = [[UILabel alloc]init];
+        zhuboxiangqingNewVCPlayBtn *playBtn = [[zhuboxiangqingNewVCPlayBtn alloc] init];
         if (self.isClass) {
             titleLab.frame = CGRectMake(72.0 / 375 * IPHONE_W, 12.0 / 667 * IPHONE_H, SCREEN_WIDTH - 137.0 / 375 * IPHONE_W, 21 * 3);
+            //播放按钮
+            playBtn.frame = CGRectMake(SCREEN_WIDTH - 50 - 10, 10, 50, 50);
+            [playBtn setImage:[UIImage imageNamed:@"classpause"] forState:UIControlStateNormal];
+            [playBtn setImage:[UIImage imageNamed:@"classplay"] forState:UIControlStateSelected];
+            //            playBtn.tag = indexPath.row;
+            playBtn.indexPath = indexPath;
+            [playBtn addTarget:self action:@selector(playBtnPlay:) forControlEvents:UIControlEventTouchUpInside];
+            [cell.contentView addSubview:playBtn];
         }else{
             titleLab.frame = CGRectMake(72.0 / 375 * IPHONE_W, 12.0 / 667 * IPHONE_H, SCREEN_WIDTH - 87.0 / 375 * IPHONE_W, 21 * 3);
         }
@@ -1461,14 +1573,17 @@
                     if ([[CommonCode readFromUserD:@"dangqianbofangxinwenID"] isEqualToString:xinwenArr[indexPath.row][@"id"]])
                     {
                         titleLab.textColor = gMainColor;
+                        playBtn.selected = YES;
                         break;
                     }
                     else{
                         titleLab.textColor = [[UIColor grayColor]colorWithAlphaComponent:0.7f];
+                        playBtn.selected = NO;
                         break;
                     }
                 }else
                 {
+                    playBtn.selected = NO;
                     titleLab.textColor = nTextColorMain;
                 }
             }
@@ -1498,7 +1613,7 @@
         }
         
         //大小
-        if (!self.class) {
+        if (!self.isClass) {
             UIButton *dataLab = [UIButton buttonWithType:UIButtonTypeCustom];
             [dataLab setFrame:CGRectMake(SCREEN_WIDTH -  55.0 / 375 * IPHONE_W, 64.0 / 667 * SCREEN_HEIGHT, 35.0 / 375 * IPHONE_W, 15.0 / 667 * SCREEN_HEIGHT)];
             [dataLab setTitle:[NSString stringWithFormat:@"%.1lf%@",[xinwenArr[indexPath.row][@"post_size"] intValue] / 1024.0 / 1024.0,@"M"] forState:UIControlStateNormal];
@@ -1512,13 +1627,6 @@
             [cell.contentView addSubview:dataLab];
         }
         
-        //播放按钮
-        UIButton *playBtn = [[UIButton alloc] initWithFrame:CGRectMake(SCREEN_WIDTH - 50 - 10, 10, 50, 50)];
-        [playBtn setImage:[UIImage imageNamed:@"classpause"] forState:UIControlStateNormal];
-        [playBtn setImage:[UIImage imageNamed:@"classplay"] forState:UIControlStateSelected];
-        playBtn.tag = indexPath.row;
-        [playBtn addTarget:self action:@selector(playBtnPlay:) forControlEvents:UIControlEventTouchUpInside];
-        [cell.contentView addSubview:playBtn];
         
         TTTAttributedLabel *riqiLab = [[TTTAttributedLabel alloc]initWithFrame:CGRectMake(20.0 / 375 * IPHONE_W, 12.0 / 667 * SCREEN_HEIGHT, 52.0 / 375 * IPHONE_W, 30.0 / 667 * SCREEN_HEIGHT)];
         riqiLab.text = xinwenArr[indexPath.row][@"post_modified"];
@@ -1831,6 +1939,7 @@
                 self.hidesBottomBarWhenPushed = YES;
                 [self.navigationController.navigationBar setHidden:NO];
                 [self.navigationController pushViewController:[bofangVC shareInstance ] animated:YES];
+                [[bofangVC shareInstance] scrollToTop];
                 [[NSNotificationCenter defaultCenter]postNotificationName:@"getAhocComment" object:xinwenArr[indexPath.row][@"id"]];
             }
             else{
@@ -1884,6 +1993,7 @@
                 self.hidesBottomBarWhenPushed = YES;
                 [self.navigationController.navigationBar setHidden:NO];
                 [self.navigationController pushViewController:[bofangVC shareInstance ] animated:YES];
+                [[bofangVC shareInstance] scrollToTop];
                 [[NSNotificationCenter defaultCenter]postNotificationName:@"getAhocComment" object:xinwenArr[indexPath.row][@"id"]];
             }
             else{

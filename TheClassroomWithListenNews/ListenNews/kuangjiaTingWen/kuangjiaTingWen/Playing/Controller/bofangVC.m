@@ -255,7 +255,6 @@ static bofangVC *_instance = nil;
 }
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    [self.tableView setContentOffset:CGPointMake(0, 0) animated:NO];
     IQKeyboardManager *manager = [IQKeyboardManager sharedManager];
     manager.enable = YES;
     manager.shouldResignOnTouchOutside = YES;
@@ -282,6 +281,7 @@ static bofangVC *_instance = nil;
     [self recordTheLastNews];
     //获取评论列表
     [self huoqupinglunliebiao];
+    [self.tableView setContentOffset:CGPointMake(0, -20) animated:NO];
 }
 
 -(void)viewWillDisappear:(BOOL)animated {
@@ -718,6 +718,7 @@ static bofangVC *_instance = nil;
     self.sliderProgress.maximumTrackTintColor = [UIColor clearColor];
     
     [dibuView addSubview:bofangCenterBtn];
+    self.centerBtn = bofangCenterBtn;
     
     if (timeObserver != nil) {
         [Explayer removeTimeObserver:timeObserver];
@@ -911,7 +912,7 @@ static bofangVC *_instance = nil;
     [self huoqupinglunliebiao];
     [self configNowPlayingInfoCenter];
     [self.tableView reloadData];
-    [self.tableView setContentOffset:CGPointMake(0, 0) animated:NO];
+    [self.tableView setContentOffset:CGPointZero animated:NO];
     
     if ([ExwhichBoFangYeMianStr isEqualToString:@"Downloadbofang"]){
         [Explayer replaceCurrentItemWithPlayerItem:[[AVPlayerItem alloc]initWithURL:[NSURL fileURLWithPath:self.newsModel.post_mp]]];

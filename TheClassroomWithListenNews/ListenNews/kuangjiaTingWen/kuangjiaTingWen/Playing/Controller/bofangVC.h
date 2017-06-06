@@ -10,6 +10,7 @@
 
 @class NewsModel;
 @interface bofangVC : UIViewController
+
 + (instancetype)shareInstance;
 
 @property(strong,nonatomic)NewsModel *newsModel;
@@ -19,6 +20,7 @@
 
 @property(strong,nonatomic)UITableView *tableView;
 @property(strong,nonatomic)UILabel *yinpinzongTime;
+@property (strong, nonatomic) UIButton *centerBtn;
 
 @property(nonatomic)NSString *zidongjiazaiPinDaoID;
 @property(nonatomic)NSInteger zidongjiazaiTableTag;
@@ -31,5 +33,7 @@
 
 - (NSString *)convertStringWithTime:(float)time;/**<计算音频总时间*/
 - (void)configNowPlayingInfoCenter;
+- (void)doPlay:(UIButton *)sender;
 - (void)doplay2;
+- (void)scrollToTop;
 @end
