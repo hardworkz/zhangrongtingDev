@@ -26,6 +26,7 @@
 #import "WHC_Download.h"
 #import "LoginVC.h"
 #import "LoginNavC.h"
+#import "tianjiaGuanZhuVC.h"
 
 @interface dingyueVC ()<UITableViewDataSource,UITableViewDelegate,UIScrollViewDelegate>
 {
@@ -35,12 +36,26 @@
 @property(strong,nonatomic)UITableView *tableView;
 @property(strong,nonatomic)NSMutableArray *infoArr;
 @property (strong, nonatomic) NSMutableDictionary *pushNewsInfo;
-
+@property (strong, nonatomic) UIButton *tipBtn;;
 
 @end
 
 @implementation dingyueVC
-
+- (UIButton *)tipBtn
+{
+    if (_tipBtn == nil) {
+        NSMutableAttributedString *str = [[NSMutableAttributedString alloc] initWithString:@"当前为未登录状态，无法获取用户个人数据\n点击前往登录" attributes:@{NSForegroundColorAttributeName:[UIColor lightGrayColor]}];
+        [str setAttributes:@{NSForegroundColorAttributeName:gMainColor} range:NSMakeRange(str.length - 6, 6)];
+        _tipBtn = [[UIButton alloc] initWithFrame:CGRectMake(0, SCREEN_HEIGHT * 0.5 - 100, SCREEN_WIDTH, 40)];
+        [_tipBtn setAttributedTitle:str forState:UIControlStateNormal];
+        _tipBtn.titleLabel.textAlignment = NSTextAlignmentCenter;
+        _tipBtn.titleLabel.font = gFontMain14;
+        _tipBtn.titleLabel.numberOfLines = 0;
+        [_tipBtn addTarget:self action:@selector(goToLogin)];
+        [_tipBtn setTitleColor:gMainColor forState:UIControlStateNormal];
+    }
+    return _tipBtn;
+}
 - (void)viewDidLoad {
     [super viewDidLoad];
     DefineWeakSelf;
@@ -104,8 +119,6 @@
     
     [self.view addSubview:self.tableView];
     
-    [self.tableView.mj_header beginRefreshing];
-    
     //通知
     //播放下一条自动加载更多新闻信息通知
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(dingyuezidongjiazai:) name:@"dingyuebofangRightyaojiazaishujv" object:nil];
@@ -116,21 +129,8 @@
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     [self.navigationController setNavigationBarHidden:NO animated:YES];
-    //    self.navigationController.navigationBar.titleTextAttributes = @{NSForegroundColorAttributeName: [UIColor blackColor],
-    //                                                                    NSFontAttributeName : [UIFont boldSystemFontOfSize:18]};
-    if ([[CommonCode readFromUserD:@"isLogin"]boolValue] == NO){
-        LoginVC *loginFriVC = [LoginVC new];
-        loginFriVC.isSubscription = YES;
-        LoginNavC *loginNavC = [[LoginNavC alloc]initWithRootViewController:loginFriVC];
-        [loginNavC.navigationBar setBackgroundColor:[UIColor whiteColor]];
-        //        [loginNavC.navigationBar setBackgroundImage:[UIImage imageNamed:@"mian-1"] forBarMetrics:UIBarMetricsDefault];
-        loginNavC.navigationBar.tintColor = [UIColor blackColor];
-        [self presentViewController:loginNavC animated:YES completion:nil];
-        
-    }
     
-    //    [self.tableView.mj_header beginRefreshing];
-    
+    [self.tableView.mj_header beginRefreshing];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -418,52 +418,83 @@
     }];
 }
 - (void)addUser {
-    jiemuLieBiaoVC *nextVC = [[jiemuLieBiaoVC alloc]init];
-    if (![self.infoArr isKindOfClass:[NSArray class]]){
-        nextVC.lastInfoArr = [NSMutableArray array];
-    }
-    else{
-        nextVC.lastInfoArr = [NSMutableArray arrayWithArray:self.infoArr];
-    }
-    self.hidesBottomBarWhenPushed=YES;
-    [self.navigationController pushViewController:nextVC animated:YES];
-    self.hidesBottomBarWhenPushed=NO;
-}
-- (void)refreshData{
-    numberPage = 1;
-    DefineWeakSelf;
-    [NetWorkTool getPaoGuoSelfWoDeJieMuWithaccessToken:[DSE encryptUseDES:ExdangqianUser] andPage:@"1" andLimit:@"10" sccess:^(NSDictionary *responseObject) {
-        if ([responseObject[@"results"] isKindOfClass:[NSArray class]]){
-            [self.infoArr removeAllObjects];
-            [self.infoArr addObjectsFromArray:responseObject[@"results"]];
-            [CommonCode writeToUserD:self.infoArr andKey:@"wodejiemu"];
+    if ([[CommonCode readFromUserD:@"isLogin"] boolValue] == YES)
+    {
+        jiemuLieBiaoVC *nextVC = [[jiemuLieBiaoVC alloc]init];
+        if (![self.infoArr isKindOfClass:[NSArray class]]){
+            nextVC.lastInfoArr = [NSMutableArray array];
         }
         else{
-            [weakSelf followFirst];
-            [self.infoArr removeAllObjects];
+            nextVC.lastInfoArr = [NSMutableArray arrayWithArray:self.infoArr];
         }
+        self.hidesBottomBarWhenPushed=YES;
+        [self.navigationController pushViewController:nextVC animated:YES];
+        self.hidesBottomBarWhenPushed=NO;
+    }else{
+        XWAlerLoginView *alert = [[XWAlerLoginView alloc] initWithTitle:@"请先前往登录"];
+        [alert show];
+    }
+}
+- (void)refreshData{
+    if ([[CommonCode readFromUserD:@"isLogin"] boolValue] == YES){
+        numberPage = 1;
+        DefineWeakSelf;
+        [NetWorkTool getPaoGuoSelfWoDeJieMuWithaccessToken:[DSE encryptUseDES:ExdangqianUser] andPage:@"1" andLimit:@"10" sccess:^(NSDictionary *responseObject) {
+            if ([responseObject[@"results"] isKindOfClass:[NSArray class]]){
+                [self.infoArr removeAllObjects];
+                [self.infoArr addObjectsFromArray:responseObject[@"results"]];
+                [CommonCode writeToUserD:self.infoArr andKey:@"wodejiemu"];
+                [self.tipBtn removeFromSuperview];
+            }
+            else{
+                [weakSelf followFirst];
+                [self.infoArr removeAllObjects];
+            }
+            [self.tableView reloadData];
+            [self.tableView.mj_header endRefreshing];
+        } failure:^(NSError *error) {
+            NSLog(@"error = %@",error);
+            [self.tableView.mj_header endRefreshing];
+        }];
+    }else{//清空数据，设置空数据提醒
+        [self.infoArr removeAllObjects];
         [self.tableView reloadData];
         [self.tableView.mj_header endRefreshing];
-    } failure:^(NSError *error) {
-        NSLog(@"error = %@",error);
-        [self.tableView.mj_header endRefreshing];
-    }];
+        [self.tableView.mj_footer endRefreshing];
+        [self.tableView addSubview:self.tipBtn];
+    }
 }
-
+//弹出登录页面
+- (void)goToLogin
+{
+    if ([[CommonCode readFromUserD:@"isLogin"] boolValue] == NO){
+        LoginVC *loginFriVC = [LoginVC new];
+        loginFriVC.isSubscription = YES;
+        LoginNavC *loginNavC = [[LoginNavC alloc]initWithRootViewController:loginFriVC];
+        [loginNavC.navigationBar setBackgroundColor:[UIColor whiteColor]];
+        loginNavC.navigationBar.tintColor = [UIColor blackColor];
+        [self presentViewController:loginNavC animated:YES completion:nil];
+    }
+}
 - (void)shanglajiazai
 {
-    numberPage++;
-    [NetWorkTool getPaoGuoSelfWoDeJieMuWithaccessToken:[DSE encryptUseDES:ExdangqianUser] andPage:[NSString stringWithFormat:@"%d",numberPage] andLimit:@"10" sccess:^(NSDictionary *responseObject) {
-        if ([responseObject[@"results"] isKindOfClass:[NSArray class]])
-        {
-            [self.infoArr addObjectsFromArray:responseObject[@"results"]];
-        }
-        [self.tableView reloadData];
-        [self.tableView.mj_footer endRefreshing];
-    } failure:^(NSError *error) {
-        NSLog(@"error = %@",error);
-        [self.tableView.mj_footer endRefreshing];
-    }];
+    if ([[CommonCode readFromUserD:@"isLogin"] boolValue] == YES)
+    {
+        numberPage++;
+        [NetWorkTool getPaoGuoSelfWoDeJieMuWithaccessToken:[DSE encryptUseDES:ExdangqianUser] andPage:[NSString stringWithFormat:@"%d",numberPage] andLimit:@"10" sccess:^(NSDictionary *responseObject) {
+            if ([responseObject[@"results"] isKindOfClass:[NSArray class]])
+            {
+                [self.infoArr addObjectsFromArray:responseObject[@"results"]];
+            }
+            [self.tableView reloadData];
+            [self.tableView.mj_footer endRefreshing];
+        } failure:^(NSError *error) {
+            NSLog(@"error = %@",error);
+            [self.tableView.mj_footer endRefreshing];
+        }];
+    }else{
+        
+    }
 }
 
 - (void)followFirst {
@@ -723,15 +754,4 @@
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
-
-/*
- #pragma mark - Navigation
- 
- // In a storyboard-based application, you will often want to do a little preparation before navigation
- - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
- // Get the new view controller using [segue destinationViewController].
- // Pass the selected object to the new view controller.
- }
- */
-
 @end

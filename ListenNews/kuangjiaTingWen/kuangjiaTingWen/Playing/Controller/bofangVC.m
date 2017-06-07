@@ -2782,7 +2782,7 @@ static bofangVC *_instance = nil;
             [_customRewardTextField setPlaceholder:@"可输入1-500整数"];
             [_customRewardTextField setFont:gFontSub11];
             [_customRewardTextField setClearButtonMode:UITextFieldViewModeAlways];
-            [_customRewardTextField setKeyboardType:UIKeyboardTypeNumberPad];
+            [_customRewardTextField setKeyboardType:UIKeyboardTypeDecimalPad];
             [_customRewardTextField setDelegate:self];
             [customRewardView addSubview:_customRewardTextField];
             

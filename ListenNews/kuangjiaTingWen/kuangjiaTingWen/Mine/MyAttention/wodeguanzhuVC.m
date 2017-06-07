@@ -259,14 +259,15 @@
 
 - (void)addUser{
     NSLog(@"添加关注");
-    tianjiaGuanZhuVC *tianjiaguanzhu = [tianjiaGuanZhuVC new];
-    
-    self.hidesBottomBarWhenPushed=YES;
-    [self.navigationController pushViewController:tianjiaguanzhu animated:YES];
-    //    self.hidesBottomBarWhenPushed=NO;
-    
-    
-    
+    if ([[CommonCode readFromUserD:@"isLogin"] boolValue] == YES){
+        tianjiaGuanZhuVC *tianjiaguanzhu = [tianjiaGuanZhuVC new];
+        self.hidesBottomBarWhenPushed=YES;
+        [self.navigationController pushViewController:tianjiaguanzhu animated:YES];
+        //    self.hidesBottomBarWhenPushed=NO;
+    }else{
+        XWAlerLoginView *alert = [[XWAlerLoginView alloc] initWithTitle:@"请先登录"];
+        [alert show];
+    }
 }
 - (void)back
 {

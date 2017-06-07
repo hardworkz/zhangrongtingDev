@@ -152,6 +152,7 @@
 		6985B9311D7404EE0081BCBD /* iAppInfos.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6985B92F1D7404EE0081BCBD /* iAppInfos.framework */; };
 		6985B9321D7404EF0081BCBD /* SAMTextView.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6985B9301D7404EE0081BCBD /* SAMTextView.framework */; };
 		6985B9341D740F6A0081BCBD /* TTTAttributedLabel.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6985B9331D740F690081BCBD /* TTTAttributedLabel.framework */; };
+		698754261EE8054700AE8B72 /* Order2.m in Sources */ = {isa = PBXBuildFile; fileRef = 698754251EE8054700AE8B72 /* Order2.m */; };
 		698CBDAA1ECE7C7200040108 /* Foundation+Log.m in Sources */ = {isa = PBXBuildFile; fileRef = 698CBDA91ECE7C7200040108 /* Foundation+Log.m */; };
 		6991651C1EE0F83A001914EB /* ClassContentTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 6991651B1EE0F83A001914EB /* ClassContentTableViewCell.m */; };
 		6991651F1EE0F863001914EB /* ClassImageViewTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 6991651E1EE0F863001914EB /* ClassImageViewTableViewCell.m */; };
@@ -754,6 +755,8 @@
 		6985B92F1D7404EE0081BCBD /* iAppInfos.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = iAppInfos.framework; path = "Pods/../build/Debug-iphoneos/iAppInfos/iAppInfos.framework"; sourceTree = "<group>"; };
 		6985B9301D7404EE0081BCBD /* SAMTextView.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SAMTextView.framework; path = "Pods/../build/Debug-iphoneos/SAMTextView/SAMTextView.framework"; sourceTree = "<group>"; };
 		6985B9331D740F690081BCBD /* TTTAttributedLabel.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = TTTAttributedLabel.framework; path = "Pods/../build/Debug-iphoneos/TTTAttributedLabel/TTTAttributedLabel.framework"; sourceTree = "<group>"; };
+		698754241EE8054700AE8B72 /* Order2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Order2.h; sourceTree = "<group>"; };
+		698754251EE8054700AE8B72 /* Order2.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Order2.m; sourceTree = "<group>"; };
 		698CBDA91ECE7C7200040108 /* Foundation+Log.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "Foundation+Log.m"; sourceTree = "<group>"; };
 		6991651A1EE0F83A001914EB /* ClassContentTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ClassContentTableViewCell.h; sourceTree = "<group>"; };
 		6991651B1EE0F83A001914EB /* ClassContentTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ClassContentTableViewCell.m; sourceTree = "<group>"; };
@@ -2502,6 +2505,8 @@
 		69C712E31EC0740F00F2729E /* PayOnline */ = {
 			isa = PBXGroup;
 			children = (
+				698754241EE8054700AE8B72 /* Order2.h */,
+				698754251EE8054700AE8B72 /* Order2.m */,
 				69C712E41EC0740F00F2729E /* PayOnlineViewController.h */,
 				69C712E51EC0740F00F2729E /* PayOnlineViewController.m */,
 			);
@@ -3528,6 +3533,7 @@
 				63B690BD1D2F8B8D0013961E /* FMActionSheet.m in Sources */,
 				633C2BF01D2CA58000476CBD /* ZYPinYinSearch.m in Sources */,
 				6991651C1EE0F83A001914EB /* ClassContentTableViewCell.m in Sources */,
+				698754261EE8054700AE8B72 /* Order2.m in Sources */,
 				69C7139D1EC0740F00F2729E /* bofangVC.m in Sources */,
 				E956E03D1E66B9DB00444F06 /* IAPHelper.m in Sources */,
 				69C7134F1EC0740F00F2729E /* YJImageBrowserView.m in Sources */,

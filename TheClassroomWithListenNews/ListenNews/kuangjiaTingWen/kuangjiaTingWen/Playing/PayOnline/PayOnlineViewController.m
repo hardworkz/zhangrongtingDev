@@ -10,6 +10,7 @@
 #import "TTTAttributedLabel.h"
 #import <AlipaySDK/AlipaySDK.h>
 #import "Order.h"
+#import "Order2.h"
 #import "APAuthV2Info.h"
 #import "RSADataSigner.h"
 #import "AppDelegate.h"
@@ -385,6 +386,19 @@
      *生成订单信息及签名
      */
     //将商品信息赋予AlixPayOrder的成员变量
+    Order2 *order2 = [[Order2 alloc] init];
+    order2.partner = @"2088121595506011";
+    order2.seller = rsaPrivateKey;
+    order2.tradeNO = [self generateTradeNO];
+    order2.productName = @"听闻打赏";
+    order2.productDescription = @"0.0";
+    order2.amount = @"0.1";
+    order2.notifyURL = @"http://admin.tingwen.me/index.php/api/Alipay/notifyurl";
+    order2.service = @"alipay.trade.app.pay";
+    order2.paymentType = @"1";
+    order2.inputCharset = @"utf-8";
+    order2.itBPay = @"30m";
+    order2.showUrl = @"m.alipay.com";
     Order* order = [Order new];
     
     // NOTE: app_id设置
@@ -417,9 +431,10 @@
     order.biz_content.out_trade_no = [self generateTradeNO]; //订单ID（由商家自行制定）
     order.biz_content.timeout_express = @"30m"; //超时时间设置
     order.biz_content.total_amount = [NSString stringWithFormat:@"%.2f", self.rewardCount]; //商品价格
-    
+    order.biz_content.seller_id = rsaPrivateKey;
     //将商品信息拼接成字符串
-    NSString *orderInfo = [order orderInfoEncoded:NO];
+//    NSString *orderInfo = [order orderInfoEncoded:NO];
+    NSString *orderInfo = [order2 description];
     NSString *orderInfoEncoded = [order orderInfoEncoded:YES];
     // NOTE: 获取私钥并将商户信息签名，外部商户的加签过程请务必放在服务端，防止公私钥数据泄露；
     //       需要遵循RSA签名规范，并将签名字符串base64编码和UrlEncode
