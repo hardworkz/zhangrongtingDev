@@ -1126,7 +1126,7 @@ static bofangVC *_instance = nil;
 }
 
 - (void)bofangwanbi:(NSNotification *)notice{
-    RTLog(@"bofangwanbi----------");
+    [bofangCenterBtn setImage:[UIImage imageNamed:@"home_news_ic_play"] forState:UIControlStateNormal];
     if ([[CommonCode readFromUserD:TINGYOUQUANBOFANGWANBI] isEqualToString:@"YES"]) {
         [CommonCode writeToUserD:@"NO" andKey:TINGYOUQUANBOFANGWANBI];
         return;

@@ -1475,6 +1475,20 @@
                           sccess:(void (^)(NSDictionary *responseObject))success
                          failure:(void (^)(NSError *error))failure;
 /**
+ *  	获取用户对该节目的订单
+ *
+ *  @param accessToken      accessToken
+ *  @param act_id           主播或节目id (必填)
+ *  @param money           主播或节目id (必填)
+ *  @param success          成功
+ *  @param failure          错误
+ */
++ (void)buyActWithaccessToken:(NSString *)accessToken
+                       act_id:(NSString *)act_id
+                        money:(NSString *)money
+                       sccess:(void (^)(NSDictionary *responseObject))success
+                      failure:(void (^)(NSError *error))failure;
+/**
  *  	删除用户自己的评论
  *
  *  @param accessToken      accessToken

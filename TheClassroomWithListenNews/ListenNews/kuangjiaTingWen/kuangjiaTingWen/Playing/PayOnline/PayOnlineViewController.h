@@ -22,4 +22,8 @@
 
 @property (assign, nonatomic) BOOL isPayClass;
 
+//微信支付
+- (void)WechatPay;
+//支付宝
+- (void)AliPay;
 @end

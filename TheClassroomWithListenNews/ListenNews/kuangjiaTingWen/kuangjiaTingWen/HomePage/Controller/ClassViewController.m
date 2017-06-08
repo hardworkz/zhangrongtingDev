@@ -25,8 +25,10 @@
     NSInteger playIndex;
     NSString *currentClassID;
     UITextView *zhengwenTextView;
+    NSString *rewardMoney;
+    NSString *orderNum;
 }
-
+@property (strong, nonatomic) CustomAlertView *alertView;
 @property (nonatomic, strong) UITableView *helpTableView;
 @property (nonatomic, strong) NSMutableArray *buttons;
 @property (nonatomic, strong) NSMutableArray *dataSourceArr;
@@ -71,12 +73,6 @@
     [super viewWillAppear:animated];
     self.hidesBottomBarWhenPushed = YES;
     [self.navigationController setNavigationBarHidden:YES animated:YES];
-    
-//    if (!_isPlaying && ![bofangVC shareInstance].isPlay) {
-//        [[NSNotificationCenter defaultCenter] postNotificationName:@"stopAnimate" object:nil];
-//    }else {
-//        [[NSNotificationCenter defaultCenter] postNotificationName:@"startAnimate" object:nil];
-//    }
 }
 
 - (void)viewWillDisappear:(BOOL)animated{
@@ -86,11 +82,6 @@
     if (_isPlaying) {
         [self auditionnBtnAction:_auditionnBtn];
     }
-//    if (!_isPlaying && ![bofangVC shareInstance].isPlay) {
-//        [[NSNotificationCenter defaultCenter] postNotificationName:@"stopAnimate" object:nil];
-//    }else {
-//        [[NSNotificationCenter defaultCenter] postNotificationName:@"startAnimate" object:nil];
-//    }
 }
 
 - (void)setUpData{
@@ -110,8 +101,6 @@
     [self.session setCategory:AVAudioSessionCategoryPlayback error:&error];
     //激活会话
     [self.session setActive:YES error:&error];
-    //添加观察者，用来监视播放器的状态变化
-//    [Explayer addObserver:self forKeyPath:@"statu" options:NSKeyValueObservingOptionNew context:nil];
     //接收播放完毕后发出的通知
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(voicePlayEnd:) name:AVPlayerItemDidPlayToEndTimeNotification object:Explayer.currentItem];
     
@@ -507,32 +496,179 @@
     }
     
 }
-
 - (void)purchaseBtnAction:(UIButton *)sender{
     if ([[CommonCode readFromUserD:@"isLogin"]boolValue] == YES){
-        XWAlerLoginView *xw = [[XWAlerLoginView alloc]initWithTitle:@"正在努力开发中~"];
-        [xw show];
-//        PayOnlineViewController *vc = [PayOnlineViewController new];
-//        NSString *accesstoken = nil;
-//        accesstoken = AvatarAccessToken;
-//        [NetWorkTool getListenMoneyWithaccessToken:accesstoken sccess:^(NSDictionary *responseObject) {
-//            NSLog(@"%@",responseObject);
-//            if ([responseObject[@"status"] integerValue] == 1) {
-//                vc.balanceCount = [responseObject[@"results"][@"listen_money"] doubleValue];
-//                vc.rewardCount = [self.auditionResult[@"price"] floatValue];
-//                vc.uid = self.auditionResult[@"act_id"];
-////                vc.post_id = self.jiemuID;
-//                vc.isPayClass = YES;
-//                self.hidesBottomBarWhenPushed = YES;
-//                [self.navigationController pushViewController:vc animated:YES];
-//            }
-//        } failure:^(NSError *error) {
-//            
-//        }];
+        if ([[CommonCode readFromUserD:@"isIAP"] boolValue] == YES)
+        {//当前为内购路线
+            
+            _alertView = [[CustomAlertView alloc] initWithCustomView:[self setupPayAlertWithIAP:YES]];
+            _alertView.alertHeight = 105;
+            _alertView.alertDuration = 0.25;
+            _alertView.coverAlpha = 0.6;
+            [_alertView show];
+        }
+        else
+        {//当前为支付宝，微信，听币支付路线
+            [NetWorkTool get_orderWithaccessToken:AvatarAccessToken act_id:self.classModel.act_id sccess:^(NSDictionary *responseObject) {
+                RTLog(@"%@",responseObject);
+                if ([responseObject[@"status"] intValue] == 1) {
+                    rewardMoney = responseObject[@"results"][@"money"];
+                    orderNum = responseObject[@"results"][@"order_num"];
+                    _alertView = [[CustomAlertView alloc] initWithCustomView:[self setupPayAlertWithIAP:NO]];
+                    _alertView.alertHeight = 205;
+                    _alertView.alertDuration = 0.25;
+                    _alertView.coverAlpha = 0.6;
+                    [_alertView show];
+                }else{
+                    XWAlerLoginView *xw = [[XWAlerLoginView alloc]initWithTitle:@"订单获取失败"];
+                    [xw show];
+                }
+            } failure:^(NSError *error) {
+                
+            }];
+
+        }
     }
     else{
         [self loginFirst];
     }
+}
+//创建支付弹窗view
+- (UIView *)setupPayAlertWithIAP:(BOOL)iap
+{
+    if (iap) {
+        UIView *bgView = [[UIView alloc] init];
+        bgView.backgroundColor = HEXCOLOR(0xe3e3e3);
+        bgView.frame = CGRectMake(0, 0, SCREEN_WIDTH, 105);
+        
+        UIButton *deleteBtn = [[UIButton alloc] init];
+        deleteBtn.frame = CGRectMake(0, 0, SCREEN_WIDTH, 50);
+        deleteBtn.backgroundColor = [UIColor whiteColor];
+        [deleteBtn setTitle:@"听币支付" forState:UIControlStateNormal];
+        [deleteBtn setTitleColor:gMainColor forState:UIControlStateNormal];
+        deleteBtn.titleLabel.font = [UIFont systemFontOfSize:17];
+        [deleteBtn addTarget:self action:@selector(tingbiBtnClicked)];
+        [bgView addSubview:deleteBtn];
+        
+        UIButton *cancelBtn = [[UIButton alloc] init];
+        cancelBtn.frame = CGRectMake(0, 55, SCREEN_WIDTH, 50);
+        cancelBtn.backgroundColor = [UIColor whiteColor];
+        [cancelBtn setTitle:@"取消" forState:UIControlStateNormal];
+        [cancelBtn setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+        cancelBtn.titleLabel.font = [UIFont systemFontOfSize:17];
+        [cancelBtn addTarget:self action:@selector(cancelAlert)];
+        [bgView addSubview:cancelBtn];
+        
+        return bgView;
+
+    }else{
+        UIView *bgView = [[UIView alloc] init];
+        bgView.backgroundColor = HEXCOLOR(0xe3e3e3);
+        bgView.frame = CGRectMake(0, 0, SCREEN_WIDTH, 205);
+        
+        UIButton *zhifubaoBtn = [[UIButton alloc] init];
+        zhifubaoBtn.frame = CGRectMake(0, 0, SCREEN_WIDTH, 50);
+        zhifubaoBtn.backgroundColor = [UIColor whiteColor];
+        [zhifubaoBtn setTitle:@"支付宝支付" forState:UIControlStateNormal];
+        [zhifubaoBtn setTitleColor:gMainColor forState:UIControlStateNormal];
+        zhifubaoBtn.titleLabel.font = [UIFont systemFontOfSize:17];
+        [zhifubaoBtn addTarget:self action:@selector(zhifubaoBtnClicked)];
+        [bgView addSubview:zhifubaoBtn];
+        
+        UIButton *weixinBtn = [[UIButton alloc] init];
+        weixinBtn.frame = CGRectMake(0, 0, SCREEN_WIDTH, 50);
+        weixinBtn.backgroundColor = [UIColor whiteColor];
+        [weixinBtn setTitle:@"微信支付" forState:UIControlStateNormal];
+        [weixinBtn setTitleColor:gMainColor forState:UIControlStateNormal];
+        weixinBtn.titleLabel.font = [UIFont systemFontOfSize:17];
+        [weixinBtn addTarget:self action:@selector(weixinBtnClicked)];
+        [bgView addSubview:weixinBtn];
+        
+        UIButton *tingbiBtn = [[UIButton alloc] init];
+        tingbiBtn.frame = CGRectMake(0, 0, SCREEN_WIDTH, 50);
+        tingbiBtn.backgroundColor = [UIColor whiteColor];
+        [tingbiBtn setTitle:@"听币支付" forState:UIControlStateNormal];
+        [tingbiBtn setTitleColor:gMainColor forState:UIControlStateNormal];
+        tingbiBtn.titleLabel.font = [UIFont systemFontOfSize:17];
+        [tingbiBtn addTarget:self action:@selector(tingbiBtnClicked)];
+        [bgView addSubview:tingbiBtn];
+        
+        UIButton *cancelBtn = [[UIButton alloc] init];
+        cancelBtn.frame = CGRectMake(0, 55, SCREEN_WIDTH, 50);
+        cancelBtn.backgroundColor = [UIColor whiteColor];
+        [cancelBtn setTitle:@"取消" forState:UIControlStateNormal];
+        [cancelBtn setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+        cancelBtn.titleLabel.font = [UIFont systemFontOfSize:17];
+        [cancelBtn addTarget:self action:@selector(cancelAlert)];
+        [bgView addSubview:cancelBtn];
+        
+        return bgView;
+    }
+}
+//支付宝支付
+- (void)zhifubaoBtnClicked
+{
+    PayOnlineViewController *vc = [PayOnlineViewController new];
+    vc.rewardCount = [rewardMoney floatValue];
+    vc.uid = self.classModel.act_id;
+    vc.post_id = self.classModel.ID;
+    vc.isPayClass = YES;
+    [vc AliPay];
+}
+//微信支付
+- (void)weixinBtnClicked
+{
+    PayOnlineViewController *vc = [PayOnlineViewController new];
+    vc.rewardCount = [rewardMoney floatValue];
+    vc.uid = self.classModel.act_id;
+    vc.post_id = self.classModel.ID;
+    vc.isPayClass = YES;
+    [vc WechatPay];
+}
+//听币支付
+- (void)tingbiBtnClicked
+{
+    //获取听币余额
+    PayOnlineViewController *vc = [PayOnlineViewController new];
+    [NetWorkTool getListenMoneyWithaccessToken:AvatarAccessToken sccess:^(NSDictionary *responseObject) {
+        NSLog(@"%@",responseObject);
+        if ([responseObject[@"status"] integerValue] == 1) {
+            if ([responseObject[@"results"][@"listen_money"] doubleValue] < [rewardMoney floatValue]) {//余额不足，前往充值
+                vc.balanceCount = [responseObject[@"results"][@"listen_money"] doubleValue];
+                vc.rewardCount = [rewardMoney floatValue];
+                vc.uid = self.classModel.act_id;
+                vc.post_id = self.classModel.ID;
+                vc.isPayClass = NO;
+                self.hidesBottomBarWhenPushed = YES;
+                [self.navigationController pushViewController:vc animated:YES];
+            }else{//调用购买接口
+                [NetWorkTool buyActWithaccessToken:AvatarAccessToken act_id:self.classModel.ID money:rewardMoney sccess:^(NSDictionary *responseObject) {
+                    if ([responseObject[@"status"] integerValue] == 1) {
+                        //购买成功，退出课堂购买界面，刷新列表
+                        XWAlerLoginView *xw = [[XWAlerLoginView alloc]initWithTitle:@"课程购买成功"];
+                        [xw show];
+                        [self.navigationController popViewControllerAnimated:YES];
+                    }else{
+                        XWAlerLoginView *xw = [[XWAlerLoginView alloc]initWithTitle:@"课程购买失败"];
+                        [xw show];
+                    }
+                } failure:^(NSError *error) {
+                    
+                }];
+            }
+        }else{
+            XWAlerLoginView *xw = [[XWAlerLoginView alloc]initWithTitle:@"获取听币余额失败"];
+            [xw show];
+        }
+    } failure:^(NSError *error) {
+        
+    }];
+
+}
+//取消支付弹窗
+- (void)cancelAlert
+{
+    [_alertView coverClick];
 }
 //列表试听按钮点击
 - (void)playTestMp:(UIButton *)sender{
