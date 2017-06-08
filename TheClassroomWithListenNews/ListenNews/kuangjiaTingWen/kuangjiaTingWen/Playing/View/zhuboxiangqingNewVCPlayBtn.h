@@ -10,4 +10,5 @@
 
 @interface zhuboxiangqingNewVCPlayBtn : UIButton
 @property (strong, nonatomic) NSIndexPath *indexPath;
+@property (strong, nonatomic) UILabel *titleLab;
 @end

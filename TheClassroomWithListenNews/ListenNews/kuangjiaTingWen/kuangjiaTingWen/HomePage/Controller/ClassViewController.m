@@ -71,6 +71,12 @@
     [super viewWillAppear:animated];
     self.hidesBottomBarWhenPushed = YES;
     [self.navigationController setNavigationBarHidden:YES animated:YES];
+    
+//    if (!_isPlaying && ![bofangVC shareInstance].isPlay) {
+//        [[NSNotificationCenter defaultCenter] postNotificationName:@"stopAnimate" object:nil];
+//    }else {
+//        [[NSNotificationCenter defaultCenter] postNotificationName:@"startAnimate" object:nil];
+//    }
 }
 
 - (void)viewWillDisappear:(BOOL)animated{
@@ -80,6 +86,11 @@
     if (_isPlaying) {
         [self auditionnBtnAction:_auditionnBtn];
     }
+//    if (!_isPlaying && ![bofangVC shareInstance].isPlay) {
+//        [[NSNotificationCenter defaultCenter] postNotificationName:@"stopAnimate" object:nil];
+//    }else {
+//        [[NSNotificationCenter defaultCenter] postNotificationName:@"startAnimate" object:nil];
+//    }
 }
 
 - (void)setUpData{
@@ -447,6 +458,7 @@
 }
 //点击底部试听按钮
 - (void)auditionnBtnAction:(UIButton *)sender{
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"stopAnimate" object:nil];
     if (sender.selected == YES) {//选中状态，为播放状态,则将列表按钮设置全部设置为暂停
         sender.selected = NO;
         for ( int i = 0 ; i < self.buttons.count; i ++ ) {
@@ -524,6 +536,7 @@
 }
 //列表试听按钮点击
 - (void)playTestMp:(UIButton *)sender{
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"stopAnimate" object:nil];
     BOOL isTestMpPlay = NO;//判断是否在试听列表里面有选中的按钮正在播放
     for ( int i = 0 ; i < self.buttons.count; i ++ ) {
         UIButton *allDoneButton = self.buttons[i];

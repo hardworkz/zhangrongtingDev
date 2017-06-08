@@ -115,6 +115,7 @@
     ExTouXiangPath = [[NSHomeDirectory() stringByAppendingPathComponent:@"Documents"] stringByAppendingPathComponent:@"userAvatar.png"];
     ExdangqianUserUid = [CommonCode readFromUserD:@"dangqianUserUid"];
     
+    [self getAppVersion];
     //启动时获取已登录用户的信息、未读消息
     if ([[CommonCode readFromUserD:@"isLogin"]boolValue] == YES) {
         
@@ -157,34 +158,6 @@
         }
         
         
-        //请求是否为内购的接口
-        [NetWorkTool getAppVersionSccess:^(NSDictionary *responseObject) {
-            NSLog(@"%@",responseObject);
-            //听闻电台
-            if ([APPBUNDLEIDENTIFIER isEqualToString:@"com.popwcn.ListenNewsExploreVersion"]) {
-                //当前版本号与提交审核时后台配置的一样说明正在审核
-                if ([responseObject[@"results"][@"exploreVersion"] isEqualToString:APPVERSION]) {
-                    [CommonCode writeToUserD:@(YES) andKey:@"isIAP"];
-                }
-                else{
-                    [CommonCode writeToUserD:@(NO) andKey:@"isIAP"];
-                }
-            }
-            //听闻FM
-            else{
-                if ([responseObject[@"results"][@"listenNews"] isEqualToString:APPVERSION]) {
-                    [CommonCode writeToUserD:@(YES) andKey:@"isIAP"];
-                }
-                else{
-                    [CommonCode writeToUserD:@(NO) andKey:@"isIAP"];
-                }
-            }
-            
-        } failure:^(NSError *error) {
-            //
-            [CommonCode writeToUserD:nil andKey:@"isIAP"];
-        }];
-
         //获取未读消息数
         dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
         dispatch_group_t group = dispatch_group_create();
@@ -315,6 +288,36 @@
     [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:&error];
 
     return YES;
+}
+- (void)getAppVersion
+{
+    //请求是否为内购的接口
+    [NetWorkTool getAppVersionSccess:^(NSDictionary *responseObject) {
+        NSLog(@"%@",responseObject);
+        //听闻电台
+        if ([APPBUNDLEIDENTIFIER isEqualToString:@"com.popwcn.ListenNewsExploreVersion"]) {
+            //当前版本号与提交审核时后台配置的一样说明正在审核
+            if ([responseObject[@"results"][@"exploreVersion"] isEqualToString:APPVERSION]) {
+                [CommonCode writeToUserD:@(YES) andKey:@"isIAP"];
+            }
+            else{
+                [CommonCode writeToUserD:@(NO) andKey:@"isIAP"];
+            }
+        }
+        //听闻FM
+        else{
+            if ([responseObject[@"results"][@"listenNews"] isEqualToString:APPVERSION]) {
+                [CommonCode writeToUserD:@(YES) andKey:@"isIAP"];
+            }
+            else{
+                [CommonCode writeToUserD:@(NO) andKey:@"isIAP"];
+            }
+        }
+        
+    } failure:^(NSError *error) {
+        //
+        [CommonCode writeToUserD:nil andKey:@"isIAP"];
+    }];
 }
 
 

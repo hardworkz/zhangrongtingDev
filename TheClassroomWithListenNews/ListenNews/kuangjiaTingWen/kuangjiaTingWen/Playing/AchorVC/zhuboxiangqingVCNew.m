@@ -74,6 +74,7 @@
 @property (assign, nonatomic) BOOL isRewardLoginBack;
 @property (strong, nonatomic) RewardCustomView *rewardView;
 @property (assign, nonatomic) BOOL isReplyComment;
+@property (assign, nonatomic) BOOL isTapPlayBtn;/**<第一次点击节目列表中的播放按钮，用来让页面第一次点击列表按钮，颜色状态能发生改变*/
 @property (strong, nonatomic) NSString *replyTouid;
 @property (strong, nonatomic) NSString *replyCommentid;
 
@@ -241,25 +242,6 @@
     [pinglunBgView addGestureRecognizer:back];
     
 }
-
-//-(void)viewDidAppear:(BOOL)animated{
-//
-//    IQKeyboardManager *manager = [IQKeyboardManager sharedManager];
-//    manager.enable = YES;
-//    manager.shouldResignOnTouchOutside = YES;
-//    manager.shouldToolbarUsesTextFieldTintColor = YES;
-//    manager.enableAutoToolbar = NO;
-//
-//}
-//- (void)viewWillDisappear:(BOOL)animated{
-//
-//    [super viewWillDisappear:animated];
-//
-//    [IQKeyboardManager sharedManager].enable = NO;
-//
-//}
-
-
 - (void)viewWillAppear:(BOOL)animated{
     [super viewWillAppear:animated];
     IQKeyboardManager *manager = [IQKeyboardManager sharedManager];
@@ -277,11 +259,23 @@
     [self btnAction:[CenterView viewWithTag:10]];
 //    UITableView *fansBoardTableView = (UITableView *)[TwoScrollV viewWithTag:4];
 //    [fansBoardTableView.mj_header beginRefreshing];
+    
+    if (![bofangVC shareInstance].isPlay) {
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"stopAnimate" object:nil];
+    }else {
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"startAnimate" object:nil];
+    }
 }
 
 - (void)viewWillDisappear:(BOOL)animated{
     [super viewWillDisappear:animated];
     [self.navigationController setNavigationBarHidden:NO animated:YES];
+    
+    if (![bofangVC shareInstance].isPlay) {
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"stopAnimate" object:nil];
+    }else {
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"startAnimate" object:nil];
+    }
 }
 
 #pragma mark --- 评论框UI
@@ -1362,6 +1356,9 @@
 - (void)playBtnPlay:(zhuboxiangqingNewVCPlayBtn *)button
 {
     NSIndexPath *indexPath = button.indexPath;
+    button.selected = YES;
+    button.titleLab.textColor = gMainColor;
+    _isTapPlayBtn = YES;
     if ([[CommonCode readFromUserD:@"dangqianbofangxinwenID"] isEqualToString:xinwenArr[indexPath.row][@"id"]]){
         
         if (self.isfaxian) {
@@ -1380,7 +1377,6 @@
         }
         else{
             [[bofangVC shareInstance] doplay2];
-            button.selected = YES;
         }
     }
     else{
@@ -1408,23 +1404,17 @@
         [bofangVC shareInstance].newsModel.praisenum = xinwenArr[indexPath.row][@"praisenum"];
         [bofangVC shareInstance].iszhuboxiangqing = YES;
         [[bofangVC shareInstance].tableView reloadData];
-        //        Explayer = [[AVPlayer alloc]initWithPlayerItem:[[AVPlayerItem alloc]initWithURL:[NSURL URLWithString:arr[indexPath.row][@"post_mp"]]]];
         [Explayer replaceCurrentItemWithPlayerItem:[[AVPlayerItem alloc]initWithURL:[NSURL URLWithString:xinwenArr[indexPath.row][@"post_mp"]]]];
         if ([bofangVC shareInstance].isPlay || ExIsKaiShiBoFang == NO) {
-            //            [[bofangVC shareInstance] doPlay:[bofangVC shareInstance].centerBtn];
             RTLog(@"bofangVC--isPlay");
         }
         else{
             [[bofangVC shareInstance] doplay2];
-            button.selected = YES;
         }
         ExisRigester = YES;
         ExIsKaiShiBoFang = YES;
         ExwhichBoFangYeMianStr = @"zhuboxiangqingbofang";
         if (self.isfaxian) {
-//            self.hidesBottomBarWhenPushed = YES;
-//            [self.navigationController.navigationBar setHidden:NO];
-//            [self.navigationController pushViewController:[bofangVC shareInstance ] animated:YES];
             [[NSNotificationCenter defaultCenter]postNotificationName:@"getAhocComment" object:xinwenArr[indexPath.row][@"id"]];
         }
         else{
@@ -1450,16 +1440,6 @@
     }
 }
 #pragma mark - UITableViewDelegate
-
-//-(CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
-//    return 50.0f;
-//}
-//
-//- (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
-//    CenterView = [[UIView alloc]initWithFrame:CGRectMake(0, CGRectGetMaxY(headerView.frame), IPHONE_W, 50)];
-//    CenterView.backgroundColor = [UIColor whiteColor];
-//    return CenterView;
-//}
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     if (tableView.tag == 3){
@@ -1553,6 +1533,7 @@
         if (self.isClass) {
             titleLab.frame = CGRectMake(72.0 / 375 * IPHONE_W, 12.0 / 667 * IPHONE_H, SCREEN_WIDTH - 137.0 / 375 * IPHONE_W, 21 * 3);
             //播放按钮
+            playBtn.titleLab = titleLab;
             playBtn.frame = CGRectMake(SCREEN_WIDTH - 50 - 10, 10, 50, 50);
             [playBtn setImage:[UIImage imageNamed:@"classpause"] forState:UIControlStateNormal];
             [playBtn setImage:[UIImage imageNamed:@"classplay"] forState:UIControlStateSelected];
@@ -1573,24 +1554,27 @@
                     if ([[CommonCode readFromUserD:@"dangqianbofangxinwenID"] isEqualToString:xinwenArr[indexPath.row][@"id"]])
                     {
                         titleLab.textColor = gMainColor;
-                        playBtn.selected = YES;
                         break;
                     }
                     else{
-                        titleLab.textColor = [[UIColor grayColor]colorWithAlphaComponent:0.7f];
-                        playBtn.selected = NO;
+                        titleLab.textColor = [[UIColor grayColor] colorWithAlphaComponent:0.7f];
                         break;
                     }
                 }else
                 {
-                    playBtn.selected = NO;
                     titleLab.textColor = nTextColorMain;
                 }
             }
         }
         if ([[CommonCode readFromUserD:@"dangqianbofangxinwenID"] isEqualToString:xinwenArr[indexPath.row][@"id"]])
         {
-            titleLab.textColor = gMainColor;
+            if (![bofangVC shareInstance].isPlay && !_isTapPlayBtn){
+                playBtn.selected = NO;
+                titleLab.textColor = [[UIColor grayColor] colorWithAlphaComponent:0.7f];
+            }else{
+                playBtn.selected = YES;
+                titleLab.textColor = gMainColor;
+            }
         }
         titleLab.numberOfLines = 0;
         titleLab.textAlignment = NSTextAlignmentLeft;
@@ -1647,98 +1631,6 @@
     }
     //粉丝榜
     else if (tableView.tag == 4){
-//        static NSString *pinglunIdentify = @"FansIdentify";
-//        UITableViewCell *cell = [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:pinglunIdentify];
-//        if (!cell){
-//            cell = [tableView dequeueReusableCellWithIdentifier:pinglunIdentify];
-//        }
-//        //👑
-//        UIImageView *head = [[UIImageView alloc]initWithFrame:CGRectMake(15, 0, 45, 40)];
-//        head.hidden = YES;
-//        [cell.contentView addSubview:head];
-//        UILabel *headLabel = [[UILabel alloc]initWithFrame:CGRectMake(15, 0, 45, 40)];
-//        [headLabel setHidden:YES];
-//        [headLabel setTextAlignment:NSTextAlignmentCenter];
-//        [headLabel setTextColor:gTextDownload];
-//        [headLabel setFont:gFontMain14];
-//        [cell.contentView addSubview:headLabel];
-//        if (indexPath.row == 0 ) {
-//            head.hidden = NO;
-//            [headLabel setHidden:YES];
-//            [head setImage:[UIImage imageNamed:@"fans1"]];
-//        }
-//        else if (indexPath.row == 1){
-//            head.hidden = NO;
-//            [headLabel setHidden:YES];
-//            [head setImage:[UIImage imageNamed:@"fans2"]];
-//        }
-//        else if (indexPath.row == 2){
-//            head.hidden = NO;
-//            [headLabel setHidden:YES];
-//            [head setImage:[UIImage imageNamed:@"fans3"]];
-//        }
-//        else{
-//            head.hidden = YES;
-//            [headLabel setHidden:NO];
-//            [headLabel setText:[NSString stringWithFormat:@"%ld",(long)indexPath.row + 1]];
-//        }
-//        
-//        //lv
-//        UIImageView *lvView = [[UIImageView alloc]initWithFrame:CGRectMake(CGRectGetMaxX(head.frame) + 15, 10, 52.0, 20.0)];
-//        [lvView setImage:[UIImage imageNamed:@"LV1~9"]];
-//        [cell.contentView addSubview:lvView];
-//        UILabel *lvLab = [[UILabel alloc]initWithFrame:CGRectMake(lvView.frame.size.width - 25, 0, 25, 20)];
-//        [lvLab setFont:gFontMain12];
-//        [lvLab setTextAlignment:NSTextAlignmentCenter];
-//        [lvLab setTextColor:[UIColor whiteColor]];
-//        [lvView addSubview:lvLab];
-//        NSInteger lv = [fansArr[indexPath.row][@"level"] integerValue];
-//        if (lv > 0 && lv < 10) {
-//            [lvView setImage:[UIImage imageNamed:@"LV1~9"]];
-//        }
-//        else if (lv >= 10 && lv < 20){
-//            [lvView setImage:[UIImage imageNamed:@"LV10~19"]];
-//        }
-//        else if (lv >= 20 && lv < 30){
-//            [lvView setImage:[UIImage imageNamed:@"LV20~29"]];
-//        }
-//        else if (lv >= 30 && lv < 40){
-//            [lvView setImage:[UIImage imageNamed:@"LV30~39"]];
-//        }
-//        else if (lv >= 40 && lv < 50){
-//            [lvView setImage:[UIImage imageNamed:@"LV40~49"]];
-//        }
-//        else if (lv >= 50 && lv < 60){
-//            [lvView setImage:[UIImage imageNamed:@"LV50~59"]];
-//        }
-//        else if (lv >= 60 && lv < 70){
-//            [lvView setImage:[UIImage imageNamed:@"LV60~69"]];
-//        }
-//        else if (lv >= 70 && lv < 80){
-//            [lvView setImage:[UIImage imageNamed:@"LV70~79"]];
-//        }
-//        else if (lv >= 80 && lv < 90){
-//            [lvView setImage:[UIImage imageNamed:@"LV80~89"]];
-//        }
-//        else if (lv >= 90 && lv < 99){
-//            [lvView setImage:[UIImage imageNamed:@"LV90~99"]];
-//        }
-//        else{
-//            [lvView setImage:[UIImage imageNamed:@"LV100"]];
-//        }
-//        [lvLab setText:fansArr[indexPath.row][@"level"]];
-//        
-//        //name
-//        UILabel *name = [[UILabel alloc]initWithFrame:CGRectMake(CGRectGetMaxX(lvView.frame) + 10, 10.0, 200.0, 20.0 )];
-//        name.text = fansArr[indexPath.row][@"user_name"];
-//        name.textAlignment = NSTextAlignmentLeft;
-//        name.textColor = gTextDownload;
-//        name.font = [UIFont systemFontOfSize:14.0f];
-//        [cell.contentView addSubview:name];
-//        
-//        [cell setSelectionStyle:UITableViewCellSelectionStyleNone];
-//        
-//        return cell;
         static NSString *identify = @"reWardCell";
         RewardListTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:identify];
         if (cell == nil) {
