@@ -50,7 +50,7 @@
         [discription appendFormat:@"&it_b_pay=\"%@\"",self.itBPay];//30m
     }
     if (self.showUrl) {
-        [discription appendFormat:@"&show_url=\"%@\"",self.showUrl];//m.alipay.com
+        [discription appendFormat:@"&return_url=\"%@\"",self.showUrl];//m.alipay.com
     }
     if (self.rsaDate) {
         [discription appendFormat:@"&sign_date=\"%@\"",self.rsaDate];

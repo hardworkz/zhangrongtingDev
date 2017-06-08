@@ -31,7 +31,9 @@
     const char *pstr = [privateKey UTF8String];
     int len = (int)[privateKey length];
     NSMutableString *result = [NSMutableString string];
-    [result appendString:@"-----BEGIN PRIVATE KEY-----\n"];
+    //改动解决支付宝报错rsa_private read error : private key is NULL
+//    [result appendString:@"-----BEGIN PRIVATE KEY-----\n"];
+    [result appendString:@"-----BEGIN RSA PRIVATE KEY-----\n"];
     int index = 0;
 	int count = 0;
     while (index < len) {
@@ -48,7 +50,9 @@
         }
         index++;
     }
-    [result appendString:@"\n-----END PRIVATE KEY-----"];
+    //改动解决支付宝报错rsa_private read error : private key is NULL
+//    [result appendString:@"\n-----END PRIVATE KEY-----"];
+    [result appendString:@"\n-----END RSA PRIVATE KEY-----"];
     return result;
 }
 

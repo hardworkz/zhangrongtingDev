@@ -48,7 +48,8 @@
     
     // NOTE: 增加不变部分数据
     NSMutableDictionary *tmpDict = [NSMutableDictionary new];
-    [tmpDict addEntriesFromDictionary:@{@"app_id":_app_id,
+    [tmpDict addEntriesFromDictionary:@{@"partner":_partner,
+                                        @"app_id":_app_id,
                                         @"method":_method?:@"alipay.trade.app.pay",
                                         @"charset":_charset?:@"utf-8",
                                         @"timestamp":_timestamp?:@"",

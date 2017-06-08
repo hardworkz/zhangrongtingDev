@@ -38,6 +38,8 @@
 
 @interface Order : NSObject
 
+// NOTE: 支付宝分配给商户ID(如2088121595506011)
+@property(nonatomic, copy) NSString * partner;
 // NOTE: 支付宝分配给开发者的应用ID(如2014072300007148)
 @property (nonatomic, copy) NSString *app_id;
 
