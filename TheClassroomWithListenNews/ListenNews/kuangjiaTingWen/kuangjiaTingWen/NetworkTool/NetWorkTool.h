@@ -1475,11 +1475,11 @@
                           sccess:(void (^)(NSDictionary *responseObject))success
                          failure:(void (^)(NSError *error))failure;
 /**
- *  	获取用户对该节目的订单
+ *  	听币购买界面调用
  *
  *  @param accessToken      accessToken
  *  @param act_id           主播或节目id (必填)
- *  @param money           主播或节目id (必填)
+ *  @param money           订单金额 (必填)
  *  @param success          成功
  *  @param failure          错误
  */
@@ -1488,6 +1488,18 @@
                         money:(NSString *)money
                        sccess:(void (^)(NSDictionary *responseObject))success
                       failure:(void (^)(NSError *error))failure;
+/**
+ *  	购买节目成功调用上传订单
+ *
+ *  @param accessToken      accessToken
+ *  @param order_num           订单号 (必填)
+ *  @param success          成功
+ *  @param failure          错误
+ */
++ (void)order_notifyWithaccessToken:(NSString *)accessToken
+                             order_num:(NSString *)order_num
+                             sccess:(void (^)(NSDictionary *responseObject))success
+                            failure:(void (^)(NSError *error))failure;
 /**
  *  	删除用户自己的评论
  *

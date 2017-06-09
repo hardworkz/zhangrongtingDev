@@ -429,8 +429,6 @@ static bofangVC *_instance = nil;
             //用户中途取消
             title=@"PayFail1";msg=@"用户中途取消，请稍后再试";sureTitle=@"确定";
             av= [AKAlertView alertView:title des:msg  type:AKAlertFaild effect:AKAlertEffectDrop sureTitle:sureTitle cancelTitle:cancelTitle];
-//            title=@"PaySuccess1",msg=@"您已赞赏成功",sureTitle=@"确定";
-//            av= [AKAlertView alertView:title des:msg  type:AKAlertSuccess effect:AKAlertEffectDrop sureTitle:sureTitle cancelTitle:cancelTitle];
         }
         else if ([resultDic[@"resultStatus"]integerValue] == 6002){
             //网络连接出错
@@ -835,7 +833,14 @@ static bofangVC *_instance = nil;
 {
     [self performSelector:@selector(bofangwanbi:) withObject:notice afterDelay:0.5f];
 }
-
+- (Boolean)isPlaying
+{
+    if([[UIDevice currentDevice] systemVersion].intValue>=10){
+        return Explayer.timeControlStatus == AVPlayerTimeControlStatusPlaying;
+    }else{
+        return Explayer.rate==1;
+    }
+}
 #pragma mark - 计算音频总时长方法
 - (void)reloadPlayAllTime
 {
@@ -1051,7 +1056,7 @@ static bofangVC *_instance = nil;
             ExisRigester = NO;
         }
         
-        if (ExcurrentNumber == (arr.count - 1)){
+        if (ExcurrentNumber >= (arr.count - 1)){
             [bofangRightBtn setEnabled:NO];
             if ([ExwhichBoFangYeMianStr isEqualToString:@"shouyebofang"])
             {
@@ -1071,8 +1076,6 @@ static bofangVC *_instance = nil;
                     XWAlerLoginView *xw = [[XWAlerLoginView alloc]initWithTitle:@"已经是最后一条了"];
                     [xw show];
                     [self doPlay:bofangCenterBtn];
-                    //改变播放新闻列表文字颜色通知
-//                    [[NSNotificationCenter defaultCenter] postNotificationName:@"gaibianyanse" object:nil];
                     return;
             }
             //改变播放新闻列表文字颜色通知
@@ -1126,6 +1129,7 @@ static bofangVC *_instance = nil;
 }
 
 - (void)bofangwanbi:(NSNotification *)notice{
+    RTLog(@"bofangwanbi--------");
     [bofangCenterBtn setImage:[UIImage imageNamed:@"home_news_ic_play"] forState:UIControlStateNormal];
     if ([[CommonCode readFromUserD:TINGYOUQUANBOFANGWANBI] isEqualToString:@"YES"]) {
         [CommonCode writeToUserD:@"NO" andKey:TINGYOUQUANBOFANGWANBI];
@@ -1141,8 +1145,8 @@ static bofangVC *_instance = nil;
         }
         
         arr = [NSMutableArray arrayWithArray:[CommonCode readFromUserD:@"zhuyeliebiao"]];
-        
-        if (ExcurrentNumber == (arr.count - 1)){
+        RTLog(@"playArrayCount--:%ld ExcurrentNumber：%d ExwhichBoFangYeMianStr:%@",arr.count,ExcurrentNumber,ExwhichBoFangYeMianStr);
+        if (ExcurrentNumber >= (arr.count - 1)){
             [bofangRightBtn setEnabled:NO];
             if ([ExwhichBoFangYeMianStr isEqualToString:@"Downloadbofang"]){
                 [self doPlay:bofangCenterBtn];
@@ -1156,15 +1160,12 @@ static bofangVC *_instance = nil;
                 XWAlerLoginView *xw = [[XWAlerLoginView alloc]initWithTitle:@"已经是最后一条了"];
                 [xw show];
                 [self doPlay:bofangCenterBtn];
-                //改变播放新闻列表文字颜色通知
-//                [[NSNotificationCenter defaultCenter] postNotificationName:@"gaibianyanse" object:nil];
                 return;
             }else{
                 //如果数组中的播放成员播放完毕，就要加载
                 [[NSNotificationCenter defaultCenter] postNotificationName:@"bofangRightyaojiazaishujv" object:nil];
                 [[NSNotificationCenter defaultCenter] postNotificationName:@"gaibianyanse" object:nil];
             }
-           
         }
         else{
             if (self.isMyCollectionVC) {
@@ -3058,11 +3059,14 @@ static bofangVC *_instance = nil;
     if ([[SuNetworkMonitor monitor] isWiFiEnable]) {//网络切换为WiFi
 //        [Explayer replaceCurrentItemWithPlayerItem:[[AVPlayerItem alloc]initWithURL:[NSURL fileURLWithPath:self.newsModel.post_mp]]];
 //        [self doplay2];
+        RTLog(@"wifi");
     }else if([[SuNetworkMonitor monitor] isNetworkEnable]){//网络切换为手机网络
 //        [Explayer replaceCurrentItemWithPlayerItem:[[AVPlayerItem alloc]initWithURL:[NSURL fileURLWithPath:self.newsModel.post_mp]]];
-//        [self doplay2];
+        //        [self doplay2];
+        RTLog(@"iphone network");
     }else{
-//        [self doPlay:bofangCenterBtn];
+        //        [self doPlay:bofangCenterBtn];
+        RTLog(@"no network");
     }
 }
 #pragma mark - 懒加载新闻详情控件

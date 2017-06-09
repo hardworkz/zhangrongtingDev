@@ -327,13 +327,25 @@
         // 支付跳转支付宝钱包进行支付，处理支付结果
         [[AlipaySDK defaultService] processOrderWithPaymentResult:url standbyCallback:^(NSDictionary *resultDic) {
             NSLog(@"result = %@",resultDic);
-            if (APPDELEGATE.isReward) {
+            if (APPDELEGATE.isClassPay) {
+                if ([CommonCode readFromUserD:orderNumber] != nil && [resultDic[@"resultStatus"] intValue] == 9000) {//上传订单号
+                    [NetWorkTool order_notifyWithaccessToken:AvatarAccessToken order_num:[CommonCode readFromUserD:@"orderNumber"] sccess:^(NSDictionary *responseObject) {
+                        if ([responseObject[@"status"] integerValue] == 1) {
+                            [CommonCode writeToUserD:nil andKey:@"orderNumber"];
+                        }
+                    } failure:^(NSError *error) {
+                        
+                    }];
+                }
                 [[NSNotificationCenter defaultCenter] postNotificationName:@"AliPayResults" object:resultDic];
+            }else{
+                if (APPDELEGATE.isReward) {//打赏
+                    [[NSNotificationCenter defaultCenter] postNotificationName:@"AliPayResults" object:resultDic];
+                }
+                else{//充值
+                    [[NSNotificationCenter defaultCenter] postNotificationName:@"RechargeAliPayResults" object:resultDic];
+                }
             }
-            else{
-                [[NSNotificationCenter defaultCenter] postNotificationName:@"RechargeAliPayResults" object:resultDic];
-            }
-            
         }];
         
         // 授权跳转支付宝钱包进行支付，处理支付结果
@@ -377,13 +389,25 @@
     if ([url.host isEqualToString:@"safepay"]) {
         // 支付跳转支付宝钱包进行支付，处理支付结果
         [[AlipaySDK defaultService] processOrderWithPaymentResult:url standbyCallback:^(NSDictionary *resultDic) {
-            if (APPDELEGATE.isReward) {
+            if (APPDELEGATE.isClassPay) {
+                if ([CommonCode readFromUserD:orderNumber] != nil && [resultDic[@"resultStatus"] intValue] == 9000) {//上传订单号
+                    [NetWorkTool order_notifyWithaccessToken:AvatarAccessToken order_num:[CommonCode readFromUserD:@"orderNumber"] sccess:^(NSDictionary *responseObject) {
+                        if ([responseObject[@"status"] integerValue] == 1) {
+                            [CommonCode writeToUserD:nil andKey:@"orderNumber"];
+                        }
+                    } failure:^(NSError *error) {
+                        
+                    }];
+                }
                 [[NSNotificationCenter defaultCenter] postNotificationName:@"AliPayResults" object:resultDic];
+            }else{
+                if (APPDELEGATE.isReward) {//打赏
+                    [[NSNotificationCenter defaultCenter] postNotificationName:@"AliPayResults" object:resultDic];
+                }
+                else{//充值
+                    [[NSNotificationCenter defaultCenter] postNotificationName:@"RechargeAliPayResults" object:resultDic];
+                }
             }
-            else{
-                [[NSNotificationCenter defaultCenter] postNotificationName:@"RechargeAliPayResults" object:resultDic];
-            }
-            
         }];
         
         // 授权跳转支付宝钱包进行支付，处理支付结果
@@ -436,13 +460,25 @@
         if ([url.host isEqualToString:@"safepay"]) {
             // 支付跳转支付宝钱包进行支付，处理支付结果
             [[AlipaySDK defaultService] processOrderWithPaymentResult:url standbyCallback:^(NSDictionary *resultDic) {
-                if (APPDELEGATE.isReward) {
+                if (APPDELEGATE.isClassPay) {
+                    if ([CommonCode readFromUserD:orderNumber] != nil && [resultDic[@"resultStatus"] intValue] == 9000) {//上传订单号
+                        [NetWorkTool order_notifyWithaccessToken:AvatarAccessToken order_num:[CommonCode readFromUserD:@"orderNumber"] sccess:^(NSDictionary *responseObject) {
+                            if ([responseObject[@"status"] integerValue] == 1) {
+                                [CommonCode writeToUserD:nil andKey:@"orderNumber"];
+                            }
+                        } failure:^(NSError *error) {
+                            
+                        }];
+                    }
                     [[NSNotificationCenter defaultCenter] postNotificationName:@"AliPayResults" object:resultDic];
+                }else{
+                    if (APPDELEGATE.isReward) {//打赏
+                        [[NSNotificationCenter defaultCenter] postNotificationName:@"AliPayResults" object:resultDic];
+                    }
+                    else{//充值
+                        [[NSNotificationCenter defaultCenter] postNotificationName:@"RechargeAliPayResults" object:resultDic];
+                    }
                 }
-                else{
-                    [[NSNotificationCenter defaultCenter] postNotificationName:@"RechargeAliPayResults" object:resultDic];
-                }
-                
             }];
             
             // 授权跳转支付宝钱包进行支付，处理支付结果
@@ -672,11 +708,25 @@
             }
                 break;
         }
-        if (APPDELEGATE.isReward) {
-             [[NSNotificationCenter defaultCenter] postNotificationName:@"WechatPayResults" object:@(resp.errCode)];
-        }
-        else{
-            [[NSNotificationCenter defaultCenter] postNotificationName:@"RechargeWechatPayResults" object:@(resp.errCode)];
+        if (APPDELEGATE.isClassPay) {
+            if ([CommonCode readFromUserD:orderNumber] != nil && resp.errCode == WXSuccess) {
+                [NetWorkTool order_notifyWithaccessToken:AvatarAccessToken order_num:[CommonCode readFromUserD:@"orderNumber"] sccess:^(NSDictionary *responseObject) {
+                    if ([responseObject[@"status"] integerValue] == 1) {
+                        [CommonCode writeToUserD:nil andKey:@"orderNumber"];
+                    }
+                } failure:^(NSError *error) {
+                    
+                }];
+            }
+            //通知支付结果
+            [[NSNotificationCenter defaultCenter] postNotificationName:@"WechatPayResults" object:@(resp.errCode)];
+        }else{
+            if (APPDELEGATE.isReward) {
+                [[NSNotificationCenter defaultCenter] postNotificationName:@"WechatPayResults" object:@(resp.errCode)];
+            }
+            else{
+                [[NSNotificationCenter defaultCenter] postNotificationName:@"RechargeWechatPayResults" object:@(resp.errCode)];
+            }
         }
         
     }

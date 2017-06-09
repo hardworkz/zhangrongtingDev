@@ -2058,8 +2058,19 @@ NSMutableDictionary *dic = [[NSMutableDictionary alloc]initWithCapacity:1
     dic[@"accessToken"] = accessToken;
     dic[@"act_id"] = act_id;
     dic[@"money"] = money;
-    [self asyncNetworkingUrl:@"/interfaceNew/get_order" andDict:dic success:success failure:failure];
+    [self asyncNetworkingUrl:@"/interfaceNew/buyAct" andDict:dic success:success failure:failure];
 }
+//购买节目成功调用上传订单
++ (void)order_notifyWithaccessToken:(NSString *)accessToken
+                       order_num:(NSString *)order_num
+                       sccess:(void (^)(NSDictionary *responseObject))success
+                      failure:(void (^)(NSError *error))failure{
+    NSMutableDictionary *dic = [[NSMutableDictionary alloc]initWithCapacity:1];
+    dic[@"accessToken"] = accessToken;
+    dic[@"order_num"] = order_num;
+    [self asyncNetworkingUrl:@"/interfaceNew/order_notify" andDict:dic success:success failure:failure];
+}
+
 //删除自己的评论
 + (void)postDeleteSelfCommentWithaccessToken:(NSString *)accessToken
                                  commnet_id:(NSString *)comment_id

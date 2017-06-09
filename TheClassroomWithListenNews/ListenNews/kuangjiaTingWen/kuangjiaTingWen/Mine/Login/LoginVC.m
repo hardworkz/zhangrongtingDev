@@ -54,7 +54,7 @@
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]initWithTitle:@"注册" style:UIBarButtonItemStylePlain target:self action:@selector(zhuce:)];
     
     
-    UIView *textFBgV = [[UIView alloc]initWithFrame:CGRectMake(15.0 / 375 * IPHONE_W, 72.0 / 667 * IPHONE_H, IPHONE_W - 30.0 / 375 * IPHONE_W, 92.0 / 667 * IPHONE_H)];
+    UIView *textFBgV = [[UIView alloc]initWithFrame:CGRectMake(15.0 / 375 * IPHONE_W, 82.0 / 667 * IPHONE_H, IPHONE_W - 30.0 / 375 * IPHONE_W, 92.0 / 667 * IPHONE_H)];
     textFBgV.backgroundColor = [UIColor whiteColor];
     textFBgV.layer.borderWidth = 0.5f;
     textFBgV.layer.borderColor = [UIColor lightGrayColor].CGColor;

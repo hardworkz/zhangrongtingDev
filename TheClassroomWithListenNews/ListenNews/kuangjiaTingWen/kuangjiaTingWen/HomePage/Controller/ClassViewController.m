@@ -16,7 +16,7 @@
 #import "LoginNavC.h"
 #import "PayOnlineViewController.h"
 #import "CommentViewController.h"
-
+#import "AppDelegate.h"
 
 
 @interface ClassViewController ()<UITableViewDelegate,UITableViewDataSource,UITextViewDelegate,TTTAttributedLabelDelegate>{
@@ -67,6 +67,9 @@
     }
     [self setUpData];
     [self setUpView];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(AliPayResults:) name:@"AliPayResults" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(WechatPayResults:) name:@"WechatPayResults" object:nil];
 }
 
 - (void)viewWillAppear:(BOOL)animated{
@@ -78,7 +81,9 @@
 - (void)viewWillDisappear:(BOOL)animated{
     [super viewWillDisappear:animated];
     [self.navigationController setNavigationBarHidden:NO animated:YES];
-//    [Explayer pause];
+    //    [Explayer pause];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"AliPayResults" object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"WechatPayResults" object:nil];
     if (_isPlaying) {
         [self auditionnBtnAction:_auditionnBtn];
     }
@@ -500,20 +505,36 @@
     if ([[CommonCode readFromUserD:@"isLogin"]boolValue] == YES){
         if ([[CommonCode readFromUserD:@"isIAP"] boolValue] == YES)
         {//当前为内购路线
-            
-            _alertView = [[CustomAlertView alloc] initWithCustomView:[self setupPayAlertWithIAP:YES]];
-            _alertView.alertHeight = 105;
-            _alertView.alertDuration = 0.25;
-            _alertView.coverAlpha = 0.6;
-            [_alertView show];
+            [NetWorkTool get_orderWithaccessToken:AvatarAccessToken act_id:self.classModel.act_id sccess:^(NSDictionary *responseObject) {
+                RTLog(@"%@",responseObject);
+                if ([responseObject[@"status"] intValue] == 1) {
+                    APPDELEGATE.isClassPay = YES;
+                    rewardMoney = responseObject[@"results"][@"money"];
+                    orderNum = responseObject[@"results"][@"order_num"];
+                    [CommonCode writeToUserD:orderNum andKey:@"orderNumber"];
+                    _alertView = [[CustomAlertView alloc] initWithCustomView:[self setupPayAlertWithIAP:YES]];
+                    _alertView.alertHeight = 105;
+                    _alertView.alertDuration = 0.25;
+                    _alertView.coverAlpha = 0.6;
+                    [_alertView show];
+                }else{
+                    XWAlerLoginView *xw = [[XWAlerLoginView alloc]initWithTitle:@"订单获取失败"];
+                    [xw show];
+                }
+            } failure:^(NSError *error) {
+                
+            }];
+
         }
         else
         {//当前为支付宝，微信，听币支付路线
             [NetWorkTool get_orderWithaccessToken:AvatarAccessToken act_id:self.classModel.act_id sccess:^(NSDictionary *responseObject) {
                 RTLog(@"%@",responseObject);
                 if ([responseObject[@"status"] intValue] == 1) {
+                    APPDELEGATE.isClassPay = YES;
                     rewardMoney = responseObject[@"results"][@"money"];
                     orderNum = responseObject[@"results"][@"order_num"];
+                    [CommonCode writeToUserD:orderNum andKey:@"orderNumber"];
                     _alertView = [[CustomAlertView alloc] initWithCustomView:[self setupPayAlertWithIAP:NO]];
                     _alertView.alertHeight = 205;
                     _alertView.alertDuration = 0.25;
@@ -526,7 +547,6 @@
             } failure:^(NSError *error) {
                 
             }];
-
         }
     }
     else{
@@ -541,14 +561,16 @@
         bgView.backgroundColor = HEXCOLOR(0xe3e3e3);
         bgView.frame = CGRectMake(0, 0, SCREEN_WIDTH, 105);
         
-        UIButton *deleteBtn = [[UIButton alloc] init];
-        deleteBtn.frame = CGRectMake(0, 0, SCREEN_WIDTH, 50);
-        deleteBtn.backgroundColor = [UIColor whiteColor];
-        [deleteBtn setTitle:@"听币支付" forState:UIControlStateNormal];
-        [deleteBtn setTitleColor:gMainColor forState:UIControlStateNormal];
-        deleteBtn.titleLabel.font = [UIFont systemFontOfSize:17];
-        [deleteBtn addTarget:self action:@selector(tingbiBtnClicked)];
-        [bgView addSubview:deleteBtn];
+        UIButton *tingbiBtn = [[UIButton alloc] init];
+        tingbiBtn.frame = CGRectMake(0, 0, SCREEN_WIDTH, 50);
+        tingbiBtn.backgroundColor = [UIColor whiteColor];
+        [tingbiBtn setImage:@"pay2"];
+        tingbiBtn.imageEdgeInsets = UIEdgeInsetsMake(0, -20, 0, 0);
+        [tingbiBtn setTitle:@"听币支付" forState:UIControlStateNormal];
+        [tingbiBtn setTitleColor:gMainColor forState:UIControlStateNormal];
+        tingbiBtn.titleLabel.font = [UIFont systemFontOfSize:17];
+        [tingbiBtn addTarget:self action:@selector(tingbiBtnClicked)];
+        [bgView addSubview:tingbiBtn];
         
         UIButton *cancelBtn = [[UIButton alloc] init];
         cancelBtn.frame = CGRectMake(0, 55, SCREEN_WIDTH, 50);
@@ -569,6 +591,8 @@
         UIButton *zhifubaoBtn = [[UIButton alloc] init];
         zhifubaoBtn.frame = CGRectMake(0, 0, SCREEN_WIDTH, 50);
         zhifubaoBtn.backgroundColor = [UIColor whiteColor];
+        [zhifubaoBtn setImage:@"pay3"];
+        zhifubaoBtn.imageEdgeInsets = UIEdgeInsetsMake(0, -20, 0, 0);
         [zhifubaoBtn setTitle:@"支付宝支付" forState:UIControlStateNormal];
         [zhifubaoBtn setTitleColor:gMainColor forState:UIControlStateNormal];
         zhifubaoBtn.titleLabel.font = [UIFont systemFontOfSize:17];
@@ -576,8 +600,10 @@
         [bgView addSubview:zhifubaoBtn];
         
         UIButton *weixinBtn = [[UIButton alloc] init];
-        weixinBtn.frame = CGRectMake(0, 0, SCREEN_WIDTH, 50);
+        weixinBtn.frame = CGRectMake(0, 50, SCREEN_WIDTH, 50);
         weixinBtn.backgroundColor = [UIColor whiteColor];
+        [weixinBtn setImage:@"pay4"];
+        weixinBtn.imageEdgeInsets = UIEdgeInsetsMake(0, -20, 0, 0);
         [weixinBtn setTitle:@"微信支付" forState:UIControlStateNormal];
         [weixinBtn setTitleColor:gMainColor forState:UIControlStateNormal];
         weixinBtn.titleLabel.font = [UIFont systemFontOfSize:17];
@@ -585,8 +611,10 @@
         [bgView addSubview:weixinBtn];
         
         UIButton *tingbiBtn = [[UIButton alloc] init];
-        tingbiBtn.frame = CGRectMake(0, 0, SCREEN_WIDTH, 50);
+        tingbiBtn.frame = CGRectMake(0, 100, SCREEN_WIDTH, 50);
         tingbiBtn.backgroundColor = [UIColor whiteColor];
+        [tingbiBtn setImage:@"pay2"];
+        tingbiBtn.imageEdgeInsets = UIEdgeInsetsMake(0, -20, 0, 0);
         [tingbiBtn setTitle:@"听币支付" forState:UIControlStateNormal];
         [tingbiBtn setTitleColor:gMainColor forState:UIControlStateNormal];
         tingbiBtn.titleLabel.font = [UIFont systemFontOfSize:17];
@@ -594,7 +622,7 @@
         [bgView addSubview:tingbiBtn];
         
         UIButton *cancelBtn = [[UIButton alloc] init];
-        cancelBtn.frame = CGRectMake(0, 55, SCREEN_WIDTH, 50);
+        cancelBtn.frame = CGRectMake(0, 155, SCREEN_WIDTH, 50);
         cancelBtn.backgroundColor = [UIColor whiteColor];
         [cancelBtn setTitle:@"取消" forState:UIControlStateNormal];
         [cancelBtn setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
@@ -608,16 +636,18 @@
 //支付宝支付
 - (void)zhifubaoBtnClicked
 {
+    [_alertView coverClick];
     PayOnlineViewController *vc = [PayOnlineViewController new];
     vc.rewardCount = [rewardMoney floatValue];
     vc.uid = self.classModel.act_id;
     vc.post_id = self.classModel.ID;
     vc.isPayClass = YES;
-    [vc AliPay];
+    [vc AliPayWithSubject:@"听闻课程订单" body:@"听闻课程"];
 }
 //微信支付
 - (void)weixinBtnClicked
 {
+    [_alertView coverClick];
     PayOnlineViewController *vc = [PayOnlineViewController new];
     vc.rewardCount = [rewardMoney floatValue];
     vc.uid = self.classModel.act_id;
@@ -628,8 +658,10 @@
 //听币支付
 - (void)tingbiBtnClicked
 {
+    [_alertView coverClick];
     //获取听币余额
     PayOnlineViewController *vc = [PayOnlineViewController new];
+    
     [NetWorkTool getListenMoneyWithaccessToken:AvatarAccessToken sccess:^(NSDictionary *responseObject) {
         NSLog(@"%@",responseObject);
         if ([responseObject[@"status"] integerValue] == 1) {
@@ -647,9 +679,19 @@
                         //购买成功，退出课堂购买界面，刷新列表
                         XWAlerLoginView *xw = [[XWAlerLoginView alloc]initWithTitle:@"课程购买成功"];
                         [xw show];
-                        [self.navigationController popViewControllerAnimated:YES];
+                        //上传订单
+                        [NetWorkTool order_notifyWithaccessToken:AvatarAccessToken order_num:orderNum sccess:^(NSDictionary *responseObject) {
+                            if ([responseObject[@"status"] integerValue] == 1) {
+                                APPDELEGATE.isClassPay = NO;
+                                [CommonCode writeToUserD:nil andKey:@"orderNumber"];
+                                [[NSNotificationCenter defaultCenter] postNotificationName:ReloadClassList object:nil];
+                                [self.navigationController popViewControllerAnimated:YES];
+                            }
+                        } failure:^(NSError *error) {
+                            
+                        }];
                     }else{
-                        XWAlerLoginView *xw = [[XWAlerLoginView alloc]initWithTitle:@"课程购买失败"];
+                        XWAlerLoginView *xw = [[XWAlerLoginView alloc]initWithTitle:@"课程购买失败，请重新再试"];
                         [xw show];
                     }
                 } failure:^(NSError *error) {
@@ -668,6 +710,7 @@
 //取消支付弹窗
 - (void)cancelAlert
 {
+    APPDELEGATE.isClassPay = NO;
     [_alertView coverClick];
 }
 //列表试听按钮点击
@@ -952,8 +995,78 @@
     }
     return _frameArray;
 }
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
+#pragma mark - 支付结果通知方法
+- (void)AliPayResults:(NSNotification *)notification {
+    
+    NSString* title=@"PaySuccess1",*msg=@"您已支付成功",*sureTitle=@"确定" , *cancelTitle=@"取消吧";
+    AKAlertView* av;
+    
+    APPDELEGATE.isClassPay = NO;
+    NSDictionary *resultDic = notification.object;
+    if ([resultDic[@"resultStatus"]integerValue] == 9000) {
+        //支付成功
+        title=@"PaySuccess1",msg=@"您已支付成功",sureTitle=@"确定";
+        av= [AKAlertView alertView:title des:msg  type:AKAlertFaild effect:AKAlertEffectDrop sureTitle:sureTitle cancelTitle:cancelTitle];
+        [[NSNotificationCenter defaultCenter] postNotificationName:ReloadClassList object:nil];
+        [self back];
+    }
+    else if ([resultDic[@"resultStatus"]integerValue] == 8000){
+        //正在处理中
+        av= [AKAlertView alertView:title des:msg  type:AKAlertFaild effect:AKAlertEffectDrop sureTitle:sureTitle cancelTitle:cancelTitle];
+    }
+    else if ([resultDic[@"resultStatus"]integerValue] == 4000){
+        //订单支付失败
+        title=@"PayFail1";msg=@"返回信息错误，请稍后再试";sureTitle=@"确定";
+        av= [AKAlertView alertView:title des:msg  type:AKAlertFaild effect:AKAlertEffectDrop sureTitle:sureTitle cancelTitle:cancelTitle];
+    }
+    else if ([resultDic[@"resultStatus"]integerValue] == 6001){
+        //用户中途取消
+        title=@"PayFail1";msg=@"用户中途取消，请稍后再试";sureTitle=@"确定";
+        av= [AKAlertView alertView:title des:msg  type:AKAlertFaild effect:AKAlertEffectDrop sureTitle:sureTitle cancelTitle:cancelTitle];
+    }
+    else if ([resultDic[@"resultStatus"]integerValue] == 6002){
+        //网络连接出错
+        title=@"PayFail1";msg=@"网络连接出错，请稍后再试";sureTitle=@"确定";
+        av= [AKAlertView alertView:title des:msg  type:AKAlertFaild effect:AKAlertEffectDrop sureTitle:sureTitle cancelTitle:cancelTitle];
+    }
+    else{
+        //
+        title=@"PayFail1";msg=@"返回信息错误，请稍后再试";sureTitle=@"确定";
+        av= [AKAlertView alertView:title des:msg  type:AKAlertFaild effect:AKAlertEffectDrop sureTitle:sureTitle cancelTitle:cancelTitle];
+    }
+    
+    av.sureClick=^(AKAlertView* av,BOOL isMessageSelected,NSString *message){
+    };
+    [av show];
+    //充值成功 --》 获取用户信息
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"updateUserInfo" object:nil];
+}
+
+- (void)WechatPayResults:(NSNotification *)notification {
+    NSString* title=@"PaySuccess1",*msg=@"您已支付成功",*sureTitle=@"确定" , *cancelTitle=@"取消吧";
+    APPDELEGATE.isClassPay = NO;
+    AKAlertView* av;
+    if ([notification.object integerValue] == 0) {
+        title=@"PaySuccess1",msg=@"您已支付成功",sureTitle=@"确定";
+        av= [AKAlertView alertView:title des:msg  type:AKAlertSuccess effect:AKAlertEffectDrop sureTitle:sureTitle cancelTitle:cancelTitle];
+        [[NSNotificationCenter defaultCenter] postNotificationName:ReloadClassList object:nil];
+        [self back];
+    }
+    else if ([notification.object integerValue] == -2){
+        title=@"PayFail1";msg=@"用户中途取消，请稍后再试";sureTitle=@"确定";
+        av= [AKAlertView alertView:title des:msg  type:AKAlertFaild effect:AKAlertEffectDrop sureTitle:sureTitle cancelTitle:cancelTitle];
+    }
+    else{
+        title=@"PayFail1";msg=@"返回信息错误，请稍后再试";sureTitle=@"确定";
+        av= [AKAlertView alertView:title des:msg  type:AKAlertFaild effect:AKAlertEffectDrop sureTitle:sureTitle cancelTitle:cancelTitle];
+    }
+    
+    av.sureClick=^(AKAlertView* av,BOOL isMessageSelected,NSString *message){
+        [av removeFromSuperview];
+    };
+    
+    [av show];
+    //充值成功 --》 获取用户信息
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"updateUserInfo" object:nil];
 }
 @end

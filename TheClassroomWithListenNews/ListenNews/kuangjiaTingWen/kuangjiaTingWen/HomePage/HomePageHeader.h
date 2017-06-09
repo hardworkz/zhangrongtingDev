@@ -24,4 +24,8 @@
 #import "ClassCommentCellFrameModel.h"
 #import "ClassAuditionCellFrameModel.h"
 
+
+static NSString *const orderNumber = @"orderNumber";/**<课堂购买订单号*/
+static NSString *const ReloadClassList = @"reloadClassList";/**<刷新课堂列表通知*/
+
 #endif /* HomePageHeader_h */

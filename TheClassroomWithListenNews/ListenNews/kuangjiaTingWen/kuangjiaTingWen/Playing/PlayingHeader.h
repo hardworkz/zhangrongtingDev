@@ -9,6 +9,8 @@
 #ifndef PlayingHeader_h
 #define PlayingHeader_h
 
+#import "AppDelegate.h"
+
 #import "NewsModel.h"
 #import "NewObj.h"
 #import "Post_actor.h"
@@ -19,6 +21,7 @@
 #import "PlayVCCommentTableViewCell.h"
 #import "zhuboxiangqingNewVCPlayBtn.h"
 
+#import "AKAlertView.h"
 #import "PinglundianzanCustomBtn.h"
 
 #import "LoginVC.h"

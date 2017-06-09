@@ -25,5 +25,5 @@
 //微信支付
 - (void)WechatPay;
 //支付宝
-- (void)AliPay;
+- (void)AliPayWithSubject:(NSString *)subject body:(NSString *)body;
 @end

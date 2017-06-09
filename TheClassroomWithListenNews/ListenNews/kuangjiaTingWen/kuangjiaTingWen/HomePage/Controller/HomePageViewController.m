@@ -71,7 +71,7 @@
     _ztADResult = [NSMutableArray new];
     _pushNewsInfo = [NSMutableDictionary new];
     [self loadColumnData];
-    [self loadNewsData];
+    [self loadNewsDataWithBofangVCNotification:NO];
     [self loadClassData];
     //获取频道列表 - 下载时有用到
     [NetWorkTool getPaoGuoFenLeiLieBiaoWithWhateverSomething:@"q" sccess:^(NSDictionary *responseObject) {
@@ -125,6 +125,7 @@
     };
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(zidongjiazai:) name:@"bofangRightyaojiazaishujv" object:nil];
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(gaibianyanse:) name:@"gaibianyanse" object:nil];
+    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(reloadClassList) name:ReloadClassList object:nil];
 }
 
 - (void)setUpView{
@@ -149,11 +150,11 @@
     }];
     self.newsTableView.mj_header = [MJRefreshNormalHeader headerWithRefreshingBlock:^{
         weakSelf.newsIndex = 1;
-        [weakSelf loadNewsData];
+        [weakSelf loadNewsDataWithBofangVCNotification:NO];
     }];
     self.newsTableView.mj_footer = [MJRefreshAutoNormalFooter footerWithRefreshingBlock:^{
         weakSelf.newsIndex ++;
-        [weakSelf loadNewsData];
+        [weakSelf loadNewsDataWithBofangVCNotification:NO];
     }];
     self.classroomTableView.mj_header = [MJRefreshNormalHeader headerWithRefreshingBlock:^{
         weakSelf.classIndex = 1;
@@ -255,7 +256,7 @@
 }
 
 #pragma mark - Utiliteis
-- (void)loadNewsData{
+- (void)loadNewsDataWithBofangVCNotification:(BOOL)isFormNotification{
     if (self.newsIndex == 1) {
         [self getAD];
     }
@@ -267,6 +268,7 @@
         accessToken = [DSE encryptUseDES:ExdangqianUser];
     }
     DefineWeakSelf;
+    RTLog(@"loadNewsData:%ld",self.newsIndex);
     [NetWorkTool getInformationListWithaccessToken:accessToken andPage:[NSString stringWithFormat:@"%ld",(long)self.newsIndex] andLimit:[NSString stringWithFormat:@"%ld",(long)self.newsPageSize] sccess:^(NSDictionary *responseObject) {
         if ([responseObject[@"results"] isKindOfClass:[NSArray class]]){
             if (weakSelf.newsIndex == 1) {
@@ -287,6 +289,9 @@
             [weakSelf.newsInfoArr addObjectsFromArray:responseObject[@"results"]];
             weakSelf.newsInfoArr = [[NSMutableArray alloc]initWithArray:weakSelf.newsInfoArr];
             [CommonCode writeToUserD:weakSelf.newsInfoArr andKey:@"zhuyeliebiao"];
+            if (isFormNotification) {
+                [[NSNotificationCenter defaultCenter] postNotificationName:@"jiazaichenggong" object:nil];
+            }
             [weakSelf.newsTableView reloadData];
             [weakSelf endNewsRefreshing];
         }
@@ -716,10 +721,15 @@
     }
     else if (self.segmentedControl.selectedSegmentIndex == 1){
         weakSelf.newsIndex ++;
-        [weakSelf loadNewsData];
+        [weakSelf loadNewsDataWithBofangVCNotification:YES];
     }
 }
-
+//刷新课堂列表
+- (void)reloadClassList
+{
+    self.classIndex = 1;
+    [self loadClassData];
+}
 #pragma mark -UIScrollViewDelegate
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView {
     CGFloat pageWidth = self.scrollView.frame.size.width;
@@ -1165,11 +1175,8 @@
 
     }
     else if (tableView == self.classroomTableView){
-//        if ([self.classroomInfoArr[indexPath.row][@"is_free"] isEqualToString:@"1"]) {
-//            XWAlerLoginView *xw = [[XWAlerLoginView alloc]initWithTitle:@"已购买界面正在开发中"];
-//            [xw show];
-//        }
-        if (indexPath.row == 0) {
+        //跳转已购买课堂界面
+        if ([self.classroomInfoArr[indexPath.row][@"is_free"] isEqualToString:@"1"]) {
             NSDictionary *dic = self.classroomInfoArr[indexPath.row];
             zhuboxiangqingVCNew *faxianzhuboVC = [[zhuboxiangqingVCNew alloc]init];
             faxianzhuboVC.jiemuDescription = dic[@"description"];
@@ -1186,6 +1193,7 @@
             self.hidesBottomBarWhenPushed=NO;
 
         }
+        //跳转未购买课堂界面
         else if ([self.classroomInfoArr[indexPath.row][@"is_free"] isEqualToString:@"0"]){
             ClassViewController *vc = [ClassViewController new];
             vc.act_id = self.classroomInfoArr[indexPath.row][@"id"];
@@ -1194,9 +1202,7 @@
             [self.navigationController pushViewController:vc animated:YES];
             self.hidesBottomBarWhenPushed = NO;
         }
-        
     }
-    
 }
 
 - (void)getAD{

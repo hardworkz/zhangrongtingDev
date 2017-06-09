@@ -272,7 +272,7 @@
                 [self TCoinPay];
             }
             else if (self.aliPay.selected){
-                [self AliPay];
+                [self AliPayWithSubject:nil body:nil];
             }
             else{
                 [self WechatPay];
@@ -325,7 +325,7 @@
     }
 }
 
-- (void)AliPay{
+- (void)AliPayWithSubject:(NSString *)subject body:(NSString *)body{
     
     NSMutableDictionary *dic = [NSMutableDictionary new];
     [dic setObject:[NSString stringWithFormat:@"%.2f",self.rewardCount] forKey:@"listen_money"];
@@ -412,8 +412,8 @@
     
     // NOTE: 商品数据
     order.biz_content = [BizContent new];
-    order.biz_content.body = @"打赏";
-    order.biz_content.subject = @"听闻打赏";
+    order.biz_content.body = body?body:@"打赏";
+    order.biz_content.subject = subject?subject:@"听闻打赏";
     order.biz_content.out_trade_no = [self generateTradeNO]; //订单ID（由商家自行制定）
     order.biz_content.timeout_express = @"30m"; //超时时间设置
     order.biz_content.total_amount = [NSString stringWithFormat:@"%.2f", self.rewardCount]; //商品价格
