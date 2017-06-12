@@ -330,8 +330,6 @@
         
         UIActionSheet *ac = [[UIActionSheet alloc]initWithTitle:@"提示" delegate:self cancelButtonTitle:@"取消" destructiveButtonTitle:@"退出登录" otherButtonTitles: nil];
         [ac showInView:self.view];
-        
-        
     }
 }
 
@@ -354,6 +352,7 @@
         [CommonCode writeToUserD:@(NO) andKey:@"isLogin"];
         self.dataArr = @[@[@"当前版本",@"清除缓存"],@[@"字体大小",@"手势控制",@"夜间模式"],@[@"意见反馈",@"关于听闻",@"喜欢，就来评分吧"]];
         self.imgNameArr = @[@[@"shuaxin",@"shanchu"],@[@"font",@"shoushi",@"nightMode"],@[@"yijian",@"guanyu",@"favourable_comment"]];
+        APPDELEGATE.isLogin = YES;
         [self.tableView reloadData];
         [[NSNotificationCenter defaultCenter] postNotificationName:@"tuichuLoginSeccess" object:nil];
         ExdangqianUser = nil;

@@ -35,7 +35,11 @@
 @end
 
 @implementation LoginVC
-
+- (void)viewWillDisappear:(BOOL)animated
+{
+    [super viewWillDisappear:animated];
+    APPDELEGATE.isLogin = YES;
+}
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.title = @"账号登录";

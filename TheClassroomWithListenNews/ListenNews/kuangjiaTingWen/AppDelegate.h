@@ -24,7 +24,10 @@ typedef void (^WechatdidReceiveCode)(NSString *);
 @property (strong, nonatomic) UIWindow *window;
 
 @property (assign, nonatomic) BOOL isReward;//打赏 ? 充值
+
 @property (assign, nonatomic) BOOL isClassPay;//购买课堂
+
+@property (assign, nonatomic) BOOL isLogin;//是否登录
 
 @property (copy, nonatomic) SkipToPlayingVCBlock shouyeSkipToPlayingVC;
 @property (copy, nonatomic) SkipToPlayingVCBlock dingyueSkipToPlayingVC;

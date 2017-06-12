@@ -129,8 +129,10 @@
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     [self.navigationController setNavigationBarHidden:NO animated:YES];
-    
-    [self.tableView.mj_header beginRefreshing];
+    if (APPDELEGATE.isLogin) {
+        [self.tableView.mj_header beginRefreshing];
+        APPDELEGATE.isLogin = NO;
+    }
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
