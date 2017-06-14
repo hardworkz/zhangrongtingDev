@@ -297,7 +297,6 @@ static bofangVC *_instance = nil;
     }
     [CommonCode writeToUserD:@"NO" andKey:@"isPlayingVC"];
 }
-
 #pragma mark - NSNotification
 
 - (void)onAudioSessionEvent:(NSNotification *)no {
@@ -1273,19 +1272,23 @@ static bofangVC *_instance = nil;
         
     }
     else{
-        UIAlertController *qingshuruyonghuming = [UIAlertController alertControllerWithTitle:@"温馨提示" message:@"您还没登录，请先登录后操作" preferredStyle:UIAlertControllerStyleAlert];
-        [qingshuruyonghuming addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-        }]];
-        [qingshuruyonghuming addAction:[UIAlertAction actionWithTitle:@"登录" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-            [self doPlay:bofangCenterBtn];
-            LoginVC *loginFriVC = [LoginVC new];
-            LoginNavC *loginNavC = [[LoginNavC alloc]initWithRootViewController:loginFriVC];
-            [loginNavC.navigationBar setBackgroundColor:[UIColor whiteColor]];
-            loginNavC.navigationBar.tintColor = [UIColor blackColor];
-            [self presentViewController:loginNavC animated:YES completion:nil];
-        }]];
-        
-        [self presentViewController:qingshuruyonghuming animated:YES completion:nil];
+        if ([[CommonCode readFromUserD:@"isIAP"] boolValue] == YES) {
+            [sender setTitle:@"取消" forState:UIControlStateNormal];
+        }else{
+            UIAlertController *qingshuruyonghuming = [UIAlertController alertControllerWithTitle:@"温馨提示" message:@"您还没登录，请先登录后操作" preferredStyle:UIAlertControllerStyleAlert];
+            [qingshuruyonghuming addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+            }]];
+            [qingshuruyonghuming addAction:[UIAlertAction actionWithTitle:@"登录" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+                [self doPlay:bofangCenterBtn];
+                LoginVC *loginFriVC = [LoginVC new];
+                LoginNavC *loginNavC = [[LoginNavC alloc]initWithRootViewController:loginFriVC];
+                [loginNavC.navigationBar setBackgroundColor:[UIColor whiteColor]];
+                loginNavC.navigationBar.tintColor = [UIColor blackColor];
+                [self presentViewController:loginNavC animated:YES completion:nil];
+            }]];
+            
+            [self presentViewController:qingshuruyonghuming animated:YES completion:nil];
+        }
     }
 }
 
@@ -1345,19 +1348,24 @@ static bofangVC *_instance = nil;
         self.hidesBottomBarWhenPushed = YES;
     }
     else{
-        UIAlertController *qingshuruyonghuming = [UIAlertController alertControllerWithTitle:@"请先登录" message:nil preferredStyle:UIAlertControllerStyleAlert];
-        [qingshuruyonghuming addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-        }]];
-        [qingshuruyonghuming addAction:[UIAlertAction actionWithTitle:@"去登录" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-            [self doPlay:bofangCenterBtn];
-            LoginVC *loginFriVC = [LoginVC new];
-            LoginNavC *loginNavC = [[LoginNavC alloc]initWithRootViewController:loginFriVC];
-            [loginNavC.navigationBar setBackgroundColor:[UIColor whiteColor]];
-            loginNavC.navigationBar.tintColor = [UIColor blackColor];
-            [self presentViewController:loginNavC animated:YES completion:nil];
-        }]];
-        
-        [self presentViewController:qingshuruyonghuming animated:YES completion:nil];
+        if ([[CommonCode readFromUserD:@"isIAP"] boolValue] == YES) {
+            XWAlerLoginView *xw = [[XWAlerLoginView alloc]initWithTitle:@"登录后才可以评论哦~"];
+            [xw show];
+        }else{
+            UIAlertController *qingshuruyonghuming = [UIAlertController alertControllerWithTitle:@"请先登录" message:nil preferredStyle:UIAlertControllerStyleAlert];
+            [qingshuruyonghuming addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+            }]];
+            [qingshuruyonghuming addAction:[UIAlertAction actionWithTitle:@"去登录" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+                [self doPlay:bofangCenterBtn];
+                LoginVC *loginFriVC = [LoginVC new];
+                LoginNavC *loginNavC = [[LoginNavC alloc]initWithRootViewController:loginFriVC];
+                [loginNavC.navigationBar setBackgroundColor:[UIColor whiteColor]];
+                loginNavC.navigationBar.tintColor = [UIColor blackColor];
+                [self presentViewController:loginNavC animated:YES completion:nil];
+            }]];
+            
+            [self presentViewController:qingshuruyonghuming animated:YES completion:nil];
+        }
     }
 }
 

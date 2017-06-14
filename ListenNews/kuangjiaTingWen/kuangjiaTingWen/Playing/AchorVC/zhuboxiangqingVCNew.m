@@ -1116,19 +1116,24 @@
         }
     }
     else{
-        UIAlertController *qingshuruyonghuming = [UIAlertController alertControllerWithTitle:@"请先登录" message:nil preferredStyle:UIAlertControllerStyleAlert];
-        [qingshuruyonghuming addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-        }]];
-        [qingshuruyonghuming addAction:[UIAlertAction actionWithTitle:@"去登录" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-            LoginVC *loginFriVC = [LoginVC new];
-            LoginNavC *loginNavC = [[LoginNavC alloc]initWithRootViewController:loginFriVC];
-            [loginNavC.navigationBar setBackgroundColor:[UIColor whiteColor]];
-            //        [loginNavC.navigationBar setBackgroundImage:[UIImage imageNamed:@"mian-1"] forBarMetrics:UIBarMetricsDefault];
-            loginNavC.navigationBar.tintColor = [UIColor blackColor];
-            [self presentViewController:loginNavC animated:YES completion:nil];
-        }]];
+        if ([[CommonCode readFromUserD:@"isIAP"] boolValue] == YES) {
+            [sender setTitle:@"取消" forState:UIControlStateNormal];
+        }else{
+            UIAlertController *qingshuruyonghuming = [UIAlertController alertControllerWithTitle:@"请先登录" message:nil preferredStyle:UIAlertControllerStyleAlert];
+            [qingshuruyonghuming addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+            }]];
+            [qingshuruyonghuming addAction:[UIAlertAction actionWithTitle:@"去登录" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+                LoginVC *loginFriVC = [LoginVC new];
+                LoginNavC *loginNavC = [[LoginNavC alloc]initWithRootViewController:loginFriVC];
+                [loginNavC.navigationBar setBackgroundColor:[UIColor whiteColor]];
+                //        [loginNavC.navigationBar setBackgroundImage:[UIImage imageNamed:@"mian-1"] forBarMetrics:UIBarMetricsDefault];
+                loginNavC.navigationBar.tintColor = [UIColor blackColor];
+                [self presentViewController:loginNavC animated:YES completion:nil];
+            }]];
+            
+            [self presentViewController:qingshuruyonghuming animated:YES completion:nil];
+        }
         
-        [self presentViewController:qingshuruyonghuming animated:YES completion:nil];
     }
 }
 

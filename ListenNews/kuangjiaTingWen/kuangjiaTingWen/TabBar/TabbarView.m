@@ -272,35 +272,15 @@
     _isPushSkip = NO;
 }
 
-- (void)imgAnimate:(UIButton*)btn{
-    //    UIView *view=btn.subviews[0];
-    //    // 动画执行顺序
-    //    [UIView animateWithDuration:0.1 animations:^(void){
-    //         view.transform = CGAffineTransformScale(CGAffineTransformIdentity,0.5, 0.5);
-    //
-    //    } completion:^(BOOL finished){
-    //         [UIView animateWithDuration:0.2 animations:
-    //          ^(void){
-    //              view.transform = CGAffineTransformScale(CGAffineTransformIdentity,1.2, 1.2);
-    //
-    //          } completion:^(BOOL finished){
-    //              [UIView animateWithDuration:0.1 animations:
-    //               ^(void){
-    //                   view.transform = CGAffineTransformScale(CGAffineTransformIdentity,1,1);
-    //
-    //               } completion:^(BOOL finished){
-    //               }];
-    //          }];
-    //     }];
-    
+- (void)imgAnimate:(UIButton*)btn
+{
     _rotationAnimation = [CABasicAnimation animationWithKeyPath:@"transform.rotation.z"];
     _rotationAnimation.toValue = [NSNumber numberWithFloat: M_PI * 2.0 ];
     _rotationAnimation.duration = 2.0;
     _rotationAnimation.cumulative = YES;
     _rotationAnimation.repeatCount = HUGE_VALF;
     
-    [btn.layer addAnimation:_rotationAnimation forKey:@"rotationAnimation"];
-    
+    [btn.layer addAnimation:_rotationAnimation forKey:@"rotationAnimation"];  
 }
 
 - (void)stopAnimate {

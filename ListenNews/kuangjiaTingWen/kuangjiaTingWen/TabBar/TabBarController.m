@@ -37,8 +37,13 @@
             [childView removeFromSuperview];
         }
     }
+    if ([bofangVC shareInstance].isPlay) {
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"startAnimate" object:nil];
+    }
+    else{
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"stopAnimate" object:nil];
+    }
 }
-
 - (void)viewDidLoad{
     [super viewDidLoad];
     _itemArray = [NSMutableArray array];

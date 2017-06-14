@@ -444,8 +444,6 @@
     else{
         return [WeiboSDK handleOpenURL:url delegate:self];
     }
-    
-
 }
 
 //#define __IPHONE_10_0    100000

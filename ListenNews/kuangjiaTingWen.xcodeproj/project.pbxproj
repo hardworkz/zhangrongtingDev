@@ -3748,7 +3748,7 @@
 					"$(inherited)",
 					"-ObjC",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.popwcn.ListenNewsExploreVersion;
+				PRODUCT_BUNDLE_IDENTIFIER = com.popwcn.listenNews;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -3834,7 +3834,7 @@
 					"$(inherited)",
 					"-ObjC",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.popwcn.ListenNewsExploreVersion;
+				PRODUCT_BUNDLE_IDENTIFIER = com.popwcn.listenNews;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";
