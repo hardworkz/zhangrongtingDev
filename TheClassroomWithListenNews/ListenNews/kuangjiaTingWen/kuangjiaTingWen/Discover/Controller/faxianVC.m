@@ -697,19 +697,43 @@
         if ([self.SearchActResultsArrM count]) {
             if (indexPath.section == 0) {
                 NSDictionary *dic = [[NSDictionary alloc]initWithDictionary:self.SearchActResultsArrM[indexPath.row]];
-                
-                zhuboxiangqingVCNew *faxianzhuboVC = [[zhuboxiangqingVCNew alloc]init];
-                faxianzhuboVC.jiemuDescription = dic[@"description"];
-                faxianzhuboVC.jiemuFan_num = dic[@"fan_num"];
-                faxianzhuboVC.jiemuID = dic[@"id"];
-                faxianzhuboVC.jiemuImages = dic[@"images"];
-                faxianzhuboVC.jiemuIs_fan = dic[@"is_fan"];
-                faxianzhuboVC.jiemuMessage_num = dic[@"message_num"];
-                faxianzhuboVC.jiemuName = dic[@"name"];
-                faxianzhuboVC.isfaxian = YES;
-                self.hidesBottomBarWhenPushed=YES;
-                [self.navigationController pushViewController:faxianzhuboVC animated:YES];
-                self.hidesBottomBarWhenPushed=NO;
+//                zhuboxiangqingVCNew *faxianzhuboVC = [[zhuboxiangqingVCNew alloc]init];
+//                faxianzhuboVC.jiemuDescription = dic[@"description"];
+//                faxianzhuboVC.jiemuFan_num = dic[@"fan_num"];
+//                faxianzhuboVC.jiemuID = dic[@"id"];
+//                faxianzhuboVC.jiemuImages = dic[@"images"];
+//                faxianzhuboVC.jiemuIs_fan = dic[@"is_fan"];
+//                faxianzhuboVC.jiemuMessage_num = dic[@"message_num"];
+//                faxianzhuboVC.jiemuName = dic[@"name"];
+//                faxianzhuboVC.isfaxian = YES;
+//                self.hidesBottomBarWhenPushed=YES;
+//                [self.navigationController pushViewController:faxianzhuboVC animated:YES];
+//                self.hidesBottomBarWhenPushed=NO;
+                if ([dic[@"is_free"] isEqualToString:@"1"]) {
+                    zhuboxiangqingVCNew *faxianzhuboVC = [[zhuboxiangqingVCNew alloc]init];
+                    faxianzhuboVC.jiemuDescription = dic[@"description"];
+                    faxianzhuboVC.jiemuFan_num = dic[@"fan_num"];
+                    faxianzhuboVC.jiemuID = dic[@"id"];
+                    faxianzhuboVC.jiemuImages = dic[@"images"];
+                    faxianzhuboVC.jiemuIs_fan = dic[@"is_fan"];
+                    faxianzhuboVC.jiemuMessage_num = dic[@"message_num"];
+                    faxianzhuboVC.jiemuName = dic[@"name"];                    faxianzhuboVC.isfaxian = YES;
+                    faxianzhuboVC.isClass = YES;
+                    self.hidesBottomBarWhenPushed=YES;
+                    [self.navigationController pushViewController:faxianzhuboVC animated:YES];
+                    self.hidesBottomBarWhenPushed=NO;
+                    
+                }
+                //跳转未购买课堂界面
+                else if ([dic[@"is_free"] isEqualToString:@"0"]){
+                    ClassViewController *vc = [ClassViewController new];
+                    vc.act_id = dic[@"id"];
+                    self.hidesBottomBarWhenPushed = YES;
+                    [self.navigationController.navigationBar setHidden:YES];
+                    [self.navigationController pushViewController:vc animated:YES];
+                    self.hidesBottomBarWhenPushed = NO;
+                }
+
             }
             else{
                 if (SouSuoquanjvIndexPath){
@@ -872,18 +896,44 @@
     else{
         //TODO：发现课堂模块
         if (indexPath.row < [[self.faxianArrM firstObject][@"data"] count]) {
-            if ([[self.faxianArrM firstObject][@"data"][indexPath.row][@"is_free"] isEqualToString:@"1"]) {
-                XWAlerLoginView *xw = [[XWAlerLoginView alloc]initWithTitle:@"已购买界面正在开发中"];
-                [xw show];
+//            if ([[self.faxianArrM firstObject][@"data"][indexPath.row][@"is_free"] isEqualToString:@"1"]) {
+//                XWAlerLoginView *xw = [[XWAlerLoginView alloc]initWithTitle:@"已购买界面正在开发中"];
+//                [xw show];
+//            }
+//            else if ([[self.faxianArrM firstObject][@"data"][indexPath.row][@"is_free"] isEqualToString:@"0"]){
+//                ClassViewController *vc = [ClassViewController new];
+//                vc.act_id = [self.faxianArrM firstObject][@"data"][indexPath.row][@"id"];
+//                self.hidesBottomBarWhenPushed = YES;
+//                [self.navigationController.navigationBar setHidden:YES];
+//                [self.navigationController pushViewController:vc animated:YES];
+//                self.hidesBottomBarWhenPushed = NO;
+//            }
+            NSDictionary *dic = [self.faxianArrM firstObject][@"data"][indexPath.row];
+            if ([dic[@"is_free"] isEqualToString:@"1"]) {
+                zhuboxiangqingVCNew *faxianzhuboVC = [[zhuboxiangqingVCNew alloc]init];
+                faxianzhuboVC.jiemuDescription = dic[@"description"];
+                faxianzhuboVC.jiemuFan_num = dic[@"fan_num"];
+                faxianzhuboVC.jiemuID = dic[@"id"];
+                faxianzhuboVC.jiemuImages = dic[@"images"];
+                faxianzhuboVC.jiemuIs_fan = dic[@"is_fan"];
+                faxianzhuboVC.jiemuMessage_num = dic[@"message_num"];
+                faxianzhuboVC.jiemuName = dic[@"name"];                    faxianzhuboVC.isfaxian = YES;
+                faxianzhuboVC.isClass = YES;
+                self.hidesBottomBarWhenPushed=YES;
+                [self.navigationController pushViewController:faxianzhuboVC animated:YES];
+                self.hidesBottomBarWhenPushed=NO;
+                
             }
-            else if ([[self.faxianArrM firstObject][@"data"][indexPath.row][@"is_free"] isEqualToString:@"0"]){
+            //跳转未购买课堂界面
+            else if ([dic[@"is_free"] isEqualToString:@"0"]){
                 ClassViewController *vc = [ClassViewController new];
-                vc.act_id = [self.faxianArrM firstObject][@"data"][indexPath.row][@"id"];
+                vc.act_id = dic[@"id"];
                 self.hidesBottomBarWhenPushed = YES;
                 [self.navigationController.navigationBar setHidden:YES];
                 [self.navigationController pushViewController:vc animated:YES];
                 self.hidesBottomBarWhenPushed = NO;
             }
+
         }
     }
     
