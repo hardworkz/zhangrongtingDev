@@ -126,6 +126,7 @@
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(zidongjiazai:) name:@"bofangRightyaojiazaishujv" object:nil];
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(gaibianyanse:) name:@"gaibianyanse" object:nil];
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(reloadClassList) name:ReloadClassList object:nil];
+    RegisterNotify(ReloadHomeSelectPageData, @selector(reloadSelectedList))
 }
 
 - (void)setUpView{
@@ -358,20 +359,23 @@
                 [weakSelf.classroomInfoArr removeAllObjects];
             }
             else{
-                NSRange range = {NSNotFound, NSNotFound};
-                for (int i = 0 ; i < [weakSelf.classroomInfoArr count]; i ++) {
-                    if ([weakSelf.classroomInfoArr[i][@"id"] isEqualToString:[responseObject[@"results"] firstObject][@"id"] ]) {
-                        range = NSMakeRange(i, [weakSelf.classroomInfoArr count] - i);
-                        break;
-                    }
-                }
-                if (range.location < [weakSelf.classroomInfoArr count]) {
-                    [weakSelf.classroomInfoArr removeObjectsInRange:range];
-                }
+//                NSRange range = {NSNotFound, NSNotFound};
+//                for (int i = 0 ; i < [weakSelf.classroomInfoArr count]; i ++) {
+//                    if ([weakSelf.classroomInfoArr[i][@"id"] isEqualToString:[responseObject[@"results"] firstObject][@"id"] ]) {
+//                        range = NSMakeRange(i, [weakSelf.classroomInfoArr count] - i);
+//                        break;
+//                    }
+//                }
+//                if (range.location < [weakSelf.classroomInfoArr count]) {
+//                    [weakSelf.classroomInfoArr removeObjectsInRange:range];
+//                }
             }
-            [weakSelf.classroomInfoArr addObjectsFromArray:responseObject[@"results"]];
+            NSMutableArray *classArray = [self frameWithDataArray:[MyClassroomListModel mj_objectArrayWithKeyValuesArray:responseObject[@"results"]]];
+//            if (classArray.count == self.classPageSize) {
+//                self.classIndex ++;
+//            }
+            [weakSelf.classroomInfoArr addObjectsFromArray:classArray];
             weakSelf.classroomInfoArr = [[NSMutableArray alloc]initWithArray:weakSelf.classroomInfoArr];
-           // [CommonCode writeToUserD:weakSelf.classroomInfoArr andKey:@"zhuyeliebiao"];
             [weakSelf.classroomTableView reloadData];
             [weakSelf endClassroomRefreshing];
         }
@@ -383,7 +387,22 @@
     }];
     
 }
-
+/**
+ 返回frameArray
+ 
+ @param modeArray 数据模型数组
+ @return frame数据模型数组
+ */
+- (NSMutableArray *)frameWithDataArray:(NSMutableArray *)modeArray
+{
+    NSMutableArray *array = [NSMutableArray array];
+    for (MyClassroomListModel *model in modeArray) {
+        MyClassroomListFrameModel *frameModel = [[MyClassroomListFrameModel alloc] init];
+        frameModel.model = model;
+        [array addObject:frameModel];
+    }
+    return array;
+}
 - (void)CustomNavigationBar{
     UIView *view = [[UIView alloc]initWithFrame:CGRectMake((SCREEN_WIDTH - 54) / 2, 35, 54, 25)];
     view.backgroundColor = [UIColor whiteColor];
@@ -403,7 +422,6 @@
 
 - (void)segmentedControlChangedValue:(HMSegmentedControl *)segmentedControl {
     NSLog(@"Selected index %ld (via UIControlEventValueChanged)", (long)segmentedControl.selectedSegmentIndex);
-    
     [self.lineView setFrame:CGRectMake(segmentedControl.selectedSegmentIndex * (SCREEN_WIDTH )/3 + 30, self.segmentedControl.frame.size.height - 5, (SCREEN_WIDTH)/6, 5)];
 }
 
@@ -730,6 +748,20 @@
     self.classIndex = 1;
     [self loadClassData];
 }
+
+/**
+ 重复点击刷新首页对应列表
+ */
+- (void)reloadSelectedList
+{
+    if (self.segmentedControl.selectedSegmentIndex == 0) {
+        [self.columnTableView.mj_header beginRefreshing];
+    }else if (self.segmentedControl.selectedSegmentIndex == 1){
+        [self.newsTableView.mj_header beginRefreshing];
+    }else{
+        [self.classroomTableView.mj_header beginRefreshing];
+    }
+}
 #pragma mark -UIScrollViewDelegate
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView {
     CGFloat pageWidth = self.scrollView.frame.size.width;
@@ -986,81 +1018,81 @@
         return cell;
     }
     else{
-        static NSString *NewsCellIdentify = @"ClassCellIdentify";
-        UITableViewCell *cell = [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:NewsCellIdentify];
-        if (!cell){
-            cell = [tableView dequeueReusableCellWithIdentifier:NewsCellIdentify];
-        }
-        if ([self.classroomInfoArr count]) {
-            //图片
-            UIImageView *imgLeft = [[UIImageView alloc]initWithFrame:CGRectMake(20.0 / 375 * IPHONE_W, 7.5, 105.0 / 375 * IPHONE_W, 105.0 / 375 *IPHONE_W)];
-            if (IS_IPAD) {
-                [imgLeft setFrame:CGRectMake(20.0 / 375 * IPHONE_W, 7.5, 105.0 / 375 * IPHONE_W, 70.0 / 375 *IPHONE_W)];
-            }
-            [imgLeft.layer setMasksToBounds:YES];
-            [imgLeft.layer setCornerRadius:5.0];
-            NSString *imgUrl = [NSString stringWithFormat:@"%@",[self.classroomInfoArr[indexPath.row][@"images"] stringByReplacingOccurrencesOfString:@"\\" withString:@""]];
-            NSString *imgUrl1 = [imgUrl stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-            NSString *imgUrl2 = [imgUrl1 stringByReplacingOccurrencesOfString:@"thumb:" withString:@""];
-            NSString *imgUrl3 = [imgUrl2 stringByReplacingOccurrencesOfString:@"{" withString:@""];
-            NSString *imgUrl4 = [imgUrl3 stringByReplacingOccurrencesOfString:@"}" withString:@""];
-            if ([imgUrl4  rangeOfString:@"http"].location != NSNotFound){
-                [imgLeft sd_setImageWithURL:[NSURL URLWithString:imgUrl4]];
-                //placeholderImage:[UIImage imageNamed:@"thumbnailsdefault"]
-            }
-            else{
-                NSString *str = USERPOTOAD(imgUrl4);
-                [imgLeft sd_setImageWithURL:[NSURL URLWithString:str]];
-                //placeholderImage:[UIImage imageNamed:@"thumbnailsdefault"]
-            }
-            
-            [cell.contentView addSubview:imgLeft];
-            imgLeft.contentMode = UIViewContentModeScaleAspectFill;
-            imgLeft.clipsToBounds = YES;
-            
-            //标题
-            UILabel *titleLab = [[UILabel alloc]initWithFrame:CGRectMake(CGRectGetMaxX(imgLeft.frame) + 5.0 / 375 * IPHONE_W, imgLeft.frame.origin.y,  SCREEN_WIDTH - CGRectGetMaxX(imgLeft.frame) - 70.0 / 375 * IPHONE_W, 21.0 / 667 *IPHONE_H)];
-            titleLab.text = self.classroomInfoArr[indexPath.row][@"name"];
-            titleLab.textColor = [UIColor blackColor];
-            titleLab.textAlignment = NSTextAlignmentLeft;
-            titleLab.font = [UIFont boldSystemFontOfSize:16.0f ];
-            [cell.contentView addSubview:titleLab];
-            [titleLab setNumberOfLines:3];
-            titleLab.lineBreakMode = NSLineBreakByWordWrapping;
-            CGSize size = [titleLab sizeThatFits:CGSizeMake(titleLab.frame.size.width, MAXFLOAT)];
-            titleLab.frame = CGRectMake(titleLab.frame.origin.x, titleLab.frame.origin.y, titleLab.frame.size.width, size.height);
-            //价钱
-            UILabel *price = [[UILabel alloc]initWithFrame:CGRectMake(CGRectGetMaxX(titleLab.frame) + 10, titleLab.frame.origin.y,40.0 / 375 * IPHONE_W, 21.0 / 667 *IPHONE_H)];
-            price.text = [NSString stringWithFormat:@"￥%ld",[self.classroomInfoArr[indexPath.row][@"price"] integerValue]];
-            price.font = gFontMain14;
-//            price.textAlignment = NSTextAlignmentRight;
-            price.textColor = gMainColor;
-            [cell.contentView addSubview:price];
-            
-            //简介
-            UILabel *describe = [[UILabel alloc]initWithFrame:CGRectMake(titleLab.frame.origin.x, 60.0 * 667.0/SCREEN_HEIGHT,  SCREEN_WIDTH - CGRectGetMaxX(imgLeft.frame) - 20.0 / 375 * IPHONE_W, 21.0 / 667 *IPHONE_H)];
-            if (TARGETED_DEVICE_IS_IPHONE_568){
-                [describe setFrame:CGRectMake(titleLab.frame.origin.x, CGRectGetMaxY(titleLab.frame), SCREEN_WIDTH - CGRectGetMaxX(imgLeft.frame) - 20.0 / 375 * IPHONE_W, 21.0 / 667 *IPHONE_H)];
-            }
-            else{
-                [describe setFrame:CGRectMake(titleLab.frame.origin.x, 60.0 * 667.0/SCREEN_HEIGHT, SCREEN_WIDTH - CGRectGetMaxX(imgLeft.frame) - 20.0 / 375 * IPHONE_W, 21.0 / 667 *IPHONE_H)];
-            }
-            describe.text = self.classroomInfoArr[indexPath.row][@"description"];
-            describe.textColor = [[UIColor grayColor]colorWithAlphaComponent:0.7f];
-            describe.textColor = gTextColorSub;
-            describe.textAlignment = NSTextAlignmentLeft;
-            describe.font = gFontMain14;
-            [cell.contentView addSubview:describe];
-            [describe setNumberOfLines:3];
-            describe.lineBreakMode = NSLineBreakByWordWrapping;
-            CGSize size1 = [describe sizeThatFits:CGSizeMake(describe.frame.size.width, MAXFLOAT)];
-            describe.frame = CGRectMake(describe.frame.origin.x, describe.frame.origin.y, describe.frame.size.width, size1.height);
-            UIView *line = [[UIView alloc]initWithFrame:CGRectMake(20.0 / 375 * SCREEN_WIDTH, CGRectGetMaxY(imgLeft.frame) + 7, SCREEN_WIDTH - 40.0 / 375 * SCREEN_WIDTH, 0.5)];
-            [line setBackgroundColor:nMineNameColor];
-            [cell.contentView addSubview:line];
-        }
-        
+//        static NSString *NewsCellIdentify = @"ClassCellIdentify";
+//        UITableViewCell *cell = [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:NewsCellIdentify];
+//        if (!cell){
+//            cell = [tableView dequeueReusableCellWithIdentifier:NewsCellIdentify];
+//        }
+//        if ([self.classroomInfoArr count]) {
+//            //图片
+//            UIImageView *imgLeft = [[UIImageView alloc]initWithFrame:CGRectMake(20.0 / 375 * IPHONE_W, 7.5, 105.0 / 375 * IPHONE_W, 105.0 / 375 *IPHONE_W)];
+//            if (IS_IPAD) {
+//                [imgLeft setFrame:CGRectMake(20.0 / 375 * IPHONE_W, 7.5, 105.0 / 375 * IPHONE_W, 70.0 / 375 *IPHONE_W)];
+//            }
+//            [imgLeft.layer setMasksToBounds:YES];
+//            [imgLeft.layer setCornerRadius:5.0];
+//            if ([NEWSSEMTPHOTOURL(self.classroomInfoArr[indexPath.row][@"images"])  rangeOfString:@"http"].location != NSNotFound){
+//                [imgLeft sd_setImageWithURL:[NSURL URLWithString:NEWSSEMTPHOTOURL(self.classroomInfoArr[indexPath.row][@"images"])]];
+//                //placeholderImage:[UIImage imageNamed:@"thumbnailsdefault"]
+//            }
+//            else{
+//                NSString *str = USERPOTOAD(NEWSSEMTPHOTOURL(self.classroomInfoArr[indexPath.row][@"images"]));
+//                [imgLeft sd_setImageWithURL:[NSURL URLWithString:str]];
+//                //placeholderImage:[UIImage imageNamed:@"thumbnailsdefault"]
+//            }
+//            
+//            [cell.contentView addSubview:imgLeft];
+//            imgLeft.contentMode = UIViewContentModeScaleAspectFill;
+//            imgLeft.clipsToBounds = YES;
+//            
+//            //标题
+//            UILabel *titleLab = [[UILabel alloc]initWithFrame:CGRectMake(CGRectGetMaxX(imgLeft.frame) + 5.0 / 375 * IPHONE_W, imgLeft.frame.origin.y,  SCREEN_WIDTH - CGRectGetMaxX(imgLeft.frame) - 70.0 / 375 * IPHONE_W, 21.0 / 667 *IPHONE_H)];
+//            titleLab.text = self.classroomInfoArr[indexPath.row][@"name"];
+//            titleLab.textColor = [UIColor blackColor];
+//            titleLab.textAlignment = NSTextAlignmentLeft;
+//            titleLab.font = [UIFont boldSystemFontOfSize:16.0f ];
+//            [cell.contentView addSubview:titleLab];
+//            [titleLab setNumberOfLines:3];
+//            titleLab.lineBreakMode = NSLineBreakByWordWrapping;
+//            CGSize size = [titleLab sizeThatFits:CGSizeMake(titleLab.frame.size.width, MAXFLOAT)];
+//            titleLab.frame = CGRectMake(titleLab.frame.origin.x, titleLab.frame.origin.y, titleLab.frame.size.width, size.height);
+//            //价钱
+//            UILabel *price = [[UILabel alloc]initWithFrame:CGRectMake(CGRectGetMaxX(titleLab.frame) + 10, titleLab.frame.origin.y,40.0 / 375 * IPHONE_W, 21.0 / 667 *IPHONE_H)];
+//            price.text = [NSString stringWithFormat:@"￥%ld",[self.classroomInfoArr[indexPath.row][@"price"] integerValue]];
+//            price.font = gFontMain14;
+////            price.textAlignment = NSTextAlignmentRight;
+//            price.textColor = gMainColor;
+//            [cell.contentView addSubview:price];
+//            
+//            //简介
+//            UILabel *describe = [[UILabel alloc]initWithFrame:CGRectMake(titleLab.frame.origin.x, 60.0 * 667.0/SCREEN_HEIGHT,  SCREEN_WIDTH - CGRectGetMaxX(imgLeft.frame) - 20.0 / 375 * IPHONE_W, 21.0 / 667 *IPHONE_H)];
+//            if (TARGETED_DEVICE_IS_IPHONE_568){
+//                [describe setFrame:CGRectMake(titleLab.frame.origin.x, CGRectGetMaxY(titleLab.frame), SCREEN_WIDTH - CGRectGetMaxX(imgLeft.frame) - 20.0 / 375 * IPHONE_W, 21.0 / 667 *IPHONE_H)];
+//            }
+//            else{
+//                [describe setFrame:CGRectMake(titleLab.frame.origin.x, 60.0 * 667.0/SCREEN_HEIGHT, SCREEN_WIDTH - CGRectGetMaxX(imgLeft.frame) - 20.0 / 375 * IPHONE_W, 21.0 / 667 *IPHONE_H)];
+//            }
+//            describe.text = self.classroomInfoArr[indexPath.row][@"description"];
+//            describe.textColor = [[UIColor grayColor]colorWithAlphaComponent:0.7f];
+//            describe.textColor = gTextColorSub;
+//            describe.textAlignment = NSTextAlignmentLeft;
+//            describe.font = gFontMain14;
+//            [cell.contentView addSubview:describe];
+//            [describe setNumberOfLines:3];
+//            describe.lineBreakMode = NSLineBreakByWordWrapping;
+//            CGSize size1 = [describe sizeThatFits:CGSizeMake(describe.frame.size.width, MAXFLOAT)];
+//            describe.frame = CGRectMake(describe.frame.origin.x, describe.frame.origin.y, describe.frame.size.width, size1.height);
+//            UIView *line = [[UIView alloc]initWithFrame:CGRectMake(20.0 / 375 * SCREEN_WIDTH, CGRectGetMaxY(imgLeft.frame) + 7, SCREEN_WIDTH - 40.0 / 375 * SCREEN_WIDTH, 0.5)];
+//            [line setBackgroundColor:nMineNameColor];
+//            [cell.contentView addSubview:line];
+//        }
+//        
+//        [cell setSelectionStyle:UITableViewCellSelectionStyleNone];
+//        return cell;
+        MyClassroomTableViewCell *cell = [MyClassroomTableViewCell cellWithTableView:tableView];
         [cell setSelectionStyle:UITableViewCellSelectionStyleNone];
+        MyClassroomListFrameModel *frameModel = self.classroomInfoArr[indexPath.row];
+        cell.frameModel = frameModel;
         return cell;
     }
 }
@@ -1080,7 +1112,8 @@
         }
     }
     else if (tableView == self.classroomTableView){
-        heightForRow = 120.0 / 667 * IPHONE_H;
+        MyClassroomListFrameModel *frameModel = self.classroomInfoArr[indexPath.row];
+        heightForRow = frameModel.cellHeight;
     }
     return heightForRow;
 }
@@ -1176,16 +1209,16 @@
     }
     else if (tableView == self.classroomTableView){
         //跳转已购买课堂界面
-        if ([self.classroomInfoArr[indexPath.row][@"is_free"] isEqualToString:@"1"]) {
-            NSDictionary *dic = self.classroomInfoArr[indexPath.row];
+        MyClassroomListFrameModel *frameModel = self.classroomInfoArr[indexPath.row];
+        if ([frameModel.model.is_free isEqualToString:@"1"]) {
             zhuboxiangqingVCNew *faxianzhuboVC = [[zhuboxiangqingVCNew alloc]init];
-            faxianzhuboVC.jiemuDescription = dic[@"description"];
-            faxianzhuboVC.jiemuFan_num = dic[@"fan_num"];
-            faxianzhuboVC.jiemuID = dic[@"id"];
-            faxianzhuboVC.jiemuImages = dic[@"images"];
-            faxianzhuboVC.jiemuIs_fan = dic[@"is_fan"];
-            faxianzhuboVC.jiemuMessage_num = dic[@"message_num"];
-            faxianzhuboVC.jiemuName = dic[@"name"];
+            faxianzhuboVC.jiemuDescription = frameModel.model.Description;
+            faxianzhuboVC.jiemuFan_num = frameModel.model.fan_num;
+            faxianzhuboVC.jiemuID = frameModel.model.ID;
+            faxianzhuboVC.jiemuImages = frameModel.model.images;
+            faxianzhuboVC.jiemuIs_fan = frameModel.model.is_fan;
+            faxianzhuboVC.jiemuMessage_num = frameModel.model.message_num;
+            faxianzhuboVC.jiemuName = frameModel.model.name;
             faxianzhuboVC.isfaxian = YES;
             faxianzhuboVC.isClass = YES;
             self.hidesBottomBarWhenPushed=YES;
@@ -1194,9 +1227,9 @@
 
         }
         //跳转未购买课堂界面
-        else if ([self.classroomInfoArr[indexPath.row][@"is_free"] isEqualToString:@"0"]){
+        else if ([frameModel.model.is_free isEqualToString:@"0"]){
             ClassViewController *vc = [ClassViewController new];
-            vc.act_id = self.classroomInfoArr[indexPath.row][@"id"];
+            vc.act_id = frameModel.model.ID;
             self.hidesBottomBarWhenPushed = YES;
             [self.navigationController.navigationBar setHidden:YES];
             [self.navigationController pushViewController:vc animated:YES];

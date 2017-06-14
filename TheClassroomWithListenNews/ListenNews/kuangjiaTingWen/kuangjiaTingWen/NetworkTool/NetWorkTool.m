@@ -1973,7 +1973,17 @@ NSMutableDictionary *dic = [[NSMutableDictionary alloc]initWithCapacity:1
     dic[@"accessToken"] = accessToken;
     [self asyncNetworkingUrl:@"/interfaceNew/get_collection" andDict:dic success:success failure:failure];
 }
-
++ (void)listBuyWithaccessToken:(NSString *)accessToken
+                       andPage:(NSString *)page
+                      andLimit:(NSString *)limit
+                               sccess:(void (^)(NSDictionary *responseObject))success
+                              failure:(void(^)(NSError *error))failure{
+    NSMutableDictionary *dic = [[NSMutableDictionary alloc]initWithCapacity:1];
+    dic[@"accessToken"] = accessToken;
+    dic[@"page"] = page;
+    dic[@"limit"] = limit;
+    [self asyncNetworkingUrl:@"/interfaceNew/listBuy" andDict:dic success:success failure:failure];
+}
 + (void)del_collectionWithaccessToken:(NSString *)accessToken
                               post_id:(NSString *)post_id
                                sccess:(void (^)(NSDictionary *responseObject))success

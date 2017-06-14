@@ -8,6 +8,9 @@
 
 #ifndef MineHeader_h
 #define MineHeader_h
+
+#import "MyClassroomController.h"
+
 #import "UIAlertView+MKBlockAdditions.h"
 
 #import "FeedBackAndListenFriendModel.h"
@@ -16,9 +19,12 @@
 #import "UserDetailModel.h"
 #import "child_commentModel.h"
 #import "CommentAndReviewFrameModel.h"
+#import "MyClassroomListModel.h"
+#import "MyClassroomListFrameModel.h"
 
 #import "BlobNewTableViewCell.h"
 #import "CommentAndReviewTableViewCell.h"
+#import "MyClassroomTableViewCell.h"
 
 #import "MultiImageView.h"
 #import "UIView+tap.h"

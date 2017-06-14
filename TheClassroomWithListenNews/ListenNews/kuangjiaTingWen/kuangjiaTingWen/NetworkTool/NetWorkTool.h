@@ -1512,5 +1512,20 @@
                                   commnet_id:(NSString *)comment_id
                                       sccess:(void (^)(NSDictionary *responseObject))success
                                      failure:(void(^)(NSError *error))failure;
+
+/**
+ 我的课堂列表
+
+ @param accessToken accessToken
+ *  @param page             页码（默认为1）
+ *  @param limit            每页条数（默认为10条
+ *  @param success          成功
+ *  @param failure          错误
+ */
++ (void)listBuyWithaccessToken:(NSString *)accessToken
+                       andPage:(NSString *)page
+                      andLimit:(NSString *)limit
+                        sccess:(void (^)(NSDictionary *responseObject))success
+                       failure:(void(^)(NSError *error))failure;
 @end
 

@@ -54,16 +54,10 @@
     faxianVC *faxian = [[faxianVC alloc]init];
     mineVC *mine = [[mineVC alloc]init];
     
-//    [self tabBarChildViewController:shouye tabBarTitle:@"听闻" norImage:[UIImage imageNamed:@"shouye_grey_new"] selImage:[UIImage imageNamed:@"shouye_blue_new"]];
-//    [self tabBarChildViewController:dingyue tabBarTitle:@"订阅" norImage:[UIImage imageNamed:@"dingyue_grey_new"] selImage:[UIImage imageNamed:@"dingyue_blue_new"]];
-//    [self tabBarChildViewController:faxian tabBarTitle:@"发现" norImage:[UIImage imageNamed:@"faxian_grey_new"] selImage:[self changColorXuanRan:@"faxian_blue_new"]];
-//    [self tabBarChildViewController:mine tabBarTitle:@"我" norImage:[UIImage imageNamed:@"wo_grey_new"] selImage:[self changColorXuanRan:@"wo_blue_new"]];
     [self tabBarChildViewController:shouye tabBarTitle:@"听闻" norImage:[UIImage imageNamed:@"home_tab_home"] selImage:[UIImage imageNamed:@"home_tab_home_select"]];
     [self tabBarChildViewController:dingyue tabBarTitle:@"订阅" norImage:[UIImage imageNamed:@"home_tab_subscribe"] selImage:[UIImage imageNamed:@"home_tab_subscribe_select"]];
     [self tabBarChildViewController:faxian tabBarTitle:@"发现" norImage:[UIImage imageNamed:@"home_tab_find"] selImage:[self changColorXuanRan:@"home_tab_find_select"]];
     [self tabBarChildViewController:mine tabBarTitle:@"我" norImage:[UIImage imageNamed:@"home_tab_me"] selImage:[self changColorXuanRan:@"home_tab_me_select"]];
-    
-    
     
     // 自定义TatBar
     [self setTatBar];
@@ -97,6 +91,12 @@
 
 #pragma mark TabbarViewDelegate
 - (void)LC_tabBar:(TabbarView *)tabBar didSelectItem:(NSInteger)index{
+    
+    if (self.selectedIndex == index && index == 0) {
+        RTLog(@"self.selectedIndex:0");
+        
+        SendNotify(ReloadHomeSelectPageData, nil)
+    }
     // 获取点击的索引 --> 对应tabBar的索引
     self.selectedIndex = index;
     if (index == 3 && [[CommonCode readFromUserD:@"isLogin"]boolValue] == NO) {

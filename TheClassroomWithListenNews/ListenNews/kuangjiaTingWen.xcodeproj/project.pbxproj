@@ -127,6 +127,10 @@
 		695745AD1D5C7384001022AD /* UITextView+Night.m in Sources */ = {isa = PBXBuildFile; fileRef = 6957458C1D5C7384001022AD /* UITextView+Night.m */; };
 		695745AE1D5C7384001022AD /* UIToolbar+Night.m in Sources */ = {isa = PBXBuildFile; fileRef = 6957458E1D5C7384001022AD /* UIToolbar+Night.m */; };
 		695745AF1D5C7384001022AD /* UIView+Night.m in Sources */ = {isa = PBXBuildFile; fileRef = 695745901D5C7384001022AD /* UIView+Night.m */; };
+		6958731C1EF119490011B174 /* MyClassroomController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6958731B1EF119490011B174 /* MyClassroomController.m */; };
+		6958731F1EF11AAB0011B174 /* MyClassroomTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 6958731E1EF11AAB0011B174 /* MyClassroomTableViewCell.m */; };
+		695873221EF11ACC0011B174 /* MyClassroomListModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 695873211EF11ACC0011B174 /* MyClassroomListModel.m */; };
+		695873251EF11ADA0011B174 /* MyClassroomListFrameModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 695873241EF11ADA0011B174 /* MyClassroomListFrameModel.m */; };
 		695CACFE1EC30F1C00FED470 /* libMiPushSDK.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 695CACFC1EC30F1C00FED470 /* libMiPushSDK.a */; };
 		695CAD001EC30FA600FED470 /* libresolv.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 695CACFF1EC30FA600FED470 /* libresolv.tbd */; };
 		695CAD021EC30FB300FED470 /* libxml2.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 695CAD011EC30FB300FED470 /* libxml2.tbd */; };
@@ -645,6 +649,15 @@
 		6957458E1D5C7384001022AD /* UIToolbar+Night.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIToolbar+Night.m"; sourceTree = "<group>"; };
 		6957458F1D5C7384001022AD /* UIView+Night.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIView+Night.h"; sourceTree = "<group>"; };
 		695745901D5C7384001022AD /* UIView+Night.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIView+Night.m"; sourceTree = "<group>"; };
+		695873151EF10DC80011B174 /* NotificationConfigHeader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NotificationConfigHeader.h; sourceTree = "<group>"; };
+		6958731A1EF119490011B174 /* MyClassroomController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MyClassroomController.h; sourceTree = "<group>"; };
+		6958731B1EF119490011B174 /* MyClassroomController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MyClassroomController.m; sourceTree = "<group>"; };
+		6958731D1EF11AAB0011B174 /* MyClassroomTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MyClassroomTableViewCell.h; sourceTree = "<group>"; };
+		6958731E1EF11AAB0011B174 /* MyClassroomTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MyClassroomTableViewCell.m; sourceTree = "<group>"; };
+		695873201EF11ACC0011B174 /* MyClassroomListModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MyClassroomListModel.h; sourceTree = "<group>"; };
+		695873211EF11ACC0011B174 /* MyClassroomListModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MyClassroomListModel.m; sourceTree = "<group>"; };
+		695873231EF11ADA0011B174 /* MyClassroomListFrameModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MyClassroomListFrameModel.h; sourceTree = "<group>"; };
+		695873241EF11ADA0011B174 /* MyClassroomListFrameModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MyClassroomListFrameModel.m; sourceTree = "<group>"; };
 		695CACFC1EC30F1C00FED470 /* libMiPushSDK.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libMiPushSDK.a; sourceTree = "<group>"; };
 		695CACFD1EC30F1C00FED470 /* MiPushSDK.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MiPushSDK.h; sourceTree = "<group>"; };
 		695CACFF1EC30FA600FED470 /* libresolv.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libresolv.tbd; path = usr/lib/libresolv.tbd; sourceTree = SDKROOT; };
@@ -1563,6 +1576,7 @@
 				6300DB141D05647F00B82C42 /* External */,
 				636E33891D01154C002BA6DD /* AppDelegate.h */,
 				636E338A1D01154C002BA6DD /* AppDelegate.m */,
+				695873151EF10DC80011B174 /* NotificationConfigHeader.h */,
 				636E338C1D01154C002BA6DD /* ViewController.h */,
 				636E338D1D01154C002BA6DD /* ViewController.m */,
 				6300DBAA1D056C8E00B82C42 /* Common.plist */,
@@ -1799,6 +1813,45 @@
 				695745901D5C7384001022AD /* UIView+Night.m */,
 			);
 			path = UIKit;
+			sourceTree = "<group>";
+		};
+		695873161EF118A20011B174 /* MyClassroom */ = {
+			isa = PBXGroup;
+			children = (
+				695873171EF118A20011B174 /* Controller */,
+				695873181EF118A20011B174 /* Model */,
+				695873191EF118A20011B174 /* View */,
+			);
+			path = MyClassroom;
+			sourceTree = "<group>";
+		};
+		695873171EF118A20011B174 /* Controller */ = {
+			isa = PBXGroup;
+			children = (
+				6958731A1EF119490011B174 /* MyClassroomController.h */,
+				6958731B1EF119490011B174 /* MyClassroomController.m */,
+			);
+			path = Controller;
+			sourceTree = "<group>";
+		};
+		695873181EF118A20011B174 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				695873201EF11ACC0011B174 /* MyClassroomListModel.h */,
+				695873211EF11ACC0011B174 /* MyClassroomListModel.m */,
+				695873231EF11ADA0011B174 /* MyClassroomListFrameModel.h */,
+				695873241EF11ADA0011B174 /* MyClassroomListFrameModel.m */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		695873191EF118A20011B174 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				6958731D1EF11AAB0011B174 /* MyClassroomTableViewCell.h */,
+				6958731E1EF11AAB0011B174 /* MyClassroomTableViewCell.m */,
+			);
+			path = View;
 			sourceTree = "<group>";
 		};
 		699165191EE0F818001914EB /* ClassCells */ = {
@@ -2047,6 +2100,7 @@
 		69C7122A1EC0740E00F2729E /* Mine */ = {
 			isa = PBXGroup;
 			children = (
+				695873161EF118A20011B174 /* MyClassroom */,
 				69C7122B1EC0740E00F2729E /* APPReference */,
 				69C7122E1EC0740E00F2729E /* Controller */,
 				69C712311EC0740E00F2729E /* FriendNews */,
@@ -3369,7 +3423,9 @@
 				6300DB441D05648F00B82C42 /* UIImageView+WebCache.m in Sources */,
 				693DA8D41ECC3A7200EAB6C6 /* PlayVCCommentTableViewCell.m in Sources */,
 				69C7134A1EC0740F00F2729E /* NewReportViewController.m in Sources */,
+				6958731C1EF119490011B174 /* MyClassroomController.m in Sources */,
 				69C7139B1EC0740F00F2729E /* zhuboxiangqingVCNew.m in Sources */,
+				695873221EF11ACC0011B174 /* MyClassroomListModel.m in Sources */,
 				E96ACDD71D6C6C41009856B1 /* CTAssetsPickerController.m in Sources */,
 				69C7138D1EC0740F00F2729E /* SheZhiVC.m in Sources */,
 				69C713701EC0740F00F2729E /* DownloadTableViewCell.m in Sources */,
@@ -3439,6 +3495,7 @@
 				69C713381EC0740F00F2729E /* EXtern.m in Sources */,
 				633C2BEA1D2CA58000476CBD /* HanyuPinyinOutputFormat.m in Sources */,
 				69C713901EC0740F00F2729E /* AddBookManager.m in Sources */,
+				6958731F1EF11AAB0011B174 /* MyClassroomTableViewCell.m in Sources */,
 				E91D53AC1D93719A008B8564 /* MJRefreshBackNormalFooter.m in Sources */,
 				69C713931EC0740F00F2729E /* UserClass.m in Sources */,
 				E91D53B21D93719A008B8564 /* MJRefreshConst.m in Sources */,
@@ -3593,6 +3650,7 @@
 				69C713BB1EC0740F00F2729E /* UIBarButtonItem+Utility.m in Sources */,
 				69C713881EC0740F00F2729E /* UnreadDetailViewController.m in Sources */,
 				69C7139A1EC0740F00F2729E /* zhuboXiangQingTabelView.m in Sources */,
+				695873251EF11ADA0011B174 /* MyClassroomListFrameModel.m in Sources */,
 				69C713AD1EC0740F00F2729E /* UIView+AK.m in Sources */,
 				69C713B11EC0740F00F2729E /* navigationC.m in Sources */,
 				6300DB421D05648F00B82C42 /* UIImage+MultiFormat.m in Sources */,
