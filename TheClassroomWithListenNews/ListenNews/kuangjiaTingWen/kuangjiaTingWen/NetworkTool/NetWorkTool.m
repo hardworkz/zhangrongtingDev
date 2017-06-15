@@ -1193,7 +1193,7 @@ NSMutableDictionary *dic = [[NSMutableDictionary alloc]initWithCapacity:1
 + (void)getPaoGuoShouYeSouSuoLieBiao:(NSString *)str sccess:(void (^)(NSDictionary *responseObject))success failure:(void (^)(NSError *error))failure
 {
     NSMutableDictionary *dic = [[NSMutableDictionary alloc]initWithCapacity:1];
-    dic[@"str"] = str;
+    dic[@"accessToken"] = str;
     [self asyncNetworkingUrl:@"/interfaceNew/findIndex" andDict:dic success:success failure:failure];
 }
 ///根据主播ID以及用户accessToken进行对主播的关注

@@ -933,7 +933,6 @@
                 [self.navigationController pushViewController:vc animated:YES];
                 self.hidesBottomBarWhenPushed = NO;
             }
-
         }
     }
     
@@ -1082,7 +1081,8 @@
 
 - (void)loadData{
     //TODO:发现课堂模块 /interfaceNew/findIndex
-    [NetWorkTool getPaoGuoShouYeSouSuoLieBiao:@"这里什么都不用写写了也没有事" sccess:^(NSDictionary *responseObject) {
+    [NetWorkTool getPaoGuoShouYeSouSuoLieBiao:AvatarAccessToken sccess:^(NSDictionary *responseObject) {
+        
         if ([responseObject[@"results"] isKindOfClass:[NSArray class]]){
             self.faxianArrM = [[NSMutableArray alloc]initWithArray:responseObject[@"results"]];
             for (int i = 0; i < self.faxianArrM.count; i ++ ){
