@@ -78,8 +78,13 @@
     imgLeft.frame = frameModel.imgLeftF;
     titleLab.frame = frameModel.titleLabF;
     price.frame = frameModel.priceF;
-    describe.frame = frameModel.describeF;
-    line.frame = frameModel.lineF;
+    describe.frame = frameModel.describeF;\
+    if (!_hiddenDevider) {
+        line.frame = frameModel.lineF;
+        line.hidden = NO;
+    }else{
+        line.hidden = YES;
+    }
     
     if ([NEWSSEMTPHOTOURL(frameModel.model.images)  rangeOfString:@"http"].location != NSNotFound){
         [imgLeft sd_setImageWithURL:[NSURL URLWithString:NEWSSEMTPHOTOURL(frameModel.model.images)]];

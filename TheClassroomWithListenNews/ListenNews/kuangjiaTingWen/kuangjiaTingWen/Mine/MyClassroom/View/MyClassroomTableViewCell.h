@@ -10,6 +10,7 @@
 
 @interface MyClassroomTableViewCell : UITableViewCell
 @property (assign, nonatomic) BOOL hiddenPrice;
+@property (assign, nonatomic) BOOL hiddenDevider;
 @property (strong, nonatomic) MyClassroomListFrameModel *frameModel;
 +(MyClassroomTableViewCell *)cellWithTableView:(UITableView *)tableView;
 @end

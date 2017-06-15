@@ -604,8 +604,12 @@
 ///根据主播或者节目ID获取详情新闻留言照片等等列表信息
 + (void)postPaoGuoZhuBoOrJieMuMessageWithID:(NSString *)an_id andpage:(NSString *)page andlimit:(NSString *)limit sccess:(void (^)(NSDictionary *responseObject))success failure:(void(^)(NSError *error))failure;
 
-///	根据分类获取该分类下主播播报的新闻列表
-+ (void)postPaoGuoFenLeiZhuBoBoBaoXinWenWithterm_id:(NSString *)term_id andpage:(NSString *)page andlimit:(NSString *)limit sccess:(void (^)(NSDictionary *responseObject))success failure:(void(^)(NSError *error))failure;
+///	根据分类获取该分类下的新闻列表
++ (void)postPaoGuoFenLeiZhuBoBoBaoXinWenWithterm_id:(NSString *)term_id
+                                            andpage:(NSString *)page
+                                           andlimit:(NSString *)limit
+                                     andaccessToken:(NSString *)accessToken
+                                             sccess:(void (^)(NSDictionary *responseObject))success failure:(void(^)(NSError *error))failure;
 
 ///	根据分类获取该分类下节目播报的新闻列表
 + (void)postPaoGuoFenLeiJieMuBoBaoXinWenWithterm_id:(NSString *)term_id andpage:(NSString *)page andlimit:(NSString *)limit sccess:(void (^)(NSDictionary *responseObject))success failure:(void(^)(NSError *error))failure;

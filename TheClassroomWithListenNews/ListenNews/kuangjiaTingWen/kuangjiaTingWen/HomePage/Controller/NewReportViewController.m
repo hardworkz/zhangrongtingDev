@@ -307,7 +307,7 @@
     NSLog(@"下拉刷新");
     
     DefineWeakSelf;
-    [NetWorkTool postPaoGuoFenLeiZhuBoBoBaoXinWenWithterm_id:self.term_id andpage:@"1" andlimit:@"10" sccess:^(NSDictionary *responseObject) {
+    [NetWorkTool postPaoGuoFenLeiZhuBoBoBaoXinWenWithterm_id:self.term_id andpage:@"1" andlimit:@"10" andaccessToken:AvatarAccessToken sccess:^(NSDictionary *responseObject) {
         if ([responseObject[@"results"] isKindOfClass:[NSArray class]]){
             [weakSelf.infoArr removeAllObjects];
             [weakSelf.infoArr addObjectsFromArray:responseObject[@"results"]];
@@ -325,7 +325,7 @@
 {
     numberPage++;
     DefineWeakSelf;
-    [NetWorkTool postPaoGuoFenLeiZhuBoBoBaoXinWenWithterm_id:self.term_id andpage:[NSString stringWithFormat:@"%d",numberPage] andlimit:@"10" sccess:^(NSDictionary *responseObject) {
+    [NetWorkTool postPaoGuoFenLeiZhuBoBoBaoXinWenWithterm_id:self.term_id andpage:[NSString stringWithFormat:@"%d",numberPage] andlimit:@"10" andaccessToken:AvatarAccessToken sccess:^(NSDictionary *responseObject) {
         if ([responseObject[@"results"] isKindOfClass:[NSArray class]]){
             [weakSelf.infoArr addObjectsFromArray:responseObject[@"results"]];
         }

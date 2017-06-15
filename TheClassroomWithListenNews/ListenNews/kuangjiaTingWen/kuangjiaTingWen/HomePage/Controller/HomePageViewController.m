@@ -128,7 +128,7 @@
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(reloadClassList) name:ReloadClassList object:nil];
     RegisterNotify(ReloadHomeSelectPageData, @selector(reloadSelectedList))
     RegisterNotify(@"loginSccess", @selector(reloadClassList))
-    RegisterNotify(@"tuichuLoginSeccess", @selector(reloadClassList))    
+    RegisterNotify(@"tuichuLoginSeccess", @selector(reloadClassList))
 }
 
 - (void)setUpView{
@@ -218,7 +218,7 @@
 //        [self.lineView setBackgroundColor:gTextColorSub];
 //        [self.segmentedControl addSubview:self.lineView];
         
-        UIView *downLine = [[UIView alloc]initWithFrame:CGRectMake(20.0 / 375 * IPHONE_W, _segmentedControl.frame.size.height - 1, SCREEN_WIDTH - 40.0 / 375 * IPHONE_W, 0.8)];
+        UIView *downLine = [[UIView alloc]initWithFrame:CGRectMake(15.0 / 375 * IPHONE_W, _segmentedControl.frame.size.height - 1, SCREEN_WIDTH - 30.0 / 375 * IPHONE_W, 0.8)];
         [downLine setBackgroundColor:[UIColor colorWithHue:0.00 saturation:0.00 brightness:0.85 alpha:1.00]];
         [_segmentedControl addSubview:downLine];
     }
@@ -804,7 +804,7 @@
         if ([self.columnInfoArr count]) {
             CGFloat offsetY = 0;
             //图片
-            UIImageView *imgLeft = [[UIImageView alloc]initWithFrame:CGRectMake(SCREEN_WIDTH - 125.0 / 375 * IPHONE_W, 19 + offsetY, 105.0 / 375 * IPHONE_W,   84.72 / 375 *IPHONE_W)];
+            UIImageView *imgLeft = [[UIImageView alloc]initWithFrame:CGRectMake(SCREEN_WIDTH - 120.0 / 375 * IPHONE_W, 19 + offsetY, 105.0 / 375 * IPHONE_W,   84.72 / 375 *IPHONE_W)];
             if (IS_IPAD) {
                 [imgLeft setFrame:CGRectMake(SCREEN_WIDTH - 125.0 / 375 * IPHONE_W, 19 + offsetY, 105.0 / 375 * IPHONE_W, 70.0 / 375 *IPHONE_W)];
             }
@@ -823,7 +823,7 @@
             imgLeft.clipsToBounds = YES;
             
             //标题
-            UILabel *titleLab = [[UILabel alloc]initWithFrame:CGRectMake(20.0 / 375 * IPHONE_W, 16.0 / 667 * IPHONE_H + offsetY,  SCREEN_WIDTH - 155.0 / 375 * IPHONE_W, 21.0 / 667 *IPHONE_H)];
+            UILabel *titleLab = [[UILabel alloc]initWithFrame:CGRectMake(15.0 / 375 * IPHONE_W, 16.0 / 667 * IPHONE_H + offsetY,  SCREEN_WIDTH - 155.0 / 375 * IPHONE_W, 21.0 / 667 *IPHONE_H)];
             titleLab.text = self.columnInfoArr[indexPath.row][@"post_title"];
             titleLab.textColor = [UIColor blackColor];
             if ([[CommonCode readFromUserD:@"yitingguoxinwenID"] isKindOfClass:[NSArray class]]){
@@ -856,7 +856,7 @@
             titleLab.frame = CGRectMake(titleLab.frame.origin.x, titleLab.frame.origin.y, titleLab.frame.size.width, size.height);
             if (IS_IPAD) {
                 //正文
-                UILabel *detailNews = [[UILabel alloc]initWithFrame:CGRectMake(20.0 / 375 * IPHONE_W, titleLab.frame.origin.y + titleLab.frame.size.height + 20.0 / 667 * SCREEN_HEIGHT, titleLab.frame.size.width, 21.0 / 667 *IPHONE_H)];
+                UILabel *detailNews = [[UILabel alloc]initWithFrame:CGRectMake(15.0 / 375 * IPHONE_W, titleLab.frame.origin.y + titleLab.frame.size.height + 20.0 / 667 * SCREEN_HEIGHT, titleLab.frame.size.width, 21.0 / 667 *IPHONE_H)];
                 detailNews.text = self.columnInfoArr[indexPath.row][@"post_excerpt"];
                 detailNews.textColor = gTextColorSub;
                 detailNews.font = [UIFont systemFontOfSize:15.0f];
@@ -864,7 +864,7 @@
             }
             
             //日期
-            UILabel *riqiLab = [[UILabel alloc]initWithFrame:CGRectMake(20.0 / 375 * IPHONE_W, 86.0 / 667 *IPHONE_H + offsetY, 135.0 / 375 * IPHONE_W, 21.0 / 667 *IPHONE_H)];
+            UILabel *riqiLab = [[UILabel alloc]initWithFrame:CGRectMake(15.0 / 375 * IPHONE_W, 86.0 / 667 *IPHONE_H + offsetY, 135.0 / 375 * IPHONE_W, 21.0 / 667 *IPHONE_H)];
             NSDate *date = [NSDate dateFromString:self.columnInfoArr[indexPath.row][@"post_modified"]];
             riqiLab.text = [date showTimeByTypeA];
             riqiLab.textColor = nSubColor;
@@ -887,7 +887,7 @@
             download.accessibilityLabel = @"下载";
             [cell.contentView addSubview:download];
             
-            UIView *line = [[UIView alloc]initWithFrame:CGRectMake(20.0 / 375 * SCREEN_WIDTH, CGRectGetMaxY(dataLab.frame) + 12.0 / 667 * SCREEN_HEIGHT, SCREEN_WIDTH - 40.0 / 375 * SCREEN_WIDTH, 0.5)];
+            UIView *line = [[UIView alloc]initWithFrame:CGRectMake(15.0 / 375 * SCREEN_WIDTH, CGRectGetMaxY(dataLab.frame) + 12.0 / 667 * SCREEN_HEIGHT, SCREEN_WIDTH - 30.0 / 375 * SCREEN_WIDTH, 0.5)];
             [line setBackgroundColor:nMineNameColor];
             [cell.contentView addSubview:line];
         }
@@ -909,7 +909,7 @@
                 NSArray *newsItemTitle = @[@"财经",@"文娱",@"国际",@"科技",@"时政"];
                 for (int i = 0 ; i < 5; i ++) {
                     UIButton *newsItem = [UIButton buttonWithType:UIButtonTypeCustom];
-                    [newsItem setFrame:CGRectMake(newsItem_width * i + 20.0 / 375 * IPHONE_W + 2.5, 5, newsItem_width - 5, 30)];
+                    [newsItem setFrame:CGRectMake(newsItem_width * i + 20.0 / 375 * IPHONE_W + 2.5, 5, newsItem_width - 5, 25)];
                     [newsItem.layer setMasksToBounds:YES];
                     [newsItem.layer setCornerRadius:10.0];
                     [newsItem.layer setBorderWidth:0.5];
@@ -926,21 +926,16 @@
                 offsetY = 0;
             }
             //图片
-            UIImageView *imgLeft = [[UIImageView alloc]initWithFrame:CGRectMake(SCREEN_WIDTH - 125.0 / 375 * IPHONE_W, 19 + offsetY, 105.0 / 375 * IPHONE_W,   84.72 / 375 *IPHONE_W)];
+            UIImageView *imgLeft = [[UIImageView alloc]initWithFrame:CGRectMake(SCREEN_WIDTH - 120.0 / 375 * IPHONE_W, 19 + offsetY, 105.0 / 375 * IPHONE_W,   84.72 / 375 *IPHONE_W)];
             if (IS_IPAD) {
                 [imgLeft setFrame:CGRectMake(SCREEN_WIDTH - 125.0 / 375 * IPHONE_W, 19 + offsetY, 105.0 / 375 * IPHONE_W, 70.0 / 375 *IPHONE_W)];
             }
-            NSString *imgUrl = [NSString stringWithFormat:@"%@",[self.newsInfoArr[indexPath.row][@"smeta"] stringByReplacingOccurrencesOfString:@"\\" withString:@""]];
-            NSString *imgUrl1 = [imgUrl stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-            NSString *imgUrl2 = [imgUrl1 stringByReplacingOccurrencesOfString:@"thumb:" withString:@""];
-            NSString *imgUrl3 = [imgUrl2 stringByReplacingOccurrencesOfString:@"{" withString:@""];
-            NSString *imgUrl4 = [imgUrl3 stringByReplacingOccurrencesOfString:@"}" withString:@""];
-            if ([imgUrl4  rangeOfString:@"http"].location != NSNotFound){
-                [imgLeft sd_setImageWithURL:[NSURL URLWithString:imgUrl4]];
+            if ([NEWSSEMTPHOTOURL(self.newsInfoArr[indexPath.row][@"smeta"])  rangeOfString:@"http"].location != NSNotFound){
+                [imgLeft sd_setImageWithURL:[NSURL URLWithString:NEWSSEMTPHOTOURL(self.newsInfoArr[indexPath.row][@"smeta"])]];
                 //placeholderImage:[UIImage imageNamed:@"thumbnailsdefault"]
             }
             else{
-                NSString *str = USERPHOTOHTTPSTRINGZhuBo(imgUrl4);
+                NSString *str = USERPHOTOHTTPSTRINGZhuBo(NEWSSEMTPHOTOURL(self.newsInfoArr[indexPath.row][@"smeta"]));
                 [imgLeft sd_setImageWithURL:[NSURL URLWithString:str]];
                 //placeholderImage:[UIImage imageNamed:@"thumbnailsdefault"]
             }
@@ -949,7 +944,7 @@
             imgLeft.clipsToBounds = YES;
             
             //标题
-            UILabel *titleLab = [[UILabel alloc]initWithFrame:CGRectMake(20.0 / 375 * IPHONE_W, 16.0 / 667 * IPHONE_H + offsetY,  SCREEN_WIDTH - 155.0 / 375 * IPHONE_W, 21.0 / 667 *IPHONE_H)];
+            UILabel *titleLab = [[UILabel alloc]initWithFrame:CGRectMake(15.0 / 375 * IPHONE_W, 16.0 / 667 * IPHONE_H + offsetY,  SCREEN_WIDTH - 155.0 / 375 * IPHONE_W, 21.0 / 667 *IPHONE_H)];
             titleLab.text = self.newsInfoArr[indexPath.row][@"post_title"];
             titleLab.textColor = [UIColor blackColor];
             if ([[CommonCode readFromUserD:@"yitingguoxinwenID"] isKindOfClass:[NSArray class]]){
@@ -982,7 +977,7 @@
             titleLab.frame = CGRectMake(titleLab.frame.origin.x, titleLab.frame.origin.y, titleLab.frame.size.width, size.height);
             if (IS_IPAD) {
                 //正文
-                UILabel *detailNews = [[UILabel alloc]initWithFrame:CGRectMake(20.0 / 375 * IPHONE_W, titleLab.frame.origin.y + titleLab.frame.size.height + 20.0 / 667 * SCREEN_HEIGHT, titleLab.frame.size.width, 21.0 / 667 *IPHONE_H)];
+                UILabel *detailNews = [[UILabel alloc]initWithFrame:CGRectMake(15.0 / 375 * IPHONE_W, titleLab.frame.origin.y + titleLab.frame.size.height + 20.0 / 667 * SCREEN_HEIGHT, titleLab.frame.size.width, 21.0 / 667 *IPHONE_H)];
                 detailNews.text = self.newsInfoArr[indexPath.row][@"post_excerpt"];
                 detailNews.textColor = gTextColorSub;
                 detailNews.font = [UIFont systemFontOfSize:15.0f];
@@ -990,7 +985,7 @@
             }
             
             //日期
-            UILabel *riqiLab = [[UILabel alloc]initWithFrame:CGRectMake(20.0 / 375 * IPHONE_W, 86.0 / 667 *IPHONE_H + offsetY, 135.0 / 375 * IPHONE_W, 21.0 / 667 *IPHONE_H)];
+            UILabel *riqiLab = [[UILabel alloc]initWithFrame:CGRectMake(15.0 / 375 * IPHONE_W, 86.0 / 667 *IPHONE_H + offsetY, 135.0 / 375 * IPHONE_W, 21.0 / 667 *IPHONE_H)];
             NSDate *date = [NSDate dateFromString:self.newsInfoArr[indexPath.row][@"post_modified"]];
             riqiLab.text = [date showTimeByTypeA];
             riqiLab.textColor = nSubColor;
@@ -1013,7 +1008,7 @@
             download.accessibilityLabel = @"下载";
             [cell.contentView addSubview:download];
             
-            UIView *line = [[UIView alloc]initWithFrame:CGRectMake(20.0 / 375 * SCREEN_WIDTH, CGRectGetMaxY(dataLab.frame) + 12.0 / 667 * SCREEN_HEIGHT, SCREEN_WIDTH - 40.0 / 375 * SCREEN_WIDTH, 0.5)];
+            UIView *line = [[UIView alloc]initWithFrame:CGRectMake(15.0 / 375 * SCREEN_WIDTH, CGRectGetMaxY(dataLab.frame) + 12.0 / 667 * SCREEN_HEIGHT, SCREEN_WIDTH - 30.0 / 375 * SCREEN_WIDTH, 0.5)];
             [line setBackgroundColor:nMineNameColor];
             [cell.contentView addSubview:line];
         }
@@ -1094,6 +1089,7 @@
 //        return cell;
         MyClassroomTableViewCell *cell = [MyClassroomTableViewCell cellWithTableView:tableView];
         [cell setSelectionStyle:UITableViewCellSelectionStyleNone];
+        cell.hiddenDevider = YES;
         MyClassroomListFrameModel *frameModel = self.classroomInfoArr[indexPath.row];
         cell.frameModel = frameModel;
         return cell;
@@ -1279,7 +1275,7 @@
      }
      */
     if (self.slideADResult.count != 0) {
-        TBCircleScrollView *tbScView = [[TBCircleScrollView alloc] initWithFrame:CGRectMake(20.0 / 375 * IPHONE_W, 0, IPHONE_W - 40.0 / 375 * IPHONE_W, 162.0 / 667 * SCREEN_HEIGHT) andArr:self.slideADResult];
+        TBCircleScrollView *tbScView = [[TBCircleScrollView alloc] initWithFrame:CGRectMake(15.0 / 375 * IPHONE_W, 0, IPHONE_W - 30.0 / 375 * IPHONE_W, 162.0 / 667 * SCREEN_HEIGHT) andArr:self.slideADResult];
         tbScView.scrollView.scrollsToTop = NO;
         tbScView.biaozhiStr = @"头条";
         NSMutableArray *imgArr = [[NSMutableArray alloc]init];

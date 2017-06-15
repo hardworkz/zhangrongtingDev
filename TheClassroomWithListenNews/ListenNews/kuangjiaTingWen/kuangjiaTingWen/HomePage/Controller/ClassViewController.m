@@ -164,13 +164,13 @@
             [self setTableHeadView];
             [self.helpTableView reloadData];
             
-            NSString *textStr = [NSString stringWithFormat:@"￥%@ ",responseObject[@"results"][@"sprice"]];
+            NSString *textStr = [NSString stringWithFormat:@" ￥%d ",[responseObject[@"results"][@"sprice"]intValue]];
             //中划线
             NSDictionary *attribtDic = @{NSStrikethroughStyleAttributeName: [NSNumber numberWithInteger:NSUnderlineStyleSingle]};
             NSMutableAttributedString *attribtStr = [[NSMutableAttributedString alloc]initWithString:textStr attributes:attribtDic];
             // 赋值
             self.spriceLabel.attributedText = attribtStr;
-            self.priceLabel.text = [NSString stringWithFormat:@"￥%@",responseObject[@"results"][@"price"]];
+            self.priceLabel.text = [NSString stringWithFormat:@" ￥%d",[responseObject[@"results"][@"price"] intValue]];
         }
     } failure:^(NSError *error) {
         //
@@ -275,7 +275,8 @@
     titleLab.text = self.classModel.title;
     titleLab.textAlignment = NSTextAlignmentCenter;
     titleLab.textColor = nTextColorMain;
-    titleLab.font = [UIFont fontWithName:@"Semibold" size:19];
+    titleLab.font = [UIFont boldSystemFontOfSize:19.0];
+//    titleLab.font = [UIFont fontWithName:@"Semibold" size:19];
     CGFloat titleHight = [self computeTextHeightWithString:self.classModel.title andWidth:(SCREEN_WIDTH-20) andFontSize:gFontMain14];
     [titleLab setFrame:CGRectMake(20.0 / 375 * IPHONE_W, CGRectGetMaxY(zhengwenImg.frame) + 20.0 / 667 * SCREEN_HEIGHT, IPHONE_W - 40.0 / 375 * IPHONE_W, (titleHight + 20) / 667 * IPHONE_H)];
     [titleLab setNumberOfLines:0];
@@ -944,8 +945,9 @@
 
 -(UILabel *)priceLabel{
     if (!_priceLabel) {
-        _priceLabel = [[UILabel alloc]initWithFrame:CGRectMake(SCREEN_WIDTH / 4, 0, SCREEN_WIDTH / 4, 25)];
-        [_priceLabel setBackgroundColor:purchaseButtonColor];
+        _priceLabel = [[UILabel alloc]initWithFrame:CGRectMake(SCREEN_WIDTH / 4, 5, SCREEN_WIDTH / 4, 25)];
+        _priceLabel.font = [UIFont boldSystemFontOfSize:18];
+        [_priceLabel setBackgroundColor:[UIColor clearColor]];
         [_priceLabel setTextColor:[UIColor whiteColor]];
     }
     return _priceLabel;
@@ -953,10 +955,13 @@
 
 -(UILabel *)spriceLabel{
     if (!_spriceLabel) {
-        _spriceLabel = [[UILabel alloc]initWithFrame:CGRectMake(SCREEN_WIDTH / 4, 25, SCREEN_WIDTH / 4, 24)];
-        [_spriceLabel setBackgroundColor:purchaseButtonColor];
+        _spriceLabel = [[UILabel alloc]initWithFrame:CGRectMake(SCREEN_WIDTH / 4, 22, SCREEN_WIDTH / 4, 24)];
+        [_spriceLabel setBackgroundColor:[UIColor clearColor]];
         [_spriceLabel setTextColor:[UIColor whiteColor]];
         _spriceLabel.font = gFontMain14;
+        UIView *line = [[UIView alloc] initWithFrame:CGRectMake(5, 12, SCREEN_WIDTH / 4 - 45, 1)];
+        line.backgroundColor = [UIColor whiteColor];
+        [_spriceLabel addSubview:line];
     }
     return _spriceLabel;
 }

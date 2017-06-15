@@ -1238,14 +1238,19 @@ NSMutableDictionary *dic = [[NSMutableDictionary alloc]initWithCapacity:1
     dic[@"limit"] = limit;
     [self asyncNetworkingUrl:@"/interface/Actinfo" andDict:dic success:success failure:failure];
 }
-///	根据分类获取该分类下主播播报的新闻列表
-+ (void)postPaoGuoFenLeiZhuBoBoBaoXinWenWithterm_id:(NSString *)term_id andpage:(NSString *)page andlimit:(NSString *)limit sccess:(void (^)(NSDictionary *responseObject))success failure:(void(^)(NSError *error))failure
+///	根据分类获取该分类下的新闻列表
++ (void)postPaoGuoFenLeiZhuBoBoBaoXinWenWithterm_id:(NSString *)term_id
+                                            andpage:(NSString *)page
+                                           andlimit:(NSString *)limit
+                                     andaccessToken:(NSString *)accessToken
+                                             sccess:(void (^)(NSDictionary *responseObject))success failure:(void(^)(NSError *error))failure
 {
     NSMutableDictionary *dic = [[NSMutableDictionary alloc]initWithCapacity:1];
     dic[@"term_id"] = term_id;
     dic[@"page"] = page;
     dic[@"limit"] = limit;
-    [self asyncNetworkingUrl:@"/interfaceYou/zhuboNewsList" andDict:dic success:success failure:failure];
+    dic[@"accessToken"] = accessToken;
+    [self asyncNetworkingUrl:@"/interface/postList" andDict:dic success:success failure:failure];
 }
 ///	根据分类获取该分类下节目播报的新闻列表
 + (void)postPaoGuoFenLeiJieMuBoBaoXinWenWithterm_id:(NSString *)term_id andpage:(NSString *)page andlimit:(NSString *)limit sccess:(void (^)(NSDictionary *responseObject))success failure:(void(^)(NSError *error))failure
