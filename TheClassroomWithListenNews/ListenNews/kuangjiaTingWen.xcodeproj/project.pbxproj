@@ -180,6 +180,7 @@
 		699582101EC569A50037E9A4 /* UserDetailModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 6995820F1EC569A50037E9A4 /* UserDetailModel.m */; };
 		699582131EC5B40E0037E9A4 /* UIView+Extension.m in Sources */ = {isa = PBXBuildFile; fileRef = 699582121EC5B40E0037E9A4 /* UIView+Extension.m */; };
 		6997589E1EE656160022D1F3 /* zhuboxiangqingNewVCPlayBtn.m in Sources */ = {isa = PBXBuildFile; fileRef = 6997589D1EE656160022D1F3 /* zhuboxiangqingNewVCPlayBtn.m */; };
+		69A0E3D21EF28F8B008A0A48 /* HHHorizontalPagingView.m in Sources */ = {isa = PBXBuildFile; fileRef = 69A0E3D11EF28F8B008A0A48 /* HHHorizontalPagingView.m */; };
 		69A7BABA1ED4177C0094E0BA /* SuNetworkMonitor.m in Sources */ = {isa = PBXBuildFile; fileRef = 69A7BAB91ED4177C0094E0BA /* SuNetworkMonitor.m */; };
 		69C713341EC0740F00F2729E /* CommonCode.m in Sources */ = {isa = PBXBuildFile; fileRef = 69C711E51EC0740E00F2729E /* CommonCode.m */; };
 		69C713351EC0740F00F2729E /* CommonEnums.m in Sources */ = {isa = PBXBuildFile; fileRef = 69C711E71EC0740E00F2729E /* CommonEnums.m */; };
@@ -816,6 +817,8 @@
 		699582121EC5B40E0037E9A4 /* UIView+Extension.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIView+Extension.m"; sourceTree = "<group>"; };
 		6997589C1EE656160022D1F3 /* zhuboxiangqingNewVCPlayBtn.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = zhuboxiangqingNewVCPlayBtn.h; sourceTree = "<group>"; };
 		6997589D1EE656160022D1F3 /* zhuboxiangqingNewVCPlayBtn.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = zhuboxiangqingNewVCPlayBtn.m; sourceTree = "<group>"; };
+		69A0E3D01EF28F8B008A0A48 /* HHHorizontalPagingView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HHHorizontalPagingView.h; sourceTree = "<group>"; };
+		69A0E3D11EF28F8B008A0A48 /* HHHorizontalPagingView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HHHorizontalPagingView.m; sourceTree = "<group>"; };
 		69A7BAB81ED4177C0094E0BA /* SuNetworkMonitor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SuNetworkMonitor.h; sourceTree = "<group>"; };
 		69A7BAB91ED4177C0094E0BA /* SuNetworkMonitor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SuNetworkMonitor.m; sourceTree = "<group>"; };
 		69C711E41EC0740E00F2729E /* CommonCode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CommonCode.h; sourceTree = "<group>"; };
@@ -1315,6 +1318,7 @@
 		6300DB141D05647F00B82C42 /* External */ = {
 			isa = PBXGroup;
 			children = (
+				69A0E3CF1EF28F8B008A0A48 /* HHHorizontalPagingView */,
 				E91A531E1E8E3454005D2F68 /* Masonry */,
 				E956E0341E66B9DB00444F06 /* IAPHelper */,
 				E965A6AC1E1F3A2700845E18 /* AliPay */,
@@ -1901,6 +1905,15 @@
 				69601E6F1EC98CEA00445561 /* CommentAndReviewFrameModel.m */,
 			);
 			path = Model;
+			sourceTree = "<group>";
+		};
+		69A0E3CF1EF28F8B008A0A48 /* HHHorizontalPagingView */ = {
+			isa = PBXGroup;
+			children = (
+				69A0E3D01EF28F8B008A0A48 /* HHHorizontalPagingView.h */,
+				69A0E3D11EF28F8B008A0A48 /* HHHorizontalPagingView.m */,
+			);
+			path = HHHorizontalPagingView;
 			sourceTree = "<group>";
 		};
 		69A7BAB71ED4177C0094E0BA /* NetworkTool */ = {
@@ -3420,6 +3433,7 @@
 				695745951D5C7384001022AD /* DKNightVersionManager.m in Sources */,
 				69C713891EC0740F00F2729E /* UnreadMessageViewController.m in Sources */,
 				636B58AA1D34D87600290681 /* IQKeyboardManager.m in Sources */,
+				69A0E3D21EF28F8B008A0A48 /* HHHorizontalPagingView.m in Sources */,
 				6300DB441D05648F00B82C42 /* UIImageView+WebCache.m in Sources */,
 				693DA8D41ECC3A7200EAB6C6 /* PlayVCCommentTableViewCell.m in Sources */,
 				69C7134A1EC0740F00F2729E /* NewReportViewController.m in Sources */,

@@ -42,6 +42,7 @@
 #import "MJRefresh.h"
 #import "Masonry.h"
 #import "SuNetworkMonitor.h"
+#import "HHHorizontalPagingView.h"
 
 #import "PlayingHeader.h"
 #import "MineHeader.h"
