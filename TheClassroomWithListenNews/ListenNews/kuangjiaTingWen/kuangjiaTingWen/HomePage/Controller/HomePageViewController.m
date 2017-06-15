@@ -127,6 +127,8 @@
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(gaibianyanse:) name:@"gaibianyanse" object:nil];
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(reloadClassList) name:ReloadClassList object:nil];
     RegisterNotify(ReloadHomeSelectPageData, @selector(reloadSelectedList))
+    RegisterNotify(@"loginSccess", @selector(reloadClassList))
+    RegisterNotify(@"tuichuLoginSeccess", @selector(reloadClassList))    
 }
 
 - (void)setUpView{
@@ -762,6 +764,7 @@
         [self.classroomTableView.mj_header beginRefreshing];
     }
 }
+
 #pragma mark -UIScrollViewDelegate
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView {
     CGFloat pageWidth = self.scrollView.frame.size.width;

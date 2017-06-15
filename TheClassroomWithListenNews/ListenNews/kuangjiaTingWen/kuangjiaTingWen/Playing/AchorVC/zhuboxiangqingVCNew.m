@@ -527,7 +527,7 @@
     [btn ChangeBlueToBlack:[UIImage imageNamed:[NSString stringWithFormat:@"BmentButton%ld",(long)lastBtnTag - 9]]];
     [sender ChangeBlackToBlue:[UIImage imageNamed:[NSString stringWithFormat:@"mentButton%ld",(long)sender.tag - 9]]];
     NSInteger i = sender.tag - 10;
-    [TwoScrollV setContentOffset:CGPointMake(IPHONE_W * i, 0) animated:YES];
+    [TwoScrollV setContentOffset:CGPointMake(IPHONE_W * i, 0) animated:NO];
 //    UITableView *tableView = (UITableView *)[[[sender superview] superview]viewWithTag:sender.tag - 7];
 
     UITableView *selectTableView;
