@@ -9,6 +9,8 @@
 #ifndef PlayingHeader_h
 #define PlayingHeader_h
 
+#import "zhuboXiangQingVCNewController.h"
+
 #import "AppDelegate.h"
 
 #import "NewsModel.h"

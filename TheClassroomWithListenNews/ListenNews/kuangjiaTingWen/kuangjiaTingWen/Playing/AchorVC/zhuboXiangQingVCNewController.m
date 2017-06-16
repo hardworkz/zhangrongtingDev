@@ -1,12 +1,12 @@
 //
-//  zhuboxiangqingVCNew.m
-//  reHeardTheNews
+//  zhuboXiangQingVCNewController.m
+//  kuangjiaTingWen
 //
-//  Created by 贺楠 on 16/5/27.
-//  Copyright © 2016年 paoguo. All rights reserved.
+//  Created by 泡果 on 2017/6/16.
+//  Copyright © 2017年 zhimi. All rights reserved.
 //
 
-#import "zhuboxiangqingVCNew.h"
+#import "zhuboXiangQingVCNewController.h"
 #import "UIImageView+WebCache.h"
 #import "MJRefresh.h"
 #import "zhuboxiangqingBtn.h"
@@ -16,7 +16,6 @@
 #import "ShareAlertView.h"
 #import "AppDelegate.h"
 #import "UIImage+compress.h"
-//#import "UMSocialWechatHandler.h"
 #import "BatchDownloadTableTableViewController.h"
 #import "NSDate+TimeFormat.h"
 #import "UIView+tap.h"
@@ -30,15 +29,13 @@
 #import "PinglundianzanCustomBtn.h"
 
 
-@interface zhuboxiangqingVCNew ()<UIScrollViewDelegate,UITableViewDataSource,UITableViewDelegate,TTTAttributedLabelDelegate,UITextFieldDelegate>
+@interface zhuboXiangQingVCNewController ()<UIScrollViewDelegate,UITableViewDataSource,UITableViewDelegate,TTTAttributedLabelDelegate,UITextFieldDelegate>
 {
     BOOL isGuanZhu;
     UIScrollView *ZhuscrollView;
     UIScrollView *TwoScrollV;
     UIImageView *headerView;
-//    UIView *topHeaderV;
     UIView *downHeaderV;
-    //    UIView *SliderLine;
     NSInteger lastBtnTag;
     UIView *CenterView;
     UILabel *PingLundianzanNumLab;
@@ -57,11 +54,13 @@
     UITableView *pinglunhoushuaxinTableView;
     UITableView *fansWallTableView;
     UITableView *xinwenshuaxinTableView;
+    
+    NSInteger selectedSwitchIndex;/**<选中按钮*/
 }
 
+//@property (strong, nonatomic) UIView *sectionHeadView;
 
 @property (strong,nonatomic)UIButton *selectBtn;
-//@property (strong,nonatomic)UITableView *tableView;
 
 @property (weak, nonatomic) UIScrollView *scrollView;
 @property (weak, nonatomic) UIImageView *lastImageView;
@@ -80,13 +79,14 @@
 
 @end
 
-@implementation zhuboxiangqingVCNew
+@implementation zhuboXiangQingVCNewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.edgesForExtendedLayout = UIRectEdgeNone;
-    self.automaticallyAdjustsScrollViewInsets = NO;
-    self.extendedLayoutIncludesOpaqueBars = NO;
+    [self.navigationController setNavigationBarHidden:YES animated:YES];
+//    self.edgesForExtendedLayout = UIRectEdgeNone;
+//    self.automaticallyAdjustsScrollViewInsets = NO;
+//    self.extendedLayoutIncludesOpaqueBars = NO;
     [self setTitle:@"详情"];
     self.view.backgroundColor = [UIColor whiteColor];
     _isRewardLoginBack = NO;
@@ -103,127 +103,205 @@
     fansPageNumber = 1;
     liuyanPageNumber = 1;
     
-    ZhuscrollView = [[UIScrollView alloc]initWithFrame:CGRectMake(0, 0, IPHONE_W, IPHONE_H)];
-    ZhuscrollView.delegate = self;
-    ZhuscrollView.tag = 1;
-    ZhuscrollView.backgroundColor = [UIColor whiteColor];
-    ZhuscrollView.showsHorizontalScrollIndicator = NO;
-    ZhuscrollView.showsVerticalScrollIndicator = NO;
-    [self.view addSubview:ZhuscrollView];
     [self addHeaderView];
     
-    CenterView = [[UIView alloc]initWithFrame:CGRectMake(0, CGRectGetMaxY(headerView.frame), IPHONE_W, 62.0 / 667 * SCREEN_HEIGHT)];
-    CenterView.backgroundColor = [UIColor redColor];
-    [ZhuscrollView addSubview:CenterView];
-    UIView *CenterTopLine = [[UIView alloc]initWithFrame:CGRectMake(0, 0, IPHONE_W, 0.5)];
-    CenterTopLine.backgroundColor = [[UIColor grayColor]colorWithAlphaComponent:0.2f];
-    [CenterView addSubview:CenterTopLine];
-//    UIView *CenterDownLine = [[UIView alloc]initWithFrame:CGRectMake(0, CenterView.frame.size.height - 1, IPHONE_W, 1)];
-//    CenterDownLine.backgroundColor = [[UIColor grayColor]colorWithAlphaComponent:0.2f];
-//    [CenterView addSubview:CenterDownLine];
-    
+    NSMutableArray *buttonArray = [NSMutableArray array];
     for (int i = 0; i < 5; i ++ ){
-        zhuboxiangqingBtn *btn;
+        zhuboxiangqingBtn *btn = [[zhuboxiangqingBtn alloc] init];
+        if (SCREEN_WIDTH >= 375) {
+            btn.titleEdgeInsets = UIEdgeInsetsMake(10, 10, 0, 0);
+        }
+        btn.backgroundColor = [UIColor whiteColor];
         if (i == 0){
-            btn = [[zhuboxiangqingBtn alloc]initWithImage:[UIImage imageNamed:@"BmentButton1"] andTitle:@"节目"];
+            [btn setImage:@"BmentButton1"];
+            [btn setSelectedImage:@"mentButton1"];
+            [btn setTitleColor:gTextColorSub];
+            [btn setSelectedTitleColor:nMainColor];
+            btn.titleLabel.font = gFontSub11;
+            [btn setTitle:@"节目"];
+            selectedSwitchIndex = 0;
             btn.accessibilityLabel = @"节目";
-            [btn ChangeBlackToBlue:[UIImage imageNamed:@"mentButton1"]];
-            btn.tag = 10;
+            btn.selected = YES;
         }
         else if (i == 1){
-            btn = [[zhuboxiangqingBtn alloc]initWithImage:[UIImage imageNamed:@"BmentButton2"] andTitle:@"粉丝榜"];
+            [btn setImage:@"BmentButton2"];
+            [btn setSelectedImage:@"mentButton2"];
+            [btn setTitleColor:gTextColorSub];
+            [btn setSelectedTitleColor:nMainColor];
+            btn.titleLabel.font = gFontSub11;
+            [btn setTitle:@"粉丝榜"];
             btn.accessibilityLabel = @"粉丝榜";
-            btn.tag = 11;
         }
         else if (i == 2){
-            btn = [[zhuboxiangqingBtn alloc]initWithImage:[UIImage imageNamed:@"BmentButton3"] andTitle:@"留言"];
+            [btn setImage:@"BmentButton3"];
+            [btn setSelectedImage:@"mentButton3"];
+            [btn setTitleColor:gTextColorSub];
+            [btn setSelectedTitleColor:nMainColor];
+            btn.titleLabel.font = gFontSub11;
+            [btn setTitle:@"留言"];
             btn.accessibilityLabel = @"留言";
-            btn.tag = 12;
         }
         else if (i == 3){
-            btn = [[zhuboxiangqingBtn alloc]initWithImage:[UIImage imageNamed:@"BmentButton4"] andTitle:@"图片"];
+            [btn setImage:@"BmentButton4"];
+            [btn setSelectedImage:@"mentButton4"];
+            [btn setTitleColor:gTextColorSub];
+            [btn setSelectedTitleColor:nMainColor];
+            btn.titleLabel.font = gFontSub11;
+            [btn setTitle:@"图片"];
             btn.accessibilityLabel = @"图片";
-            btn.tag = 13;
         }
         else{
-            btn = [[zhuboxiangqingBtn alloc]initWithImage:[UIImage imageNamed:@"BmentButton5"] andTitle:@"下载"];
+            [btn setImage:@"BmentButton5"];
+            [btn setSelectedImage:@"mentButton5"];
+            [btn setTitleColor:gTextColorSub];
+            [btn setSelectedTitleColor:nMainColor];
+            btn.titleLabel.font = gFontSub11;
+            [btn setTitle:@"下载"];
             btn.accessibilityLabel = @"下载";
-            btn.tag = 14;
         }
-        btn.frame = CGRectMake((75.0 / 375 * SCREEN_WIDTH) * i, 0, 75.0 / 375 * SCREEN_WIDTH, CenterView.frame.size.height);
-        [btn addTarget:self action:@selector(btnAction:) forControlEvents:UIControlEventTouchUpInside];
-        lastBtnTag = 10;
-        [CenterView addSubview:btn];
-        
+        btn.frame = CGRectMake((75.0 / 375 * SCREEN_WIDTH) * i, 0, 75.0 / 375 * SCREEN_WIDTH, 62.0 / 667 * SCREEN_HEIGHT);
+        [buttonArray addObject:btn];
     }
     
-    TwoScrollV = [[UIScrollView alloc]initWithFrame:CGRectMake(0, CGRectGetMaxY(headerView.frame) + 50.0 / 667 * SCREEN_HEIGHT, IPHONE_W, IPHONE_H + 20.0 / 667 * SCREEN_HEIGHT)];
-    TwoScrollV.delegate = self;
-    //开启时和左滑返回手势冲突了
-    TwoScrollV.scrollEnabled = NO;
-    TwoScrollV.contentSize = CGSizeMake(IPHONE_W * 4, ZhuscrollView.contentSize.height - headerView.frame.size.height - 50.0 / 667 * SCREEN_HEIGHT);
-    TwoScrollV.tag = 2;
-    TwoScrollV.scrollsToTop = NO;
-    TwoScrollV.backgroundColor = [UIColor whiteColor];
-    TwoScrollV.bounces = NO;
-    TwoScrollV.pagingEnabled = YES;
-    [ZhuscrollView addSubview:TwoScrollV];
-    ZhuscrollView.contentSize = CGSizeMake(IPHONE_W, 250.0 / 667 * SCREEN_HEIGHT + TwoScrollV.frame.size.height);
+    //分页tableView
     for (int i = 0; i < 3; i ++ ){
-        UITableView *tableView = [[UITableView alloc]initWithFrame:CGRectMake(IPHONE_W * i, 0, IPHONE_W , IPHONE_H - 50.0 / 667 * SCREEN_HEIGHT) style:UITableViewStylePlain];
+        UITableView *tableView = [[UITableView alloc]initWithFrame:CGRectMake(IPHONE_W * i, 0, IPHONE_W , IPHONE_H + 40.0/ 667 * SCREEN_HEIGHT) style:UITableViewStylePlain];
         
         if (i == 0){
             xinwenshuaxinTableView = tableView;
         }
         else if (i == 1){
-            tableView.frame = CGRectMake(IPHONE_W * i + 2, 0, IPHONE_W, IPHONE_H - 50.0 / 667 * SCREEN_HEIGHT);
+            tableView = [[UITableView alloc]initWithFrame:CGRectMake(IPHONE_W * i + 1, 0, IPHONE_W , IPHONE_H + 30.0/ 667 * SCREEN_HEIGHT) style:UITableViewStyleGrouped];
             fansWallTableView = tableView;
+            fansWallTableView.backgroundColor = [UIColor whiteColor];
             tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
         }
         else if (i == 2){
-            tableView.frame = CGRectMake(IPHONE_W * i + 2, 0, IPHONE_W, IPHONE_H - 50.0 / 667 * SCREEN_HEIGHT - 50.0 / 667 * SCREEN_HEIGHT);
+            tableView.frame = CGRectMake(IPHONE_W * i + 2, 0, IPHONE_W, IPHONE_H - 50.0 / 667 * SCREEN_HEIGHT);
             pinglunhoushuaxinTableView = tableView;
         }
         tableView.delegate = self;
         tableView.dataSource = self;
         tableView.tag = 3 + i; // 3：节目 4：粉丝榜 5：留言
         tableView.scrollsToTop = NO;
-        tableView.scrollEnabled = NO;
         tableView.tableFooterView = [UIView new];
         if (i == 0){
-            tableView.mj_header = [MJRefreshNormalHeader headerWithRefreshingBlock:^{
-                [self xinwenRefresh:tableView];
-            }];
             tableView.mj_footer = [MJRefreshAutoStateFooter footerWithRefreshingBlock:^{
                 [self xinwenshanglajiazai:tableView];
             }];
             [tableView.mj_header beginRefreshing];
         }
         else if (i == 1){
-            tableView.mj_header = [MJRefreshNormalHeader headerWithRefreshingBlock:^{
-                [self fansRefresh:tableView];
-            }];
-//            tableView.mj_footer = [MJRefreshAutoStateFooter footerWithRefreshingBlock:^{
-//                [self liuyanshanglajiazai:tableView];
-//            }];
             [tableView.mj_header beginRefreshing];
         }
         else if (i == 2){
-            tableView.mj_header = [MJRefreshNormalHeader headerWithRefreshingBlock:^{
-                [self liuyanRefresh:tableView];
-            }];
             tableView.mj_footer = [MJRefreshAutoStateFooter footerWithRefreshingBlock:^{
                 [self liuyanshanglajiazai:tableView];
             }];
             [tableView.mj_header beginRefreshing];
         }
-        [TwoScrollV addSubview:tableView];
     }
     UIView *picView = [[UIView alloc]initWithFrame:CGRectMake(IPHONE_W * 3, 0, IPHONE_W, IPHONE_H - 50.0 / 667 * SCREEN_HEIGHT - 50.0 / 667 * IPHONE_H)];
     [picView setBackgroundColor:[UIColor whiteColor]];
-    //TODO:主播图片
-    [TwoScrollV addSubview:picView];
     
+    //详情页移动导航栏主框架
+    UIScrollView *scrollView = [[UIScrollView alloc] init];
+    scrollView.backgroundColor = [UIColor whiteColor];
+    
+    HHHorizontalPagingView *pagingView = [HHHorizontalPagingView pagingViewWithHeaderView:headerView headerHeight:273.0 / 667 * SCREEN_HEIGHT segmentButtons:buttonArray segmentHeight:52.0 / 667 * SCREEN_HEIGHT contentViews:@[xinwenshuaxinTableView, fansWallTableView, pinglunhoushuaxinTableView,scrollView]];
+    pagingView.pagingViewSwitchBlock = ^(NSInteger switchIndex) {
+        RTLog(@"switchIndex---%ld",switchIndex);
+        switch (switchIndex) {
+            case 0:
+                if (selectedSwitchIndex == switchIndex) {
+                    [self xinwenRefresh:xinwenshuaxinTableView];
+                }else{
+                    if (xinwenArr.count == 0) {
+                        [self xinwenRefresh:xinwenshuaxinTableView];
+                    }
+                }
+                break;
+            case 1:
+                if (selectedSwitchIndex == switchIndex) {
+                    [self fansRefresh:fansWallTableView];
+                }else{
+                    if (_rewardListArray.count == 0) {
+                        [self fansRefresh:fansWallTableView];
+                    }
+                }
+                break;
+            case 2:
+                if (selectedSwitchIndex == switchIndex) {
+                    [self liuyanRefresh:pinglunhoushuaxinTableView];
+                }else{
+                    if (liuyanArr.count == 0) {
+                        [self liuyanRefresh:pinglunhoushuaxinTableView];
+                    }
+                }
+                break;
+            default:
+                break;
+        }
+        
+        if (switchIndex != 2 && switchIndex != 4) {//切换到粉丝列表
+            if (self.isbofangye == YES) {
+                [UIView animateWithDuration:0.3f animations:^{
+                    pinglunBgView.frame = CGRectMake(pinglunBgView.frame.origin.x, IPHONE_H, pinglunBgView.frame.size.width, pinglunBgView.frame.size.height);
+                }];
+            }
+            else{
+                [UIView animateWithDuration:0.3f animations:^{
+                    pinglunBgView.frame = CGRectMake(pinglunBgView.frame.origin.x, IPHONE_H, pinglunBgView.frame.size.width, pinglunBgView.frame.size.height);
+                }];
+            }
+        }else if (switchIndex == 2) {//切换到留言列表
+            [self.view endEditing:YES];
+            _isReplyComment = NO;
+            pinglunTextF.placeholder = @"输入评论";
+            if (self.isbofangye == YES){
+                [UIView animateWithDuration:0.3f animations:^{
+                    pinglunBgView.frame = CGRectMake(pinglunBgView.frame.origin.x, IPHONE_H - pinglunBgView.frame.size.height, pinglunBgView.frame.size.width, pinglunBgView.frame.size.height);
+                }];
+            }
+            else{
+                [UIView animateWithDuration:0.3f animations:^{
+                    pinglunBgView.frame = CGRectMake(pinglunBgView.frame.origin.x, IPHONE_H - pinglunBgView.frame.size.height, pinglunBgView.frame.size.width, pinglunBgView.frame.size.height);
+                }];
+            }
+        }else if (switchIndex == 4) {//点击下载跳转
+            self.hidesBottomBarWhenPushed=YES;
+            [self.navigationController setNavigationBarHidden:NO animated:YES];
+            BatchDownloadTableTableViewController *vc = [BatchDownloadTableTableViewController new];
+            vc.downloadSource = @"1";
+            vc.programID = self.jiemuID;
+            vc.headTitleStr = [NSString stringWithFormat:@"【%@】节目批量下载",self.jiemuName ];
+            [self.navigationController pushViewController:vc animated:YES];
+            self.hidesBottomBarWhenPushed=YES;
+        }
+        
+        selectedSwitchIndex = switchIndex;
+    };
+    pagingView.clickEventViewsBlock = ^(UIView *eventView) {
+        RTLog(@"%@",eventView.class);
+        if ([eventView isKindOfClass:[UIButton class]]) {
+            UIButton *button = (UIButton *)eventView;
+            if ([button.accessibilityLabel isEqualToString:@"返回"]) {
+                [self backAction:button];
+            }else if ([button.accessibilityLabel isEqualToString:@"节目分享"]){
+                [self shareAction:button];
+            }else if ([button.accessibilityLabel isEqualToString:@"关注按钮"]){
+                [self guanzhuBtnAction:button];
+            }
+            
+        }else if ([eventView isKindOfClass:[UIImageView class]]){
+            UIImageView *imageView = (UIImageView *)eventView;
+            if ([imageView.accessibilityLabel isEqualToString:@"主播头像"]) {
+                [self showHeadImageViewWithImageView:imageView];
+            }
+        }
+        
+    };
+    [self.view addSubview:pagingView];
     
     if (self.isbofangye == YES){
         [self bofangyepinglunkuang];
@@ -231,19 +309,23 @@
     else{
         [self pinglunkuang];
     }
+    
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(gaibianyanse:) name:@"gaibianyanse" object:nil];
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(zhuboxiangqingbofangJiaZai:) name:@"zhuboxiangqingbofang" object:nil];
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(back) name:@"isBackfromPersonalPage" object:nil];
+    
     UISwipeGestureRecognizer *rightSwipe = [[UISwipeGestureRecognizer alloc]initWithTarget:self action:@selector(back)];
     [rightSwipe setDirection:UISwipeGestureRecognizerDirectionRight];
     [self.view addGestureRecognizer:rightSwipe];
     UISwipeGestureRecognizer *back = [[UISwipeGestureRecognizer alloc]initWithTarget:self action:@selector(back)];
-    [ZhuscrollView addGestureRecognizer:back];
-    [pinglunBgView addGestureRecognizer:back];
+    [headerView addGestureRecognizer:back];
+    [pagingView addGestureRecognizer:back];
     
 }
 - (void)viewWillAppear:(BOOL)animated{
     [super viewWillAppear:animated];
+//    self.navBarBgAlpha = @"0.0";
+    
     IQKeyboardManager *manager = [IQKeyboardManager sharedManager];
     manager.enable = YES;
     manager.shouldResignOnTouchOutside = YES;
@@ -256,9 +338,10 @@
         _isRewardLoginBack = NO;
         [self rewardAlert];
     }
-    [self btnAction:[CenterView viewWithTag:10]];
-//    UITableView *fansBoardTableView = (UITableView *)[TwoScrollV viewWithTag:4];
-//    [fansBoardTableView.mj_header beginRefreshing];
+    
+    [self xinwenRefresh:xinwenshuaxinTableView];
+    [self fansRefresh:fansWallTableView];
+    [self liuyanRefresh:pinglunhoushuaxinTableView];
     
     if (![bofangVC shareInstance].isPlay) {
         [[NSNotificationCenter defaultCenter] postNotificationName:@"stopAnimate" object:nil];
@@ -269,6 +352,8 @@
 
 - (void)viewWillDisappear:(BOOL)animated{
     [super viewWillDisappear:animated];
+    
+//    self.navBarBgAlpha = @"1.0";
     [self.navigationController setNavigationBarHidden:NO animated:YES];
     
     if (![bofangVC shareInstance].isPlay) {
@@ -390,16 +475,6 @@
     else{
         accesstoken = nil;
     }
-//    [NetWorkTool getFan_boardWithact_id:self.jiemuID sccess:^(NSDictionary *responseObject) {
-//        if ([responseObject[@"results"] isKindOfClass:[NSArray class]]){
-//            fansArr = [[NSMutableArray alloc]initWithArray:responseObject[@"results"]];
-//            [tableView reloadData];
-//        }
-//        [tableView.mj_header endRefreshing];
-//    } failure:^(NSError *error) {
-//        //
-//        [tableView.mj_header endRefreshing];
-//    }];
     
     [NetWorkTool getZan_boardWithaccessToken:accesstoken act_id:self.jiemuID sccess:^(NSDictionary *responseObject) {
         _myRank = [responseObject[@"results"][@"rank"] integerValue];
@@ -521,113 +596,6 @@
     }
 }
 
-- (void)btnAction:(zhuboxiangqingBtn *)sender {
-    
-    zhuboxiangqingBtn *btn = (zhuboxiangqingBtn *)[CenterView viewWithTag:lastBtnTag];
-    [btn ChangeBlueToBlack:[UIImage imageNamed:[NSString stringWithFormat:@"BmentButton%ld",(long)lastBtnTag - 9]]];
-    [sender ChangeBlackToBlue:[UIImage imageNamed:[NSString stringWithFormat:@"mentButton%ld",(long)sender.tag - 9]]];
-    NSInteger i = sender.tag - 10;
-    [TwoScrollV setContentOffset:CGPointMake(IPHONE_W * i, 0) animated:NO];
-//    UITableView *tableView = (UITableView *)[[[sender superview] superview]viewWithTag:sender.tag - 7];
-
-    UITableView *selectTableView;
-    for (UITableView *tableView in TwoScrollV.subviews) {
-        if (sender.tag - 7 == 3) {
-            if ([xinwenshuaxinTableView isEqual:tableView]) {
-                selectTableView = tableView;
-            }
-        }else if (sender.tag - 7 == 5){
-            if ([fansWallTableView isEqual:tableView]) {
-                selectTableView = tableView;
-            }
-        }else if (sender.tag - 7 == 5){
-            if ([pinglunhoushuaxinTableView isEqual:tableView]) {
-                selectTableView = tableView;
-            }
-        }
-    }
-    [selectTableView.mj_header beginRefreshing];
-    //TODO:主播详情界面内容未超过一页时 不能上滑
-    
-//    NSLog(@"tableView.frame.size.height%f",tableView.frame.size.height);
-//    NSLog(@"tableView.contentSize.height%f",tableView.contentSize.height);
-//    NSLog(@"TwoScrollV.contentSize.height%f",TwoScrollV.contentSize.height);
-//    if (tableView.contentSize.height < (SCREEN_HEIGHT - headerView.frame.size.height - 50.0 / 667 * SCREEN_HEIGHT) ) {
-//        ZhuscrollView.contentSize = CGSizeMake(IPHONE_W, 253.0 / 667 * SCREEN_HEIGHT + tableView.contentSize.height);
-//    }
-//    else{
-//        ZhuscrollView.contentSize = CGSizeMake(IPHONE_W, 250.0 / 667 * SCREEN_HEIGHT + TwoScrollV.frame.size.height);
-//    }
-    
-    lastBtnTag = sender.tag;
-    //粉丝榜
-    if (sender.tag == 11){
-        if (self.isbofangye == YES) {
-            [UIView animateWithDuration:0.3f animations:^{
-                pinglunBgView.frame = CGRectMake(pinglunBgView.frame.origin.x, IPHONE_H, pinglunBgView.frame.size.width, pinglunBgView.frame.size.height);
-            }];
-        }
-        else{
-            [UIView animateWithDuration:0.3f animations:^{
-                pinglunBgView.frame = CGRectMake(pinglunBgView.frame.origin.x, IPHONE_H, pinglunBgView.frame.size.width, pinglunBgView.frame.size.height);
-            }];
-        }
-    }
-    //留言
-    else if (sender.tag == 12){
-        [self.view endEditing:YES];
-        _isReplyComment = NO;
-        pinglunTextF.placeholder = @"输入评论";
-        if (self.isbofangye == YES){
-            [UIView animateWithDuration:0.3f animations:^{
-                pinglunBgView.frame = CGRectMake(pinglunBgView.frame.origin.x, IPHONE_H - pinglunBgView.frame.size.height, pinglunBgView.frame.size.width, pinglunBgView.frame.size.height);
-            }];
-        }
-        else{
-            [UIView animateWithDuration:0.3f animations:^{
-                pinglunBgView.frame = CGRectMake(pinglunBgView.frame.origin.x, IPHONE_H - pinglunBgView.frame.size.height, pinglunBgView.frame.size.width, pinglunBgView.frame.size.height);
-            }];
-        }
-    }
-    //图片
-    else if (sender.tag == 13){
-        if (self.isbofangye == YES) {
-            [UIView animateWithDuration:0.3f animations:^{
-                pinglunBgView.frame = CGRectMake(pinglunBgView.frame.origin.x, IPHONE_H, pinglunBgView.frame.size.width, pinglunBgView.frame.size.height);
-            }];
-        }
-        else{
-            [UIView animateWithDuration:0.3f animations:^{
-                pinglunBgView.frame = CGRectMake(pinglunBgView.frame.origin.x, IPHONE_H, pinglunBgView.frame.size.width, pinglunBgView.frame.size.height);
-            }];
-        }
-    }
-    //下载
-    else if (sender.tag == 14){
-        self.hidesBottomBarWhenPushed=YES;
-        [self.navigationController setNavigationBarHidden:NO animated:YES];
-        BatchDownloadTableTableViewController *vc = [BatchDownloadTableTableViewController new];
-        vc.downloadSource = @"1";
-        vc.programID = self.jiemuID;
-        vc.headTitleStr = [NSString stringWithFormat:@"【%@】节目批量下载",self.jiemuName ];
-        [self.navigationController pushViewController:vc animated:YES];
-        self.hidesBottomBarWhenPushed=YES;
-    }
-    //新闻
-    else{
-        if (self.isbofangye == YES) {
-            [UIView animateWithDuration:0.3f animations:^{
-                pinglunBgView.frame = CGRectMake(pinglunBgView.frame.origin.x, IPHONE_H, pinglunBgView.frame.size.width, pinglunBgView.frame.size.height);
-            }];
-        }else
-        {
-            [UIView animateWithDuration:0.3f animations:^{
-                pinglunBgView.frame = CGRectMake(pinglunBgView.frame.origin.x, IPHONE_H, pinglunBgView.frame.size.width, pinglunBgView.frame.size.height);
-            }];
-        }
-    }
-}
-
 - (void)isbofangyeBuJv {
     UIView *topView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, IPHONE_W, 64)];
     topView.backgroundColor = gMainColor;
@@ -660,7 +628,7 @@
 - (void)addHeaderView{
     
     headerView = [[UIImageView alloc]initWithFrame:CGRectMake(0, 0, IPHONE_W, 273.0 / 667 * SCREEN_HEIGHT)];
-//    headerView.image = [UIImage imageNamed:@"anchor_top"];
+    headerView.backgroundColor = [UIColor whiteColor];
     headerView.userInteractionEnabled = YES;
     
     UIImageView *shadowView = [[UIImageView alloc]initWithFrame:CGRectMake(0, 0, IPHONE_W,167.0 / 667 * IPHONE_H)];
@@ -668,7 +636,6 @@
     [shadowView setImage:[UIImage imageNamed:@"me_mypage_mettopbg"]];
     [headerView addSubview:shadowView];
     
-//    topHeaderV = [[UIView alloc]initWithFrame:CGRectMake(0, 64.0 / 667 *SCREEN_HEIGHT , IPHONE_W, 100.0 / 667 *SCREEN_HEIGHT)];
     if (!self.isClass) {
         downHeaderV = [[UIView alloc]initWithFrame:CGRectMake(0, 223.0 / 667 *SCREEN_HEIGHT, IPHONE_W, 50.0 / 667 *SCREEN_HEIGHT)];
     }else{
@@ -691,7 +658,7 @@
     topLab.backgroundColor = [UIColor clearColor];
     topLab.textAlignment = NSTextAlignmentCenter;
     [headerView addSubview:topLab];
-
+    
     //分享按钮
     UIButton *shareBtn = [UIButton buttonWithType:UIButtonTypeCustom];
     shareBtn.frame = CGRectMake(SCREEN_WIDTH - 45, 25, 35, 35);
@@ -716,6 +683,7 @@
     else{
         [img sd_setImageWithURL:[NSURL URLWithString:USERPOTOAD(self.jiemuImages)] placeholderImage:[UIImage imageNamed:@"tingwen_bg_square"]];
     }
+    img.accessibilityLabel = @"主播头像";
     img.layer.masksToBounds = YES;
     img.layer.cornerRadius = 90.0 / 667 * IPHONE_H / 2;
     img.contentMode = UIViewContentModeScaleAspectFill;
@@ -734,7 +702,6 @@
     }
     name.numberOfLines = 0;
     name.textColor = nTextColorMain;
-//    name.font = [UIFont fontWithName:@"Helvetica-Bold" size:17.0f ];
     name.font = gFontMajor17;
     name.textAlignment = NSTextAlignmentLeft;
     name.text = self.jiemuName;
@@ -749,7 +716,6 @@
         fensiliuyan.frame = CGRectMake(name.frame.origin.x,CGRectGetMaxY(name.frame) + 20.0 / 667 *SCREEN_HEIGHT, SCREEN_WIDTH - name.frame.origin.x - 80.0 / 375 * SCREEN_WIDTH, 40.0 / 667 * IPHONE_H);
     }
     fensiliuyan.textColor = gTextColorSub;
-//    fensiliuyan.alpha = 0.5f;
     fensiliuyan.font = gFontMain14;
     fensiliuyan.textAlignment = NSTextAlignmentLeft;
     fensiliuyan.numberOfLines = 2;
@@ -766,6 +732,7 @@
         else{
             [guanzhuBtn setTitle:@"+ 关注" forState:UIControlStateNormal];
         }
+        guanzhuBtn.accessibilityLabel = @"关注按钮";
         [guanzhuBtn setTitleColor:gMainColor forState:UIControlStateNormal];
         guanzhuBtn.titleLabel.font                  = [UIFont systemFontOfSize:11.0];
         [guanzhuBtn setBackgroundColor:[UIColor clearColor]];
@@ -815,7 +782,7 @@
     }
     
     [headerView addSubview:downHeaderV];
-    [ZhuscrollView addSubview:headerView];
+//    [ZhuscrollView addSubview:headerView];
 }
 
 
@@ -863,6 +830,39 @@
                             }];
     return arr;
 }
+- (void)showHeadImageViewWithImageView:(UIImageView *)imgView
+{
+    //scrollView作为背景
+    UIScrollView *bgView = [[UIScrollView alloc] init];
+    bgView.frame = [UIScreen mainScreen].bounds;
+    bgView.backgroundColor = [UIColor blackColor];
+    UITapGestureRecognizer *tapBg = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapBgView:)];
+    [bgView addGestureRecognizer:tapBg];
+    
+    
+    UIImageView *imageView = [[UIImageView alloc] init];
+    imageView.image = imgView.image;
+    imageView.frame = [bgView convertRect:imgView.frame fromView:self.view];
+    [bgView addSubview:imageView];
+    
+    [[[UIApplication sharedApplication] keyWindow] addSubview:bgView];
+    
+    self.lastImageView = imageView;
+    self.originalFrame = imageView.frame;
+    self.scrollView = bgView;
+    //最大放大比例
+    self.scrollView.maximumZoomScale = 2.0f;
+    self.scrollView.showsHorizontalScrollIndicator = NO;
+    self.scrollView.showsVerticalScrollIndicator = NO;
+    [UIView animateWithDuration:0.35 animations:^{
+        CGRect frame = imageView.frame;
+        frame.size.width = bgView.frame.size.width;
+        frame.size.height = frame.size.width * (imageView.image.size.height / imageView.image.size.width);
+        frame.origin.x = 0;
+        frame.origin.y = (bgView.frame.size.height - frame.size.height) * 0.5;
+        imageView.frame = frame;
+    }];
+}
 
 - (void)showHeadImageView:(UITapGestureRecognizer *)tap
 {
@@ -891,7 +891,6 @@
     self.scrollView = bgView;
     //最大放大比例
     self.scrollView.maximumZoomScale = 2.0f;
-    //    self.scrollView.delegate = self;
     self.scrollView.showsHorizontalScrollIndicator = NO;
     self.scrollView.showsVerticalScrollIndicator = NO;
     [UIView animateWithDuration:0.35 animations:^{
@@ -902,7 +901,6 @@
         frame.origin.y = (bgView.frame.size.height - frame.size.height) * 0.5;
         imageView.frame = frame;
     }];
-    //    self.scrollView.contentSize = imageView.frame.size;
 }
 
 -(void)tapBgView:(UITapGestureRecognizer *)tapBgRecognizer
@@ -1152,7 +1150,6 @@
             LoginVC *loginFriVC = [LoginVC new];
             LoginNavC *loginNavC = [[LoginNavC alloc]initWithRootViewController:loginFriVC];
             [loginNavC.navigationBar setBackgroundColor:[UIColor whiteColor]];
-            //        [loginNavC.navigationBar setBackgroundImage:[UIImage imageNamed:@"mian-1"] forBarMetrics:UIBarMetricsDefault];
             loginNavC.navigationBar.tintColor = [UIColor blackColor];
             [self presentViewController:loginNavC animated:YES completion:nil];
         }]];
@@ -1253,7 +1250,7 @@
     }
     else{
         [self reward];
-       
+        
     }
 }
 
@@ -1337,11 +1334,9 @@
     [qingshuruyonghuming addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
     }]];
     [qingshuruyonghuming addAction:[UIAlertAction actionWithTitle:@"登录" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-//        LoginNavC *loginNavC = [LoginNavC new];
         LoginVC *loginFriVC = [LoginVC new];
         LoginNavC *loginNavC = [[LoginNavC alloc]initWithRootViewController:loginFriVC];
         [loginNavC.navigationBar setBackgroundColor:[UIColor whiteColor]];
-        //        [loginNavC.navigationBar setBackgroundImage:[UIImage imageNamed:@"mian-1"] forBarMetrics:UIBarMetricsDefault];
         loginNavC.navigationBar.tintColor = [UIColor blackColor];
         [self presentViewController:loginNavC animated:YES completion:nil];
     }]];
@@ -1364,7 +1359,6 @@
         if (self.isfaxian) {
             self.hidesBottomBarWhenPushed = YES;
             [self.navigationController.navigationBar setHidden:NO];
-//            [self.navigationController pushViewController:[bofangVC shareInstance ] animated:YES];
             [[NSNotificationCenter defaultCenter]postNotificationName:@"getAhocComment" object:xinwenArr[indexPath.row][@"id"]];
         }
         else{
@@ -1372,8 +1366,6 @@
             [[NSNotificationCenter defaultCenter]postNotificationName:@"getAhocComment" object:xinwenArr[indexPath.row][@"id"]];
         }
         if ([bofangVC shareInstance].isPlay) {
-//            [[bofangVC shareInstance] doPlay:[bofangVC shareInstance].centerBtn];
-            RTLog(@"bofangVC--isPlay");
         }
         else{
             [[bofangVC shareInstance] doplay2];
@@ -1406,7 +1398,6 @@
         [[bofangVC shareInstance].tableView reloadData];
         [Explayer replaceCurrentItemWithPlayerItem:[[AVPlayerItem alloc]initWithURL:[NSURL URLWithString:xinwenArr[indexPath.row][@"post_mp"]]]];
         if ([bofangVC shareInstance].isPlay || ExIsKaiShiBoFang == NO) {
-            RTLog(@"bofangVC--isPlay");
         }
         else{
             [[bofangVC shareInstance] doplay2];
@@ -1459,7 +1450,7 @@
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
     //粉丝榜
     if (tableView.tag == 4){
-        return 44.0f;
+        return 40.0f;
     }
     else{
         return 0.01f;
@@ -1470,13 +1461,13 @@
 - (nullable UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section{
     //粉丝榜
     if (tableView.tag == 4){
-        UIView *sectionHeadView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, 44)];
+        UIView *sectionHeadView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, 40)];
         [sectionHeadView setBackgroundColor:gSubColor];
         //TODO:我的排名
         [sectionHeadView addSubview:self.myRanking];
         
         UIButton *goButton = [UIButton buttonWithType:UIButtonTypeCustom];
-        [goButton setFrame:CGRectMake(SCREEN_WIDTH - 75, 10, 60, 25)];
+        [goButton setFrame:CGRectMake(SCREEN_WIDTH - 75, 10, 60, 20)];
         [goButton.titleLabel setFont:gFontSub11];
         
         [goButton.layer setBorderWidth:0.5f];
@@ -1486,7 +1477,7 @@
         [goButton addTarget:self action:@selector(goButtonAction:) forControlEvents:UIControlEventTouchUpInside];
         //追加赞赏
         UIButton *rewardButton = [UIButton buttonWithType:UIButtonTypeCustom];
-        [rewardButton setFrame:CGRectMake(SCREEN_WIDTH - 145, 10, 60, 25)];
+        [rewardButton setFrame:CGRectMake(SCREEN_WIDTH - 145, 10, 60, 20)];
         [rewardButton.titleLabel setFont:gFontSub11];
         
         [rewardButton.layer setBorderWidth:0.5f];
@@ -1699,8 +1690,6 @@
                 [to_user setValue:liuyanArr[indexPath.row][@"to_signature"] forKey:@"signature"];
                 [to_user setValue:liuyanArr[indexPath.row][@"to_user_login"] forKey:@"user_login"];
                 [to_user setValue:liuyanArr[indexPath.row][@"to_avatar"] forKey:@"avatar"];
-                //        [to_user setValue:liuyanArr[indexPath.row][@"to_user_nicename"] forKey:@"fan_num"];
-                //        [to_user setValue:liuyanArr[indexPath.row][@"to_user_nicename"] forKey:@"guan_num"];
                 [to_user setValue:liuyanArr[indexPath.row][@"to_uid"] forKey:@"id"];
                 
                 NSRange nameRange = NSMakeRange(2, [liuyanArr[indexPath.row][@"to_user_nicename"] length] ? [liuyanArr[indexPath.row][@"to_user_nicename"] length] + 1 : [liuyanArr[indexPath.row][@"to_user_login"] length] + 1);
@@ -1724,8 +1713,6 @@
                 [to_user setValue:liuyanArr[indexPath.row][@"to_signature"] forKey:@"signature"];
                 [to_user setValue:liuyanArr[indexPath.row][@"to_user_login"] forKey:@"user_login"];
                 [to_user setValue:liuyanArr[indexPath.row][@"to_avatar"] forKey:@"avatar"];
-                //        [to_user setValue:liuyanArr[indexPath.row][@"to_user_nicename"] forKey:@"fan_num"];
-                //        [to_user setValue:liuyanArr[indexPath.row][@"to_user_nicename"] forKey:@"guan_num"];
                 [to_user setValue:liuyanArr[indexPath.row][@"to_uid"] forKey:@"id"];
                 
                 NSRange nameRange = NSMakeRange(2,  [liuyanArr[indexPath.row][@"to_user_nicename"] length] ? [liuyanArr[indexPath.row][@"to_user_nicename"] length] + 1 : [liuyanArr[indexPath.row][@"to_user_login"] length] + 1);
@@ -1762,15 +1749,15 @@
         
         PinglundianzanCustomBtn *PingLundianzanBtn = [PinglundianzanCustomBtn buttonWithType:UIButtonTypeCustom];
         PingLundianzanBtn.frame = CGRectMake(IPHONE_W - 60.0 / 375 * IPHONE_W, 20.0 / 667 * IPHONE_H, 50.0 / 375 * IPHONE_W, 20.0 / 667 * IPHONE_H);
-//        PingLundianzanBtn.enabled = NO;
+        //        PingLundianzanBtn.enabled = NO;
         PingLundianzanBtn.backgroundColor = [UIColor clearColor];
-//        [PingLundianzanBtn.imageView setContentMode:UIViewContentModeCenter];
+        //        [PingLundianzanBtn.imageView setContentMode:UIViewContentModeCenter];
         [cell.contentView addSubview:PingLundianzanBtn];
         [PingLundianzanBtn addTarget:self action:@selector(pinglundianzanAction:) forControlEvents:UIControlEventTouchUpInside];
         
         PingLundianzanNumLab = [[UILabel alloc]initWithFrame:CGRectMake(CGRectGetMaxX(PingLundianzanBtn.frame) - 30.0 / 375 * IPHONE_W, PingLundianzanBtn.frame.origin.y + 1.0 / 667 * IPHONE_H, 20.0 / 375 * IPHONE_W, 20.0 / 667 * IPHONE_H)];
         PingLundianzanNumLab.text = liuyanArr[indexPath.row][@"praisenum"];
-//        [PingLundianzanNumLab addTapGesWithTarget:self action:@selector(pinglundianzanAction:)];
+        //        [PingLundianzanNumLab addTapGesWithTarget:self action:@selector(pinglundianzanAction:)];
         PingLundianzanNumLab.textAlignment = NSTextAlignmentCenter;
         PingLundianzanNumLab.font = [UIFont systemFontOfSize:16.0f];
         PingLundianzanNumLab.tag = indexPath.row + 2000;
@@ -1870,7 +1857,6 @@
             [bofangVC shareInstance].newsModel.praisenum = xinwenArr[indexPath.row][@"praisenum"];
             [bofangVC shareInstance].iszhuboxiangqing = YES;
             [[bofangVC shareInstance].tableView reloadData];
-            //        Explayer = [[AVPlayer alloc]initWithPlayerItem:[[AVPlayerItem alloc]initWithURL:[NSURL URLWithString:arr[indexPath.row][@"post_mp"]]]];
             [Explayer replaceCurrentItemWithPlayerItem:[[AVPlayerItem alloc]initWithURL:[NSURL URLWithString:xinwenArr[indexPath.row][@"post_mp"]]]];
             if ([bofangVC shareInstance].isPlay || ExIsKaiShiBoFang == NO) {
                 
@@ -2022,106 +2008,131 @@
     
 }
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView {
-
-        if (scrollView.tag == lastBtnTag - 7){
-            if (scrollView.contentOffset.y > 0.0){
-                
+    
+    if (scrollView.tag == lastBtnTag - 7){
+        if (scrollView.contentOffset.y > 0.0){
+            
+        }
+        else{
+            scrollView.scrollEnabled = NO;
+            ZhuscrollView.scrollEnabled = YES;
+        }
+    }
+    else if (scrollView.tag == 2){
+        CGPoint point = scrollView.contentOffset;
+        NSInteger i = point.x / IPHONE_W;
+        zhuboxiangqingBtn *btn = (zhuboxiangqingBtn *)[CenterView viewWithTag:lastBtnTag];
+        [btn ChangeBlueToBlack:[UIImage imageNamed:[NSString stringWithFormat:@"BzhuboBtn%ld",(long)lastBtnTag - 9]]];
+        zhuboxiangqingBtn *btn1 = (zhuboxiangqingBtn *)[CenterView viewWithTag:i + 10];
+        [btn1 ChangeBlackToBlue:[UIImage imageNamed:[NSString stringWithFormat:@"zhuboBtn%ld",(long)i + 1]]];
+        lastBtnTag = i + 10;
+        if (i + 10 == 11){
+            if (self.isbofangye == YES){
+                [UIView animateWithDuration:0.3f animations:^{
+                    pinglunBgView.frame = CGRectMake(pinglunBgView.frame.origin.x, IPHONE_H - pinglunBgView.frame.size.height, pinglunBgView.frame.size.width, pinglunBgView.frame.size.height);
+                }];
             }
             else{
-                scrollView.scrollEnabled = NO;
-                ZhuscrollView.scrollEnabled = YES;
+                [UIView animateWithDuration:0.3f animations:^{
+                    pinglunBgView.frame = CGRectMake(pinglunBgView.frame.origin.x, IPHONE_H - pinglunBgView.frame.size.height, pinglunBgView.frame.size.width, pinglunBgView.frame.size.height);
+                }];
             }
         }
-        else if (scrollView.tag == 2){
-            CGPoint point = scrollView.contentOffset;
-            NSInteger i = point.x / IPHONE_W;
-            zhuboxiangqingBtn *btn = (zhuboxiangqingBtn *)[CenterView viewWithTag:lastBtnTag];
-            [btn ChangeBlueToBlack:[UIImage imageNamed:[NSString stringWithFormat:@"BzhuboBtn%ld",(long)lastBtnTag - 9]]];
-            zhuboxiangqingBtn *btn1 = (zhuboxiangqingBtn *)[CenterView viewWithTag:i + 10];
-            [btn1 ChangeBlackToBlue:[UIImage imageNamed:[NSString stringWithFormat:@"zhuboBtn%ld",(long)i + 1]]];
-            lastBtnTag = i + 10;
-            if (i + 10 == 11){
-                if (self.isbofangye == YES){
-                    [UIView animateWithDuration:0.3f animations:^{
-                        pinglunBgView.frame = CGRectMake(pinglunBgView.frame.origin.x, IPHONE_H - pinglunBgView.frame.size.height, pinglunBgView.frame.size.width, pinglunBgView.frame.size.height);
-                    }];
-                }
-                else{
-                    [UIView animateWithDuration:0.3f animations:^{
-                        pinglunBgView.frame = CGRectMake(pinglunBgView.frame.origin.x, IPHONE_H - pinglunBgView.frame.size.height, pinglunBgView.frame.size.width, pinglunBgView.frame.size.height);
-                    }];
-                }
-            }
-            else if (i + 10 == 10){
-//                if (scrollView.contentOffset.x < 0) {
-//                    [self.navigationController popViewControllerAnimated:YES];
-//                }
-                NSLog(@"xinwen");
+        else if (i + 10 == 10){
+            NSLog(@"xinwen");
+        }
+        else{
+            if (self.isbofangye == YES){
+                [UIView animateWithDuration:0.3f animations:^{
+                    pinglunBgView.frame = CGRectMake(pinglunBgView.frame.origin.x, IPHONE_H, pinglunBgView.frame.size.width, pinglunBgView.frame.size.height);
+                }];
             }
             else{
-                if (self.isbofangye == YES){
-                    [UIView animateWithDuration:0.3f animations:^{
-                        pinglunBgView.frame = CGRectMake(pinglunBgView.frame.origin.x, IPHONE_H, pinglunBgView.frame.size.width, pinglunBgView.frame.size.height);
-                    }];
-                }
-                else{
-                    [UIView animateWithDuration:0.3f animations:^{
-                        pinglunBgView.frame = CGRectMake(pinglunBgView.frame.origin.x, IPHONE_H - 64, pinglunBgView.frame.size.width, pinglunBgView.frame.size.height);
-                    }];
-                }
+                [UIView animateWithDuration:0.3f animations:^{
+                    pinglunBgView.frame = CGRectMake(pinglunBgView.frame.origin.x, IPHONE_H - 64, pinglunBgView.frame.size.width, pinglunBgView.frame.size.height);
+                }];
             }
         }
+    }
 }
 
 #pragma mark - TTTAttributedLabelDelegate
 
 - (void)attributedLabel:(TTTAttributedLabel *)label
 didSelectLinkWithTransitInformation:(NSDictionary *)components {
-
-        gerenzhuyeVC *gerenzhuye = [gerenzhuyeVC new];
-        if ([components[@"user_login"] isEqualToString:ExdangqianUser] && [[CommonCode readFromUserD:@"isLogin"]boolValue] == YES) {
-            gerenzhuye.isMypersonalPage = YES;
-        }
-        else{
-            gerenzhuye.isMypersonalPage = NO;
-        }
-        gerenzhuye.isNewsComment = NO;
-        gerenzhuye.user_nicename = components[@"user_nicename"];
-        gerenzhuye.sex = components[@"sex"];
-        gerenzhuye.signature = components[@"signature"];
-        gerenzhuye.user_login = components[@"user_login"];
-        gerenzhuye.avatar = components[@"avatar"];
-//        gerenzhuye.fan_num = components[@"fan_num"];
-//        gerenzhuye.guan_num = components[@"guan_num"];
-        gerenzhuye.user_id = components[@"id"];
-        self.hidesBottomBarWhenPushed=YES;
-        [self.navigationController pushViewController:gerenzhuye animated:YES];
-        self.hidesBottomBarWhenPushed=YES;
+    
+    gerenzhuyeVC *gerenzhuye = [gerenzhuyeVC new];
+    if ([components[@"user_login"] isEqualToString:ExdangqianUser] && [[CommonCode readFromUserD:@"isLogin"]boolValue] == YES) {
+        gerenzhuye.isMypersonalPage = YES;
+    }
+    else{
+        gerenzhuye.isMypersonalPage = NO;
+    }
+    gerenzhuye.isNewsComment = NO;
+    gerenzhuye.user_nicename = components[@"user_nicename"];
+    gerenzhuye.sex = components[@"sex"];
+    gerenzhuye.signature = components[@"signature"];
+    gerenzhuye.user_login = components[@"user_login"];
+    gerenzhuye.avatar = components[@"avatar"];
+    gerenzhuye.user_id = components[@"id"];
+    self.hidesBottomBarWhenPushed=YES;
+    [self.navigationController pushViewController:gerenzhuye animated:YES];
+    self.hidesBottomBarWhenPushed=YES;
 }
 
 - (UILabel *)myRanking{
     if (!_myRanking) {
-        _myRanking = [[UILabel alloc]initWithFrame:CGRectMake(15, 15, 150, 20)];
+        _myRanking = [[UILabel alloc]initWithFrame:CGRectMake(15, 10, 150, 20)];
         [_myRanking setFont:gFontMain14];
         [_myRanking setTextColor:gTextDownload];
-        //        [_myRanking setText:[NSString stringWithFormat:@"我的排名：暂无排名"]];
     }
     return _myRanking;
 }
-
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
-}
-
-/*
- #pragma mark - Navigation
- 
- // In a storyboard-based application, you will often want to do a little preparation before navigation
- - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
- // Get the new view controller using [segue destinationViewController].
- // Pass the selected object to the new view controller.
- }
- */
-
+//- (UIView *)sectionHeadView
+//{
+//    if (_sectionHeadView == nil) {
+//        _sectionHeadView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, 44)];
+//        [_sectionHeadView setBackgroundColor:gSubColor];
+//        //TODO:我的排名
+//        [_sectionHeadView addSubview:self.myRanking];
+//        
+//        UIButton *goButton = [UIButton buttonWithType:UIButtonTypeCustom];
+//        [goButton setFrame:CGRectMake(SCREEN_WIDTH - 75, 10, 60, 25)];
+//        [goButton.titleLabel setFont:gFontSub11];
+//        
+//        [goButton.layer setBorderWidth:0.5f];
+//        [goButton.layer setBorderColor:gThinLineColor.CGColor];
+//        [goButton.layer setMasksToBounds:YES];
+//        [goButton.layer setCornerRadius:5.0f];
+//        [goButton addTarget:self action:@selector(goButtonAction:) forControlEvents:UIControlEventTouchUpInside];
+//        //追加赞赏
+//        UIButton *rewardButton = [UIButton buttonWithType:UIButtonTypeCustom];
+//        [rewardButton setFrame:CGRectMake(SCREEN_WIDTH - 145, 10, 60, 25)];
+//        [rewardButton.titleLabel setFont:gFontSub11];
+//        
+//        [rewardButton.layer setBorderWidth:0.5f];
+//        [rewardButton.layer setBorderColor:gThinLineColor.CGColor];
+//        [rewardButton.layer setMasksToBounds:YES];
+//        [rewardButton.layer setCornerRadius:5.0f];
+//        [rewardButton addTarget:self action:@selector(rewardButtonAction:) forControlEvents:UIControlEventTouchUpInside];
+//        [rewardButton setBackgroundColor:gButtonRewardColor];
+//        [rewardButton setTitle:@"我要赞赏" forState:UIControlStateNormal];
+//        [rewardButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+//        [_sectionHeadView addSubview:rewardButton];
+//        
+//        if (_isOnRank) {
+//            [rewardButton setHidden:NO];
+//            [goButton setTitleColor:gTextColorBackground forState:UIControlStateNormal];
+//            [goButton setTitle:@"立即前往" forState:UIControlStateNormal];
+//        }
+//        else{
+//            [rewardButton setHidden:YES];
+//            [goButton setBackgroundColor:gButtonRewardColor];
+//            [goButton setTitle:@"我要上榜" forState:UIControlStateNormal];
+//            [goButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+//        }
+//        [_sectionHeadView addSubview:goButton];
+//    }
+//    return _sectionHeadView;
+//}
 @end

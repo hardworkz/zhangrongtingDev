@@ -153,6 +153,11 @@
 		69711B0D1EBC140C00A01728 /* openssl_wrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 69711B061EBC140C00A01728 /* openssl_wrapper.m */; };
 		69711B0E1EBC140C00A01728 /* RSADataSigner.m in Sources */ = {isa = PBXBuildFile; fileRef = 69711B081EBC140C00A01728 /* RSADataSigner.m */; };
 		69711B0F1EBC140C00A01728 /* RSADataVerifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 69711B0A1EBC140C00A01728 /* RSADataVerifier.m */; };
+		697CA2991EF3678F00F853AF /* zhuboXiangQingVCNewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 697CA2981EF3678F00F853AF /* zhuboXiangQingVCNewController.m */; };
+		697CA29F1EF384BE00F853AF /* UINavigationController+Cloudox.m in Sources */ = {isa = PBXBuildFile; fileRef = 697CA29C1EF384BE00F853AF /* UINavigationController+Cloudox.m */; };
+		697CA2A01EF384BE00F853AF /* UIViewController+Cloudox.m in Sources */ = {isa = PBXBuildFile; fileRef = 697CA29E1EF384BE00F853AF /* UIViewController+Cloudox.m */; };
+		697CA2A31EF3D2C600F853AF /* faxianModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 697CA2A21EF3D2C600F853AF /* faxianModel.m */; };
+		697CA2A61EF3D2E800F853AF /* faxianSubModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 697CA2A51EF3D2E800F853AF /* faxianSubModel.m */; };
 		6985B9311D7404EE0081BCBD /* iAppInfos.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6985B92F1D7404EE0081BCBD /* iAppInfos.framework */; };
 		6985B9321D7404EF0081BCBD /* SAMTextView.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6985B9301D7404EE0081BCBD /* SAMTextView.framework */; };
 		6985B9341D740F6A0081BCBD /* TTTAttributedLabel.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6985B9331D740F690081BCBD /* TTTAttributedLabel.framework */; };
@@ -765,6 +770,17 @@
 		69711B581EBC143500A01728 /* x509_vfy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = x509_vfy.h; path = openssl/x509_vfy.h; sourceTree = SOURCE_ROOT; };
 		69711B591EBC143500A01728 /* x509.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = x509.h; path = openssl/x509.h; sourceTree = SOURCE_ROOT; };
 		69711B5A1EBC143500A01728 /* x509v3.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = x509v3.h; path = openssl/x509v3.h; sourceTree = SOURCE_ROOT; };
+		697CA2971EF3678F00F853AF /* zhuboXiangQingVCNewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = zhuboXiangQingVCNewController.h; sourceTree = "<group>"; };
+		697CA2981EF3678F00F853AF /* zhuboXiangQingVCNewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = zhuboXiangQingVCNewController.m; sourceTree = "<group>"; };
+		697CA29B1EF384BE00F853AF /* UINavigationController+Cloudox.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UINavigationController+Cloudox.h"; sourceTree = "<group>"; };
+		697CA29C1EF384BE00F853AF /* UINavigationController+Cloudox.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UINavigationController+Cloudox.m"; sourceTree = "<group>"; };
+		697CA29D1EF384BE00F853AF /* UIViewController+Cloudox.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIViewController+Cloudox.h"; sourceTree = "<group>"; };
+		697CA29E1EF384BE00F853AF /* UIViewController+Cloudox.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIViewController+Cloudox.m"; sourceTree = "<group>"; };
+		697CA2A11EF3D2C600F853AF /* faxianModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = faxianModel.h; sourceTree = "<group>"; };
+		697CA2A21EF3D2C600F853AF /* faxianModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = faxianModel.m; sourceTree = "<group>"; };
+		697CA2A41EF3D2E800F853AF /* faxianSubModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = faxianSubModel.h; sourceTree = "<group>"; };
+		697CA2A51EF3D2E800F853AF /* faxianSubModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = faxianSubModel.m; sourceTree = "<group>"; };
+		697CA2A71EF3D37800F853AF /* DiscoverHeader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DiscoverHeader.h; sourceTree = "<group>"; };
 		6985B92F1D7404EE0081BCBD /* iAppInfos.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = iAppInfos.framework; path = "Pods/../build/Debug-iphoneos/iAppInfos/iAppInfos.framework"; sourceTree = "<group>"; };
 		6985B9301D7404EE0081BCBD /* SAMTextView.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SAMTextView.framework; path = "Pods/../build/Debug-iphoneos/SAMTextView/SAMTextView.framework"; sourceTree = "<group>"; };
 		6985B9331D740F690081BCBD /* TTTAttributedLabel.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = TTTAttributedLabel.framework; path = "Pods/../build/Debug-iphoneos/TTTAttributedLabel/TTTAttributedLabel.framework"; sourceTree = "<group>"; };
@@ -1318,6 +1334,7 @@
 		6300DB141D05647F00B82C42 /* External */ = {
 			isa = PBXGroup;
 			children = (
+				697CA29A1EF384BE00F853AF /* NavigationBarAlphaSet */,
 				69A0E3CF1EF28F8B008A0A48 /* HHHorizontalPagingView */,
 				E91A531E1E8E3454005D2F68 /* Masonry */,
 				E956E0341E66B9DB00444F06 /* IAPHelper */,
@@ -1858,6 +1875,17 @@
 			path = View;
 			sourceTree = "<group>";
 		};
+		697CA29A1EF384BE00F853AF /* NavigationBarAlphaSet */ = {
+			isa = PBXGroup;
+			children = (
+				697CA29B1EF384BE00F853AF /* UINavigationController+Cloudox.h */,
+				697CA29C1EF384BE00F853AF /* UINavigationController+Cloudox.m */,
+				697CA29D1EF384BE00F853AF /* UIViewController+Cloudox.h */,
+				697CA29E1EF384BE00F853AF /* UIViewController+Cloudox.m */,
+			);
+			path = NavigationBarAlphaSet;
+			sourceTree = "<group>";
+		};
 		699165191EE0F818001914EB /* ClassCells */ = {
 			isa = PBXGroup;
 			children = (
@@ -2014,6 +2042,7 @@
 				69C712041EC0740E00F2729E /* Controller */,
 				69C7120B1EC0740E00F2729E /* Model */,
 				69C7120C1EC0740E00F2729E /* View */,
+				697CA2A71EF3D37800F853AF /* DiscoverHeader.h */,
 			);
 			path = Discover;
 			sourceTree = "<group>";
@@ -2034,6 +2063,10 @@
 		69C7120B1EC0740E00F2729E /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				697CA2A11EF3D2C600F853AF /* faxianModel.h */,
+				697CA2A21EF3D2C600F853AF /* faxianModel.m */,
+				697CA2A41EF3D2E800F853AF /* faxianSubModel.h */,
+				697CA2A51EF3D2E800F853AF /* faxianSubModel.m */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -2520,6 +2553,8 @@
 				69C712D91EC0740F00F2729E /* zhuboXiangQingTabelView.m */,
 				69C712DA1EC0740F00F2729E /* zhuboxiangqingVCNew.h */,
 				69C712DB1EC0740F00F2729E /* zhuboxiangqingVCNew.m */,
+				697CA2971EF3678F00F853AF /* zhuboXiangQingVCNewController.h */,
+				697CA2981EF3678F00F853AF /* zhuboXiangQingVCNewController.m */,
 			);
 			path = AchorVC;
 			sourceTree = "<group>";
@@ -3402,6 +3437,7 @@
 				6957459C1D5C7384001022AD /* UIImageView+Night.m in Sources */,
 				695745A71D5C7384001022AD /* UISearchBar+Night.m in Sources */,
 				69C7139F1EC0740F00F2729E /* RewardListViewController.m in Sources */,
+				697CA2991EF3678F00F853AF /* zhuboXiangQingVCNewController.m in Sources */,
 				E956E03E1E66B9DB00444F06 /* IAPShare.m in Sources */,
 				69C713491EC0740F00F2729E /* lunboxiangqingVC.m in Sources */,
 				695745AC1D5C7384001022AD /* UITextField+Night.m in Sources */,
@@ -3442,6 +3478,7 @@
 				695873221EF11ACC0011B174 /* MyClassroomListModel.m in Sources */,
 				E96ACDD71D6C6C41009856B1 /* CTAssetsPickerController.m in Sources */,
 				69C7138D1EC0740F00F2729E /* SheZhiVC.m in Sources */,
+				697CA29F1EF384BE00F853AF /* UINavigationController+Cloudox.m in Sources */,
 				69C713701EC0740F00F2729E /* DownloadTableViewCell.m in Sources */,
 				69C713C41EC0754200F2729E /* BlogTableViewCell.m in Sources */,
 				6353EB1F1D1BCC73003A1B2A /* TBCircleScrollView.m in Sources */,
@@ -3527,9 +3564,11 @@
 				69C7135B1EC0740F00F2729E /* zhaohuiyanzhengmaVC.m in Sources */,
 				69C713A51EC0740F00F2729E /* HeNanAudioManager.m in Sources */,
 				6300DB3E1D05648F00B82C42 /* SDWebImageManager.m in Sources */,
+				697CA2A01EF384BE00F853AF /* UIViewController+Cloudox.m in Sources */,
 				695745A11D5C7384001022AD /* UIBarButtonItem+Night.m in Sources */,
 				E91D53B31D93719A008B8564 /* NSBundle+MJRefresh.m in Sources */,
 				6300DB611D0565B300B82C42 /* AFHTTPSessionManager.m in Sources */,
+				697CA2A61EF3D2E800F853AF /* faxianSubModel.m in Sources */,
 				E91A53401E8E3455005D2F68 /* NSArray+MASAdditions.m in Sources */,
 				69C713711EC0740F00F2729E /* SelectedNewsTypeView.m in Sources */,
 				69C713641EC0740F00F2729E /* wodeguanzhuVC.m in Sources */,
@@ -3682,6 +3721,7 @@
 				69C713A21EC0740F00F2729E /* AKAlertView.m in Sources */,
 				6300DB3A1D05648F00B82C42 /* SDWebImageCompat.m in Sources */,
 				69C7137C1EC0740F00F2729E /* PersonalUnreadViewController.m in Sources */,
+				697CA2A31EF3D2C600F853AF /* faxianModel.m in Sources */,
 				E91D53B01D93719A008B8564 /* MJRefreshStateHeader.m in Sources */,
 				695745971D5C7384001022AD /* CALayer+Night.m in Sources */,
 				695745A61D5C7384001022AD /* UIProgressView+Night.m in Sources */,

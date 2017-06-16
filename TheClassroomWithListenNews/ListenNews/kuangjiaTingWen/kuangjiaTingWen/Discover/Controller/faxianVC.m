@@ -102,7 +102,7 @@
     SouSuoquanjvIndexPath = nil;
     
     if ([[CommonCode readFromUserD:@"faxianDataArr"] isKindOfClass:[NSArray class]]){
-        self.faxianArrM = [[NSMutableArray alloc]initWithArray:[CommonCode readFromUserD:@"faxianDataArr"]];
+        self.faxianArrM = [faxianModel mj_objectArrayWithKeyValuesArray:[CommonCode readFromUserD:@"faxianDataArr"]];
         [self.faxianTableView reloadData];
     }
     
@@ -111,7 +111,7 @@
     [self.view addSubview:self.SouSuotableView];
     [self.view addSubview:self.SouSuosearchBar];
     [self.view addSubview:self.SouSuosousuoTableView];
-    [self.view addSubview:self.faxianTableView];
+    [self.view insertSubview:self.faxianTableView atIndex:0];
     
     //播放下一条自动加载更多新闻信息通知
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(zidongjiazai:) name:@"faxianbofangyaojiazaishujv" object:nil];
@@ -121,6 +121,7 @@
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
+//    self.navBarBgAlpha = @"0.0";
     [self.navigationController setNavigationBarHidden:YES animated:YES];
     [self loadData];
 }
@@ -182,8 +183,8 @@
     }
     else{
         //TODO:发现课堂模块
-        return self.faxianArrM.count + [[self.faxianArrM firstObject][@"data"] count] - 1;
-//        return self.faxianArrM.count;
+        faxianModel *model = [self.faxianArrM firstObject];
+        return self.faxianArrM.count + [model.data count] - 1;
     }
 }
 
@@ -273,6 +274,7 @@
                     if (IS_IPAD) {
                         [imgLeft setFrame:CGRectMake(SCREEN_WIDTH - 125.0 / 375 * IPHONE_W, 19, 105.0 / 375 * IPHONE_W, 70.0 / 375 *IPHONE_W)];
                     }
+                    RTLog(@"%@----%@",NEWSSEMTPHOTOURL(self.SouSuodataArrM[indexPath.row][@"smeta"]),self.SouSuodataArrM[indexPath.row][@"smeta"]);
                     [imgLeft sd_setImageWithURL:[NSURL URLWithString:NEWSSEMTPHOTOURL(self.SouSuodataArrM[indexPath.row][@"smeta"])]];
                     imgLeft.contentMode = UIViewContentModeScaleAspectFill;
                     imgLeft.clipsToBounds = YES;
@@ -371,7 +373,7 @@
             }
             else {
             UIImageView *imgLeft = [[UIImageView alloc]initWithFrame:CGRectMake(SCREEN_WIDTH - 125.0 / 375 * IPHONE_W, 19, 105.0 / 375 * IPHONE_W,   84.72 / 375 *IPHONE_W)];
-            [imgLeft sd_setImageWithURL:[NSURL URLWithString:self.SouSuodataArrM[indexPath.row][@"smeta"]]];
+            [imgLeft sd_setImageWithURL:[NSURL URLWithString:NEWSSEMTPHOTOURL(self.SouSuodataArrM[indexPath.row][@"smeta"])]];
             //placeholderImage:[UIImage imageNamed:@"thumbnailsdefault"]
             [cell.contentView addSubview:imgLeft];
             imgLeft.contentMode = UIViewContentModeScaleAspectFill;
@@ -501,18 +503,24 @@
 //        faxiantitleLab.text = self.faxianArrM[indexPath.row][@"type"];
         
 //        //TODO:发现课堂模块
-        if (indexPath.row == 0 || indexPath.row >= [[self.faxianArrM firstObject][@"data"] count]) {
+        RTLog(@"%ld",indexPath.row);
+        faxianModel *firstModel = [self.faxianArrM firstObject];
+        faxianSubModel *subModel;
+        faxianModel *model2;
+        if (indexPath.row == 0 || indexPath.row >= [firstModel.data count]) {
             [cell.contentView addSubview:faxiantitleLab];
             [cell.contentView addSubview:faxiangengduoBtn];
             [cell.contentView addSubview:faxianjiantou];
         }
         if (indexPath.row == 0) {
-            faxiantitleLab.text = self.faxianArrM[indexPath.row][@"type"];
+            faxiantitleLab.text = firstModel.type;
         }
-        else if (indexPath.row >= [[self.faxianArrM firstObject][@"data"] count]){
-            faxiantitleLab.text = self.faxianArrM[indexPath.row - [[self.faxianArrM firstObject][@"data"] count] + 1][@"type"];
+        else if (indexPath.row >= [firstModel.data count]){
+            model2 = self.faxianArrM[indexPath.row - [firstModel.data count] + 1];
+            faxiantitleLab.text = model2.type;
         }
-        if (indexPath.row < [[self.faxianArrM firstObject][@"data"] count]){
+        if (indexPath.row < [firstModel.data count]){
+            subModel = firstModel.data[indexPath.row];
             CGFloat tempHeight = 0;
             if (indexPath.row == 0) {
                 tempHeight = 27.5;
@@ -527,17 +535,12 @@
             }
             [imgLeft.layer setMasksToBounds:YES];
             [imgLeft.layer setCornerRadius:5.0];
-            NSString *imgUrl = [NSString stringWithFormat:@"%@",[[self.faxianArrM firstObject][@"data"][indexPath.row][@"images"] stringByReplacingOccurrencesOfString:@"\\" withString:@""]];
-            NSString *imgUrl1 = [imgUrl stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-            NSString *imgUrl2 = [imgUrl1 stringByReplacingOccurrencesOfString:@"thumb:" withString:@""];
-            NSString *imgUrl3 = [imgUrl2 stringByReplacingOccurrencesOfString:@"{" withString:@""];
-            NSString *imgUrl4 = [imgUrl3 stringByReplacingOccurrencesOfString:@"}" withString:@""];
-            if ([imgUrl4  rangeOfString:@"http"].location != NSNotFound){
-                [imgLeft sd_setImageWithURL:[NSURL URLWithString:imgUrl4]];
+            if ([NEWSSEMTPHOTOURL(subModel.images)  rangeOfString:@"http"].location != NSNotFound){
+                [imgLeft sd_setImageWithURL:[NSURL URLWithString:NEWSSEMTPHOTOURL(subModel.images)]];
                 //placeholderImage:[UIImage imageNamed:@"thumbnailsdefault"]
             }
             else{
-                NSString *str = USERPOTOAD(imgUrl4);
+                NSString *str = USERPOTOAD(NEWSSEMTPHOTOURL(subModel.images));
                 [imgLeft sd_setImageWithURL:[NSURL URLWithString:str]];
                 //placeholderImage:[UIImage imageNamed:@"thumbnailsdefault"]
             }
@@ -546,9 +549,10 @@
             imgLeft.contentMode = UIViewContentModeScaleAspectFill;
             imgLeft.clipsToBounds = YES;
             
+            faxianSubModel *subModel2 = firstModel.data[indexPath.row];
             //标题
             UILabel *classTitle = [[UILabel alloc]initWithFrame:CGRectMake(CGRectGetMaxX(imgLeft.frame) + 5.0 / 375 * IPHONE_W, imgLeft.frame.origin.y,  SCREEN_WIDTH - CGRectGetMaxX(imgLeft.frame) - 70.0 / 375 * IPHONE_W, 21.0 / 667 *IPHONE_H)];
-            classTitle.text = [self.faxianArrM firstObject][@"data"][indexPath.row][@"name"];
+            classTitle.text = subModel2.name;
             classTitle.textColor = [UIColor blackColor];
             classTitle.textAlignment = NSTextAlignmentLeft;
             classTitle.font = [UIFont boldSystemFontOfSize:16.0f ];
@@ -559,7 +563,7 @@
             classTitle.frame = CGRectMake(classTitle.frame.origin.x, classTitle.frame.origin.y, classTitle.frame.size.width, size.height);
             //价钱
             UILabel *price = [[UILabel alloc]initWithFrame:CGRectMake(CGRectGetMaxX(classTitle.frame) + 10, classTitle.frame.origin.y,40.0 / 375 * IPHONE_W, 21.0 / 667 *IPHONE_H)];
-            price.text = [NSString stringWithFormat:@"￥%ld",[[self.faxianArrM firstObject][@"data"][indexPath.row][@"price"] integerValue]];
+            price.text = [NSString stringWithFormat:@"￥%ld",[subModel2.price integerValue]];
             price.font = gFontMain14;
             price.textColor = gMainColor;
             [cell.contentView addSubview:price];
@@ -572,7 +576,7 @@
             else{
                 [describe setFrame:CGRectMake(classTitle.frame.origin.x, 60.0 * 667.0/SCREEN_HEIGHT + tempHeight, SCREEN_WIDTH - CGRectGetMaxX(imgLeft.frame) - 20.0 / 375 * IPHONE_W, 21.0 / 667 *IPHONE_H)];
             }
-            describe.text = [self.faxianArrM firstObject][@"data"][indexPath.row][@"description"];
+            describe.text = subModel2.Description;
             describe.textColor = [[UIColor grayColor]colorWithAlphaComponent:0.7f];
             describe.textColor = gTextColorSub;
             describe.textAlignment = NSTextAlignmentLeft;
@@ -584,11 +588,12 @@
             describe.frame = CGRectMake(describe.frame.origin.x, describe.frame.origin.y, describe.frame.size.width, size1.height);
             cell.selectionStyle = UITableViewCellSelectionStyleNone;
         }
-        else if (indexPath.row == [[self.faxianArrM firstObject][@"data"] count]){
-            NSArray *arr = self.faxianArrM[indexPath.row - [[self.faxianArrM firstObject][@"data"] count] + 1][@"data"];
+        else if (indexPath.row == [firstModel.data count]){
+            NSArray *arr = model2.data;
             //主播
             for (int i = 0; i < arr.count; i ++ ){
-                faxianBtn *zhuboBtn = [[faxianBtn alloc]initWithImageUrlStr:self.faxianArrM[indexPath.row - [[self.faxianArrM firstObject][@"data"] count] + 1][@"data"][i][@"images"] andTitle:self.faxianArrM[indexPath.row - [[self.faxianArrM firstObject][@"data"] count] + 1][@"data"][i][@"name"] andIndex_row:(NSInteger *)indexPath.row forzhubo:YES];
+                faxianSubModel *currenSubModel = model2.data[i];
+                faxianBtn *zhuboBtn = [[faxianBtn alloc]initWithImageUrlStr:currenSubModel.images andTitle:currenSubModel.name andIndex_row:(NSInteger *)indexPath.row forzhubo:YES];
                 zhuboBtn.frame = CGRectMake(25.0 / 375 * IPHONE_W + (87.5 / 375 * IPHONE_W * i), 40.0 / 667 * IPHONE_H, 82.5 / 667 * IPHONE_H, 82.5 / 667 * IPHONE_H);
                 zhuboBtn.tag = i;
                 [zhuboBtn addTarget:self action:@selector(zhuboBtnAction:) forControlEvents:UIControlEventTouchUpInside];
@@ -598,10 +603,11 @@
         }
         else{
             //节目
-            NSArray *arr = self.faxianArrM[indexPath.row - [[self.faxianArrM firstObject][@"data"] count] + 1][@"data"];
+            NSArray *arr = model2.data;
             if ([arr isKindOfClass:[NSArray class]]){
                 for (int i = 0; i < arr.count; i ++ ){
-                    faxianBtn *zhuboBtn = [[faxianBtn alloc]initWithImageUrlStr:self.faxianArrM[indexPath.row- [[self.faxianArrM firstObject][@"data"] count] + 1][@"data"][i][@"images"] andTitle:self.faxianArrM[indexPath.row - [[self.faxianArrM firstObject][@"data"] count] + 1][@"data"][i][@"name"] andIndex_row:(NSInteger *)indexPath.row forzhubo:NO];
+                    faxianSubModel *currenSubModel = model2.data[i];
+                    faxianBtn *zhuboBtn = [[faxianBtn alloc]initWithImageUrlStr:currenSubModel.images andTitle:currenSubModel.name andIndex_row:(NSInteger *)indexPath.row forzhubo:NO];
                     zhuboBtn.frame = CGRectMake((120.0 / 375 * IPHONE_W) * i, 40.0 / 667 * IPHONE_H, 120.0 / 667 * SCREEN_HEIGHT, 120.0 / 667 * SCREEN_HEIGHT);
                     zhuboBtn.tag = i;
                     [zhuboBtn addTarget:self action:@selector(zhuboBtnAction:) forControlEvents:UIControlEventTouchUpInside];
@@ -610,33 +616,6 @@
             }
             cell.selectionStyle = UITableViewCellSelectionStyleNone;
         }
-        
-//        if (indexPath.row == 0) {
-//            NSArray *arr = self.faxianArrM[indexPath.row][@"data"];
-//            //主播
-//            for (int i = 0; i < arr.count; i ++ ){
-//                faxianBtn *zhuboBtn = [[faxianBtn alloc]initWithImageUrlStr:self.faxianArrM[indexPath.row][@"data"][i][@"images"] andTitle:self.faxianArrM[indexPath.row ][@"data"][i][@"name"] andIndex_row:(NSInteger *)indexPath.row forzhubo:YES];
-//                zhuboBtn.frame = CGRectMake(25.0 / 375 * IPHONE_W + (87.5 / 375 * IPHONE_W * i), 40.0 / 667 * IPHONE_H, 82.5 / 667 * IPHONE_H, 82.5 / 667 * IPHONE_H);
-//                zhuboBtn.tag = i;
-//                [zhuboBtn addTarget:self action:@selector(zhuboBtnAction:) forControlEvents:UIControlEventTouchUpInside];
-//                [cell.contentView addSubview:zhuboBtn];
-//                cell.selectionStyle = UITableViewCellSelectionStyleNone;
-//            }
-//        }
-//        else{
-//            //节目
-//            NSArray *arr = self.faxianArrM[indexPath.row ][@"data"];
-//            if ([arr isKindOfClass:[NSArray class]]){
-//                for (int i = 0; i < arr.count; i ++ ){
-//                    faxianBtn *zhuboBtn = [[faxianBtn alloc]initWithImageUrlStr:self.faxianArrM[indexPath.row][@"data"][i][@"images"] andTitle:self.faxianArrM[indexPath.row ][@"data"][i][@"name"] andIndex_row:(NSInteger *)indexPath.row forzhubo:NO];
-//                    zhuboBtn.frame = CGRectMake((120.0 / 375 * IPHONE_W) * i, 40.0 / 667 * IPHONE_H, 120.0 / 667 * SCREEN_HEIGHT, 120.0 / 667 * SCREEN_HEIGHT);
-//                    zhuboBtn.tag = i;
-//                    [zhuboBtn addTarget:self action:@selector(zhuboBtnAction:) forControlEvents:UIControlEventTouchUpInside];
-//                    [cell.contentView addSubview:zhuboBtn];
-//                }
-//            }
-//            cell.selectionStyle = UITableViewCellSelectionStyleNone;
-//        }
         return cell;
     }
 }
@@ -660,13 +639,14 @@
     }
     else{
         //TODO:发现课堂模块
+        faxianModel *model = [self.faxianArrM firstObject];
         if (indexPath.row == 0){
             return  147.5 / 667 * IPHONE_H;
         }
-        else if(indexPath.row < [[self.faxianArrM firstObject][@"data"] count]){
+        else if(indexPath.row < [model.data count]){
             return  120.0 / 667 * IPHONE_H;
         }
-        else if (indexPath.row == [[self.faxianArrM firstObject][@"data"] count]){
+        else if (indexPath.row == [model.data  count]){
             return 161.0 / 667 * IPHONE_H;
         }
         else{
@@ -895,7 +875,8 @@
     }
     else{
         //TODO：发现课堂模块
-        if (indexPath.row < [[self.faxianArrM firstObject][@"data"] count]) {
+        faxianModel *model = [self.faxianArrM firstObject];
+        if (indexPath.row < [model.data count]) {
 //            if ([[self.faxianArrM firstObject][@"data"][indexPath.row][@"is_free"] isEqualToString:@"1"]) {
 //                XWAlerLoginView *xw = [[XWAlerLoginView alloc]initWithTitle:@"已购买界面正在开发中"];
 //                [xw show];
@@ -908,16 +889,17 @@
 //                [self.navigationController pushViewController:vc animated:YES];
 //                self.hidesBottomBarWhenPushed = NO;
 //            }
-            NSDictionary *dic = [self.faxianArrM firstObject][@"data"][indexPath.row];
-            if ([dic[@"is_free"] isEqualToString:@"1"]) {
+            faxianSubModel *dic = model.data[indexPath.row];
+            if ([dic.is_free isEqualToString:@"1"]) {
                 zhuboxiangqingVCNew *faxianzhuboVC = [[zhuboxiangqingVCNew alloc]init];
-                faxianzhuboVC.jiemuDescription = dic[@"description"];
-                faxianzhuboVC.jiemuFan_num = dic[@"fan_num"];
-                faxianzhuboVC.jiemuID = dic[@"id"];
-                faxianzhuboVC.jiemuImages = dic[@"images"];
-                faxianzhuboVC.jiemuIs_fan = dic[@"is_fan"];
-                faxianzhuboVC.jiemuMessage_num = dic[@"message_num"];
-                faxianzhuboVC.jiemuName = dic[@"name"];                    faxianzhuboVC.isfaxian = YES;
+                faxianzhuboVC.jiemuDescription = dic.Description;
+                faxianzhuboVC.jiemuFan_num = dic.fan_num;
+                faxianzhuboVC.jiemuID = dic.ID;
+                faxianzhuboVC.jiemuImages = dic.images;
+                faxianzhuboVC.jiemuIs_fan = dic.is_fan;
+                faxianzhuboVC.jiemuMessage_num = dic.message_num;
+                faxianzhuboVC.jiemuName = dic.name;
+                faxianzhuboVC.isfaxian = YES;
                 faxianzhuboVC.isClass = YES;
                 self.hidesBottomBarWhenPushed=YES;
                 [self.navigationController pushViewController:faxianzhuboVC animated:YES];
@@ -925,9 +907,9 @@
                 
             }
             //跳转未购买课堂界面
-            else if ([dic[@"is_free"] isEqualToString:@"0"]){
+            else if ([dic.is_free isEqualToString:@"0"]){
                 ClassViewController *vc = [ClassViewController new];
-                vc.act_id = dic[@"id"];
+                vc.act_id = dic.ID;
                 self.hidesBottomBarWhenPushed = YES;
                 [self.navigationController.navigationBar setHidden:YES];
                 [self.navigationController pushViewController:vc animated:YES];
@@ -980,22 +962,26 @@
 
 #pragma mark - Utilities
 //发现列表点击主播的跳转事件
-- (void)zhuboBtnAction:(UIButton *)sender {
+- (void)zhuboBtnAction:(faxianBtn *)sender {
     UITableViewCell *cell = (UITableViewCell *)[[sender superview] superview];
     NSIndexPath *indexPath = [self.faxianTableView indexPathForCell:cell];
     //TODO:发现课堂模块
-    NSDictionary *dic = [[NSDictionary alloc]initWithDictionary:self.faxianArrM[indexPath.row - [[self.faxianArrM firstObject][@"data"] count] + 1 ][@"data"][sender.tag]];
+#warning 越界bug,崩溃
+    faxianModel *model = [self.faxianArrM firstObject];
+    faxianModel *model2 = self.faxianArrM[indexPath.row - [model.data count] + 1 ];
+    faxianSubModel *dic = model2.data[sender.tag];
+//    NSDictionary *dic = [[NSDictionary alloc]initWithDictionary:[@"data"][sender.tag]];
 //    NSDictionary *dic = [[NSDictionary alloc]initWithDictionary:self.faxianArrM[indexPath.row][@"data"][sender.tag]];
     
-    zhuboxiangqingVCNew *faxianzhuboVC = [[zhuboxiangqingVCNew alloc]init];
+    zhuboXiangQingVCNewController *faxianzhuboVC = [[zhuboXiangQingVCNewController alloc]init];
     faxianzhuboVC.isfaxian = YES;
-    faxianzhuboVC.jiemuDescription = dic[@"description"];
-    faxianzhuboVC.jiemuFan_num = dic[@"fan_num"];
-    faxianzhuboVC.jiemuID = dic[@"id"];
-    faxianzhuboVC.jiemuImages = dic[@"images"];
-    faxianzhuboVC.jiemuIs_fan = dic[@"is_fan"];
-    faxianzhuboVC.jiemuMessage_num = dic[@"message_num"];
-    faxianzhuboVC.jiemuName = dic[@"name"];
+    faxianzhuboVC.jiemuDescription = dic.Description;
+    faxianzhuboVC.jiemuFan_num = dic.fan_num;
+    faxianzhuboVC.jiemuID = dic.ID;
+    faxianzhuboVC.jiemuImages = dic.images;
+    faxianzhuboVC.jiemuIs_fan = dic.is_fan;
+    faxianzhuboVC.jiemuMessage_num = dic.message_num;
+    faxianzhuboVC.jiemuName = dic.name;
 //    if (indexPath.row > 0){
 //        faxianzhuboVC.act_table = @"act";
 //    }
@@ -1011,9 +997,11 @@
     UITableViewCell *cell = (UITableViewCell *)[[sender superview] superview];
     NSIndexPath *indexPath = [self.faxianTableView indexPathForCell:cell];
     //TODO:发现课堂模块
-    if (indexPath.row >= [[self.faxianArrM firstObject][@"data"]count]) {
+    faxianModel *model = [self.faxianArrM firstObject];
+    faxianModel *model2 = self.faxianArrM[indexPath.row - [model.data count] + 1];
+    if (indexPath.row >= [model.data count]) {
         faxianGengDuoVC *faxiangengduoVC = [[faxianGengDuoVC alloc]init];
-        faxiangengduoVC.term_id = [NSString stringWithFormat:@"%@",self.faxianArrM[indexPath.row - [[self.faxianArrM firstObject][@"data"] count] + 1][@"id"]];
+        faxiangengduoVC.term_id = [NSString stringWithFormat:@"%@",model2.ID];
         self.hidesBottomBarWhenPushed=YES;
         [self.navigationController pushViewController:faxiangengduoVC animated:YES];
         self.hidesBottomBarWhenPushed=NO;
@@ -1084,14 +1072,15 @@
     [NetWorkTool getPaoGuoShouYeSouSuoLieBiao:AvatarAccessToken sccess:^(NSDictionary *responseObject) {
         
         if ([responseObject[@"results"] isKindOfClass:[NSArray class]]){
-            self.faxianArrM = [[NSMutableArray alloc]initWithArray:responseObject[@"results"]];
+            self.faxianArrM = [faxianModel mj_objectArrayWithKeyValuesArray:responseObject[@"results"]];
             for (int i = 0; i < self.faxianArrM.count; i ++ ){
-                NSString *str = [NSString stringWithFormat:@"%@",self.faxianArrM[i][@"data"]];
+                faxianModel *model = self.faxianArrM[i];
+                NSString *str = [NSString stringWithFormat:@"%@",model.data];
                 if (str.length == 0){
                     [self.faxianArrM removeObjectAtIndex:i];
                 }
             }
-            [CommonCode writeToUserD:self.faxianArrM andKey:@"faxianDataArr"];
+            [CommonCode writeToUserD:responseObject[@"results"] andKey:@"faxianDataArr"];
             [self.faxianTableView reloadData];
         }
     } failure:^(NSError *error) {
@@ -1603,7 +1592,7 @@
 
 - (UISearchBar *)SouSuosearchBar {
     if (!_SouSuosearchBar) {
-        _SouSuosearchBar = [[UISearchBar alloc]initWithFrame:CGRectMake(20, 26, IPHONE_W - 40, 44)];
+        _SouSuosearchBar = [[UISearchBar alloc]initWithFrame:CGRectMake(20 , 26, IPHONE_W - 40, 44)];
         _SouSuosearchBar.delegate = self;
         _SouSuosearchBar.placeholder = @"搜索新闻、主播、节目";
         _SouSuosearchBar.showsCancelButton = NO;

@@ -144,11 +144,13 @@ typedef void(^animateBlock)();
 
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
-    [self.navigationController setNavigationBarHidden:NO animated:YES];
+//    [self.navigationController setNavigationBarHidden:NO animated:YES];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
+    
+//    self.navBarBgAlpha = @"0.0";
     [self.navigationController setNavigationBarHidden:YES animated:YES];
     if ([[CommonCode readFromUserD:@"isLogin"]boolValue] == YES){
         self.signInView.hidden = NO;

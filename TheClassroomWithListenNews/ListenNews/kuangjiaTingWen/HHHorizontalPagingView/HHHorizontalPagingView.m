@@ -24,12 +24,13 @@
 @property (nonatomic, assign) CGFloat            headerViewHeight;
 @property (nonatomic, assign) CGFloat            segmentBarHeight;
 @property (nonatomic, assign) BOOL               isSwitching;
-
+@property (assign, nonatomic) BOOL scrollLeftOrRight;
 @property (nonatomic, strong) NSMutableArray     *segmentButtonConstraintArray;
 
 @property (nonatomic, strong) UIView             *currentTouchView;
 @property (nonatomic, strong) UIButton           *currentTouchButton;
 
+@property (assign, nonatomic) NSInteger currenPageIndex;
 @end
 
 @implementation HHHorizontalPagingView
@@ -59,6 +60,7 @@ static NSInteger pagingButtonTag                 = 1000;
     pagingView.horizontalCollectionView.delegate                       = pagingView;
     pagingView.horizontalCollectionView.pagingEnabled                  = YES;
     pagingView.horizontalCollectionView.showsHorizontalScrollIndicator = NO;
+    pagingView.horizontalCollectionView.scrollEnabled = NO;
     pagingView.headerView                     = headerView;
     pagingView.segmentButtons                 = segmentButtons;
     pagingView.contentViews                   = contentViews;
@@ -151,6 +153,9 @@ static NSInteger pagingButtonTag                 = 1000;
             [_segmentView addSubview:segmentButton];
             
             if(i == 0) {
+                UIView *devider = [[UIView alloc] initWithFrame:CGRectMake(0, self.segmentTopSpace - 0.5, SCREEN_WIDTH, 0.5)];
+                devider.backgroundColor = [[UIColor grayColor]colorWithAlphaComponent:0.2f];
+                [_segmentView addSubview:devider];
                 [segmentButton setSelected:YES];
             }
             
@@ -184,15 +189,18 @@ static NSInteger pagingButtonTag                 = 1000;
     
     NSInteger clickIndex = segmentButton.tag-pagingButtonTag;
     
-    [self.horizontalCollectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:clickIndex inSection:0] atScrollPosition:UICollectionViewScrollPositionCenteredHorizontally animated:NO];
-    if(self.currentScrollView.contentOffset.y<-(self.headerViewHeight+self.segmentBarHeight)) {
-        [self.currentScrollView setContentOffset:CGPointMake(self.currentScrollView.contentOffset.x, -(self.headerViewHeight+self.segmentBarHeight)) animated:NO];
-    }else {
-        [self.currentScrollView setContentOffset:self.currentScrollView.contentOffset animated:NO];
+    if (clickIndex <4) {
+        [self.horizontalCollectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:clickIndex inSection:0] atScrollPosition:UICollectionViewScrollPositionCenteredHorizontally animated:NO];
+        if(self.currentScrollView.contentOffset.y<-(self.headerViewHeight+self.segmentBarHeight)) {
+            [self.currentScrollView setContentOffset:CGPointMake(self.currentScrollView.contentOffset.x, -(self.headerViewHeight+self.segmentBarHeight)) animated:NO];
+        }else {
+            [self.currentScrollView setContentOffset:self.currentScrollView.contentOffset animated:NO];
+        }
+        self.currentScrollView = self.contentViews[clickIndex];
+        
+        [self adjustContentViewOffset];
+
     }
-    self.currentScrollView = self.contentViews[clickIndex];
-    
-    [self adjustContentViewOffset];
     
     if(self.pagingViewSwitchBlock) {
         self.pagingViewSwitchBlock(clickIndex);
@@ -352,26 +360,33 @@ static NSInteger pagingButtonTag                 = 1000;
 }
 
 #pragma mark - UIScrollViewDelegate //侧滑切换底部多个View
+
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView {
     NSLog(@"scrollViewDidEndDecelerating---");
-    NSInteger currentPage = scrollView.contentOffset.x/[[UIScreen mainScreen] bounds].size.width;
     
-    for(UIButton *b in self.segmentButtons) {
-        if(b.tag - pagingButtonTag == currentPage) {
-            [b setSelected:YES];
-        }else {
-            [b setSelected:NO];
+    NSInteger currentPage = scrollView.contentOffset.x/[[UIScreen mainScreen] bounds].size.width;
+    //判断当前是否为整数，减少回调次数
+    if (currentPage == 0 ||currentPage == 1 ||currentPage == 2 ||currentPage == 3 ||currentPage == 4) {
+        
+        for(UIButton *b in self.segmentButtons) {
+            if(b.tag - pagingButtonTag == currentPage) {
+                [b setSelected:YES];
+            }else {
+                [b setSelected:NO];
+            }
+        }
+        
+        //判断是否为当前分页，如果是则不回调block
+        if (self.currenPageIndex != currentPage) {
+            
+            [self segmentButtonEvent:self.segmentButtons[currentPage]];
+            //保存当前分页
+            self.currenPageIndex = currentPage;
         }
     }
-    [self segmentButtonEvent:self.segmentButtons[currentPage]];
-//    self.currentScrollView = self.contentViews[currentPage];
-//    [self adjustContentViewOffset];
     
-    if(self.pagingViewSwitchBlock) {
-        self.pagingViewSwitchBlock(currentPage);
-    }
+    
 }
-
 - (void)dealloc {
     for(UIScrollView *v in self.contentViews) {
         [v.panGestureRecognizer removeObserver:self forKeyPath:NSStringFromSelector(@selector(state)) context:&HHHorizontalPagingViewPanContext];

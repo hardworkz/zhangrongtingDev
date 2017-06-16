@@ -43,11 +43,14 @@
 #import "Masonry.h"
 #import "SuNetworkMonitor.h"
 #import "HHHorizontalPagingView.h"
+#import "UINavigationController+Cloudox.h"
+#import "UIViewController+Cloudox.h"
 
 #import "PlayingHeader.h"
 #import "MineHeader.h"
 #import "HomePageHeader.h"
 #import "NotificationConfigHeader.h"
+#import "DiscoverHeader.h"
 
 #define pchfile_pch
 
