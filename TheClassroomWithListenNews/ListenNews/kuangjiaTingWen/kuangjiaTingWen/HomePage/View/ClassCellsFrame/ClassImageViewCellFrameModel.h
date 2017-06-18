@@ -11,7 +11,7 @@
 @interface ClassImageViewCellFrameModel : NSObject
 @property (copy, nonatomic) void (^downLoadImageSuccess)(UIImage *image);
 @property (strong, nonatomic) NSString *imageUrl;
-@property (strong, nonatomic) UIImage *image;
-@property (assign, nonatomic) CGRect imageViewF;
-@property (assign, nonatomic) CGFloat cellHeight;
+@property (strong, nonatomic,readonly) UIImage *image;
+@property (assign, nonatomic,readonly) CGRect imageViewF;
+@property (assign, nonatomic,readonly) CGFloat cellHeight;
 @end

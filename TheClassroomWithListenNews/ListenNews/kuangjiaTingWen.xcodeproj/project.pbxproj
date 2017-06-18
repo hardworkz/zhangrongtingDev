@@ -329,6 +329,8 @@
 		69C713BF1EC0740F00F2729E /* UIViewController+AutoBack.m in Sources */ = {isa = PBXBuildFile; fileRef = 69C713331EC0740F00F2729E /* UIViewController+AutoBack.m */; };
 		69C713C41EC0754200F2729E /* BlogTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 69C713C21EC0754200F2729E /* BlogTableViewCell.m */; };
 		69C713C51EC0754200F2729E /* BlogTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 69C713C31EC0754200F2729E /* BlogTableViewCell.xib */; };
+		74023B7D1EF63247001782A2 /* PageTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 74023B7C1EF63247001782A2 /* PageTableView.m */; };
+		74023B801EF6AD61001782A2 /* CustomPageView.m in Sources */ = {isa = PBXBuildFile; fileRef = 74023B7F1EF6AD61001782A2 /* CustomPageView.m */; };
 		8D926761588F84556F75E34C /* Pods_kuangjiaTingWen.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3C57B8198921BF624F827CA4 /* Pods_kuangjiaTingWen.framework */; };
 		E91382561D757CC200530838 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E91382551D757CC200530838 /* MobileCoreServices.framework */; };
 		E91382581D757CCC00530838 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E91382571D757CCC00530838 /* CFNetwork.framework */; };
@@ -1116,6 +1118,10 @@
 		69C713C11EC0754200F2729E /* BlogTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BlogTableViewCell.h; sourceTree = "<group>"; };
 		69C713C21EC0754200F2729E /* BlogTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BlogTableViewCell.m; sourceTree = "<group>"; };
 		69C713C31EC0754200F2729E /* BlogTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = BlogTableViewCell.xib; sourceTree = "<group>"; };
+		74023B7B1EF63247001782A2 /* PageTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PageTableView.h; sourceTree = "<group>"; };
+		74023B7C1EF63247001782A2 /* PageTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PageTableView.m; sourceTree = "<group>"; };
+		74023B7E1EF6AD61001782A2 /* CustomPageView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CustomPageView.h; sourceTree = "<group>"; };
+		74023B7F1EF6AD61001782A2 /* CustomPageView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CustomPageView.m; sourceTree = "<group>"; };
 		99090FC437CBB943372122F0 /* Pods-kuangjiaTingWen.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-kuangjiaTingWen.release.xcconfig"; path = "kuangjiaTingWen/Pods/Target Support Files/Pods-kuangjiaTingWen/Pods-kuangjiaTingWen.release.xcconfig"; sourceTree = "<group>"; };
 		E91382551D757CC200530838 /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
 		E91382571D757CCC00530838 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
@@ -1940,6 +1946,10 @@
 			children = (
 				69A0E3D01EF28F8B008A0A48 /* HHHorizontalPagingView.h */,
 				69A0E3D11EF28F8B008A0A48 /* HHHorizontalPagingView.m */,
+				74023B7E1EF6AD61001782A2 /* CustomPageView.h */,
+				74023B7F1EF6AD61001782A2 /* CustomPageView.m */,
+				74023B7B1EF63247001782A2 /* PageTableView.h */,
+				74023B7C1EF63247001782A2 /* PageTableView.m */,
 			);
 			path = HHHorizontalPagingView;
 			sourceTree = "<group>";
@@ -3508,6 +3518,7 @@
 				636B58AC1D34D87600290681 /* IQSegmentedNextPrevious.m in Sources */,
 				636E338B1D01154C002BA6DD /* AppDelegate.m in Sources */,
 				69C713941EC0740F00F2729E /* XWAddView.m in Sources */,
+				74023B801EF6AD61001782A2 /* CustomPageView.m in Sources */,
 				69C713B71EC0740F00F2729E /* NSDateFormatter+Category.m in Sources */,
 				E953A78F1D660787006CCFD8 /* TTTAttributedLabel.m in Sources */,
 				695745911D5C7384001022AD /* DKColorTable.m in Sources */,
@@ -3711,6 +3722,7 @@
 				69C713961EC0740F00F2729E /* NetWorkTool.m in Sources */,
 				69C713571EC0740F00F2729E /* LoginVC.m in Sources */,
 				634EA5051D139EC200108A51 /* TYSlidePageScrollView.m in Sources */,
+				74023B7D1EF63247001782A2 /* PageTableView.m in Sources */,
 				691907A41D3F74B00012A42E /* SVProgressAnimatedView.m in Sources */,
 				69C713851EC0740F00F2729E /* NewQAController.m in Sources */,
 				69919FC21ED2D17100E31757 /* UIButton+Extension.m in Sources */,

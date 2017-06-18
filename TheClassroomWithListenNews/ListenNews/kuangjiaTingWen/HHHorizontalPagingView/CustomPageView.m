@@ -1,23 +1,21 @@
 //
-//  HHHorizontalPagingView.m
-//  HHHorizontalPagingView
+//  CustomPageView.m
+//  kuangjiaTingWen
 //
-//  Created by Huanhoo on 15/7/16.
-//  Copyright (c) 2015年 Huanhoo. All rights reserved.
+//  Created by zhangrongting on 2017/6/18.
+//  Copyright © 2017年 zhimi. All rights reserved.
 //
 
-#import "HHHorizontalPagingView.h"
-#import "PageTableView.h"
+#import "CustomPageView.h"
 
-@interface HHHorizontalPagingView () <UICollectionViewDataSource, UICollectionViewDelegate>
-
+@interface CustomPageView ()<UIScrollViewDelegate>
 @property (nonatomic, weak)   UIView             *headerView;
 @property (nonatomic, strong) NSArray            *segmentButtons;
 @property (nonatomic, strong) NSArray            *contentViews;
 
 @property (nonatomic, strong, readwrite) UIView  *segmentView;
 
-@property (nonatomic, strong) UICollectionView   *horizontalCollectionView;
+@property (nonatomic, strong) UIScrollView   *horizontalScrollView;
 
 @property (nonatomic, weak)   UIScrollView       *currentScrollView;
 @property (nonatomic, strong) NSLayoutConstraint *headerOriginYConstraint;
@@ -34,34 +32,29 @@
 @property (assign, nonatomic) NSInteger currenPageIndex;
 @end
 
-@implementation HHHorizontalPagingView
+@implementation CustomPageView
 
-static void *HHHorizontalPagingViewScrollContext = &HHHorizontalPagingViewScrollContext;
-static void *HHHorizontalPagingViewPanContext    = &HHHorizontalPagingViewPanContext;
+static void *CustomPageViewScrollContext = &CustomPageViewScrollContext;
+static void *CustomPageViewPanContext    = &CustomPageViewPanContext;
 static NSString *pagingCellIdentifier            = @"PagingCellIdentifier";
 static NSInteger pagingButtonTag                 = 1000;
 
-#pragma mark - HHHorizontalPagingView
-+ (HHHorizontalPagingView *)pagingViewWithHeaderView:(UIView *)headerView
+#pragma mark - CustomPageView
++ (CustomPageView *)pagingViewWithHeaderView:(UIView *)headerView
                                         headerHeight:(CGFloat)headerHeight
                                       segmentButtons:(NSArray *)segmentButtons
                                        segmentHeight:(CGFloat)segmentHeight
                                         contentViews:(NSArray *)contentViews {
-    UICollectionViewFlowLayout *layout = [[UICollectionViewFlowLayout alloc] init];
-    layout.minimumLineSpacing          = 0.0;
-    layout.minimumInteritemSpacing     = 0.0;
-    layout.scrollDirection             = UICollectionViewScrollDirectionHorizontal;
-    
-    HHHorizontalPagingView *pagingView = [[HHHorizontalPagingView alloc] initWithFrame:CGRectMake(0., 0., [[UIScreen mainScreen] bounds].size.width, [[UIScreen mainScreen] bounds].size.height)];
-    
-    pagingView.horizontalCollectionView = [[UICollectionView alloc] initWithFrame:pagingView.frame collectionViewLayout:layout];
-    [pagingView.horizontalCollectionView registerClass:[UICollectionViewCell class] forCellWithReuseIdentifier:pagingCellIdentifier];
-    pagingView.horizontalCollectionView.backgroundColor                = [UIColor clearColor];
-    pagingView.horizontalCollectionView.dataSource                     = pagingView;
-    pagingView.horizontalCollectionView.delegate                       = pagingView;
-    pagingView.horizontalCollectionView.pagingEnabled                  = YES;
-    pagingView.horizontalCollectionView.showsHorizontalScrollIndicator = NO;
-    pagingView.horizontalCollectionView.scrollEnabled = NO;
+    //创建容器view
+    CustomPageView *pagingView = [[CustomPageView alloc] initWithFrame:CGRectMake(0., 0., [[UIScreen mainScreen] bounds].size.width, [[UIScreen mainScreen] bounds].size.height)];
+    //创建滚动控件view
+    pagingView.horizontalScrollView = [[UIScrollView alloc] initWithFrame:pagingView.bounds];
+    pagingView.horizontalScrollView.backgroundColor                = [UIColor clearColor];
+    pagingView.horizontalScrollView.delegate                       = pagingView;
+    pagingView.horizontalScrollView.pagingEnabled                  = YES;
+    pagingView.horizontalScrollView.showsHorizontalScrollIndicator = NO;
+    pagingView.horizontalScrollView.showsVerticalScrollIndicator = NO;
+    pagingView.horizontalScrollView.scrollEnabled = NO;
     pagingView.headerView                     = headerView;
     pagingView.segmentButtons                 = segmentButtons;
     pagingView.contentViews                   = contentViews;
@@ -69,10 +62,7 @@ static NSInteger pagingButtonTag                 = 1000;
     pagingView.segmentBarHeight               = segmentHeight;
     pagingView.segmentButtonConstraintArray   = [NSMutableArray array];
     
-    UICollectionViewFlowLayout *tempLayout = (id)pagingView.horizontalCollectionView.collectionViewLayout;
-    tempLayout.itemSize = pagingView.horizontalCollectionView.frame.size;
-    
-    [pagingView addSubview:pagingView.horizontalCollectionView];
+    [pagingView addSubview:pagingView.horizontalScrollView];
     [pagingView configureHeaderView];
     [pagingView configureSegmentView];
     [pagingView configureContentView];
@@ -108,14 +98,17 @@ static NSInteger pagingButtonTag                 = 1000;
 }
 
 - (void)configureContentView {
-    for(UIScrollView *v in self.contentViews) {
+    self.horizontalScrollView.contentSize = CGSizeMake(self.contentViews.count * SCREEN_WIDTH, 0);
+    for(int i = 0 ;i<self.contentViews.count;i++) {
+        UIScrollView *v = self.contentViews[i];
         [v  setContentInset:UIEdgeInsetsMake(self.headerViewHeight+self.segmentBarHeight, 0., v.contentInset.bottom, 0.)];
         v.alwaysBounceVertical = YES;
         v.showsVerticalScrollIndicator = NO;
         v.contentOffset = CGPointMake(0., -self.headerViewHeight-self.segmentBarHeight);
-        [v.panGestureRecognizer addObserver:self forKeyPath:NSStringFromSelector(@selector(state)) options:NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld context:&HHHorizontalPagingViewPanContext];
-        [v addObserver:self forKeyPath:NSStringFromSelector(@selector(contentOffset)) options:NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld context:&HHHorizontalPagingViewScrollContext];
-        
+        [v.panGestureRecognizer addObserver:self forKeyPath:NSStringFromSelector(@selector(state)) options:NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld context:&CustomPageViewPanContext];
+        [v addObserver:self forKeyPath:NSStringFromSelector(@selector(contentOffset)) options:NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld context:&CustomPageViewScrollContext];
+        v.frame = CGRectMake(SCREEN_WIDTH * i, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+        [self.horizontalScrollView addSubview:v];
     }
     self.currentScrollView = [self.contentViews firstObject];
 }
@@ -191,7 +184,7 @@ static NSInteger pagingButtonTag                 = 1000;
     NSInteger clickIndex = segmentButton.tag-pagingButtonTag;
     
     if (clickIndex <4) {
-        [self.horizontalCollectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:clickIndex inSection:0] atScrollPosition:UICollectionViewScrollPositionCenteredHorizontally animated:NO];
+        [self.horizontalScrollView setContentOffset:CGPointMake(clickIndex * SCREEN_WIDTH, self.horizontalScrollView.contentOffset.y) animated:NO];
         if(self.currentScrollView.contentOffset.y<-(self.headerViewHeight+self.segmentBarHeight)) {
             [self.currentScrollView setContentOffset:CGPointMake(self.currentScrollView.contentOffset.x, -(self.headerViewHeight+self.segmentBarHeight)) animated:NO];
         }else {
@@ -200,7 +193,7 @@ static NSInteger pagingButtonTag                 = 1000;
         self.currentScrollView = self.contentViews[clickIndex];
         
         [self adjustContentViewOffset];
-
+        
     }
     
     if(self.pagingViewSwitchBlock) {
@@ -234,7 +227,7 @@ static NSInteger pagingButtonTag                 = 1000;
 - (UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event {
     UIView *view = [super hitTest:point withEvent:event];
     if ([view isDescendantOfView:self.headerView] || [view isDescendantOfView:self.segmentView]) {
-        self.horizontalCollectionView.scrollEnabled = NO;
+        self.horizontalScrollView.scrollEnabled = NO;
         
         self.currentTouchView = nil;
         self.currentTouchButton = nil;
@@ -269,37 +262,6 @@ static NSInteger pagingButtonTag                 = 1000;
     
 }
 
-#pragma mark - UICollectionViewDataSource
-- (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
-    return [self.contentViews count];
-}
-
-- (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
-    self.isSwitching = YES;
-    UICollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:pagingCellIdentifier forIndexPath:indexPath];
-    cell.backgroundColor = [UIColor clearColor];
-    
-    for(UIView *subView in cell.contentView.subviews) {
-        [subView removeFromSuperview];
-    }
-    
-    [cell.contentView addSubview:self.contentViews[indexPath.row]];
-    UIScrollView *v = self.contentViews[indexPath.row];
-    
-    CGFloat scrollViewHeight = v.frame.size.height;
-    
-    v.translatesAutoresizingMaskIntoConstraints = NO;
-    [cell.contentView addConstraint:[NSLayoutConstraint constraintWithItem:v attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:cell.contentView attribute:NSLayoutAttributeTop multiplier:1 constant:0]];
-    [cell.contentView addConstraint:[NSLayoutConstraint constraintWithItem:v attribute:NSLayoutAttributeLeft relatedBy:NSLayoutRelationEqual toItem:cell.contentView attribute:NSLayoutAttributeLeft multiplier:1 constant:0]];
-    [cell.contentView addConstraint:[NSLayoutConstraint constraintWithItem:v attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual toItem:cell.contentView attribute:NSLayoutAttributeBottom multiplier:1 constant:scrollViewHeight == 0 ? 0 : -(cell.contentView.frame.size.height-v.frame.size.height)]];
-    [cell.contentView addConstraint:[NSLayoutConstraint constraintWithItem:v attribute:NSLayoutAttributeRight relatedBy:NSLayoutRelationEqual toItem:cell.contentView attribute:NSLayoutAttributeRight multiplier:1 constant:0]];
-    self.currentScrollView = v;
-    
-    [self adjustContentViewOffset];
-    
-    return cell;
-    
-}
 
 #pragma mark - Observer
 - (void)observeValueForKeyPath:(NSString *)keyPath
@@ -307,11 +269,11 @@ static NSInteger pagingButtonTag                 = 1000;
                         change:(NSDictionary *)change
                        context:(void *)context {
     
-    if(context == &HHHorizontalPagingViewPanContext) {
+    if(context == &CustomPageViewPanContext) {
         
-//        self.horizontalCollectionView.scrollEnabled = YES;
+        self.horizontalScrollView.scrollEnabled = YES;
         UIGestureRecognizerState state = [change[NSKeyValueChangeNewKey] integerValue];
-//        RTLog(@"observeValueForKeyPath--state%ld",(long)state);
+        //        RTLog(@"observeValueForKeyPath--state%ld",(long)state);
         //failed说明是点击事件
         if(state == UIGestureRecognizerStateFailed) {
             if(self.currentTouchButton) {
@@ -323,17 +285,17 @@ static NSInteger pagingButtonTag                 = 1000;
             self.currentTouchButton = nil;
         }
         
-    }else if (context == &HHHorizontalPagingViewScrollContext) {
+    }else if (context == &CustomPageViewScrollContext) {
         self.currentTouchView = nil;
         self.currentTouchButton = nil;
         
-//        if (self.isSwitching) {
-//            RTLog(@"return");
-//            return;
-//        }
-//        RTLog(@"headerOriginYConstraint---%f",self.headerOriginYConstraint.constant);
-//        RTLog(@"currentScrollViewY%f",self.currentScrollView.contentOffset.y);
-//        RTLog(@"%@",self.headerOriginYConstraint);
+        if (self.isSwitching) {
+            RTLog(@"return");
+            return;
+        }
+        //        RTLog(@"headerOriginYConstraint---%f",self.headerOriginYConstraint.constant);
+        //        RTLog(@"currentScrollViewY%f",self.currentScrollView.contentOffset.y);
+        //        RTLog(@"%@",self.headerOriginYConstraint);
         CGFloat oldOffsetY          = [change[NSKeyValueChangeOldKey] CGPointValue].y;
         CGFloat newOffsetY          = [change[NSKeyValueChangeNewKey] CGPointValue].y;
         CGFloat deltaY              = newOffsetY - oldOffsetY;
@@ -372,7 +334,7 @@ static NSInteger pagingButtonTag                 = 1000;
 
 /**
  适配滚动过程中导致的横屏切换头部与分页内容出现空白部分
-
+ 
  @param deltaY 移动距离
  */
 - (void)autoContentOffsetYWithDeltaY:(CGFloat)deltaY
@@ -384,8 +346,12 @@ static NSInteger pagingButtonTag                 = 1000;
     }
 }
 #pragma mark - UIScrollViewDelegate //侧滑切换底部多个View
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView
+{
+    RTLog(@"scrollViewDidScroll");
+}
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView {
-//    NSLog(@"scrollViewDidEndDecelerating---");
+    //    NSLog(@"scrollViewDidEndDecelerating---");
     
     NSInteger currentPage = scrollView.contentOffset.x/[[UIScreen mainScreen] bounds].size.width;
     //判断当前是否为整数，减少回调次数
@@ -409,8 +375,8 @@ static NSInteger pagingButtonTag                 = 1000;
 }
 - (void)dealloc {
     for(UIScrollView *v in self.contentViews) {
-        [v.panGestureRecognizer removeObserver:self forKeyPath:NSStringFromSelector(@selector(state)) context:&HHHorizontalPagingViewPanContext];
-        [v removeObserver:self forKeyPath:NSStringFromSelector(@selector(contentOffset)) context:&HHHorizontalPagingViewScrollContext];
+        [v.panGestureRecognizer removeObserver:self forKeyPath:NSStringFromSelector(@selector(state)) context:&CustomPageViewPanContext];
+        [v removeObserver:self forKeyPath:NSStringFromSelector(@selector(contentOffset)) context:&CustomPageViewScrollContext];
     }
 }
 - (void)pagingViewDidSelectedIndex:(NSInteger)index
@@ -418,6 +384,3 @@ static NSInteger pagingButtonTag                 = 1000;
     [self segmentButtonEvent:self.segmentButtons[index]];
 }
 @end
-// 版权属于原作者
-// http://code4app.com (cn) http://code4app.net (en)
-// 发布代码于最专业的源码分享网站: Code4App.com

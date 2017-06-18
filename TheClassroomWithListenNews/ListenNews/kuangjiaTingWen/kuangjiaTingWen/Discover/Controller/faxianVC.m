@@ -123,7 +123,7 @@
     [super viewWillAppear:animated];
 //    self.navBarBgAlpha = @"0.0";
     [self.navigationController setNavigationBarHidden:YES animated:YES];
-    [self loadData];
+//    [self loadData];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {

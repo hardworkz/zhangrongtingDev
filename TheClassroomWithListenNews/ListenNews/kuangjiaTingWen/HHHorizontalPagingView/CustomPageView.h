@@ -1,17 +1,15 @@
 //
-//  HHHorizontalPagingView.h
-//  HHHorizontalPagingView
+//  CustomPageView.h
+//  kuangjiaTingWen
 //
-//  Created by Huanhoo on 15/7/16.
-//  Copyright (c) 2015年 Huanhoo. All rights reserved.
+//  Created by zhangrongting on 2017/6/18.
+//  Copyright © 2017年 zhimi. All rights reserved.
 //
 
 #import <UIKit/UIKit.h>
 
-@class HHSegmentView;
-
-@interface HHHorizontalPagingView : UIView
-
+@class CustomPageView;
+@interface CustomPageView : UIView
 /**
  *  segment据顶部的距离
  */
@@ -53,7 +51,7 @@
  *
  *  @return  控件对象
  */
-+ (HHHorizontalPagingView *)pagingViewWithHeaderView:(UIView *)headerView
++ (CustomPageView *)pagingViewWithHeaderView:(UIView *)headerView
                                         headerHeight:(CGFloat)headerHeight
                                       segmentButtons:(NSArray *)segmentButtons
                                        segmentHeight:(CGFloat)segmentHeight
@@ -61,11 +59,9 @@
 
 /**
  设置按钮选中按钮方法
-
+ 
  @param index 选中按钮index
  */
 - (void)pagingViewDidSelectedIndex:(NSInteger)index;
+
 @end
-// 版权属于原作者
-// http://code4app.com (cn) http://code4app.net (en)
-// 发布代码于最专业的源码分享网站: Code4App.com

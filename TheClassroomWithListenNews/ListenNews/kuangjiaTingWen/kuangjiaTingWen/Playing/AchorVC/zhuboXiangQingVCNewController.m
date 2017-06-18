@@ -27,7 +27,7 @@
 #import "pinglunyeVC.h"
 #import "TTTAttributedLabel.h"
 #import "PinglundianzanCustomBtn.h"
-
+#import "PageTableView.h"
 
 @interface zhuboXiangQingVCNewController ()<UIScrollViewDelegate,UITableViewDataSource,UITableViewDelegate,TTTAttributedLabelDelegate,UITextFieldDelegate>
 {
@@ -58,7 +58,7 @@
     NSInteger selectedSwitchIndex;/**<选中按钮*/
 }
 
-//@property (strong, nonatomic) UIView *sectionHeadView;
+@property (weak, nonatomic) CustomPageView *pagingView;
 
 @property (strong,nonatomic)UIButton *selectBtn;
 
@@ -165,13 +165,13 @@
     
     //分页tableView
     for (int i = 0; i < 3; i ++ ){
-        UITableView *tableView = [[UITableView alloc]initWithFrame:CGRectMake(IPHONE_W * i, 0, IPHONE_W , IPHONE_H + 40.0/ 667 * SCREEN_HEIGHT) style:UITableViewStylePlain];
+        PageTableView *tableView = [[PageTableView alloc]initWithFrame:CGRectMake(IPHONE_W * i, 0, IPHONE_W , IPHONE_H + 40.0/ 667 * SCREEN_HEIGHT) style:UITableViewStylePlain];
         
         if (i == 0){
             xinwenshuaxinTableView = tableView;
         }
         else if (i == 1){
-            tableView = [[UITableView alloc]initWithFrame:CGRectMake(IPHONE_W * i + 1, 0, IPHONE_W , IPHONE_H + 30.0/ 667 * SCREEN_HEIGHT) style:UITableViewStyleGrouped];
+            tableView = [[PageTableView alloc]initWithFrame:CGRectMake(IPHONE_W * i + 1, 0, IPHONE_W , IPHONE_H + 30.0/ 667 * SCREEN_HEIGHT) style:UITableViewStyleGrouped];
             fansWallTableView = tableView;
             fansWallTableView.backgroundColor = [UIColor whiteColor];
             tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
@@ -208,7 +208,8 @@
     UIScrollView *scrollView = [[UIScrollView alloc] init];
     scrollView.backgroundColor = [UIColor whiteColor];
     
-    HHHorizontalPagingView *pagingView = [HHHorizontalPagingView pagingViewWithHeaderView:headerView headerHeight:273.0 / 667 * SCREEN_HEIGHT segmentButtons:buttonArray segmentHeight:52.0 / 667 * SCREEN_HEIGHT contentViews:@[xinwenshuaxinTableView, fansWallTableView, pinglunhoushuaxinTableView,scrollView]];
+    CustomPageView *pagingView = [CustomPageView pagingViewWithHeaderView:headerView headerHeight:273.0 / 667 * SCREEN_HEIGHT segmentButtons:buttonArray segmentHeight:52.0 / 667 * SCREEN_HEIGHT contentViews:@[xinwenshuaxinTableView, fansWallTableView, pinglunhoushuaxinTableView,scrollView]];
+    self.pagingView = pagingView;
     pagingView.pagingViewSwitchBlock = ^(NSInteger switchIndex) {
         RTLog(@"switchIndex---%ld",switchIndex);
         switch (switchIndex) {
@@ -278,8 +279,9 @@
             [self.navigationController pushViewController:vc animated:YES];
             self.hidesBottomBarWhenPushed=YES;
         }
-        
-        selectedSwitchIndex = switchIndex;
+        if (switchIndex != 4) {
+            selectedSwitchIndex = switchIndex;
+        }
     };
     pagingView.clickEventViewsBlock = ^(UIView *eventView) {
         RTLog(@"%@",eventView.class);
@@ -342,6 +344,9 @@
     [self xinwenRefresh:xinwenshuaxinTableView];
     [self fansRefresh:fansWallTableView];
     [self liuyanRefresh:pinglunhoushuaxinTableView];
+    if (selectedSwitchIndex != 4) {
+        [self.pagingView pagingViewDidSelectedIndex:selectedSwitchIndex];
+    }
     
     if (![bofangVC shareInstance].isPlay) {
         [[NSNotificationCenter defaultCenter] postNotificationName:@"stopAnimate" object:nil];

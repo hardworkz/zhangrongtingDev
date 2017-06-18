@@ -7,6 +7,7 @@
 //
 
 #import "ClassImageViewCellFrameModel.h"
+#import "UIImageView+WebCache.h"
 
 @implementation ClassImageViewCellFrameModel
 - (void)setImageUrl:(NSString *)imageUrl
@@ -35,6 +36,5 @@
             }
         }];
     }
-
 }
 @end
