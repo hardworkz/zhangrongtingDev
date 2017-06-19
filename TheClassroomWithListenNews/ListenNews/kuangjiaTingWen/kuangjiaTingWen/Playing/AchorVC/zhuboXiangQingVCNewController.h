@@ -17,6 +17,11 @@
 @property(nonatomic)NSString *jiemuMessage_num;
 @property(nonatomic)NSString *jiemuIs_fan;
 
+/**
+ <p><img src="http://admin.tingwen.me/data/upload/ueditor/20170302/58b79cdd44006.JPG" title="crop_579eb4995b499.JPG" alt="crop_579eb4995b499.JPG"/></p>
+ */
+@property(nonatomic)NSString *post_content;
+
 //@property(nonatomic)NSString *act_table;
 @property(nonatomic)BOOL isClass;/**<是否为课堂详情*/
 @property(nonatomic)BOOL isbofangye;/**<是否从播放器进入主播详情*/

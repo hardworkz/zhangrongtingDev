@@ -132,7 +132,7 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     MyClassroomListFrameModel *frameModel = self.dataSourceArr[indexPath.row];
-    zhuboxiangqingVCNew *faxianzhuboVC = [[zhuboxiangqingVCNew alloc]init];
+    zhuboXiangQingVCNewController *faxianzhuboVC = [[zhuboXiangQingVCNewController alloc]init];
     faxianzhuboVC.jiemuDescription = frameModel.model.Description;
     faxianzhuboVC.jiemuFan_num = frameModel.model.fan_num;
     faxianzhuboVC.jiemuID = frameModel.model.ID;

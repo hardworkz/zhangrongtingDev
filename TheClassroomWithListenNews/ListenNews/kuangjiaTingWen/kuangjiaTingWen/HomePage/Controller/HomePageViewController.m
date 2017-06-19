@@ -1210,7 +1210,7 @@
         //跳转已购买课堂界面
         MyClassroomListFrameModel *frameModel = self.classroomInfoArr[indexPath.row];
         if ([frameModel.model.is_free isEqualToString:@"1"]) {
-            zhuboxiangqingVCNew *faxianzhuboVC = [[zhuboxiangqingVCNew alloc]init];
+            zhuboXiangQingVCNewController *faxianzhuboVC = [[zhuboXiangQingVCNewController alloc]init];
             faxianzhuboVC.jiemuDescription = frameModel.model.Description;
             faxianzhuboVC.jiemuFan_num = frameModel.model.fan_num;
             faxianzhuboVC.jiemuID = frameModel.model.ID;

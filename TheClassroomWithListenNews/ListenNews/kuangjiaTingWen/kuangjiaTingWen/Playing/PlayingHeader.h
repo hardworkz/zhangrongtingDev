@@ -12,6 +12,7 @@
 #import "zhuboXiangQingVCNewController.h"
 
 #import "AppDelegate.h"
+#import "YJImageBrowserView.h"
 
 #import "NewsModel.h"
 #import "NewObj.h"
@@ -19,8 +20,10 @@
 
 #import "PlayVCCommentModel.h"
 #import "PlayVCCommentFrameModel.h"
+#import "AutoImageViewHeightFrameModel.h"
 
 #import "PlayVCCommentTableViewCell.h"
+#import "AutoImageTableViewCell.h"
 #import "zhuboxiangqingNewVCPlayBtn.h"
 
 #import "AKAlertView.h"

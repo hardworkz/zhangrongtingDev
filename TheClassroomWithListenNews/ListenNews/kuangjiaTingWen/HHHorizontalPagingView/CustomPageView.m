@@ -107,7 +107,7 @@ static NSInteger pagingButtonTag                 = 1000;
         v.contentOffset = CGPointMake(0., -self.headerViewHeight-self.segmentBarHeight);
         [v.panGestureRecognizer addObserver:self forKeyPath:NSStringFromSelector(@selector(state)) options:NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld context:&CustomPageViewPanContext];
         [v addObserver:self forKeyPath:NSStringFromSelector(@selector(contentOffset)) options:NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld context:&CustomPageViewScrollContext];
-        v.frame = CGRectMake(SCREEN_WIDTH * i, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+        v.frame = CGRectMake(SCREEN_WIDTH * i, 0, SCREEN_WIDTH, v.frame.size.height);
         [self.horizontalScrollView addSubview:v];
     }
     self.currentScrollView = [self.contentViews firstObject];
@@ -146,8 +146,8 @@ static NSInteger pagingButtonTag                 = 1000;
             [segmentButton addTarget:self action:@selector(segmentButtonEvent:) forControlEvents:UIControlEventTouchUpInside];
             [_segmentView addSubview:segmentButton];
             
-            if(i == 0) {
-                UIView *devider = [[UIView alloc] initWithFrame:CGRectMake(0, self.segmentTopSpace - 0.5, SCREEN_WIDTH, 0.5)];
+            if(i == [self.segmentButtons count] - 1) {
+                UIView *devider = [[UIView alloc] initWithFrame:CGRectMake(0, self.segmentBarHeight - 0.5, SCREEN_WIDTH, 0.5)];
                 devider.backgroundColor = [[UIColor grayColor]colorWithAlphaComponent:0.2f];
                 [_segmentView addSubview:devider];
                 [segmentButton setSelected:YES];
@@ -201,21 +201,6 @@ static NSInteger pagingButtonTag                 = 1000;
     }
 }
 
-- (void)adjustContentViewOffset {//侧滑切换底部页面调用，适配页面空白区域
-    self.isSwitching = YES;
-    //头部view不可见高度值
-    CGFloat headerViewDisplayHeight = self.headerViewHeight + self.headerView.frame.origin.y;
-    [self.currentScrollView layoutIfNeeded];
-    if(self.currentScrollView.contentOffset.y < -self.segmentBarHeight) {
-        [self.currentScrollView setContentOffset:CGPointMake(0, -headerViewDisplayHeight-self.segmentBarHeight)];
-    }else {
-        [self.currentScrollView setContentOffset:CGPointMake(0, self.currentScrollView.contentOffset.y-headerViewDisplayHeight)];
-    }
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0)), dispatch_get_main_queue(), ^{
-        RTLog(@"self.isSwitching = NO;");
-        self.isSwitching = NO;
-    });
-}
 
 - (BOOL)pointInside:(CGPoint)point withEvent:(nullable UIEvent *)event {
     if(point.x < 20) {
@@ -261,8 +246,6 @@ static NSInteger pagingButtonTag                 = 1000;
     [self configureSegmentButtonLayout];
     
 }
-
-
 #pragma mark - Observer
 - (void)observeValueForKeyPath:(NSString *)keyPath
                       ofObject:(__unused id)object
@@ -293,15 +276,14 @@ static NSInteger pagingButtonTag                 = 1000;
             RTLog(@"return");
             return;
         }
-        //        RTLog(@"headerOriginYConstraint---%f",self.headerOriginYConstraint.constant);
-        //        RTLog(@"currentScrollViewY%f",self.currentScrollView.contentOffset.y);
-        //        RTLog(@"%@",self.headerOriginYConstraint);
         CGFloat oldOffsetY          = [change[NSKeyValueChangeOldKey] CGPointValue].y;
         CGFloat newOffsetY          = [change[NSKeyValueChangeNewKey] CGPointValue].y;
         CGFloat deltaY              = newOffsetY - oldOffsetY;
         
         CGFloat headerViewHeight    = self.headerViewHeight;
         CGFloat headerDisplayHeight = self.headerViewHeight+self.headerOriginYConstraint.constant;
+        
+//        [self autoContentOffsetYWithDeltaY:deltaY];
         if(deltaY >= 0) {//向上滚动
             
             if(headerDisplayHeight - deltaY <= self.segmentTopSpace) {//判断是否到达悬停位置
@@ -309,6 +291,7 @@ static NSInteger pagingButtonTag                 = 1000;
             }else {//上拉约束
                 self.headerOriginYConstraint.constant -= deltaY;
             }
+            
             if(headerDisplayHeight <= self.segmentTopSpace) {
                 self.headerOriginYConstraint.constant = -headerViewHeight+self.segmentTopSpace;
             }
@@ -321,7 +304,7 @@ static NSInteger pagingButtonTag                 = 1000;
             
             if (headerDisplayHeight+self.segmentBarHeight <= -newOffsetY) {//下拉约束
                 self.headerOriginYConstraint.constant = -self.headerViewHeight-self.segmentBarHeight-self.currentScrollView.contentOffset.y;
-                RTLog(@"%f--%@",self.currentScrollView.contentOffset.y,self.currentScrollView);
+//                RTLog(@"%f--%@",self.currentScrollView.contentOffset.y,self.currentScrollView);
             }
             
             if (self.headerOriginYConstraint.constant > 0 && self.magnifyTopConstraint) {
@@ -331,28 +314,41 @@ static NSInteger pagingButtonTag                 = 1000;
     }
     
 }
-
+- (void)adjustContentViewOffset {//侧滑切换底部页面调用，适配页面空白区域
+    self.isSwitching = YES;
+    //头部view不可见高度值
+    CGFloat headerViewDisplayHeight = self.headerViewHeight + self.headerView.frame.origin.y;
+    [self.currentScrollView layoutIfNeeded];
+    if(self.currentScrollView.contentOffset.y < -self.segmentBarHeight) {
+        [self.currentScrollView setContentOffset:CGPointMake(0, -headerViewDisplayHeight-self.segmentBarHeight)];
+    }else {
+        [self.currentScrollView setContentOffset:CGPointMake(0, self.currentScrollView.contentOffset.y-headerViewDisplayHeight)];
+    }
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0)), dispatch_get_main_queue(), ^{
+        RTLog(@"self.isSwitching = NO;");
+        self.isSwitching = NO;
+    });
+}
 /**
  适配滚动过程中导致的横屏切换头部与分页内容出现空白部分
- 
- @param deltaY 移动距离
  */
-- (void)autoContentOffsetYWithDeltaY:(CGFloat)deltaY
+- (void)autoContentOffsetY
 {
+    CGFloat headerViewDisplayHeight = self.headerViewHeight + self.headerView.frame.origin.y;
     for (UIScrollView *v in self.contentViews) {
-        if (v.contentOffset.y > -self.segmentTopSpace) {//判断滚动是否达到悬停值
-            
+        if (![v isEqual:self.currentScrollView]) {
+            if(v.contentOffset.y < -self.segmentBarHeight) {
+                [v setContentOffset:CGPointMake(0, -headerViewDisplayHeight-self.segmentBarHeight)];
+            }else {
+                [v setContentOffset:CGPointMake(0, v.contentOffset.y-headerViewDisplayHeight)];
+            }
         }
     }
 }
 #pragma mark - UIScrollViewDelegate //侧滑切换底部多个View
-- (void)scrollViewDidScroll:(UIScrollView *)scrollView
+
+- (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
 {
-    RTLog(@"scrollViewDidScroll");
-}
-- (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView {
-    //    NSLog(@"scrollViewDidEndDecelerating---");
-    
     NSInteger currentPage = scrollView.contentOffset.x/[[UIScreen mainScreen] bounds].size.width;
     //判断当前是否为整数，减少回调次数
     if (currentPage == 0 ||currentPage == 1 ||currentPage == 2 ||currentPage == 3 ||currentPage == 4) {

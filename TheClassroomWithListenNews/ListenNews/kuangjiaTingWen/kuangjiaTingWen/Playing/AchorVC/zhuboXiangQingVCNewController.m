@@ -27,7 +27,6 @@
 #import "pinglunyeVC.h"
 #import "TTTAttributedLabel.h"
 #import "PinglundianzanCustomBtn.h"
-#import "PageTableView.h"
 
 @interface zhuboXiangQingVCNewController ()<UIScrollViewDelegate,UITableViewDataSource,UITableViewDelegate,TTTAttributedLabelDelegate,UITextFieldDelegate>
 {
@@ -43,6 +42,7 @@
     NSMutableArray *xinwenArr;
     NSMutableArray *fansArr;
     NSMutableArray *liuyanArr;
+    NSMutableArray *imageArr;
     
     
     int xinwenPageNumber;
@@ -54,8 +54,10 @@
     UITableView *pinglunhoushuaxinTableView;
     UITableView *fansWallTableView;
     UITableView *xinwenshuaxinTableView;
+    UITableView *ImageTableView;
     
     NSInteger selectedSwitchIndex;/**<选中按钮*/
+    NSInteger touchCount;
 }
 
 @property (weak, nonatomic) CustomPageView *pagingView;
@@ -77,12 +79,32 @@
 @property (strong, nonatomic) NSString *replyTouid;
 @property (strong, nonatomic) NSString *replyCommentid;
 
+@property (strong, nonatomic) UILabel *tipLabel;
 @end
 
 @implementation zhuboXiangQingVCNewController
-
+- (NSString *)imageUrlSubStringWithStr:(NSString *)string
+{
+    NSRange range;
+    
+    range = [string rangeOfString:@" title="];
+    
+    if (range.location != NSNotFound) {
+        
+        NSLog(@"found at location = %lu, length = %lu",(unsigned long)range.location,(unsigned long)range.length);
+        NSString *imageUrl = [string substringWithRange:NSMakeRange(13, range.location - 14)];
+        return imageUrl;
+        
+    }else{
+        
+        NSLog(@"Not Found");
+        return @"";
+        
+    }
+}
 - (void)viewDidLoad {
     [super viewDidLoad];
+    touchCount = 0;
     [self.navigationController setNavigationBarHidden:YES animated:YES];
 //    self.edgesForExtendedLayout = UIRectEdgeNone;
 //    self.automaticallyAdjustsScrollViewInsets = NO;
@@ -159,34 +181,40 @@
             [btn setTitle:@"下载"];
             btn.accessibilityLabel = @"下载";
         }
-        btn.frame = CGRectMake((75.0 / 375 * SCREEN_WIDTH) * i, 0, 75.0 / 375 * SCREEN_WIDTH, 62.0 / 667 * SCREEN_HEIGHT);
+        btn.frame = CGRectMake((75.0 / 375 * SCREEN_WIDTH) * i, 0, 75.0 / 375 * SCREEN_WIDTH, 52.0 / 667 * SCREEN_HEIGHT);
         [buttonArray addObject:btn];
     }
     
     //分页tableView
-    for (int i = 0; i < 3; i ++ ){
-        PageTableView *tableView = [[PageTableView alloc]initWithFrame:CGRectMake(IPHONE_W * i, 0, IPHONE_W , IPHONE_H + 40.0/ 667 * SCREEN_HEIGHT) style:UITableViewStylePlain];
+    for (int i = 0; i < 4; i ++ ){
+        UITableView *tableView = [[UITableView alloc]initWithFrame:CGRectMake(IPHONE_W * i, 0, IPHONE_W , IPHONE_H - 20/ 667 * SCREEN_HEIGHT) style:UITableViewStyleGrouped];
+        tableView.backgroundColor = [UIColor whiteColor];
         
         if (i == 0){
             xinwenshuaxinTableView = tableView;
         }
         else if (i == 1){
-            tableView = [[PageTableView alloc]initWithFrame:CGRectMake(IPHONE_W * i + 1, 0, IPHONE_W , IPHONE_H + 30.0/ 667 * SCREEN_HEIGHT) style:UITableViewStyleGrouped];
+            tableView = [[UITableView alloc]initWithFrame:CGRectMake(IPHONE_W * i + 1, 0, IPHONE_W , IPHONE_H - 20.0/ 667 * SCREEN_HEIGHT) style:UITableViewStyleGrouped];
+            tableView.backgroundColor = [UIColor whiteColor];
             fansWallTableView = tableView;
-            fansWallTableView.backgroundColor = [UIColor whiteColor];
             tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
         }
         else if (i == 2){
-            tableView.frame = CGRectMake(IPHONE_W * i + 2, 0, IPHONE_W, IPHONE_H - 50.0 / 667 * SCREEN_HEIGHT);
+            tableView.frame = CGRectMake(IPHONE_W * i + 2, 0, IPHONE_W, IPHONE_H - 20.0 / 667 * SCREEN_HEIGHT);
             pinglunhoushuaxinTableView = tableView;
+        }else if (i == 3){
+            tableView.frame = CGRectMake(IPHONE_W * i + 2, 0, IPHONE_W, IPHONE_H - 20.0 / 667 * SCREEN_HEIGHT);
+            tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
+            ImageTableView = tableView;
         }
+//        tableView.bounces = NO;
         tableView.delegate = self;
         tableView.dataSource = self;
         tableView.tag = 3 + i; // 3：节目 4：粉丝榜 5：留言
         tableView.scrollsToTop = NO;
         tableView.tableFooterView = [UIView new];
         if (i == 0){
-            tableView.mj_footer = [MJRefreshAutoStateFooter footerWithRefreshingBlock:^{
+            tableView.mj_footer = [MJRefreshAutoNormalFooter footerWithRefreshingBlock:^{
                 [self xinwenshanglajiazai:tableView];
             }];
             [tableView.mj_header beginRefreshing];
@@ -195,7 +223,7 @@
             [tableView.mj_header beginRefreshing];
         }
         else if (i == 2){
-            tableView.mj_footer = [MJRefreshAutoStateFooter footerWithRefreshingBlock:^{
+            tableView.mj_footer = [MJRefreshAutoNormalFooter footerWithRefreshingBlock:^{
                 [self liuyanshanglajiazai:tableView];
             }];
             [tableView.mj_header beginRefreshing];
@@ -205,16 +233,16 @@
     [picView setBackgroundColor:[UIColor whiteColor]];
     
     //详情页移动导航栏主框架
-    UIScrollView *scrollView = [[UIScrollView alloc] init];
-    scrollView.backgroundColor = [UIColor whiteColor];
     
-    CustomPageView *pagingView = [CustomPageView pagingViewWithHeaderView:headerView headerHeight:273.0 / 667 * SCREEN_HEIGHT segmentButtons:buttonArray segmentHeight:52.0 / 667 * SCREEN_HEIGHT contentViews:@[xinwenshuaxinTableView, fansWallTableView, pinglunhoushuaxinTableView,scrollView]];
+    CustomPageView *pagingView = [CustomPageView pagingViewWithHeaderView:headerView headerHeight:273.0 / 667 * SCREEN_HEIGHT segmentButtons:buttonArray segmentHeight:52.0 / 667 * SCREEN_HEIGHT contentViews:@[xinwenshuaxinTableView, fansWallTableView, pinglunhoushuaxinTableView,ImageTableView]];
     self.pagingView = pagingView;
     pagingView.pagingViewSwitchBlock = ^(NSInteger switchIndex) {
         RTLog(@"switchIndex---%ld",switchIndex);
         switch (switchIndex) {
             case 0:
                 if (selectedSwitchIndex == switchIndex) {
+//                    XWAlerLoginView *xw = [[XWAlerLoginView alloc] initWithTitle:@"刷新成功"];
+//                    [xw show];
                     [self xinwenRefresh:xinwenshuaxinTableView];
                 }else{
                     if (xinwenArr.count == 0) {
@@ -224,6 +252,8 @@
                 break;
             case 1:
                 if (selectedSwitchIndex == switchIndex) {
+//                    XWAlerLoginView *xw = [[XWAlerLoginView alloc] initWithTitle:@"刷新成功"];
+//                    [xw show];
                     [self fansRefresh:fansWallTableView];
                 }else{
                     if (_rewardListArray.count == 0) {
@@ -233,6 +263,8 @@
                 break;
             case 2:
                 if (selectedSwitchIndex == switchIndex) {
+//                    XWAlerLoginView *xw = [[XWAlerLoginView alloc] initWithTitle:@"刷新成功"];
+//                    [xw show];
                     [self liuyanRefresh:pinglunhoushuaxinTableView];
                 }else{
                     if (liuyanArr.count == 0) {
@@ -344,6 +376,13 @@
     [self xinwenRefresh:xinwenshuaxinTableView];
     [self fansRefresh:fansWallTableView];
     [self liuyanRefresh:pinglunhoushuaxinTableView];
+    //主播图片数据转换截取
+    NSMutableArray *imageUrlArray = [NSMutableArray arrayWithArray:@[[self imageUrlSubStringWithStr:self.post_content]]];
+    if ([[self imageUrlSubStringWithStr:self.post_content] isEqualToString:@""]) {
+        [imageUrlArray removeAllObjects];
+    }
+    [self imageArrayWithImageData:(NSMutableArray *)imageUrlArray];
+    
     if (selectedSwitchIndex != 4) {
         [self.pagingView pagingViewDidSelectedIndex:selectedSwitchIndex];
     }
@@ -439,6 +478,11 @@
 
 #pragma mark - Utilities
 
+/**
+ 新闻数据
+
+ @param tableView 对应tableview
+ */
 - (void)xinwenRefresh:(UITableView *)tableView{
     [NetWorkTool postPaoGuoZhuBoOrJieMuMessageWithID:self.jiemuID andpage:@"1" andlimit:@"10" sccess:^(NSDictionary *responseObject) {
         if ([responseObject[@"results"] isKindOfClass:[NSArray class]])
@@ -453,6 +497,11 @@
     }];
 }
 
+/**
+ 新闻上拉加载更多
+
+ @param tableView 对应tableview
+ */
 - (void)xinwenshanglajiazai:(UITableView *)tableView{
     xinwenPageNumber++;
     
@@ -469,6 +518,11 @@
     }];
 }
 
+/**
+ 粉丝数据
+
+ @param tableView 对应tableview
+ */
 - (void)fansRefresh:(UITableView *)tableView{
     fansPageNumber = 1;
     NSString *accesstoken = nil;
@@ -503,9 +557,13 @@
         //
         [tableView.mj_header endRefreshing];
     }];
-    
-    
 }
+
+/**
+ 留言数据
+
+ @param tableView 对应tableView
+ */
 - (void)liuyanRefresh:(UITableView *)tableView{
     
     liuyanPageNumber = 1;
@@ -523,6 +581,11 @@
     }];
 }
 
+/**
+ 留言上拉加载更多
+
+ @param tableView 对应tableview
+ */
 - (void)liuyanshanglajiazai:(UITableView *)tableView{
     liuyanPageNumber ++ ;
     
@@ -539,6 +602,25 @@
     }];
 }
 
+/**
+ 图片数据
+
+ @param array 主播图片数组
+ */
+- (void)imageArrayWithImageData:(NSMutableArray *)array
+{
+    imageArr = [[NSMutableArray alloc]initWithArray:[AutoImageViewHeightFrameModel frameArrayWithImageUrlArray:array tableView:ImageTableView indexPath:[NSIndexPath indexPathForRow:0 inSection:0]]];
+    [ImageTableView reloadData];
+    if (imageArr.count == 0) {
+        [ImageTableView addSubview:self.tipLabel];
+    }
+}
+
+/**
+ 新闻数据上拉加载更多
+
+ @param notifacation 对应tableview
+ */
 - (void)zhuboxiangqingbofangJiaZai:(NSNotification *)notifacation {
     xinwenPageNumber++;
     
@@ -1435,17 +1517,32 @@
         [xinwenshuaxinTableView reloadData];
     }
 }
+
+/**
+ 图片列表点击显示大图
+
+ @param tap imageTap
+ */
+- (void)showZoomImageView:(UITapGestureRecognizer *)tap{
+    if (![(UIImageView *)tap.view image]) {
+        return;
+    }
+    [YJImageBrowserView showWithImageView:(UIImageView *)tap.view];
+}
 #pragma mark - UITableViewDelegate
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    if (tableView.tag == 3){
+    if ([tableView isEqual:xinwenshuaxinTableView]){
         return xinwenArr.count;
     }
-    else if (tableView.tag == 4){
+    else if ([tableView isEqual:fansWallTableView]){
         return self.rewardListArray.count;
     }
-    else if (tableView.tag == 5){
+    else if ([tableView isEqual:pinglunhoushuaxinTableView]){
         return liuyanArr.count;
+    }
+    else if ([tableView isEqual:ImageTableView]){
+        return imageArr.count;
     }
     else{
         return 0;
@@ -1454,7 +1551,7 @@
 
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
     //粉丝榜
-    if (tableView.tag == 4){
+    if ([tableView isEqual:fansWallTableView]){
         return 40.0f;
     }
     else{
@@ -1465,7 +1562,7 @@
 
 - (nullable UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section{
     //粉丝榜
-    if (tableView.tag == 4){
+    if ([tableView isEqual:fansWallTableView]){
         UIView *sectionHeadView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, 40)];
         [sectionHeadView setBackgroundColor:gSubColor];
         //TODO:我的排名
@@ -1518,7 +1615,7 @@
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     //新闻
-    if (tableView.tag == 3){
+    if ([tableView isEqual:xinwenshuaxinTableView]){
         static NSString *zhuboxiangqingxinwenIdentify = @"zhuboxiangqingxinwenIdentify";
         UITableViewCell *cell = [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:zhuboxiangqingxinwenIdentify];
         if (!cell){
@@ -1626,7 +1723,7 @@
         return cell;
     }
     //粉丝榜
-    else if (tableView.tag == 4){
+    else if ([tableView isEqual:fansWallTableView]){
         static NSString *identify = @"reWardCell";
         RewardListTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:identify];
         if (cell == nil) {
@@ -1638,7 +1735,7 @@
         return cell;
     }
     //留言
-    else if (tableView.tag == 5){
+    else if ([tableView isEqual:pinglunhoushuaxinTableView]){
         static NSString *pinglunIdentify = @"ZhuBopinglunIdentify";
         UITableViewCell *cell = [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:pinglunIdentify];
         if (!cell){
@@ -1782,7 +1879,15 @@
         }
         cell.tag = indexPath.row + 1000;
         return cell;
-    }else
+    }else if ([tableView isEqual:ImageTableView]){
+        AutoImageTableViewCell *cell = [AutoImageTableViewCell cellWithTableView:tableView];
+        cell.frameModel = imageArr[indexPath.row];
+        cell.tapImage = ^(UITapGestureRecognizer *tap) {
+            [self showZoomImageView:tap];
+        };
+        return cell;
+    }
+    else
     {
         UITableViewCell *cell = [[UITableViewCell alloc] init];
         return cell;
@@ -1791,20 +1896,25 @@
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    if (tableView.tag == 3){
+    if ([tableView isEqual:xinwenshuaxinTableView]){
         if (self.isClass) {
             return 70.0 / 667 * SCREEN_HEIGHT;
         }else{
             return 99.0 / 667 * SCREEN_HEIGHT;
         }
     }
-    else if (tableView.tag == 4){
+    else if ([tableView isEqual:fansWallTableView]){
         if (indexPath.row == 0 || indexPath.row == 1 || indexPath.row == 2){
             return 98.0;
         }
         else{
             return 75.0;
         }
+    }
+    else if ([tableView isEqual:ImageTableView]){
+        AutoImageViewHeightFrameModel *frameModel = imageArr[indexPath.row];
+        RTLog(@"%f",frameModel.imageViewF.size.height);
+        return frameModel.imageViewF.size.height + 10;
     }
     else{
         UITableViewCell *cell = (UITableViewCell *)[tableView viewWithTag:indexPath.row + 1000];
@@ -1816,7 +1926,7 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
     
-    if (tableView.tag == 3){
+    if ([tableView isEqual:xinwenshuaxinTableView]){
         if ([[CommonCode readFromUserD:@"dangqianbofangxinwenID"] isEqualToString:xinwenArr[indexPath.row][@"id"]]){
             
             if (self.isfaxian) {
@@ -1901,7 +2011,7 @@
             [tableView reloadData];
         }
     }
-    else if (tableView.tag == 4){
+    else if ([tableView isEqual:fansWallTableView]){
         NSMutableDictionary *components = self.rewardListArray[indexPath.row];
         gerenzhuyeVC *gerenzhuye = [gerenzhuyeVC new];
         if ([[CommonCode readFromUserD:@"dangqianUserUid"] isEqualToString:components[@"user_id"]] && [[CommonCode readFromUserD:@"isLogin"]boolValue] == YES) {
@@ -1920,7 +2030,7 @@
         self.hidesBottomBarWhenPushed=YES;
         
     }
-    else if (tableView.tag == 5){
+    else if ([tableView isEqual:pinglunhoushuaxinTableView]){
         //TODO:删除自己的留言 或者回复、复制
         NSDictionary *dic = liuyanArr[indexPath.row];
         if ([ExdangqianUserUid isEqualToString:dic[@"uid"]]) {
@@ -1945,7 +2055,6 @@
             } onCancel:^{
                 
             }];
-            
         }
         else{
             
@@ -1973,9 +2082,7 @@
             } onCancel:^{
                 
             }];
-            
         }
-        
     }
 }
 
@@ -2013,7 +2120,6 @@
     
 }
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView {
-    
     if (scrollView.tag == lastBtnTag - 7){
         if (scrollView.contentOffset.y > 0.0){
             
@@ -2059,6 +2165,22 @@
             }
         }
     }
+    //限制下拉刷新的调用频率，防止高度适配在调用频率过高的状态下错误
+    if(touchCount<1)
+    {
+        //不是频繁操作执行对应点击事件
+        [self.pagingView autoContentOffsetY];
+        touchCount++;
+        RTLog(@"autoContentOffsetY");
+    }
+    else
+    {
+        [self performSelector:@selector(timeSetting) withObject:nil afterDelay:0.5];//4秒后点击次数清零
+    }
+}
+-(void)timeSetting
+{
+    touchCount=0;
 }
 
 #pragma mark - TTTAttributedLabelDelegate
@@ -2092,6 +2214,17 @@ didSelectLinkWithTransitInformation:(NSDictionary *)components {
         [_myRanking setTextColor:gTextDownload];
     }
     return _myRanking;
+}
+- (UILabel *)tipLabel
+{
+    if (_tipLabel == nil) {
+        _tipLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, 50)];
+        _tipLabel.text = @"暂无数据";
+        _tipLabel.textAlignment = NSTextAlignmentCenter;
+        _tipLabel.font = [UIFont systemFontOfSize:20];
+        _tipLabel.textColor = [UIColor lightGrayColor];
+    }
+    return _tipLabel;
 }
 //- (UIView *)sectionHeadView
 //{
@@ -2140,4 +2273,8 @@ didSelectLinkWithTransitInformation:(NSDictionary *)components {
 //    }
 //    return _sectionHeadView;
 //}
+- (void)dealloc
+{
+    RTLog(@"dealloc");
+}
 @end

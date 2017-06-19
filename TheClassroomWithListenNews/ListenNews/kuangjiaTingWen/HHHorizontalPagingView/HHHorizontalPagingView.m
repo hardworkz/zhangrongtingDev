@@ -7,7 +7,6 @@
 //
 
 #import "HHHorizontalPagingView.h"
-#import "PageTableView.h"
 
 @interface HHHorizontalPagingView () <UICollectionViewDataSource, UICollectionViewDelegate>
 

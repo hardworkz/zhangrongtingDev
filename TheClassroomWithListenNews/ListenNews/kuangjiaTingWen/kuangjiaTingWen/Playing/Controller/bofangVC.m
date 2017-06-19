@@ -1395,7 +1395,7 @@ static bofangVC *_instance = nil;
 }
 
 - (void)zhuboBtnVAction:(UITapGestureRecognizer *)tap {
-    zhuboxiangqingVCNew *zhubo = [zhuboxiangqingVCNew new];
+    zhuboXiangQingVCNewController *zhubo = [zhuboXiangQingVCNewController new];
     zhubo.jiemuDescription = self.newsModel.jiemuDescription;
     zhubo.jiemuFan_num = self.newsModel.jiemuFan_num;
     zhubo.jiemuID = (self.newsModel.post_news != nil) ? self.newsModel.post_news : self.newsModel.jiemuID;

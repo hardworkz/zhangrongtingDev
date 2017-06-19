@@ -195,7 +195,7 @@
     else{
         dic = [[NSDictionary alloc]initWithDictionary:self.rankListInfoArr[indexPath.row]];
     }
-    zhuboxiangqingVCNew *faxianzhuboVC = [[zhuboxiangqingVCNew alloc]init];
+    zhuboXiangQingVCNewController *faxianzhuboVC = [[zhuboXiangQingVCNewController alloc]init];
     faxianzhuboVC.jiemuDescription = dic[@"description"];
     faxianzhuboVC.jiemuFan_num = dic[@"fan_num"];
     faxianzhuboVC.jiemuID = dic[@"id"];
@@ -203,6 +203,7 @@
     faxianzhuboVC.jiemuIs_fan = dic[@"is_fan"];
     faxianzhuboVC.jiemuMessage_num = dic[@"message_num"];
     faxianzhuboVC.jiemuName = dic[@"name"];
+    faxianzhuboVC.post_content = dic[@"post_content"];
     faxianzhuboVC.isfaxian = YES;
     self.hidesBottomBarWhenPushed=YES;
     [self.navigationController pushViewController:faxianzhuboVC animated:YES];

@@ -63,5 +63,8 @@
  @param index 选中按钮index
  */
 - (void)pagingViewDidSelectedIndex:(NSInteger)index;
-
+/**
+ 适配滚动过程中导致的横屏切换头部与分页内容出现空白部分,在分页tableview的scrollViewDidEndDecelerating代理方法中调用
+ */
+- (void)autoContentOffsetY;
 @end

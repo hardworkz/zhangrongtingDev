@@ -101,10 +101,14 @@
     self.CurrentSearchKeyWords = @"";
     SouSuoquanjvIndexPath = nil;
     
-    if ([[CommonCode readFromUserD:@"faxianDataArr"] isKindOfClass:[NSArray class]]){
-        self.faxianArrM = [faxianModel mj_objectArrayWithKeyValuesArray:[CommonCode readFromUserD:@"faxianDataArr"]];
-        [self.faxianTableView reloadData];
-    }
+//    if ([[CommonCode readFromUserD:@"faxianDataArr"] isKindOfClass:[NSArray class]]){
+//        self.faxianArrM = [faxianModel mj_objectArrayWithKeyValuesArray:[CommonCode readFromUserD:@"faxianDataArr"]];
+//        [self.faxianTableView reloadData];
+//    }
+    
+    self.faxianTableView.mj_header = [MJRefreshNormalHeader headerWithRefreshingBlock:^{
+        [self loadData];
+    }];
     
     [self loadData];
     
@@ -677,20 +681,8 @@
         if ([self.SearchActResultsArrM count]) {
             if (indexPath.section == 0) {
                 NSDictionary *dic = [[NSDictionary alloc]initWithDictionary:self.SearchActResultsArrM[indexPath.row]];
-//                zhuboxiangqingVCNew *faxianzhuboVC = [[zhuboxiangqingVCNew alloc]init];
-//                faxianzhuboVC.jiemuDescription = dic[@"description"];
-//                faxianzhuboVC.jiemuFan_num = dic[@"fan_num"];
-//                faxianzhuboVC.jiemuID = dic[@"id"];
-//                faxianzhuboVC.jiemuImages = dic[@"images"];
-//                faxianzhuboVC.jiemuIs_fan = dic[@"is_fan"];
-//                faxianzhuboVC.jiemuMessage_num = dic[@"message_num"];
-//                faxianzhuboVC.jiemuName = dic[@"name"];
-//                faxianzhuboVC.isfaxian = YES;
-//                self.hidesBottomBarWhenPushed=YES;
-//                [self.navigationController pushViewController:faxianzhuboVC animated:YES];
-//                self.hidesBottomBarWhenPushed=NO;
                 if ([dic[@"is_free"] isEqualToString:@"1"]) {
-                    zhuboxiangqingVCNew *faxianzhuboVC = [[zhuboxiangqingVCNew alloc]init];
+                    zhuboXiangQingVCNewController *faxianzhuboVC = [[zhuboXiangQingVCNewController alloc]init];
                     faxianzhuboVC.jiemuDescription = dic[@"description"];
                     faxianzhuboVC.jiemuFan_num = dic[@"fan_num"];
                     faxianzhuboVC.jiemuID = dic[@"id"];
@@ -891,7 +883,7 @@
 //            }
             faxianSubModel *dic = model.data[indexPath.row];
             if ([dic.is_free isEqualToString:@"1"]) {
-                zhuboxiangqingVCNew *faxianzhuboVC = [[zhuboxiangqingVCNew alloc]init];
+                zhuboXiangQingVCNewController *faxianzhuboVC = [[zhuboXiangQingVCNewController alloc]init];
                 faxianzhuboVC.jiemuDescription = dic.Description;
                 faxianzhuboVC.jiemuFan_num = dic.fan_num;
                 faxianzhuboVC.jiemuID = dic.ID;
@@ -982,6 +974,7 @@
     faxianzhuboVC.jiemuIs_fan = dic.is_fan;
     faxianzhuboVC.jiemuMessage_num = dic.message_num;
     faxianzhuboVC.jiemuName = dic.name;
+    faxianzhuboVC.post_content = dic.post_content;
 //    if (indexPath.row > 0){
 //        faxianzhuboVC.act_table = @"act";
 //    }
@@ -1070,7 +1063,7 @@
 - (void)loadData{
     //TODO:发现课堂模块 /interfaceNew/findIndex
     [NetWorkTool getPaoGuoShouYeSouSuoLieBiao:AvatarAccessToken sccess:^(NSDictionary *responseObject) {
-        
+        [self.faxianTableView.mj_header endRefreshing];
         if ([responseObject[@"results"] isKindOfClass:[NSArray class]]){
             self.faxianArrM = [faxianModel mj_objectArrayWithKeyValuesArray:responseObject[@"results"]];
             for (int i = 0; i < self.faxianArrM.count; i ++ ){
@@ -1080,10 +1073,11 @@
                     [self.faxianArrM removeObjectAtIndex:i];
                 }
             }
-            [CommonCode writeToUserD:responseObject[@"results"] andKey:@"faxianDataArr"];
+//            [CommonCode writeToUserD:responseObject[@"results"] andKey:@"faxianDataArr"];
             [self.faxianTableView reloadData];
         }
     } failure:^(NSError *error) {
+        [self.faxianTableView.mj_header endRefreshing];
         NSLog(@"error = %@",error);
     }];
     

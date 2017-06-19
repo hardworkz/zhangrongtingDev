@@ -174,7 +174,7 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
     NSDictionary *dic = [[NSDictionary alloc]initWithDictionary:self.infoArr[indexPath.row]];
     
-    zhuboxiangqingVCNew *faxianzhuboVC = [[zhuboxiangqingVCNew alloc]init];
+    zhuboXiangQingVCNewController *faxianzhuboVC = [[zhuboXiangQingVCNewController alloc]init];
     faxianzhuboVC.jiemuDescription = dic[@"description"];
     faxianzhuboVC.jiemuFan_num = dic[@"fan_num"];
     faxianzhuboVC.jiemuID = dic[@"id"];
