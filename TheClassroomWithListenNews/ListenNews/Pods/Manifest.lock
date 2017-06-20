@@ -46,7 +46,7 @@ DEPENDENCIES:
   - iAppInfos (~> 0.1.0)
   - MJExtension (~> 3.0.13)
   - MWPhotoBrowser (~> 2.1.2)
-  - Reachability
+  - Reachability (~> 3.2)
   - SAMTextView (~> 0.2.2)
   - TTTAttributedLabel
   - UIKitCategoryAdditions (~> 0.0.1)
@@ -74,6 +74,6 @@ SPEC CHECKSUMS:
   UMengAnalytics: ef8d45f94c0e5771dc364cf6a5731d9d3b101da2
   WechatOpenSDK: cbd332148eb792d444ed4eec94f421d98f2046ee
 
-PODFILE CHECKSUM: 5d9d3b65260017fbc434334befb9a9e3963118ea
+PODFILE CHECKSUM: 2d1060b40d8e13119adfdcd222d1a8622415d5e4
 
 COCOAPODS: 1.0.1

@@ -83,6 +83,10 @@
 @end
 
 @implementation zhuboXiangQingVCNewController
+- (NSString *)post_content
+{
+    return _post_content?_post_content:@"";
+}
 - (NSString *)imageUrlSubStringWithStr:(NSString *)string
 {
     NSRange range;

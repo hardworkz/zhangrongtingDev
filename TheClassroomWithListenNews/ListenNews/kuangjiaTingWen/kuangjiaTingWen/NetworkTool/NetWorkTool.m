@@ -9,6 +9,8 @@
 #import "NetWorkTool.h"
 #import "AFNetworking.h"
 
+#define TimeOutSecond 8
+
 @implementation NetWorkTool
 
 //将NSDictionary中的Null类型的项目转化成@""
@@ -160,7 +162,7 @@
     mgr.requestSerializer                 = [AFHTTPRequestSerializer serializer ];
     mgr.responseSerializer                = [AFJSONResponseSerializer serializer];
     [mgr.requestSerializer willChangeValueForKey:@"timeoutInterval"];
-    mgr.requestSerializer.timeoutInterval = 8;
+    mgr.requestSerializer.timeoutInterval = TimeOutSecond;
     [mgr.requestSerializer didChangeValueForKey:@"timeoutInterval"];
     NSString *urlStr=[NSString stringWithFormat:@"%@",url];
     //发送请求
@@ -202,7 +204,7 @@
     mgr.requestSerializer                 = [AFHTTPRequestSerializer serializer ];
     mgr.responseSerializer                = [AFJSONResponseSerializer serializer];
     [mgr.requestSerializer willChangeValueForKey:@"timeoutInterval"];
-    mgr.requestSerializer.timeoutInterval = 8;
+    mgr.requestSerializer.timeoutInterval = TimeOutSecond;
     [mgr.requestSerializer didChangeValueForKey:@"timeoutInterval"];
     NSString *urlStr=[NSString stringWithFormat:@"%@%@",APPHostURL,url];
     //发送请求

@@ -45,7 +45,18 @@
         if ([responseObject[@"results"] isKindOfClass:[NSArray class]]) {
             self.dataSourceArr = [responseObject[@"results"] mutableCopy];
             [self.helpTableView reloadData];
+        }else{
+            if (self.dataSourceArr.count == 0) {
+                [[BJNoDataView shareNoDataView] showCenterWithSuperView:self.helpTableView icon:nil iconClicked:^{
+                    //图片点击回调
+                    [self setUpData];//刷新数据
+                }];
+            }else{
+                //有数据
+                [[BJNoDataView shareNoDataView] clear];
+            }
         }
+
     } failure:^(NSError *error) {
         //
     }];

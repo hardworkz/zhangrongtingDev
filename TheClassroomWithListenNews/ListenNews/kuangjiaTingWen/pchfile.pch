@@ -46,6 +46,7 @@
 #import "CustomPageView.h"
 #import "UINavigationController+Cloudox.h"
 #import "UIViewController+Cloudox.h"
+#import "BJNoDataView.h"
 
 #import "PlayingHeader.h"
 #import "MineHeader.h"

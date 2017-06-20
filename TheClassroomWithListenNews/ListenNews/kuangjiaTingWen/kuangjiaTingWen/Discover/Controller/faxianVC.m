@@ -101,10 +101,10 @@
     self.CurrentSearchKeyWords = @"";
     SouSuoquanjvIndexPath = nil;
     
-//    if ([[CommonCode readFromUserD:@"faxianDataArr"] isKindOfClass:[NSArray class]]){
-//        self.faxianArrM = [faxianModel mj_objectArrayWithKeyValuesArray:[CommonCode readFromUserD:@"faxianDataArr"]];
-//        [self.faxianTableView reloadData];
-//    }
+    if ([[CommonCode readFromUserD:@"faxianDataArr"] isKindOfClass:[NSArray class]]){
+        self.faxianArrM = [faxianModel mj_objectArrayWithKeyValuesArray:[CommonCode readFromUserD:@"faxianDataArr"]];
+        [self.faxianTableView reloadData];
+    }
     
     self.faxianTableView.mj_header = [MJRefreshNormalHeader headerWithRefreshingBlock:^{
         [self loadData];
@@ -1073,7 +1073,7 @@
                     [self.faxianArrM removeObjectAtIndex:i];
                 }
             }
-//            [CommonCode writeToUserD:responseObject[@"results"] andKey:@"faxianDataArr"];
+            [CommonCode writeToUserD:responseObject[@"results"] andKey:@"faxianDataArr"];
             [self.faxianTableView reloadData];
         }
     } failure:^(NSError *error) {

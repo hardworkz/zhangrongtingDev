@@ -14,72 +14,17 @@
 }
 @property (nonatomic, strong) UITableView *tableView;
 @property (nonatomic, strong) NSMutableArray *dataSourceArr;
-@property (strong, nonatomic) UILabel *tipLabel;
 @property (nonatomic, strong) UILabel *label;
 @end
 
 @implementation MyClassroomController
-- (UILabel *)tipLabel
-{
-    if (_tipLabel == nil) {
-        _tipLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT - 64)];
-        _tipLabel.textAlignment = NSTextAlignmentCenter;
-        _tipLabel.text = @"您当前还没有购买的课程";
-        _tipLabel.font = [UIFont systemFontOfSize:15.0];
-        _tipLabel.textColor = [UIColor lightGrayColor];
-    }
-    return _tipLabel;
-}
 - (void)viewDidLoad {
     [super viewDidLoad];
+    
     currentPage = 1;
-    [self setUpData];
     [self setUpView];
-}
-- (void)viewWillAppear:(BOOL)animated{
-    [super viewWillAppear:animated];
-    self.hidesBottomBarWhenPushed = YES;
-    [self.navigationController setNavigationBarHidden:YES animated:YES];
-}
-
-- (void)setUpData{
-    [NetWorkTool listBuyWithaccessToken:AvatarAccessToken andPage:[NSString stringWithFormat:@"%ld",currentPage] andLimit:@"10" sccess:^(NSDictionary *responseObject) {
-        [self.tableView.mj_footer endRefreshing];
-        if ([responseObject[@"results"] isKindOfClass:[NSArray class]]) {
-            if (currentPage == 1) {
-                [self.dataSourceArr removeAllObjects];
-            }
-            NSMutableArray *dataArray = [self frameWithDataArray:[MyClassroomListModel mj_objectArrayWithKeyValuesArray:responseObject[@"results"]]];
-            [self.dataSourceArr addObjectsFromArray:dataArray];
-            if (dataArray.count == 10) {
-                currentPage ++;
-            }
-            if (self.dataSourceArr.count == 0) {
-                [self.tableView addSubview:self.tipLabel];
-            }else{
-                [self.tipLabel removeFromSuperview];
-            }
-            [self.tableView reloadData];
-        }
-    } failure:^(NSError *error) {
-        [self.tableView.mj_footer endRefreshing];
-    }];
-}
-/**
- 返回frameArray
-
- @param modeArray 数据模型数组
- @return frame数据模型数组
- */
-- (NSMutableArray *)frameWithDataArray:(NSMutableArray *)modeArray
-{
-    NSMutableArray *array = [NSMutableArray array];
-    for (MyClassroomListModel *model in modeArray) {
-        MyClassroomListFrameModel *frameModel = [[MyClassroomListFrameModel alloc] init];
-        frameModel.model = model;
-        [array addObject:frameModel];
-    }
-    return array;
+    [self setUpData];
+    
 }
 - (void)setUpView{
     
@@ -114,6 +59,7 @@
     [topView addSubview:seperatorLine];
     
     [self.view addSubview:self.tableView];
+    
     self.tableView.mj_footer = [MJRefreshAutoNormalFooter footerWithRefreshingBlock:^{
         [self setUpData];
     }];
@@ -122,6 +68,58 @@
     [rightSwipe setDirection:UISwipeGestureRecognizerDirectionRight];
     [self.tableView addGestureRecognizer:rightSwipe];
 }
+- (void)viewWillAppear:(BOOL)animated{
+    [super viewWillAppear:animated];
+    self.hidesBottomBarWhenPushed = YES;
+    [self.navigationController setNavigationBarHidden:YES animated:YES];
+}
+
+- (void)setUpData{
+    [NetWorkTool listBuyWithaccessToken:AvatarAccessToken andPage:[NSString stringWithFormat:@"%ld",currentPage] andLimit:@"10" sccess:^(NSDictionary *responseObject) {
+        [self.tableView.mj_footer endRefreshing];
+        if ([responseObject[@"results"] isKindOfClass:[NSArray class]]) {
+            if (currentPage == 1) {
+                [self.dataSourceArr removeAllObjects];
+            }
+            NSMutableArray *dataArray = [self frameWithDataArray:[MyClassroomListModel mj_objectArrayWithKeyValuesArray:responseObject[@"results"]]];
+            
+            [self.dataSourceArr addObjectsFromArray:dataArray];
+            if (dataArray.count == 10) {
+                currentPage ++;
+            }
+            [self.tableView reloadData];
+        }else{
+            if (self.dataSourceArr.count == 0) {
+                [[BJNoDataView shareNoDataView] showCenterWithSuperView:self.tableView icon:nil iconClicked:^{
+                    //图片点击回调
+                    [self setUpData];//刷新数据
+                }];
+            }else{
+                //有数据
+                [[BJNoDataView shareNoDataView] clear];
+            }
+        }
+    } failure:^(NSError *error) {
+        [self.tableView.mj_footer endRefreshing];
+    }];
+}
+/**
+ 返回frameArray
+
+ @param modeArray 数据模型数组
+ @return frame数据模型数组
+ */
+- (NSMutableArray *)frameWithDataArray:(NSMutableArray *)modeArray
+{
+    NSMutableArray *array = [NSMutableArray array];
+    for (MyClassroomListModel *model in modeArray) {
+        MyClassroomListFrameModel *frameModel = [[MyClassroomListFrameModel alloc] init];
+        frameModel.model = model;
+        [array addObject:frameModel];
+    }
+    return array;
+}
+
 
 - (void)back
 {

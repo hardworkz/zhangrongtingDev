@@ -432,9 +432,14 @@
 - (void)wanbi:(NSNotification *)notice{
     
     if (ExisRigester == YES){
-        //        [Explayer removeObserver:self forKeyPath:@"statu"];
-        //        [Explayer removeObserver:self forKeyPath:@"loadedTimeRange"];
         ExisRigester = NO;
+    }
+    //设置按钮状态为未播放图片
+    _auditionnBtn.selected = NO;
+    for ( int i = 0 ; i < self.buttons.count; i ++ ) {
+        UIButton *anotherButton = self.buttons[i];
+        anotherButton.selected = NO;
+        continue;
     }
     [Explayer pause];
     [CommonCode writeToUserD:@"YES" andKey:TINGYOUQUANBOFANGWANBI];
@@ -461,10 +466,11 @@
                 anotherButton.selected = NO;
                 continue;
         }
+        _playingIndex = -1;
         [Explayer pause];
         _isPlaying = NO;
     }
-    else{//未选中状态，为暂停状态,判断当前播放第几个按钮，设置播放状态
+    else{//未选中状态，为暂停状态,判断当前播放第一个按钮，设置播放状态
         sender.selected = YES;
         for ( int i = 0 ; i < self.buttons.count; i ++ ) {
             if (i == 0) {
@@ -867,7 +873,9 @@
         cell.playingIndex = _playingIndex;
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
         cell.frameModel = self.frameArray[indexPath.row];
-        self.buttons = cell.buttons;
+        if (self.buttons.count == 0) {
+            self.buttons = cell.buttons;
+        }
         MJWeakSelf
         cell.playAudition = ^(UIButton *button, NSMutableArray *buttons) {
             //点击试听列表按钮
