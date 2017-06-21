@@ -35,7 +35,7 @@
         zhengwenTextView.editable = NO;
         zhengwenTextView.scrollsToTop = NO;
 //        zhengwenTextView.delegate = self;
-        zhengwenTextView.font = gFontMain14;
+        zhengwenTextView.font = gFontMajor16;
         [self.contentView addSubview:zhengwenTextView];
 
     }
@@ -54,7 +54,7 @@
     [paragraphStyle setLineBreakMode:NSLineBreakByCharWrapping];
     [zhengwenTextView sizeToFit];
     if (zhengwenTextView.text.length != 0){
-        NSMutableAttributedString *attributedString =  [[NSMutableAttributedString alloc] initWithString:zhengwenTextView.text attributes:@{NSForegroundColorAttributeName : gTextDownload,NSFontAttributeName : gFontMain14}];
+        NSMutableAttributedString *attributedString =  [[NSMutableAttributedString alloc] initWithString:zhengwenTextView.text attributes:@{NSForegroundColorAttributeName : gTextDownload,NSFontAttributeName : gFontMajor16}];
         [attributedString addAttribute:NSParagraphStyleAttributeName value:paragraphStyle range:NSMakeRange(0, zhengwenTextView.text.length)];
         zhengwenTextView.attributedText = attributedString;
     }

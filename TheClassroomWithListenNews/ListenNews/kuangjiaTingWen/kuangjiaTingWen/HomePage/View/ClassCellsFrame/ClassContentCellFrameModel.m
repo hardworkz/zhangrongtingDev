@@ -20,7 +20,7 @@
     zhengwenTextView.scrollsToTop = NO;
     NSString *str1 = [_excerpt stringByReplacingOccurrencesOfString:@"\r" withString:@""];
     zhengwenTextView.text = str1;
-    zhengwenTextView.font = gFontMain14;
+    zhengwenTextView.font = gFontMajor16;
     NSMutableParagraphStyle *paragraphStyle = [[NSMutableParagraphStyle alloc]init];
     [paragraphStyle setLineSpacing:8.0];
     [paragraphStyle setAlignment:NSTextAlignmentLeft];
@@ -28,7 +28,7 @@
     [paragraphStyle setLineBreakMode:NSLineBreakByCharWrapping];
     [zhengwenTextView sizeToFit];
     if (zhengwenTextView.text.length != 0){
-        NSMutableAttributedString *attributedString =  [[NSMutableAttributedString alloc] initWithString:zhengwenTextView.text attributes:@{NSForegroundColorAttributeName : gTextDownload,NSFontAttributeName : gFontMain14}];
+        NSMutableAttributedString *attributedString =  [[NSMutableAttributedString alloc] initWithString:zhengwenTextView.text attributes:@{NSForegroundColorAttributeName : gTextDownload,NSFontAttributeName : gFontMajor16}];
         [attributedString addAttribute:NSParagraphStyleAttributeName value:paragraphStyle range:NSMakeRange(0, zhengwenTextView.text.length)];
         zhengwenTextView.attributedText = attributedString;
     }

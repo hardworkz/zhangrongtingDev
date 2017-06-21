@@ -196,7 +196,7 @@ static bofangVC *_instance = nil;
     [_topView addSubview:_rightBtn];
     
     [self xinwenxiangqingbujv];
-    [self huoqupinglunliebiao];
+//    [self huoqupinglunliebiao];
     if (!ShangTimer){
         ShangTimer = [NSTimer scheduledTimerWithTimeInterval: 0.01 target: self selector:@selector(xuanzhuanAction) userInfo: nil repeats: YES];
     }
@@ -317,8 +317,6 @@ static bofangVC *_instance = nil;
         isP = NO;
     }
 }
-
-
 - (void)qiehuanxinwen:(NSNotification *)notification {
     if ([[NSString stringWithFormat:@"%@",self.newsModel.jiemuIs_fan] isEqualToString:@"0"]){
         isGuanZhu = NO;
@@ -1631,7 +1629,7 @@ static bofangVC *_instance = nil;
  */
 - (CGFloat)computeTextHeightWithString:(NSString *)string andWidth:(CGFloat)width andFontSize:(UIFont *)fontSize{
     
-    CGRect rect  = [string boundingRectWithSize:CGSizeMake(width, 10000)
+    CGRect rect  = [string boundingRectWithSize:CGSizeMake(width, MAXFLOAT)
                                         options: NSStringDrawingUsesFontLeading |NSStringDrawingUsesLineFragmentOrigin
                                      attributes:@{NSFontAttributeName:fontSize}
                                         context:nil];
@@ -1664,22 +1662,31 @@ static bofangVC *_instance = nil;
         accesstoken = nil;
     }
     //postDetail
-    RTLog(@"%@",self.newsModel.jiemuID);
     [NetWorkTool getPostDetailWithaccessToken:accesstoken post_id:self.newsModel.jiemuID sccess:^(NSDictionary *responseObject) {
-        RTLog(@"%@",responseObject[@"results"]);
-        if ([responseObject[@"results"] isKindOfClass:[NSDictionary class]]){
-            if ([responseObject[@"results"][@"reward"] isKindOfClass:[NSArray class]]) {
+        if ([responseObject[@"status"] intValue] == 1){
+            newsDetailModel *detailModel = [newsDetailModel mj_objectWithKeyValues:responseObject[@"results"]];
+            if (detailModel.reward.count != 0) {
                 self.isPay = YES;
-                self.rewardArray = responseObject[@"results"][@"reward"];
+                self.rewardArray = detailModel.reward;
                 //修复广告点击进入的主播详情粉丝数错误
-                self.newsModel.jiemuFan_num = responseObject[@"results"][@"act"][@"fan_num"];
-                self.newsModel.jiemuMessage_num = responseObject[@"results"][@"act"][@"message_num"];
+                self.newsModel.jiemuFan_num = detailModel.act.fan_num;
+                self.newsModel.jiemuMessage_num = detailModel.act.message_num;
             }
             else{
                 self.isPay = NO;
                 self.rewardArray = nil;
             }
-            [self.appreciateNum setText:responseObject[@"results"][@"gold"] ];
+            [self.appreciateNum setText:detailModel.gold];
+            if ([detailModel.is_collection integerValue] == 1) {
+                _isCollected = YES;
+                UIButton *collectBtn = (UIButton *)[dibuView viewWithTag:99];
+                [collectBtn setImage:[UIImage imageNamed:@"home_news_collectioned"] forState:UIControlStateNormal];
+            }
+            else{
+                _isCollected = NO;
+                UIButton *collectBtn = (UIButton *)[dibuView viewWithTag:99];
+                [collectBtn setImage:[UIImage imageNamed:@"home_news_collection"] forState:UIControlStateNormal];
+            }
         }
         else{
             self.isPay = NO;
@@ -1687,6 +1694,7 @@ static bofangVC *_instance = nil;
             [self.appreciateNum setText:@"0"];
             [SVProgressHUD showErrorWithStatus:responseObject[@"msg"]];
         }
+        
         if (self.isRewardBack) {
             self.isReward = YES;
             self.isRewardBack = NO;
@@ -1695,19 +1703,10 @@ static bofangVC *_instance = nil;
             self.isReward = NO;
             self.isCustomRewardCount = NO;
         }
-        if ([responseObject[@"results"][@"is_collection"] integerValue] == 1) {
-            _isCollected = YES;
-            UIButton *collectBtn = (UIButton *)[dibuView viewWithTag:99];
-            [collectBtn setImage:[UIImage imageNamed:@"home_news_collectioned"] forState:UIControlStateNormal];
-        }
-        else{
-            _isCollected = NO;
-            UIButton *collectBtn = (UIButton *)[dibuView viewWithTag:99];
-            [collectBtn setImage:[UIImage imageNamed:@"home_news_collection"] forState:UIControlStateNormal];
-        }
+        
         [self.tableView reloadData];
     } failure:^(NSError *error) {
-        //
+        RTLog(@"%@",error);
     }];
     
 }
@@ -1917,8 +1916,8 @@ static bofangVC *_instance = nil;
     }
     WXMediaMessage *message = [WXMediaMessage message];
     message.title = self.newsModel.Titlejiemu;
-//    NSString *musicUrl = [NSString stringWithFormat:@"http://tingwen.me/index.php/article/yulan/id/%@.html",self.newsModel.jiemuID];
-    NSString *musicUrl = @"https://zhidao.baidu.com/question/2143697514695119428.html";
+    NSString *musicUrl = [NSString stringWithFormat:@"http://tingwen.me/index.php/article/yulan/id/%@.html",self.newsModel.jiemuID];
+//    NSString *musicUrl = @"https://zhidao.baidu.com/question/2143697514695119428.html";
     [self getImageWithURLStr:self.newsModel.ImgStrjiemu OnSucceed:^(UIImage *image) {
         //压缩图片大小
         CGFloat compression = 0.8f;
@@ -2598,10 +2597,10 @@ static bofangVC *_instance = nil;
         //标题
         self.titleLab.frame = CGRectMake(20.0 / 375 * IPHONE_W,CGRectGetMaxY(_seperatorLine.frame) + 20.0 / 667 * SCREEN_HEIGHT, IPHONE_W - 40.0 / 375 * IPHONE_W, 40.0 / 667 * IPHONE_H);
         _titleLab.text = self.newsModel.Titlejiemu;
-        _titleLab.font = [UIFont fontWithName:@"Semibold" size:self.titleFontSize];
-        CGFloat titleHight = [self computeTextHeightWithString:self.newsModel.jiemuDescription andWidth:(SCREEN_WIDTH-20) andFontSize:[UIFont systemFontOfSize:self.titleFontSize]];
+        _titleLab.numberOfLines = 0;
+        _titleLab.font = [UIFont boldSystemFontOfSize:self.titleFontSize];
+        CGFloat titleHight = [self computeTextHeightWithString:self.newsModel.Titlejiemu andWidth:(SCREEN_WIDTH-20) andFontSize:[UIFont systemFontOfSize:self.titleFontSize]];
         [_titleLab setFrame:CGRectMake(20.0 / 375 * IPHONE_W, CGRectGetMaxY(_seperatorLine.frame) + 20.0 / 667 * SCREEN_HEIGHT, IPHONE_W - 40.0 / 375 * IPHONE_W, (titleHight + 20) / 667 * IPHONE_H)];
-        
         [xiangqingView addSubview:_titleLab];
         //日期
         self.riqiLab.frame = CGRectMake(10.0 / 375 * IPHONE_W, CGRectGetMaxY(_titleLab.frame) + 10.0 / 667 * IPHONE_H, IPHONE_W - 20.0 / 375 * IPHONE_W, 10.0 / 667 * IPHONE_H);
@@ -2840,8 +2839,9 @@ static bofangVC *_instance = nil;
                 NSMutableArray *imageArr = [NSMutableArray new];
                 NSInteger num = (self.rewardArray.count > 5) ? 5 : self.rewardArray.count;
                 for (int i = 0 ; i < num; i ++) {
-                    [titleArr addObject:self.rewardArray[i][@"money"]];
-                    [imageArr addObject:self.rewardArray[i][@"avatar"] ];
+                    rewardModel *reward = self.rewardArray[i];
+                    [titleArr addObject:reward.money];
+                    [imageArr addObject:reward.avatar];
                 }
                 
                 MenuItemV *paidView = [[MenuItemV alloc]initWithFrame:CGRectMake(15, CGRectGetMaxY(midleLine.frame),32 * AdaptiveScale_W * [titleArr count] + 20,36) andTitleArr:titleArr andImgArr:imageArr andLineNum:[titleArr count]];

@@ -17,6 +17,9 @@
 #import "NewsModel.h"
 #import "NewObj.h"
 #import "Post_actor.h"
+#import "newsDetailModel.h"
+#import "newsActModel.h"
+#import "rewardModel.h"
 
 #import "PlayVCCommentModel.h"
 #import "PlayVCCommentFrameModel.h"

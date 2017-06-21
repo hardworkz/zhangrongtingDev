@@ -905,13 +905,13 @@
             if (indexPath.row == 0) {
                 offsetY = 30;
                 //新闻频道
-                CGFloat newsItem_width = (SCREEN_WIDTH - 40.0 / 375 * IPHONE_W)/5;
+                CGFloat newsItem_width = (SCREEN_WIDTH - 10.0 / 375 * IPHONE_W)/5;
                 NSArray *newsItemTitle = @[@"财经",@"文娱",@"国际",@"科技",@"时政"];
                 for (int i = 0 ; i < 5; i ++) {
                     UIButton *newsItem = [UIButton buttonWithType:UIButtonTypeCustom];
-                    [newsItem setFrame:CGRectMake(newsItem_width * i + 20.0 / 375 * IPHONE_W + 2.5, 5, newsItem_width - 5, 25)];
+                    [newsItem setFrame:CGRectMake(newsItem_width * i + 5.0 / 375 * IPHONE_W + 5.0, 5, newsItem_width - 5, 25)];
                     [newsItem.layer setMasksToBounds:YES];
-                    [newsItem.layer setCornerRadius:10.0];
+                    [newsItem.layer setCornerRadius:12.5];
                     [newsItem.layer setBorderWidth:0.5];
                     [newsItem.layer setBorderColor:gTextColorSub.CGColor];
                     [newsItem setTitle:newsItemTitle[i] forState:UIControlStateNormal];
@@ -1016,77 +1016,6 @@
         return cell;
     }
     else{
-//        static NSString *NewsCellIdentify = @"ClassCellIdentify";
-//        UITableViewCell *cell = [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:NewsCellIdentify];
-//        if (!cell){
-//            cell = [tableView dequeueReusableCellWithIdentifier:NewsCellIdentify];
-//        }
-//        if ([self.classroomInfoArr count]) {
-//            //图片
-//            UIImageView *imgLeft = [[UIImageView alloc]initWithFrame:CGRectMake(20.0 / 375 * IPHONE_W, 7.5, 105.0 / 375 * IPHONE_W, 105.0 / 375 *IPHONE_W)];
-//            if (IS_IPAD) {
-//                [imgLeft setFrame:CGRectMake(20.0 / 375 * IPHONE_W, 7.5, 105.0 / 375 * IPHONE_W, 70.0 / 375 *IPHONE_W)];
-//            }
-//            [imgLeft.layer setMasksToBounds:YES];
-//            [imgLeft.layer setCornerRadius:5.0];
-//            if ([NEWSSEMTPHOTOURL(self.classroomInfoArr[indexPath.row][@"images"])  rangeOfString:@"http"].location != NSNotFound){
-//                [imgLeft sd_setImageWithURL:[NSURL URLWithString:NEWSSEMTPHOTOURL(self.classroomInfoArr[indexPath.row][@"images"])]];
-//                //placeholderImage:[UIImage imageNamed:@"thumbnailsdefault"]
-//            }
-//            else{
-//                NSString *str = USERPOTOAD(NEWSSEMTPHOTOURL(self.classroomInfoArr[indexPath.row][@"images"]));
-//                [imgLeft sd_setImageWithURL:[NSURL URLWithString:str]];
-//                //placeholderImage:[UIImage imageNamed:@"thumbnailsdefault"]
-//            }
-//            
-//            [cell.contentView addSubview:imgLeft];
-//            imgLeft.contentMode = UIViewContentModeScaleAspectFill;
-//            imgLeft.clipsToBounds = YES;
-//            
-//            //标题
-//            UILabel *titleLab = [[UILabel alloc]initWithFrame:CGRectMake(CGRectGetMaxX(imgLeft.frame) + 5.0 / 375 * IPHONE_W, imgLeft.frame.origin.y,  SCREEN_WIDTH - CGRectGetMaxX(imgLeft.frame) - 70.0 / 375 * IPHONE_W, 21.0 / 667 *IPHONE_H)];
-//            titleLab.text = self.classroomInfoArr[indexPath.row][@"name"];
-//            titleLab.textColor = [UIColor blackColor];
-//            titleLab.textAlignment = NSTextAlignmentLeft;
-//            titleLab.font = [UIFont boldSystemFontOfSize:16.0f ];
-//            [cell.contentView addSubview:titleLab];
-//            [titleLab setNumberOfLines:3];
-//            titleLab.lineBreakMode = NSLineBreakByWordWrapping;
-//            CGSize size = [titleLab sizeThatFits:CGSizeMake(titleLab.frame.size.width, MAXFLOAT)];
-//            titleLab.frame = CGRectMake(titleLab.frame.origin.x, titleLab.frame.origin.y, titleLab.frame.size.width, size.height);
-//            //价钱
-//            UILabel *price = [[UILabel alloc]initWithFrame:CGRectMake(CGRectGetMaxX(titleLab.frame) + 10, titleLab.frame.origin.y,40.0 / 375 * IPHONE_W, 21.0 / 667 *IPHONE_H)];
-//            price.text = [NSString stringWithFormat:@"￥%ld",[self.classroomInfoArr[indexPath.row][@"price"] integerValue]];
-//            price.font = gFontMain14;
-////            price.textAlignment = NSTextAlignmentRight;
-//            price.textColor = gMainColor;
-//            [cell.contentView addSubview:price];
-//            
-//            //简介
-//            UILabel *describe = [[UILabel alloc]initWithFrame:CGRectMake(titleLab.frame.origin.x, 60.0 * 667.0/SCREEN_HEIGHT,  SCREEN_WIDTH - CGRectGetMaxX(imgLeft.frame) - 20.0 / 375 * IPHONE_W, 21.0 / 667 *IPHONE_H)];
-//            if (TARGETED_DEVICE_IS_IPHONE_568){
-//                [describe setFrame:CGRectMake(titleLab.frame.origin.x, CGRectGetMaxY(titleLab.frame), SCREEN_WIDTH - CGRectGetMaxX(imgLeft.frame) - 20.0 / 375 * IPHONE_W, 21.0 / 667 *IPHONE_H)];
-//            }
-//            else{
-//                [describe setFrame:CGRectMake(titleLab.frame.origin.x, 60.0 * 667.0/SCREEN_HEIGHT, SCREEN_WIDTH - CGRectGetMaxX(imgLeft.frame) - 20.0 / 375 * IPHONE_W, 21.0 / 667 *IPHONE_H)];
-//            }
-//            describe.text = self.classroomInfoArr[indexPath.row][@"description"];
-//            describe.textColor = [[UIColor grayColor]colorWithAlphaComponent:0.7f];
-//            describe.textColor = gTextColorSub;
-//            describe.textAlignment = NSTextAlignmentLeft;
-//            describe.font = gFontMain14;
-//            [cell.contentView addSubview:describe];
-//            [describe setNumberOfLines:3];
-//            describe.lineBreakMode = NSLineBreakByWordWrapping;
-//            CGSize size1 = [describe sizeThatFits:CGSizeMake(describe.frame.size.width, MAXFLOAT)];
-//            describe.frame = CGRectMake(describe.frame.origin.x, describe.frame.origin.y, describe.frame.size.width, size1.height);
-//            UIView *line = [[UIView alloc]initWithFrame:CGRectMake(20.0 / 375 * SCREEN_WIDTH, CGRectGetMaxY(imgLeft.frame) + 7, SCREEN_WIDTH - 40.0 / 375 * SCREEN_WIDTH, 0.5)];
-//            [line setBackgroundColor:nMineNameColor];
-//            [cell.contentView addSubview:line];
-//        }
-//        
-//        [cell setSelectionStyle:UITableViewCellSelectionStyleNone];
-//        return cell;
         MyClassroomTableViewCell *cell = [MyClassroomTableViewCell cellWithTableView:tableView];
         [cell setSelectionStyle:UITableViewCellSelectionStyleNone];
         cell.hiddenDevider = YES;

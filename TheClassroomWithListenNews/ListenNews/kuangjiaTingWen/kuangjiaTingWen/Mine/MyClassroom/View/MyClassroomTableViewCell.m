@@ -79,12 +79,12 @@
     titleLab.frame = frameModel.titleLabF;
     price.frame = frameModel.priceF;
     describe.frame = frameModel.describeF;\
-    if (!_hiddenDevider) {
+//    if (!_hiddenDevider) {
         line.frame = frameModel.lineF;
-        line.hidden = NO;
-    }else{
-        line.hidden = YES;
-    }
+//        line.hidden = NO;
+//    }else{
+//        line.hidden = YES;
+//    }
     
     if ([NEWSSEMTPHOTOURL(frameModel.model.images)  rangeOfString:@"http"].location != NSNotFound){
         [imgLeft sd_setImageWithURL:[NSURL URLWithString:NEWSSEMTPHOTOURL(frameModel.model.images)]];

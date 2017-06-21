@@ -28,6 +28,12 @@
     NSString *rewardMoney;
     NSString *orderNum;
 }
+
+/**
+ 系统字体大小
+ */
+@property(assign,nonatomic)CGFloat titleFontSize;
+
 @property (strong, nonatomic) CustomAlertView *alertView;
 @property (nonatomic, strong) UITableView *helpTableView;
 @property (nonatomic, strong) NSMutableArray *buttons;
@@ -59,6 +65,9 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    
+    self.titleFontSize = 19.0;
+    
     currentClassID = [CommonCode readFromUserD:@"currentClassID"];
     if ([currentClassID isEqualToString:self.act_id]) {
         playIndex = [[CommonCode readFromUserD:@"playIndex"] integerValue];
@@ -275,7 +284,7 @@
     titleLab.text = self.classModel.title;
     titleLab.textAlignment = NSTextAlignmentCenter;
     titleLab.textColor = nTextColorMain;
-    titleLab.font = [UIFont boldSystemFontOfSize:19.0];
+    titleLab.font = [UIFont boldSystemFontOfSize:self.titleFontSize];
 //    titleLab.font = [UIFont fontWithName:@"Semibold" size:19];
     CGFloat titleHight = [self computeTextHeightWithString:self.classModel.title andWidth:(SCREEN_WIDTH-20) andFontSize:gFontMain14];
     [titleLab setFrame:CGRectMake(20.0 / 375 * IPHONE_W, CGRectGetMaxY(zhengwenImg.frame) + 20.0 / 667 * SCREEN_HEIGHT, IPHONE_W - 40.0 / 375 * IPHONE_W, (titleHight + 20) / 667 * IPHONE_H)];

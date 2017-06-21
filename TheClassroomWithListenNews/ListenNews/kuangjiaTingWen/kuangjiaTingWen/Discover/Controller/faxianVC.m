@@ -527,15 +527,15 @@
             subModel = firstModel.data[indexPath.row];
             CGFloat tempHeight = 0;
             if (indexPath.row == 0) {
-                tempHeight = 27.5;
+                tempHeight = 30;
             }
             else{
                 tempHeight = 0;
             }
             //图片
-            UIImageView *imgLeft = [[UIImageView alloc]initWithFrame:CGRectMake(20.0 / 375 * IPHONE_W, 7.5 + tempHeight, 105.0 / 375 * IPHONE_W, 105.0 / 375 *IPHONE_W)];
+            UIImageView *imgLeft = [[UIImageView alloc]initWithFrame:CGRectMake(20.0 / 375 * IPHONE_W, 10 + tempHeight, 105.0 / 375 * IPHONE_W, 105.0 / 375 *IPHONE_W)];
             if (IS_IPAD) {
-                [imgLeft setFrame:CGRectMake(20.0 / 375 * IPHONE_W, 7.5, 105.0 / 375 * IPHONE_W, 70.0 / 375 *IPHONE_W)];
+                [imgLeft setFrame:CGRectMake(20.0 / 375 * IPHONE_W, 10, 105.0 / 375 * IPHONE_W, 70.0 / 375 *IPHONE_W)];
             }
             [imgLeft.layer setMasksToBounds:YES];
             [imgLeft.layer setCornerRadius:5.0];
@@ -548,7 +548,6 @@
                 [imgLeft sd_setImageWithURL:[NSURL URLWithString:str]];
                 //placeholderImage:[UIImage imageNamed:@"thumbnailsdefault"]
             }
-            
             [cell.contentView addSubview:imgLeft];
             imgLeft.contentMode = UIViewContentModeScaleAspectFill;
             imgLeft.clipsToBounds = YES;
@@ -645,10 +644,10 @@
         //TODO:发现课堂模块
         faxianModel *model = [self.faxianArrM firstObject];
         if (indexPath.row == 0){
-            return  147.5 / 667 * IPHONE_H;
+            return  157.5 / 667 * IPHONE_H;
         }
         else if(indexPath.row < [model.data count]){
-            return  120.0 / 667 * IPHONE_H;
+            return  125.0 / 667 * IPHONE_H;
         }
         else if (indexPath.row == [model.data  count]){
             return 161.0 / 667 * IPHONE_H;
@@ -987,24 +986,24 @@
     
 }
 - (void)faxianliebiaoGengDuoAction:(UIButton *)sender{
-    UITableViewCell *cell = (UITableViewCell *)[[sender superview] superview];
-    NSIndexPath *indexPath = [self.faxianTableView indexPathForCell:cell];
+//    UITableViewCell *cell = (UITableViewCell *)[[sender superview] superview];
+//    NSIndexPath *indexPath = [self.faxianTableView indexPathForCell:cell];
     //TODO:发现课堂模块
-    faxianModel *model = [self.faxianArrM firstObject];
-    faxianModel *model2 = self.faxianArrM[indexPath.row - [model.data count] + 1];
-    if (indexPath.row >= [model.data count]) {
-        faxianGengDuoVC *faxiangengduoVC = [[faxianGengDuoVC alloc]init];
-        faxiangengduoVC.term_id = [NSString stringWithFormat:@"%@",model2.ID];
-        self.hidesBottomBarWhenPushed=YES;
-        [self.navigationController pushViewController:faxiangengduoVC animated:YES];
-        self.hidesBottomBarWhenPushed=NO;
-    }
-    else{
+//    faxianModel *model = [self.faxianArrM firstObject];
+//    faxianModel *model2 = self.faxianArrM[indexPath.row - [model.data count] + 1];
+//    if (indexPath.row >= [model.data count]) {
+//        faxianGengDuoVC *faxiangengduoVC = [[faxianGengDuoVC alloc]init];
+//        faxiangengduoVC.term_id = [NSString stringWithFormat:@"%@",model2.ID];
+//        self.hidesBottomBarWhenPushed=YES;
+//        [self.navigationController pushViewController:faxiangengduoVC animated:YES];
+//        self.hidesBottomBarWhenPushed=NO;
+//    }
+//    else{
         MoreClassViewController *classVC = [[MoreClassViewController alloc]init];
         self.hidesBottomBarWhenPushed=YES;
         [self.navigationController pushViewController:classVC animated:YES];
         self.hidesBottomBarWhenPushed=NO;
-    }
+//    }
 //    faxianGengDuoVC *faxiangengduoVC = [[faxianGengDuoVC alloc]init];
 //    faxiangengduoVC.term_id = [NSString stringWithFormat:@"%@",self.faxianArrM[indexPath.row][@"id"]];
 //    self.hidesBottomBarWhenPushed=YES;
@@ -1511,6 +1510,7 @@
         _faxianTableView.dataSource = self;
         _faxianTableView.tag = 4;
         _faxianTableView.hidden = NO;
+//        _faxianTableView.separatorStyle = UITableViewCellSeparatorStyleNone;
         _faxianTableView.tableFooterView = [UIView new];
         _faxianTableView.userInteractionEnabled = YES;
 //        _faxianTableView.separatorStyle = UITableViewCellSeparatorStyleNone;
