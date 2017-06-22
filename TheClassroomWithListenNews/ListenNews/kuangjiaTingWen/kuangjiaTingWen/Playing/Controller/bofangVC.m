@@ -142,7 +142,14 @@ static bofangVC *_instance = nil;
 //        player = [[AVPlayer alloc]init];
 //    });
 //    return player;
-    if (_bofangPlayer == nil) {
+    NSString *version = [UIDevice currentDevice].systemVersion;
+    if (version.doubleValue >= 9.0) {
+        // 针对 9.0 以上的iOS系统进行处理
+        if (_bofangPlayer == nil) {
+            _bofangPlayer = [[AVPlayer alloc] init];
+        }
+    } else {
+        // 针对 9.0 以下的iOS系统进行处理
         _bofangPlayer = [[AVPlayer alloc] init];
     }
     return _bofangPlayer;

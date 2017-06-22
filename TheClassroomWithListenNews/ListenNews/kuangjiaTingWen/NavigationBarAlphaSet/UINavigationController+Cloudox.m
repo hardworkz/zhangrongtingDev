@@ -21,7 +21,8 @@
         if (backgroundImageView != nil && backgroundImageView.image != nil) {
             barBackgroundView.alpha = alpha;
         } else {
-            UIView *backgroundEffectView = [[barBackgroundView subviews] objectAtIndex:1];// UIVisualEffectView
+//            RTLog(@"%lu",(unsigned long)[barBackgroundView subviews].count);
+            UIView *backgroundEffectView = [barBackgroundView subviews].count == 1?[[barBackgroundView subviews] objectAtIndex:0]:[[barBackgroundView subviews] objectAtIndex:1];// UIVisualEffectView
             if (backgroundEffectView != nil) {
                 backgroundEffectView.alpha = alpha;
             }
