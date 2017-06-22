@@ -81,14 +81,13 @@
         [self.contentView addSubview:content];
         //点赞按钮
         PingLundianzanBtn = [PinglundianzanCustomBtn buttonWithType:UIButtonTypeCustom];
-        PingLundianzanBtn.frame = CGRectMake(IPHONE_W - 60.0 / 375 * IPHONE_W, 20.0 / 667 * IPHONE_H, 50.0 / 375 * IPHONE_W, 20.0 / 667 * IPHONE_H);
         [self.contentView addSubview:PingLundianzanBtn];
         [PingLundianzanBtn setImage:[UIImage imageNamed:@"pinglun-yizan"] forState:UIControlStateSelected];
         [PingLundianzanBtn setImage:[UIImage imageNamed:@"pinglun-10"] forState:UIControlStateNormal];
         [PingLundianzanBtn addTarget:self action:@selector(pinglundianzanAction:) forControlEvents:UIControlEventTouchUpInside];
         
         //点赞label
-        PingLundianzanNumLab = [[UILabel alloc]initWithFrame:CGRectMake(CGRectGetMaxX(PingLundianzanBtn.frame) - 30.0 / 375 * IPHONE_W, PingLundianzanBtn.frame.origin.y + 1.0 / 667 * IPHONE_H, 20.0 / 375 * IPHONE_W, 20.0 / 667 * IPHONE_H)];
+        PingLundianzanNumLab = [[UILabel alloc]init];
         PingLundianzanNumLab.textAlignment = NSTextAlignmentCenter;
         PingLundianzanNumLab.font = [UIFont systemFontOfSize:16.0f / 375 * IPHONE_W];
         [self.contentView addSubview:PingLundianzanNumLab];
@@ -132,23 +131,31 @@
         content.text = frameModel.content;
     }
     //点赞按钮和赞人数
-    PingLundianzanNumLab.text = frameModel.model.praisenum;
-    if ([[NSString stringWithFormat:@"%@",frameModel.model.praiseFlag] isEqualToString:@"1"]){
-        PingLundianzanBtn.selected = NO;
-        PingLundianzanNumLab.textColor = [UIColor grayColor];
-        PingLundianzanNumLab.alpha = 0.7f;
+    if (!self.hideZanBtn) {
+        PingLundianzanBtn.hidden = NO;
+        PingLundianzanNumLab.hidden = NO;
+        PingLundianzanBtn.frame = frameModel.pingLundianzanBtnF;
+        PingLundianzanNumLab.frame = frameModel.pingLundianzanNumLabF;
+        PingLundianzanNumLab.text = frameModel.model.praisenum;
+        if ([[NSString stringWithFormat:@"%@",frameModel.model.praiseFlag] isEqualToString:@"1"]){
+            PingLundianzanBtn.selected = NO;
+            PingLundianzanNumLab.textColor = [UIColor grayColor];
+            PingLundianzanNumLab.alpha = 0.7f;
+        }
+        else if([[NSString stringWithFormat:@"%@",frameModel.model.praiseFlag] isEqualToString:@"2"]){
+            PingLundianzanBtn.selected = YES;
+            PingLundianzanNumLab.textColor = ColorWithRGBA(0, 159, 240, 1);
+            PingLundianzanNumLab.alpha = 1.0f;
+        }
+        else {
+            PingLundianzanBtn.selected = NO;
+            PingLundianzanNumLab.textColor = [UIColor grayColor];
+            PingLundianzanNumLab.alpha = 0.7f;
+        }
+    }else{
+        PingLundianzanBtn.hidden = YES;
+        PingLundianzanNumLab.hidden = YES;
     }
-    else if([[NSString stringWithFormat:@"%@",frameModel.model.praiseFlag] isEqualToString:@"2"]){
-        PingLundianzanBtn.selected = YES;
-        PingLundianzanNumLab.textColor = ColorWithRGBA(0, 159, 240, 1);
-        PingLundianzanNumLab.alpha = 1.0f;
-    }
-    else {
-        PingLundianzanBtn.selected = NO;
-        PingLundianzanNumLab.textColor = [UIColor grayColor];
-        PingLundianzanNumLab.alpha = 0.7f;
-    }
-
 }
 - (void)pinglundianzanAction:(UIButton *)sender
 {

@@ -143,10 +143,10 @@
     UIView *seperatorLine = [[UIView alloc]initWithFrame:CGRectMake(0, CGRectGetMaxY(self.helpTableView.frame), SCREEN_WIDTH, 1.0)];
     [seperatorLine setBackgroundColor:gThickLineColor];
     [self.view addSubview:seperatorLine];
-    [self.view addSubview:self.collectBtn];
     UIView *verticalLine = [[UIView alloc]initWithFrame:CGRectMake(SCREEN_WIDTH/4, CGRectGetMaxY(self.helpTableView.frame) + 8, 1.0, 33)];
     [verticalLine setBackgroundColor:gThickLineColor];
     [self.view addSubview:verticalLine];
+//    [self.view addSubview:self.collectBtn];
     [self.view addSubview:self.auditionnBtn];
     [self.purchaseBtn addSubview:self.priceLabel];
     [self.purchaseBtn addSubview:self.spriceLabel];
@@ -894,6 +894,7 @@
     }else{
         PlayVCCommentTableViewCell *cell = [PlayVCCommentTableViewCell cellWithTableView:tableView];
         cell.isClassComment = YES;
+        cell.hideZanBtn = YES;
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
         PlayVCCommentFrameModel *frameModel = self.pinglunArr[indexPath.row - 2 - self.classModel.imagesArray.count];
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
@@ -950,7 +951,7 @@
 - (UIButton *)auditionnBtn{
     if (!_auditionnBtn) {
         _auditionnBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-        [_auditionnBtn setFrame:CGRectMake(SCREEN_WIDTH / 4, SCREEN_HEIGHT - 49, SCREEN_WIDTH / 4, 49)];
+        [_auditionnBtn setFrame:CGRectMake(0, SCREEN_HEIGHT - 49, SCREEN_WIDTH / 4 *2, 49)];
         [_auditionnBtn setImage:[UIImage imageNamed:@"classpause"] forState:UIControlStateNormal];
         [_auditionnBtn setImage:[UIImage imageNamed:@"classplay"] forState:UIControlStateSelected];
         [_auditionnBtn setTitle:@"试听" forState:UIControlStateNormal];

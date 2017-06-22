@@ -15,6 +15,8 @@
 @property (assign, nonatomic) CGRect pinglunTitleF;
 @property (assign, nonatomic) CGRect pinglunshijianF;
 @property (assign, nonatomic) CGRect pinglunLabF;
+@property (assign, nonatomic) CGRect pingLundianzanBtnF;
+@property (assign, nonatomic) CGRect pingLundianzanNumLabF;
 @property (assign, nonatomic) CGRect commenterF;
 @property (assign, nonatomic) CGRect contentF;
 @property (assign, nonatomic) CGRect deviderF;

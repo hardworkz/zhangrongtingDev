@@ -13,6 +13,7 @@
 @property (copy, nonatomic) void (^zanClicked)(PinglundianzanCustomBtn *zanButton,PlayVCCommentFrameModel *frameModel);
 @property (strong, nonatomic) PlayVCCommentFrameModel *frameModel;
 @property (assign, nonatomic) BOOL isClassComment;
+@property (assign, nonatomic) BOOL hideZanBtn;
 + (NSString *)ID;
 
 +(PlayVCCommentTableViewCell *)cellWithTableView:(UITableView *)tableView;

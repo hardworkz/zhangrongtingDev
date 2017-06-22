@@ -395,6 +395,7 @@
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
     PlayVCCommentTableViewCell *cell = [PlayVCCommentTableViewCell cellWithTableView:tableView];
+    cell.hideZanBtn = YES;
     cell.isClassComment = YES;
     cell.selectionStyle = UITableViewCellSelectionStyleNone;
     PlayVCCommentFrameModel *frameModel = self.commentInfoArr[indexPath.row];
