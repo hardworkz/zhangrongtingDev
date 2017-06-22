@@ -10,11 +10,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "kuangjiaTingWen/kuangjiaTingWen/Playing/Controller/bofangVC.m"
-            timestampString = "519716497.182661"
+            timestampString = "519809473.567466"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1561"
-            endingLineNumber = "1561"
+            startingLineNumber = "1570"
+            endingLineNumber = "1570"
             landmarkName = "-appreciateGold"
             landmarkType = "7">
          </BreakpointContent>

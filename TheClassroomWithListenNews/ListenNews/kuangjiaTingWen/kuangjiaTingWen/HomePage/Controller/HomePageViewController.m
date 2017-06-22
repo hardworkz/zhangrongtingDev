@@ -528,6 +528,7 @@
     [bofangVC shareInstance].newsModel.ImgStrjiemu = dic[@"ImgStrjiemu"];
     [bofangVC shareInstance].newsModel.ZhengWenjiemu = dic[@"ZhengWenjiemu"];
     [bofangVC shareInstance].newsModel.praisenum = dic[@"praisenum"];
+    [[bofangVC shareInstance].tableView reloadData];
     [Explayer replaceCurrentItemWithPlayerItem:[[AVPlayerItem alloc]initWithURL:[NSURL URLWithString:dic[@"post_mp"]]]];
     ExisRigester = YES;
     ExIsKaiShiBoFang = YES;
@@ -536,9 +537,7 @@
     NSString *isPlayingVC = [CommonCode readFromUserD:@"isPlayingVC"];
     if ([isPlayingVC isEqualToString:@"YES"]) {
         NSString *isPlayingGray = [CommonCode readFromUserD:@"isPlayingGray"];
-        if ([isPlayingGray isEqualToString:@"NO"]) {
-            [[bofangVC shareInstance].tableView reloadData];
-        }
+        if ([isPlayingGray isEqualToString:@"NO"]) {        }
         else{
             [bofangVC shareInstance].isPushNews = YES;
             self.hidesBottomBarWhenPushed = YES;
@@ -637,6 +636,7 @@
     [bofangVC shareInstance].newsModel.ImgStrjiemu = self.pushNewsInfo[@"smeta"];
     [bofangVC shareInstance].newsModel.ZhengWenjiemu = self.pushNewsInfo[@"post_excerpt"];
     [bofangVC shareInstance].newsModel.praisenum = self.pushNewsInfo[@"praisenum"];
+    [[bofangVC shareInstance].tableView reloadData];
     [Explayer replaceCurrentItemWithPlayerItem:[[AVPlayerItem alloc]initWithURL:[NSURL URLWithString:self.pushNewsInfo[@"post_mp"]]]];
     ExisRigester = YES;
     ExIsKaiShiBoFang = YES;
@@ -645,7 +645,6 @@
     if ([isPlayingVC isEqualToString:@"YES"]) {
         NSString *isPlayingGray = [CommonCode readFromUserD:@"isPlayingGray"];
         if ([isPlayingGray isEqualToString:@"NO"]) {
-            [[bofangVC shareInstance].tableView reloadData];
         }
         else{
             [bofangVC shareInstance].isPushNews = YES;

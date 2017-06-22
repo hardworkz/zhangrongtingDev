@@ -375,6 +375,7 @@
         if (error){
             NSLog(@"删除头像文件时错误 = %@",error);
         }
+        [self.navigationController popViewControllerAnimated:YES];
     }
 }
 
