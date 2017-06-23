@@ -114,7 +114,6 @@ static ClassViewController *_instance = nil;
             Exact_id = self.act_id;
         }
         playIndex = -1;
-        [CommonCode writeToUserD:Exact_id andKey:@"Exact_id"];
         [self.helpTableView setContentOffset:CGPointZero animated:NO];
     }
     
@@ -724,6 +723,7 @@ static ClassViewController *_instance = nil;
 //点击底部试听按钮
 - (void)auditionnBtnAction:(UIButton *)sender{
     Exact_id = self.act_id;
+    [CommonCode writeToUserD:Exact_id andKey:@"Exact_id"];
     [CommonCode writeToUserD:self.playShiTingListArr andKey:playList];
     [CommonCode writeToUserD:self.act_id andKey:playAct_id];
     if (sender.selected == YES) {//选中状态，为播放状态,则将列表按钮设置全部设置为暂停
@@ -780,10 +780,11 @@ static ClassViewController *_instance = nil;
 }
 //列表试听按钮点击
 - (void)playTestMp:(UIButton *)sender{
-    [CommonCode writeToUserD:self.playShiTingListArr andKey:playList];
-    [CommonCode writeToUserD:self.act_id andKey:playAct_id];
     if (!_isVoicePlayEnd) {//判断不是播放完成调用该方法
+        [CommonCode writeToUserD:self.playShiTingListArr andKey:playList];
+        [CommonCode writeToUserD:self.act_id andKey:playAct_id];
         Exact_id = self.act_id;
+        [CommonCode writeToUserD:Exact_id andKey:@"Exact_id"];
     }
     _isVoicePlayEnd = NO;
     
