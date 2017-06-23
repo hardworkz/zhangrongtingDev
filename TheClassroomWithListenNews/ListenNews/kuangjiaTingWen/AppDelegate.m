@@ -107,6 +107,14 @@
     ExTouXiangPath = [[NSHomeDirectory() stringByAppendingPathComponent:@"Documents"] stringByAppendingPathComponent:@"userAvatar.png"];
     ExdangqianUserUid = [CommonCode readFromUserD:@"dangqianUserUid"];
     
+    //获取缓存的课堂ID，判断当前ID是否有值，没有值则不跳转课堂试听页面
+    Exact_id = [CommonCode readFromUserD:@"Exact_id"];
+    if (Exact_id != nil) {
+        ExIsClassVCPlay = YES;
+    }else{
+        ExIsClassVCPlay = NO;
+    }
+    
     [self getAppVersion];
     //启动时获取已登录用户的信息、未读消息
     if ([[CommonCode readFromUserD:@"isLogin"]boolValue] == YES) {

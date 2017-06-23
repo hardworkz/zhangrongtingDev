@@ -56,11 +56,22 @@
 //    self.navigationItem.title = @"发现";
     DefineWeakSelf;
     APPDELEGATE.faxianSkipToPlayingVC = ^(NSString *pushNewsID){
+        
+        if (ExIsClassVCPlay) {
+            ClassViewController *vc = [ClassViewController shareInstance];
+            vc.act_id = Exact_id;
+            weakSelf.hidesBottomBarWhenPushed = YES;
+            [weakSelf.navigationController.navigationBar setHidden:YES];
+            [weakSelf.navigationController pushViewController:vc animated:YES];
+            weakSelf.hidesBottomBarWhenPushed = NO;
+            return;
+        }
         if ([pushNewsID isEqualToString:@"NO"]) {
             //上一次听过的新闻
             if (ExIsKaiShiBoFang) {
                 self.hidesBottomBarWhenPushed = YES;
                 [self.navigationController pushViewController:[bofangVC shareInstance] animated:YES];
+                [[bofangVC shareInstance].tableView reloadData];
                 self.hidesBottomBarWhenPushed = NO;
             }
             else{
@@ -79,6 +90,7 @@
                     self.hidesBottomBarWhenPushed = YES;
                     [self.navigationController.navigationBar setHidden:YES];
                     [self.navigationController pushViewController:[bofangVC shareInstance] animated:YES];
+                    [[bofangVC shareInstance].tableView reloadData];
                     self.hidesBottomBarWhenPushed = NO;
                 }
                 if ([bofangVC shareInstance].isPlay) {
@@ -533,9 +545,9 @@
                 tempHeight = 0;
             }
             //图片
-            UIImageView *imgLeft = [[UIImageView alloc]initWithFrame:CGRectMake(20.0 / 375 * IPHONE_W, 10 + tempHeight, 105.0 / 375 * IPHONE_W, 105.0 / 375 *IPHONE_W)];
+            UIImageView *imgLeft = [[UIImageView alloc]initWithFrame:CGRectMake(20.0 / 375 * IPHONE_W, 15 + tempHeight, 105.0 / 375 * IPHONE_W, 105.0 / 375 *IPHONE_W)];
             if (IS_IPAD) {
-                [imgLeft setFrame:CGRectMake(20.0 / 375 * IPHONE_W, 10, 105.0 / 375 * IPHONE_W, 70.0 / 375 *IPHONE_W)];
+                [imgLeft setFrame:CGRectMake(20.0 / 375 * IPHONE_W, 15, 105.0 / 375 * IPHONE_W, 70.0 / 375 *IPHONE_W)];
             }
             [imgLeft.layer setMasksToBounds:YES];
             [imgLeft.layer setCornerRadius:5.0];
@@ -566,7 +578,7 @@
             classTitle.frame = CGRectMake(classTitle.frame.origin.x, classTitle.frame.origin.y, classTitle.frame.size.width, size.height);
             //价钱
             UILabel *price = [[UILabel alloc]initWithFrame:CGRectMake(CGRectGetMaxX(classTitle.frame) + 10, classTitle.frame.origin.y,40.0 / 375 * IPHONE_W, 21.0 / 667 *IPHONE_H)];
-            price.text = [NSString stringWithFormat:@"￥%ld",[subModel2.price integerValue]];
+            price.text = [NSString stringWithFormat:@"¥%@",[NetWorkTool formatFloat:[subModel2.price floatValue]]];
             price.font = gFontMain14;
             price.textColor = gMainColor;
             [cell.contentView addSubview:price];
@@ -644,10 +656,10 @@
         //TODO:发现课堂模块
         faxianModel *model = [self.faxianArrM firstObject];
         if (indexPath.row == 0){
-            return  157.5 / 667 * IPHONE_H;
+            return  167.5 / 667 * IPHONE_H;
         }
         else if(indexPath.row < [model.data count]){
-            return  125.0 / 667 * IPHONE_H;
+            return  135.0 / 667 * IPHONE_H;
         }
         else if (indexPath.row == [model.data  count]){
             return 161.0 / 667 * IPHONE_H;
@@ -697,7 +709,7 @@
                 }
                 //跳转未购买课堂界面
                 else if ([dic[@"is_free"] isEqualToString:@"0"]){
-                    ClassViewController *vc = [ClassViewController new];
+                    ClassViewController *vc = [ClassViewController shareInstance];
                     vc.act_id = dic[@"id"];
                     self.hidesBottomBarWhenPushed = YES;
                     [self.navigationController.navigationBar setHidden:YES];
@@ -720,6 +732,7 @@
                     self.hidesBottomBarWhenPushed = YES;
                     [self.navigationController.navigationBar setHidden:YES];
                     [self.navigationController pushViewController:[bofangVC shareInstance] animated:YES];
+                    [[bofangVC shareInstance].tableView reloadData];
                     self.hidesBottomBarWhenPushed = NO;
                     if ([bofangVC shareInstance].isPlay) {
                         
@@ -804,6 +817,7 @@
                     self.hidesBottomBarWhenPushed = YES;
                     [self.navigationController.navigationBar setHidden:YES];
                     [self.navigationController pushViewController:[bofangVC shareInstance] animated:YES];
+                    [[bofangVC shareInstance].tableView reloadData];
                     self.hidesBottomBarWhenPushed = NO;
                 }
                 else{
@@ -868,18 +882,6 @@
         //TODO：发现课堂模块
         faxianModel *model = [self.faxianArrM firstObject];
         if (indexPath.row < [model.data count]) {
-//            if ([[self.faxianArrM firstObject][@"data"][indexPath.row][@"is_free"] isEqualToString:@"1"]) {
-//                XWAlerLoginView *xw = [[XWAlerLoginView alloc]initWithTitle:@"已购买界面正在开发中"];
-//                [xw show];
-//            }
-//            else if ([[self.faxianArrM firstObject][@"data"][indexPath.row][@"is_free"] isEqualToString:@"0"]){
-//                ClassViewController *vc = [ClassViewController new];
-//                vc.act_id = [self.faxianArrM firstObject][@"data"][indexPath.row][@"id"];
-//                self.hidesBottomBarWhenPushed = YES;
-//                [self.navigationController.navigationBar setHidden:YES];
-//                [self.navigationController pushViewController:vc animated:YES];
-//                self.hidesBottomBarWhenPushed = NO;
-//            }
             faxianSubModel *dic = model.data[indexPath.row];
             if ([dic.is_free isEqualToString:@"1"]) {
                 zhuboXiangQingVCNewController *faxianzhuboVC = [[zhuboXiangQingVCNewController alloc]init];
@@ -899,7 +901,7 @@
             }
             //跳转未购买课堂界面
             else if ([dic.is_free isEqualToString:@"0"]){
-                ClassViewController *vc = [ClassViewController new];
+                ClassViewController *vc = [ClassViewController shareInstance];
                 vc.act_id = dic.ID;
                 self.hidesBottomBarWhenPushed = YES;
                 [self.navigationController.navigationBar setHidden:YES];
@@ -1346,7 +1348,7 @@
     [bofangVC shareInstance].newsModel.ImgStrjiemu = self.pushNewsInfo[@"smeta"];
     [bofangVC shareInstance].newsModel.ZhengWenjiemu = self.pushNewsInfo[@"post_excerpt"];
     [bofangVC shareInstance].newsModel.praisenum = self.pushNewsInfo[@"praisenum"];
-    //            [[bofangVC shareInstance].newsModel.tableView reloadData];
+    [[bofangVC shareInstance].tableView reloadData];
     [Explayer replaceCurrentItemWithPlayerItem:[[AVPlayerItem alloc]initWithURL:[NSURL URLWithString:self.pushNewsInfo[@"post_mp"]]]];
     ExisRigester = YES;
     ExIsKaiShiBoFang = YES;
@@ -1363,6 +1365,7 @@
             self.hidesBottomBarWhenPushed = YES;
             [self.navigationController.navigationBar setHidden:YES];
             [self.navigationController pushViewController:[bofangVC shareInstance] animated:YES];
+            [[bofangVC shareInstance].tableView reloadData];
             self.hidesBottomBarWhenPushed = NO;
             
         }
@@ -1378,6 +1381,7 @@
         self.hidesBottomBarWhenPushed = YES;
         [self.navigationController.navigationBar setHidden:YES];
         [self.navigationController pushViewController:[bofangVC shareInstance] animated:YES];
+        [[bofangVC shareInstance].tableView reloadData];
         self.hidesBottomBarWhenPushed = NO;
         if ([bofangVC shareInstance].isPlay) {
             
@@ -1432,7 +1436,6 @@
     [bofangVC shareInstance].newsModel.ImgStrjiemu = dic[@"ImgStrjiemu"];
     [bofangVC shareInstance].newsModel.ZhengWenjiemu = dic[@"ZhengWenjiemu"];
     [bofangVC shareInstance].newsModel.praisenum = dic[@"praisenum"];
-    //[[bofangVC shareInstance].newsModel.tableView reloadData];
     [Explayer replaceCurrentItemWithPlayerItem:[[AVPlayerItem alloc]initWithURL:[NSURL URLWithString:dic[@"post_mp"]]]];
     ExisRigester = YES;
     ExIsKaiShiBoFang = YES;
@@ -1449,6 +1452,7 @@
             self.hidesBottomBarWhenPushed = YES;
             [self.navigationController.navigationBar setHidden:YES];
             [self.navigationController pushViewController:[bofangVC shareInstance] animated:YES];
+            [[bofangVC shareInstance].tableView reloadData];
             self.hidesBottomBarWhenPushed = NO;
             
         }
@@ -1465,6 +1469,7 @@
         self.hidesBottomBarWhenPushed = YES;
         [self.navigationController.navigationBar setHidden:YES];
         [self.navigationController pushViewController:[bofangVC shareInstance] animated:YES];
+        [[bofangVC shareInstance].tableView reloadData];
         self.hidesBottomBarWhenPushed = NO;
         if ([bofangVC shareInstance].isPlay) {
             

@@ -60,11 +60,22 @@
     [super viewDidLoad];
     DefineWeakSelf;
     APPDELEGATE.dingyueSkipToPlayingVC = ^(NSString *pushNewsID){
+        
+        if (ExIsClassVCPlay) {
+            ClassViewController *vc = [ClassViewController shareInstance];
+            vc.act_id = Exact_id;
+            weakSelf.hidesBottomBarWhenPushed = YES;
+            [weakSelf.navigationController.navigationBar setHidden:YES];
+            [weakSelf.navigationController pushViewController:vc animated:YES];
+            weakSelf.hidesBottomBarWhenPushed = NO;
+            return;
+        }
         if ([pushNewsID isEqualToString:@"NO"]) {
             //上一次听过的新闻
             if (ExIsKaiShiBoFang) {
                 self.hidesBottomBarWhenPushed = YES;
                 [self.navigationController pushViewController:[bofangVC shareInstance] animated:YES];
+                [[bofangVC shareInstance].tableView reloadData];
                 self.hidesBottomBarWhenPushed = NO;
             }
             else{
@@ -83,6 +94,7 @@
                     self.hidesBottomBarWhenPushed = YES;
                     [self.navigationController.navigationBar setHidden:YES];
                     [self.navigationController pushViewController:[bofangVC shareInstance] animated:YES];
+                    [[bofangVC shareInstance].tableView reloadData];
                     self.hidesBottomBarWhenPushed = NO;
                 }
                 if ([bofangVC shareInstance].isPlay) {
@@ -293,7 +305,6 @@
         [bofangVC shareInstance].newsModel.ZhengWenjiemu = self.infoArr[indexPath.row][@"post_excerpt"];
         [bofangVC shareInstance].newsModel.praisenum = self.infoArr[indexPath.row][@"praisenum"];
         [[bofangVC shareInstance].tableView reloadData];
-        //        Explayer = [[AVPlayer alloc]initWithPlayerItem:[[AVPlayerItem alloc]initWithURL:[NSURL URLWithString:arr[indexPath.row][@"post_mp"]]]];
         [Explayer replaceCurrentItemWithPlayerItem:[[AVPlayerItem alloc]initWithURL:[NSURL URLWithString:self.infoArr[indexPath.row][@"post_mp"]]]];
         if ([bofangVC shareInstance].isPlay || ExIsKaiShiBoFang == NO) {
             
@@ -308,7 +319,6 @@
         [self.navigationController.navigationBar setHidden:YES];
         [self.navigationController pushViewController:[bofangVC shareInstance] animated:YES];
         [[bofangVC shareInstance].tableView reloadData];
-        //        [self.navigationController.navigationBar setHidden:NO];
         self.hidesBottomBarWhenPushed = NO;
         [[NSNotificationCenter defaultCenter] postNotificationName:@"yuanpanzhuan" object:nil];
         [[NSNotificationCenter defaultCenter] postNotificationName:@"qiehuanxinwen" object:nil];
@@ -584,6 +594,7 @@
             self.hidesBottomBarWhenPushed = YES;
             [self.navigationController.navigationBar setHidden:YES];
             [self.navigationController pushViewController:[bofangVC shareInstance] animated:YES];
+            [[bofangVC shareInstance].tableView reloadData];
             self.hidesBottomBarWhenPushed = NO;
             
         }
@@ -599,6 +610,7 @@
         self.hidesBottomBarWhenPushed = YES;
         [self.navigationController.navigationBar setHidden:YES];
         [self.navigationController pushViewController:[bofangVC shareInstance] animated:YES];
+        [[bofangVC shareInstance].tableView reloadData];
         self.hidesBottomBarWhenPushed = NO;
         if ([bofangVC shareInstance].isPlay) {
             
@@ -669,6 +681,7 @@
             self.hidesBottomBarWhenPushed = YES;
             [self.navigationController.navigationBar setHidden:YES];
             [self.navigationController pushViewController:[bofangVC shareInstance] animated:YES];
+            [[bofangVC shareInstance].tableView reloadData];
             self.hidesBottomBarWhenPushed = NO;
             
         }
@@ -685,6 +698,7 @@
         self.hidesBottomBarWhenPushed = YES;
         [self.navigationController.navigationBar setHidden:YES];
         [self.navigationController pushViewController:[bofangVC shareInstance] animated:YES];
+        [[bofangVC shareInstance].tableView reloadData];
         self.hidesBottomBarWhenPushed = NO;
         if ([bofangVC shareInstance].isPlay) {
             

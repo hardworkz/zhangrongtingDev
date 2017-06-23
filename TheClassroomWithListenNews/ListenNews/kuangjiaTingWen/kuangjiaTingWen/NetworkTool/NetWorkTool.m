@@ -13,6 +13,57 @@
 
 @implementation NetWorkTool
 
+/**
+ 获取当前栈顶控制器
+
+ @return 栈顶控制器
+ */
++ (UIViewController *)currentViewController
+{
+    UIWindow *keyWindow  = [UIApplication sharedApplication].keyWindow;
+    UIViewController *vc = keyWindow.rootViewController;
+    while (vc.presentedViewController)
+    {
+        vc = vc.presentedViewController;
+        
+        if ([vc isKindOfClass:[UINavigationController class]])
+        {
+            vc = [(UINavigationController *)vc visibleViewController];
+        }
+        else if ([vc isKindOfClass:[UITabBarController class]])
+        {
+            vc = [(UITabBarController *)vc selectedViewController];
+        }
+    }
+    return vc;
+}
+
+/**
+ 返回当前栈顶导航栏控制器
+
+ @return 栈顶导航栏控制器
+ */
++ (UINavigationController *)currentNavigationController
+{
+    return [self currentViewController].navigationController;
+}
+/**
+ 去除小数点后面为0的值，保留有效位
+ 
+ @param f 浮点型数值
+ @return 返回处理后的字符串
+ */
++ (NSString *)formatFloat:(float)f
+{
+    if (fmodf(f, 1) == 0) {//如果有一位小数点
+        return [NSString stringWithFormat:@"%.0f",f];
+    } else if (fmodf(f*10, 1)==0) {//如果有两位小数点
+        return [NSString stringWithFormat:@"%.1f",f];
+    } else {
+        return [NSString stringWithFormat:@"%.2f",f];
+    }
+}
+
 //将NSDictionary中的Null类型的项目转化成@""
 +(NSDictionary *)nullDic:(NSDictionary *)myDic{
     NSArray *keyArr = [myDic allKeys];

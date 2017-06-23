@@ -10,6 +10,7 @@
 #define HomePageHeader_h
 
 #import "zhuboxiangqingVCNew.h"
+#import "ClassViewController.h"
 
 #import "ClassContentTableViewCell.h"
 #import "ClassAuditionTableViewCell.h"

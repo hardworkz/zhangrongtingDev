@@ -133,9 +133,23 @@
             if (_playingIndex == i) {
                 playTestMp.selected = YES;
             }
+            
             titleLab.text = model.s_title;
             titleLab.frame = [frameModel.titlesFrameArray[i] CGRectValue];
             [playTestMp setFrame:[frameModel.buttonsFrameArray[i] CGRectValue]];
+        }
+    }
+    for (int i = 0; i<self.buttons.count; i++) {
+        UILabel *titleLab;
+        UIButton *playTestMp;
+        titleLab = self.titles[i];
+        playTestMp = self.buttons[i];
+        if (i<frameModel.auditionArray.count) {
+            titleLab.hidden = NO;
+            playTestMp.hidden = NO;
+        }else{
+            titleLab.hidden = YES;
+            playTestMp.hidden = YES;
         }
     }
     auditionLabel.frame = frameModel.auditionLabelF;
@@ -167,5 +181,9 @@
     if (self.playAudition) {
         self.playAudition(button, self.buttons);
     }
+}
+- (void)dealloc
+{
+    RTLog(@"dealloc");
 }
 @end

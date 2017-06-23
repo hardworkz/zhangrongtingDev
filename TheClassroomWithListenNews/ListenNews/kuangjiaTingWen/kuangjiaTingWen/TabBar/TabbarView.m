@@ -15,6 +15,7 @@
 
 #import "TabbarView.h"
 #import "AppDelegate.h"
+#import "ClassViewController.h"
 
 @interface TabbarView ()
 
@@ -159,6 +160,20 @@
 - (void)rotationBarBtnAction:(UIButton *)sender{
     
     NSString *pushNewsID = @"";
+//    if (ExIsClassVCPlay) {
+//        UITabBarController *topTabVC = (UITabBarController *)[NetWorkTool currentViewController];
+//        UIViewController *topVC = topTabVC.selectedViewController;
+//        UINavigationController *currenNavVC = [NetWorkTool currentNavigationController];
+//        id object = [self nextResponder];
+//        
+//        while (![object isKindOfClass:[UIViewController class]] &&
+//               object != nil) {
+//            object = [object nextResponder];
+//        }
+//        UINavigationController *navVC = (UINavigationController *)object;
+        
+//        return;
+//    }
     if (_isPushSkip) {
         pushNewsID = [[NSUserDefaults standardUserDefaults]valueForKey:@"pushNews"];
         [[NSUserDefaults standardUserDefaults] synchronize];

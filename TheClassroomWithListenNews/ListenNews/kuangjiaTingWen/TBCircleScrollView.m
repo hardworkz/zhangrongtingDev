@@ -319,7 +319,7 @@
         }
         HomePageViewController *homePageVC = (HomePageViewController *)object;
         UINavigationController *nav = homePageVC.navigationController;
-        ClassViewController *classVC = [ClassViewController new];
+        ClassViewController *classVC = [ClassViewController shareInstance];
         classVC.act_id = newArr[_curPage][@"url"];
         classVC.hidesBottomBarWhenPushed = YES;
         [nav.navigationBar setHidden:YES];

@@ -65,11 +65,23 @@ typedef void(^animateBlock)();
 //    self.navigationItem.title = @"我";
     DefineWeakSelf;
     APPDELEGATE.woSkipToPlayingVC = ^ (NSString *pushNewsID){
+        
+        if (ExIsClassVCPlay) {
+            ClassViewController *vc = [ClassViewController shareInstance];
+            vc.act_id = Exact_id;
+            weakSelf.hidesBottomBarWhenPushed = YES;
+            [weakSelf.navigationController.navigationBar setHidden:YES];
+            [weakSelf.navigationController pushViewController:vc animated:YES];
+            weakSelf.hidesBottomBarWhenPushed = NO;
+            return;
+        }
+        
         if ([pushNewsID isEqualToString:@"NO"]) {
             //上一次听过的新闻
             if (ExIsKaiShiBoFang) {
                 self.hidesBottomBarWhenPushed = YES;
                 [self.navigationController pushViewController:[bofangVC shareInstance] animated:YES];
+                [[bofangVC shareInstance].tableView reloadData];
                 self.hidesBottomBarWhenPushed = NO;
             }
             else{
@@ -88,6 +100,7 @@ typedef void(^animateBlock)();
                     self.hidesBottomBarWhenPushed = YES;
                     [self.navigationController.navigationBar setHidden:YES];
                     [self.navigationController pushViewController:[bofangVC shareInstance] animated:YES];
+                    [[bofangVC shareInstance].tableView reloadData];
                     self.hidesBottomBarWhenPushed = NO;
                 }
                 if ([bofangVC shareInstance].isPlay) {
@@ -339,7 +352,7 @@ typedef void(^animateBlock)();
     [bofangVC shareInstance].newsModel.ImgStrjiemu = self.pushNewsInfo[@"smeta"];
     [bofangVC shareInstance].newsModel.ZhengWenjiemu = self.pushNewsInfo[@"post_excerpt"];
     [bofangVC shareInstance].newsModel.praisenum = self.pushNewsInfo[@"praisenum"];
-    //            [[bofangVC shareInstance].newsModel.tableView reloadData];
+    [[bofangVC shareInstance].tableView reloadData];
     [Explayer replaceCurrentItemWithPlayerItem:[[AVPlayerItem alloc]initWithURL:[NSURL URLWithString:self.pushNewsInfo[@"post_mp"]]]];
     ExisRigester = YES;
     ExIsKaiShiBoFang = YES;
@@ -356,6 +369,7 @@ typedef void(^animateBlock)();
             self.hidesBottomBarWhenPushed = YES;
             [self.navigationController.navigationBar setHidden:YES];
             [self.navigationController pushViewController:[bofangVC shareInstance] animated:YES];
+            [[bofangVC shareInstance].tableView reloadData];
             self.hidesBottomBarWhenPushed = NO;
             
         }
@@ -371,6 +385,7 @@ typedef void(^animateBlock)();
         self.hidesBottomBarWhenPushed = YES;
         [self.navigationController.navigationBar setHidden:YES];
         [self.navigationController pushViewController:[bofangVC shareInstance] animated:YES];
+        [[bofangVC shareInstance].tableView reloadData];
         self.hidesBottomBarWhenPushed = NO;
         if ([bofangVC shareInstance].isPlay) {
             
@@ -423,7 +438,7 @@ typedef void(^animateBlock)();
     [bofangVC shareInstance].newsModel.ImgStrjiemu = dic[@"ImgStrjiemu"];
     [bofangVC shareInstance].newsModel.ZhengWenjiemu = dic[@"ZhengWenjiemu"];
     [bofangVC shareInstance].newsModel.praisenum = dic[@"praisenum"];
-    //[[bofangVC shareInstance].newsModel.tableView reloadData];
+    [[bofangVC shareInstance].tableView reloadData];
     [Explayer replaceCurrentItemWithPlayerItem:[[AVPlayerItem alloc]initWithURL:[NSURL URLWithString:dic[@"post_mp"]]]];
     ExisRigester = YES;
     ExIsKaiShiBoFang = YES;
@@ -440,6 +455,7 @@ typedef void(^animateBlock)();
             self.hidesBottomBarWhenPushed = YES;
             [self.navigationController.navigationBar setHidden:YES];
             [self.navigationController pushViewController:[bofangVC shareInstance] animated:YES];
+            [[bofangVC shareInstance].tableView reloadData];
             self.hidesBottomBarWhenPushed = NO;
             
         }
@@ -456,6 +472,7 @@ typedef void(^animateBlock)();
         self.hidesBottomBarWhenPushed = YES;
         [self.navigationController.navigationBar setHidden:YES];
         [self.navigationController pushViewController:[bofangVC shareInstance] animated:YES];
+        [[bofangVC shareInstance].tableView reloadData];
         self.hidesBottomBarWhenPushed = NO;
         if ([bofangVC shareInstance].isPlay) {
             

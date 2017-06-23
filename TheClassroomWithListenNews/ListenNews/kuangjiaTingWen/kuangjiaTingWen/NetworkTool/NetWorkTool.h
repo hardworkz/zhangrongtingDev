@@ -15,6 +15,26 @@
 #define SUCCEED_CODE @"0"  //网络返回成功码
 @interface NetWorkTool : NSObject
 /**
+ 获取当前栈顶控制器
+ 
+ @return 栈顶控制器
+ */
++ (UIViewController *)currentViewController;
+/**
+ 返回当前栈顶导航栏控制器
+ 
+ @return 栈顶导航栏控制器
+ */
++ (UINavigationController *)currentNavigationController;
+/**
+ 去除小数点后面为0的值，保留有效位
+ 
+ @param f 浮点型数值
+ @return 返回处理后的字符串
+ */
++ (NSString *)formatFloat:(float)f;
+
+/**
  *  数组转json
  *
  *  @param arr 数组

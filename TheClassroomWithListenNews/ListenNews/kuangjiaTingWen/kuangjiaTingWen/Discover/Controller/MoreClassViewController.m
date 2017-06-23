@@ -198,10 +198,10 @@
         CGSize size = [titleLab sizeThatFits:CGSizeMake(titleLab.frame.size.width, MAXFLOAT)];
         titleLab.frame = CGRectMake(titleLab.frame.origin.x, titleLab.frame.origin.y, titleLab.frame.size.width, size.height);
         //价钱
-        UILabel *price = [[UILabel alloc]initWithFrame:CGRectMake(CGRectGetMaxX(titleLab.frame) + 10, titleLab.frame.origin.y,40.0 / 375 * IPHONE_W, 21.0 / 667 *IPHONE_H)];
-        price.text = [NSString stringWithFormat:@"￥%ld",[self.commentInfoArr[indexPath.row][@"price"] integerValue]];
+        UILabel *price = [[UILabel alloc]initWithFrame:CGRectMake(SCREEN_WIDTH - 20 - 40.0 / 375 * IPHONE_W, titleLab.frame.origin.y,40.0 / 375 * IPHONE_W, 21.0 / 667 *IPHONE_H)];
+        price.text = [NSString stringWithFormat:@"¥%@",[NetWorkTool formatFloat:[self.commentInfoArr[indexPath.row][@"price"] floatValue]]];
         price.font = gFontMain14;
-        //            price.textAlignment = NSTextAlignmentRight;
+        price.textAlignment = NSTextAlignmentRight;
         price.textColor = gMainColor;
         [cell.contentView addSubview:price];
         
@@ -243,7 +243,7 @@
         [xw show];
     }
     else if ([self.commentInfoArr[indexPath.row][@"is_free"] isEqualToString:@"0"]){
-        ClassViewController *vc = [ClassViewController new];
+        ClassViewController *vc = [ClassViewController shareInstance];
         vc.act_id = self.commentInfoArr[indexPath.row][@"id"];
         self.hidesBottomBarWhenPushed = YES;
         [self.navigationController.navigationBar setHidden:YES];

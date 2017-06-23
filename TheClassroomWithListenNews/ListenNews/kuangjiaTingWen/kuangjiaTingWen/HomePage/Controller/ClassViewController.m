@@ -18,12 +18,14 @@
 #import "CommentViewController.h"
 #import "AppDelegate.h"
 
+static NSString *const playList = @"playList";/**<当前正在播放的课堂试听列表*/
+static NSString *const playAct_id = @"playAct_id";/**<当前正在播放的课堂ID*/
 
 @interface ClassViewController ()<UITableViewDelegate,UITableViewDataSource,UITextViewDelegate,TTTAttributedLabelDelegate>{
     UIView *xiangqingView;
     UILabel *PingLundianzanNumLab;
     NSInteger playIndex;
-    NSString *currentClassID;
+//    NSString *currentClassID;
     UITextView *zhengwenTextView;
     NSString *rewardMoney;
     NSString *orderNum;
@@ -38,6 +40,7 @@
 @property (nonatomic, strong) UITableView *helpTableView;
 @property (nonatomic, strong) NSMutableArray *buttons;
 @property (nonatomic, strong) NSMutableArray *dataSourceArr;
+@property (nonatomic, strong) NSMutableArray *playShiTingListArr;
 @property (nonatomic, strong) NSMutableArray *pinglunArr;
 //@property (nonatomic, strong) NSMutableDictionary *auditionResult;
 @property (strong, nonatomic) ClassModel *classModel;
@@ -58,22 +61,31 @@
 @property (strong, nonatomic) AVAudioSession *session;
 @property (assign, nonatomic) BOOL isPlaying;
 @property (assign, nonatomic) NSInteger playingIndex;
-
+@property (assign, nonatomic) BOOL isVoicePlayEnd;//判断是否是播放完成回调
 @end
 
+static ClassViewController *_instance = nil;
 @implementation ClassViewController
+
++ (instancetype)shareInstance {
+    static dispatch_once_t onceToken ;
+    dispatch_once(&onceToken, ^{
+        _instance = [[self alloc] init];
+    }) ;
+    return _instance ;
+}
 
 - (void)viewDidLoad {
     [super viewDidLoad];
     
     self.titleFontSize = 19.0;
     
-    currentClassID = [CommonCode readFromUserD:@"currentClassID"];
-    if ([currentClassID isEqualToString:self.act_id]) {
-        playIndex = [[CommonCode readFromUserD:@"playIndex"] integerValue];
-    }else{
-        playIndex = 0;
-    }
+//    currentClassID = [CommonCode readFromUserD:@"currentClassID"];
+//    if ([currentClassID isEqualToString:self.act_id]) {
+//        playIndex = [[CommonCode readFromUserD:@"playIndex"] integerValue];
+//    }else{
+//        playIndex = 0;
+//    }
     [self setUpData];
     [self setUpView];
     
@@ -83,25 +95,47 @@
 
 - (void)viewWillAppear:(BOOL)animated{
     [super viewWillAppear:animated];
+    
     self.hidesBottomBarWhenPushed = YES;
     [self.navigationController setNavigationBarHidden:YES animated:YES];
+    
+    ExIsClassVCPlay = YES;
+    //单例模式刷新数据
+    if (![Exact_id isEqualToString:self.act_id]) {//当前为不同页面，需要重新初始化控件状态
+        [self loadData];
+        if ([[CommonCode readFromUserD:playAct_id] isEqualToString:self.act_id] && _isPlaying)
+        {
+            self.auditionnBtn.selected = YES;
+        }else{
+            self.auditionnBtn.selected = NO;
+        }
+        
+        if (Exact_id == nil) {
+            Exact_id = self.act_id;
+        }
+        playIndex = -1;
+        [CommonCode writeToUserD:Exact_id andKey:@"Exact_id"];
+        [self.helpTableView setContentOffset:CGPointZero animated:NO];
+    }
+    
 }
 
 - (void)viewWillDisappear:(BOOL)animated{
     [super viewWillDisappear:animated];
     [self.navigationController setNavigationBarHidden:NO animated:YES];
-    //    [Explayer pause];
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"AliPayResults" object:nil];
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"WechatPayResults" object:nil];
-    if (_isPlaying) {
-        [self auditionnBtnAction:_auditionnBtn];
-    }
+    
+//    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"AliPayResults" object:nil];
+//    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"WechatPayResults" object:nil];
+//    if (_isPlaying) {
+//        [self auditionnBtnAction:_auditionnBtn];
+//    }
 }
 
 - (void)setUpData{
     _pinglunArr = [NSMutableArray new];
     _dataSourceArr = [NSMutableArray new];
     _ImageSizeArr = [NSMutableArray new];
+    
     [self loadData];
     
     _isPlaying = NO;
@@ -143,9 +177,10 @@
     UIView *seperatorLine = [[UIView alloc]initWithFrame:CGRectMake(0, CGRectGetMaxY(self.helpTableView.frame), SCREEN_WIDTH, 1.0)];
     [seperatorLine setBackgroundColor:gThickLineColor];
     [self.view addSubview:seperatorLine];
-    UIView *verticalLine = [[UIView alloc]initWithFrame:CGRectMake(SCREEN_WIDTH/4, CGRectGetMaxY(self.helpTableView.frame) + 8, 1.0, 33)];
-    [verticalLine setBackgroundColor:gThickLineColor];
-    [self.view addSubview:verticalLine];
+    
+//    UIView *verticalLine = [[UIView alloc]initWithFrame:CGRectMake(SCREEN_WIDTH/4, CGRectGetMaxY(self.helpTableView.frame) + 8, 1.0, 33)];
+//    [verticalLine setBackgroundColor:gThickLineColor];
+//    [self.view addSubview:verticalLine];
 //    [self.view addSubview:self.collectBtn];
     [self.view addSubview:self.auditionnBtn];
     [self.purchaseBtn addSubview:self.priceLabel];
@@ -167,25 +202,31 @@
     [NetWorkTool getAuditionListWithaccessToken:accessToken act_id:self.act_id sccess:^(NSDictionary *responseObject) {
         if ([responseObject[@"status"] integerValue] == 1) {
             ExisRigester = NO;
+            if ([responseObject[@"results"][@"shiting"] isKindOfClass:[NSArray class]]) {
+                self.playShiTingListArr = responseObject[@"results"][@"shiting"];
+            }
             self.classModel = [ClassModel mj_objectWithKeyValues:responseObject[@"results"]];
             self.frameArray = [self frameArrayWithClassModel:self.classModel];
             self.pinglunArr = [self pinglunFrameModelArrayWithModelArray:[PlayVCCommentModel mj_objectArrayWithKeyValuesArray:responseObject[@"results"][@"comments"]]];
             [self setTableHeadView];
             [self.helpTableView reloadData];
             
-            NSString *textStr = [NSString stringWithFormat:@" ￥%d ",[responseObject[@"results"][@"sprice"]intValue]];
+            //判断是否是纯数字
+            NSString *textStr = [NSString stringWithFormat:@" ￥%@ ",[NetWorkTool formatFloat:[responseObject[@"results"][@"sprice"] floatValue]]];
             //中划线
             NSDictionary *attribtDic = @{NSStrikethroughStyleAttributeName: [NSNumber numberWithInteger:NSUnderlineStyleSingle]};
             NSMutableAttributedString *attribtStr = [[NSMutableAttributedString alloc]initWithString:textStr attributes:attribtDic];
             // 赋值
             self.spriceLabel.attributedText = attribtStr;
-            self.priceLabel.text = [NSString stringWithFormat:@" ￥%d",[responseObject[@"results"][@"price"] intValue]];
+            self.priceLabel.text = [NSString stringWithFormat:@" ￥%@",[NetWorkTool formatFloat:[responseObject[@"results"][@"price"] floatValue]]];
+            
         }
     } failure:^(NSError *error) {
         //
         [weakSelf loadData];
     }];
 }
+
 /*
  * 设置frameArray数组
  */
@@ -428,7 +469,9 @@
 
 #pragma mark - NSNotification
 - (void)voicePlayEnd:(NSNotification *)notice {
-    if (_playingIndex < [self.classModel.shiting count] - 1) {
+    NSArray *shitingArray = [CommonCode readFromUserD:playList];
+    if (_playingIndex < [shitingArray count] - 1) {
+        _isVoicePlayEnd = YES;
         UIButton *nextTextMPButton = self.buttons[_playingIndex + 1];
         [self playTestMp:nextTextMPButton];
     }
@@ -455,95 +498,44 @@
     _isPlaying = NO;
 }
 
-- (void)dealloc {
-    [CommonCode writeToUserD:self.act_id andKey:@"currentClassID"];
-    [CommonCode writeToUserD:[NSString stringWithFormat:@"%ld",playIndex] andKey:@"playIndex"];
-}
+//- (void)dealloc {
+//    [CommonCode writeToUserD:self.act_id andKey:@"currentClassID"];
+//    [CommonCode writeToUserD:[NSString stringWithFormat:@"%ld",playIndex] andKey:@"playIndex"];
+//}
 
 #pragma mark - UIButtonAction
 - (void)collectBtnAction:(UIButton *)sender{
     XWAlerLoginView *xw = [[XWAlerLoginView alloc]initWithTitle:@"购买了才能订阅哦~"];
     [xw show];
 }
-//点击底部试听按钮
-- (void)auditionnBtnAction:(UIButton *)sender{
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"stopAnimate" object:nil];
-    if (sender.selected == YES) {//选中状态，为播放状态,则将列表按钮设置全部设置为暂停
-        sender.selected = NO;
-        for ( int i = 0 ; i < self.buttons.count; i ++ ) {
-                UIButton *anotherButton = self.buttons[i];
-                anotherButton.selected = NO;
-                continue;
-        }
-        _playingIndex = -1;
-        [Explayer pause];
-        _isPlaying = NO;
-    }
-    else{//未选中状态，为暂停状态,判断当前播放第一个按钮，设置播放状态
-        sender.selected = YES;
-        for ( int i = 0 ; i < self.buttons.count; i ++ ) {
-            if (i == 0) {
-                UIButton *allDoneButton = [self.buttons firstObject];
-                allDoneButton.selected = YES;
-                continue;
-            }
-            else{
-                UIButton *anotherButton = self.buttons[i];
-                anotherButton.selected = NO;
-                continue;
-            }
-        }
-        
-        if ([bofangVC shareInstance].isPlay) {
-            [[bofangVC shareInstance] doplay2];
-        }
-        else{
-            
-        }
-        [Explayer pause];
-        if (Explayer == nil) {
-            Explayer = [[AVPlayer alloc]init];
-        }
-        ClassAuditionListModel *auditionModel = [self.classModel.shiting firstObject];
-        [Explayer replaceCurrentItemWithPlayerItem:[[AVPlayerItem alloc]initWithURL:[NSURL URLWithString:auditionModel.s_mpurl]]];
-        
-        [Explayer play];
-        _isPlaying = YES;
-        _playingIndex = 0;
-        [CommonCode writeToUserD:@"YES" andKey:TINGYOUQUANBOFANGWANBI];
-        if (ExisRigester == NO){
-            ExisRigester = YES;
-        }
-    }
-    
-}
 - (void)purchaseBtnAction:(UIButton *)sender{
-    if ([[CommonCode readFromUserD:@"isLogin"]boolValue] == YES){
-        if ([[CommonCode readFromUserD:@"isIAP"] boolValue] == YES)
-        {//当前为内购路线
-            [NetWorkTool get_orderWithaccessToken:AvatarAccessToken act_id:self.classModel.act_id sccess:^(NSDictionary *responseObject) {
-                RTLog(@"%@",responseObject);
-                if ([responseObject[@"status"] intValue] == 1) {
-                    APPDELEGATE.isClassPay = YES;
-                    rewardMoney = responseObject[@"results"][@"money"];
-                    orderNum = responseObject[@"results"][@"order_num"];
-                    [CommonCode writeToUserD:orderNum andKey:@"orderNumber"];
-                    _alertView = [[CustomAlertView alloc] initWithCustomView:[self setupPayAlertWithIAP:YES]];
-                    _alertView.alertHeight = 105;
-                    _alertView.alertDuration = 0.25;
-                    _alertView.coverAlpha = 0.6;
-                    [_alertView show];
-                }else{
-                    XWAlerLoginView *xw = [[XWAlerLoginView alloc]initWithTitle:@"订单获取失败"];
-                    [xw show];
-                }
-            } failure:^(NSError *error) {
-                
-            }];
+    
+    if ([[CommonCode readFromUserD:@"isIAP"] boolValue] == YES)
+    {//当前为内购路线
+        [NetWorkTool get_orderWithaccessToken:AvatarAccessToken act_id:self.classModel.act_id sccess:^(NSDictionary *responseObject) {
+            RTLog(@"%@",responseObject);
+            if ([responseObject[@"status"] intValue] == 1) {
+                APPDELEGATE.isClassPay = YES;
+                rewardMoney = responseObject[@"results"][@"money"];
+                orderNum = responseObject[@"results"][@"order_num"];
+                [CommonCode writeToUserD:orderNum andKey:@"orderNumber"];
+                _alertView = [[CustomAlertView alloc] initWithCustomView:[self setupPayAlertWithIAP:YES]];
+                _alertView.alertHeight = 105;
+                _alertView.alertDuration = 0.25;
+                _alertView.coverAlpha = 0.6;
+                [_alertView show];
+            }else{
+                XWAlerLoginView *xw = [[XWAlerLoginView alloc]initWithTitle:@"订单获取失败"];
+                [xw show];
+            }
+        } failure:^(NSError *error) {
+            
+        }];
 
-        }
-        else
-        {//当前为支付宝，微信，听币支付路线
+    }
+    else
+    {//当前为支付宝，微信，听币支付路线
+        if ([[CommonCode readFromUserD:@"isLogin"]boolValue] == YES){
             [NetWorkTool get_orderWithaccessToken:AvatarAccessToken act_id:self.classModel.act_id sccess:^(NSDictionary *responseObject) {
                 RTLog(@"%@",responseObject);
                 if ([responseObject[@"status"] intValue] == 1) {
@@ -564,9 +556,9 @@
                 
             }];
         }
-    }
-    else{
-        [self loginFirst];
+        else{
+            [self loginFirst];
+        }
     }
 }
 //创建支付弹窗view
@@ -729,9 +721,72 @@
     APPDELEGATE.isClassPay = NO;
     [_alertView coverClick];
 }
+//点击底部试听按钮
+- (void)auditionnBtnAction:(UIButton *)sender{
+    Exact_id = self.act_id;
+    [CommonCode writeToUserD:self.playShiTingListArr andKey:playList];
+    [CommonCode writeToUserD:self.act_id andKey:playAct_id];
+    if (sender.selected == YES) {//选中状态，为播放状态,则将列表按钮设置全部设置为暂停
+        sender.selected = NO;
+        for ( int i = 0 ; i < self.buttons.count; i ++ ) {
+            UIButton *anotherButton = self.buttons[i];
+            anotherButton.selected = NO;
+            continue;
+        }
+        _playingIndex = -1;
+        [Explayer pause];
+        _isPlaying = NO;
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"stopAnimate" object:nil];
+    }
+    else{//未选中状态，为暂停状态,判断当前播放第一个按钮，设置播放状态
+        [[NSNotificationCenter defaultCenter] removeObserver:[bofangVC shareInstance] name:AVPlayerItemDidPlayToEndTimeNotification object:Explayer.currentItem];
+        ExIsCleanBofangVCDidPlayToEndNotification = YES;
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"startAnimate" object:nil];
+        sender.selected = YES;
+        for ( int i = 0 ; i < self.buttons.count; i ++ ) {
+            if (i == 0) {
+                UIButton *allDoneButton = [self.buttons firstObject];
+                allDoneButton.selected = YES;
+                continue;
+            }
+            else{
+                UIButton *anotherButton = self.buttons[i];
+                anotherButton.selected = NO;
+                continue;
+            }
+        }
+        
+        if ([bofangVC shareInstance].isPlay) {
+            [[bofangVC shareInstance] doplay2];
+        }
+        else{
+            
+        }
+        [Explayer pause];
+        if (Explayer == nil) {
+            Explayer = [[AVPlayer alloc]init];
+        }
+        ClassAuditionListModel *auditionModel = [self.classModel.shiting firstObject];
+        [Explayer replaceCurrentItemWithPlayerItem:[[AVPlayerItem alloc]initWithURL:[NSURL URLWithString:auditionModel.s_mpurl]]];
+        
+        [Explayer play];
+        _isPlaying = YES;
+        _playingIndex = 0;
+        [CommonCode writeToUserD:@"YES" andKey:TINGYOUQUANBOFANGWANBI];
+        if (ExisRigester == NO){
+            ExisRigester = YES;
+        }
+    }
+}
 //列表试听按钮点击
 - (void)playTestMp:(UIButton *)sender{
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"stopAnimate" object:nil];
+    [CommonCode writeToUserD:self.playShiTingListArr andKey:playList];
+    [CommonCode writeToUserD:self.act_id andKey:playAct_id];
+    if (!_isVoicePlayEnd) {//判断不是播放完成调用该方法
+        Exact_id = self.act_id;
+    }
+    _isVoicePlayEnd = NO;
+    
     BOOL isTestMpPlay = NO;//判断是否在试听列表里面有选中的按钮正在播放
     for ( int i = 0 ; i < self.buttons.count; i ++ ) {
         UIButton *allDoneButton = self.buttons[i];
@@ -748,9 +803,13 @@
         }
     }
     if (isTestMpPlay) {
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"startAnimate" object:nil];
         [self.auditionnBtn setSelected:YES];
+        [[NSNotificationCenter defaultCenter] removeObserver:[bofangVC shareInstance] name:AVPlayerItemDidPlayToEndTimeNotification object:Explayer.currentItem];
+        ExIsCleanBofangVCDidPlayToEndNotification = YES;
     }
     else{
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"stopAnimate" object:nil];
         [self.auditionnBtn setSelected:NO];
     }
     //播放试听音频
@@ -879,12 +938,15 @@
         return cell;
     }else if(indexPath.row > self.classModel.imagesArray.count && (indexPath.row <= self.classModel.imagesArray.count + 1)){
         ClassAuditionTableViewCell *cell = [ClassAuditionTableViewCell cellWithTableView:tableView];
-        cell.playingIndex = _playingIndex;
+        if ([[CommonCode readFromUserD:playAct_id] isEqualToString:self.act_id]) {
+            cell.playingIndex = _playingIndex;
+        }else{
+            cell.playingIndex = -1;
+        }
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
         cell.frameModel = self.frameArray[indexPath.row];
-        if (self.buttons.count == 0) {
-            self.buttons = cell.buttons;
-        }
+//        [self.buttons removeAllObjects];
+        self.buttons = cell.buttons;
         MJWeakSelf
         cell.playAudition = ^(UIButton *button, NSMutableArray *buttons) {
             //点击试听列表按钮
@@ -955,6 +1017,7 @@
         [_auditionnBtn setImage:[UIImage imageNamed:@"classpause"] forState:UIControlStateNormal];
         [_auditionnBtn setImage:[UIImage imageNamed:@"classplay"] forState:UIControlStateSelected];
         [_auditionnBtn setTitle:@"试听" forState:UIControlStateNormal];
+        _auditionnBtn.titleEdgeInsets = UIEdgeInsetsMake(0, 15, 0, 0);
         [_auditionnBtn setTitleColor:nTextColorMain forState:UIControlStateNormal];
         [_auditionnBtn addTarget:self action:@selector(auditionnBtnAction:) forControlEvents:UIControlEventTouchUpInside];
     }
@@ -1010,6 +1073,13 @@
         _dataSourceArr = [NSMutableArray array];
     }
     return _dataSourceArr;
+}
+- (NSMutableArray *)playShiTingListArr
+{
+    if (_playShiTingListArr == nil) {
+        _playShiTingListArr = [NSMutableArray array];
+    }
+    return _playShiTingListArr;
 }
 - (NSMutableArray *)frameArray
 {

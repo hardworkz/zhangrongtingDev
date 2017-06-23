@@ -48,7 +48,7 @@
 
 #define PINGLUN_ROW 2
 
-@interface bofangVC ()<UITableViewDataSource,UITableViewDelegate,WXApiDelegate,UITextViewDelegate,UITextFieldDelegate,TencentSessionDelegate,OJLAnimationButtonDelegate>
+@interface bofangVC ()<UITableViewDataSource,UITableViewDelegate,WXApiDelegate,UITextViewDelegate,UITextFieldDelegate,OJLAnimationButtonDelegate>
 {
     UIView *xiangqingView;
     double angle;
@@ -133,26 +133,26 @@
 __weak bofangVC *weakVC;
 __weak AVPlayer *weakPlayer;
 static bofangVC *_instance = nil;
+static AVPlayer *_instancePlay = nil;
 @implementation bofangVC
 - (AVPlayer *)bofangPlayer
 {
-//    static AVPlayer * player;
-//    static dispatch_once_t onceToken;
-//    dispatch_once(&onceToken, ^{
-//        player = [[AVPlayer alloc]init];
-//    });
-//    return player;
-    NSString *version = [UIDevice currentDevice].systemVersion;
-    if (version.doubleValue >= 9.0) {
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        _instancePlay = [[AVPlayer alloc]init];
+    });
+    return _instancePlay;
+//    NSString *version = [UIDevice currentDevice].systemVersion;
+//    if (version.doubleValue >= 9.0) {
         // 针对 9.0 以上的iOS系统进行处理
-        if (_bofangPlayer == nil) {
-            _bofangPlayer = [[AVPlayer alloc] init];
-        }
-    } else {
-        // 针对 9.0 以下的iOS系统进行处理
-        _bofangPlayer = [[AVPlayer alloc] init];
-    }
-    return _bofangPlayer;
+//        if (_bofangPlayer == nil) {
+//            _bofangPlayer = [[AVPlayer alloc] init];
+//        }
+//    } else {
+//        // 针对 9.0 以下的iOS系统进行处理
+//        _bofangPlayer = [[AVPlayer alloc] init];
+//    }
+//    return _bofangPlayer;
 }
 + (instancetype)shareInstance {
     static dispatch_once_t onceToken ;
@@ -161,6 +161,15 @@ static bofangVC *_instance = nil;
         _instance.newsModel = [[NewsModel alloc] init];
     }) ;
     return _instance ;
+}
+- (void)setIsFromzhuboXiangQingVC:(BOOL)isFromzhuboXiangQingVC
+{
+    _isFromzhuboXiangQingVC = isFromzhuboXiangQingVC;
+    if (ExIsCleanBofangVCDidPlayToEndNotification) {
+        //播放完毕后监听通知
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(PlayedidEnd:) name:AVPlayerItemDidPlayToEndTimeNotification object:Explayer.currentItem];
+        ExIsCleanBofangVCDidPlayToEndNotification = NO;
+    }
 }
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -222,8 +231,7 @@ static bofangVC *_instance = nil;
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(RewardBack:) name:@"RewardBack" object:nil];
     //添加通知，拔出耳机后暂停播放
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(routeChange:) name:AVAudioSessionRouteChangeNotification object:nil];
-    //监听播放完毕
-//    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(PlayedidEnd:) name:AVPlayerItemDidPlayToEndTimeNotification object:Explayer.currentItem];
+    
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(playStop) name:AVPlayerItemPlaybackStalledNotification object:Explayer.currentItem];
     //定时器通知
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(timerStop:) name:@"timerStop" object:nil];
@@ -262,6 +270,15 @@ static bofangVC *_instance = nil;
 }
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
+    
+    ExIsClassVCPlay = NO;
+    [CommonCode writeToUserD:nil andKey:@"Exact_id"];
+    if (ExIsCleanBofangVCDidPlayToEndNotification) {
+        //播放完毕后监听通知
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(PlayedidEnd:) name:AVPlayerItemDidPlayToEndTimeNotification object:Explayer.currentItem];
+        ExIsCleanBofangVCDidPlayToEndNotification = NO;
+    }
+    
     IQKeyboardManager *manager = [IQKeyboardManager sharedManager];
     manager.enable = YES;
     manager.shouldResignOnTouchOutside = YES;
@@ -274,6 +291,7 @@ static bofangVC *_instance = nil;
         [[UIDevice currentDevice] setProximityMonitoringEnabled:[[NSUserDefaults standardUserDefaults] boolForKey:@"shoushi"]];
         [[NSNotificationCenter defaultCenter] postNotificationName:@"startAnimate" object:nil];
     }
+    
     [self.navigationController setNavigationBarHidden:YES animated:YES];
     
     if (![ExwhichBoFangYeMianStr isEqualToString:@"Downloadbofang"]) {
@@ -288,9 +306,10 @@ static bofangVC *_instance = nil;
     [self recordTheLastNews];
     //获取评论列表
     [self huoqupinglunliebiao];
-    [self.tableView setContentOffset:CGPointMake(0, -20) animated:NO];
+    
+    [self.tableView setContentOffset:CGPointMake(0, 0) animated:YES];
+    
 }
-
 -(void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
     self.isMyCollectionVC = NO;
@@ -303,6 +322,7 @@ static bofangVC *_instance = nil;
         [[NSNotificationCenter defaultCenter] postNotificationName:@"startAnimate" object:nil];
     }
     [CommonCode writeToUserD:@"NO" andKey:@"isPlayingVC"];
+    
 }
 
 #pragma mark - NSNotification

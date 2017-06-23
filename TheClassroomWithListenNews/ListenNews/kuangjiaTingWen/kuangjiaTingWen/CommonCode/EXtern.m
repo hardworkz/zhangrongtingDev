@@ -37,4 +37,8 @@ NSString *ExZhuCeAccessToken = nil;    //注册手机号
 NSString *ExwhichBoFangVCStr = nil;       //是哪一个控制器在播放
 BOOL ExIsKaiShiBoFang = NO;           //是否开始播放，一进入app是默认没有播放，只有点击一个新闻后才会开始播放。
 NSString *ExDangQianUserAccessToken = nil;
+//课堂模块全局保存数据
+BOOL ExIsClassVCPlay = NO;//是否正在播放课堂界面
+NSString *Exact_id = nil;//保存当前课堂ID
+BOOL ExIsCleanBofangVCDidPlayToEndNotification = NO;//是否清空过bofangVC的监听播放完成通知
 @end

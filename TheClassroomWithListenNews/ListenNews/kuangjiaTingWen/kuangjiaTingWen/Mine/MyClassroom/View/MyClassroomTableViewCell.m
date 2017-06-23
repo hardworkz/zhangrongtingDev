@@ -94,7 +94,7 @@
         [imgLeft sd_setImageWithURL:[NSURL URLWithString:str]];
     }
     titleLab.text = frameModel.model.name;
-    price.text = [NSString stringWithFormat:@"￥%ld",[frameModel.model.price integerValue]];
+    price.text = [NSString stringWithFormat:@"¥%@",[NetWorkTool formatFloat:[frameModel.model.price floatValue]]];
     price.hidden = self.hiddenPrice;
     
     describe.text = frameModel.model.Description;

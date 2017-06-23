@@ -12,4 +12,10 @@
 
 @property (strong, nonatomic) NSString *act_id;
 
+/**
+ 单例模式创建
+
+ @return 单例对象
+ */
++ (instancetype)shareInstance;
 @end

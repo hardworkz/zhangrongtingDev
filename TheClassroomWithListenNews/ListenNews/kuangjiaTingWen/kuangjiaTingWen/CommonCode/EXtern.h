@@ -38,4 +38,8 @@ extern NSString *ExZhuCeAccessToken;    //注册手机号
 extern NSString *ExwhichBoFangVCStr;       //是哪一个控制器在播放
 extern BOOL ExIsKaiShiBoFang;           //是否开始播放，一进入app是默认没有播放，只有点击一个新闻后才会开始播放。
 extern NSString *ExDangQianUserAccessToken;
+//课堂模块全局保存数据
+extern BOOL ExIsClassVCPlay;//是否跳转播放课堂界面
+extern NSString *Exact_id;//保存当前课堂ID
+extern BOOL ExIsCleanBofangVCDidPlayToEndNotification;//是否清空过bofangVC的监听播放完成通知
 @end
