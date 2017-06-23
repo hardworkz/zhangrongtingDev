@@ -142,17 +142,6 @@ static AVPlayer *_instancePlay = nil;
         _instancePlay = [[AVPlayer alloc]init];
     });
     return _instancePlay;
-//    NSString *version = [UIDevice currentDevice].systemVersion;
-//    if (version.doubleValue >= 9.0) {
-        // 针对 9.0 以上的iOS系统进行处理
-//        if (_bofangPlayer == nil) {
-//            _bofangPlayer = [[AVPlayer alloc] init];
-//        }
-//    } else {
-//        // 针对 9.0 以下的iOS系统进行处理
-//        _bofangPlayer = [[AVPlayer alloc] init];
-//    }
-//    return _bofangPlayer;
 }
 + (instancetype)shareInstance {
     static dispatch_once_t onceToken ;
@@ -161,15 +150,6 @@ static AVPlayer *_instancePlay = nil;
         _instance.newsModel = [[NewsModel alloc] init];
     }) ;
     return _instance ;
-}
-- (void)setIsFromzhuboXiangQingVC:(BOOL)isFromzhuboXiangQingVC
-{
-    _isFromzhuboXiangQingVC = isFromzhuboXiangQingVC;
-    if (ExIsCleanBofangVCDidPlayToEndNotification) {
-        //播放完毕后监听通知
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(PlayedidEnd:) name:AVPlayerItemDidPlayToEndTimeNotification object:Explayer.currentItem];
-        ExIsCleanBofangVCDidPlayToEndNotification = NO;
-    }
 }
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -273,11 +253,6 @@ static AVPlayer *_instancePlay = nil;
     
     ExIsClassVCPlay = NO;
     [CommonCode writeToUserD:nil andKey:@"Exact_id"];
-    if (ExIsCleanBofangVCDidPlayToEndNotification) {
-        //播放完毕后监听通知
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(PlayedidEnd:) name:AVPlayerItemDidPlayToEndTimeNotification object:Explayer.currentItem];
-        ExIsCleanBofangVCDidPlayToEndNotification = NO;
-    }
     
     IQKeyboardManager *manager = [IQKeyboardManager sharedManager];
     manager.enable = YES;
@@ -963,7 +938,7 @@ static AVPlayer *_instancePlay = nil;
     [bofangLeftBtn setEnabled:NO];
     [bofangCenterBtn setEnabled:NO];
     [self doPlay:bofangCenterBtn];
-    [self performSelector:@selector(doplay2) withObject:nil afterDelay:0.5f];
+    [self performSelector:@selector(doplay2) withObject:nil afterDelay:0.2f];
     
 //    [CommonCode writeToUserD:arr[ExcurrentNumber][@"id"] andKey:@"dangqianbofangxinwenID"];
     if ([[CommonCode readFromUserD:@"yitingguoxinwenID"] isKindOfClass:[NSArray class]])
@@ -1154,6 +1129,9 @@ static AVPlayer *_instancePlay = nil;
 }
 
 - (void)bofangwanbi:(NSNotification *)notice{
+    if (ExIsClassVCPlay) {
+        return;
+    }
     RTLog(@"bofangwanbi--------");
     [bofangCenterBtn setImage:[UIImage imageNamed:@"home_news_ic_play"] forState:UIControlStateNormal];
     if ([[CommonCode readFromUserD:TINGYOUQUANBOFANGWANBI] isEqualToString:@"YES"]) {

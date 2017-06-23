@@ -132,6 +132,8 @@
             }
             if (_playingIndex == i) {
                 playTestMp.selected = YES;
+            }else{
+                playTestMp.selected = NO;
             }
             
             titleLab.text = model.s_title;

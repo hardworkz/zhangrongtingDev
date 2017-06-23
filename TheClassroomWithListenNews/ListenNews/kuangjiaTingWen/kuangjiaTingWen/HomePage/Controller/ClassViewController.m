@@ -80,12 +80,6 @@ static ClassViewController *_instance = nil;
     
     self.titleFontSize = 19.0;
     
-//    currentClassID = [CommonCode readFromUserD:@"currentClassID"];
-//    if ([currentClassID isEqualToString:self.act_id]) {
-//        playIndex = [[CommonCode readFromUserD:@"playIndex"] integerValue];
-//    }else{
-//        playIndex = 0;
-//    }
     [self setUpData];
     [self setUpView];
     
@@ -101,9 +95,9 @@ static ClassViewController *_instance = nil;
     
     ExIsClassVCPlay = YES;
     //单例模式刷新数据
+    RTLog(@"act_id:%@----Exact_id:%@",self.act_id,Exact_id);
     if (![Exact_id isEqualToString:self.act_id]) {//当前为不同页面，需要重新初始化控件状态
-        [self loadData];
-        if ([[CommonCode readFromUserD:playAct_id] isEqualToString:self.act_id] && _isPlaying)
+        if ([Exact_id isEqualToString:self.act_id] && _isPlaying)
         {
             self.auditionnBtn.selected = YES;
         }else{
@@ -116,6 +110,7 @@ static ClassViewController *_instance = nil;
         playIndex = -1;
         [self.helpTableView setContentOffset:CGPointZero animated:NO];
     }
+    [self loadData];
     
 }
 
@@ -123,11 +118,6 @@ static ClassViewController *_instance = nil;
     [super viewWillDisappear:animated];
     [self.navigationController setNavigationBarHidden:NO animated:YES];
     
-//    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"AliPayResults" object:nil];
-//    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"WechatPayResults" object:nil];
-//    if (_isPlaying) {
-//        [self auditionnBtnAction:_auditionnBtn];
-//    }
 }
 
 - (void)setUpData{
@@ -482,6 +472,9 @@ static ClassViewController *_instance = nil;
 
 - (void)wanbi:(NSNotification *)notice{
     
+    if (!ExIsClassVCPlay) {
+        return;
+    }
     if (ExisRigester == YES){
         ExisRigester = NO;
     }
@@ -722,6 +715,7 @@ static ClassViewController *_instance = nil;
 }
 //点击底部试听按钮
 - (void)auditionnBtnAction:(UIButton *)sender{
+    ExisRigester = NO;
     Exact_id = self.act_id;
     [CommonCode writeToUserD:Exact_id andKey:@"Exact_id"];
     [CommonCode writeToUserD:self.playShiTingListArr andKey:playList];
@@ -739,8 +733,6 @@ static ClassViewController *_instance = nil;
         [[NSNotificationCenter defaultCenter] postNotificationName:@"stopAnimate" object:nil];
     }
     else{//未选中状态，为暂停状态,判断当前播放第一个按钮，设置播放状态
-        [[NSNotificationCenter defaultCenter] removeObserver:[bofangVC shareInstance] name:AVPlayerItemDidPlayToEndTimeNotification object:Explayer.currentItem];
-        ExIsCleanBofangVCDidPlayToEndNotification = YES;
         [[NSNotificationCenter defaultCenter] postNotificationName:@"startAnimate" object:nil];
         sender.selected = YES;
         for ( int i = 0 ; i < self.buttons.count; i ++ ) {
@@ -785,29 +777,30 @@ static ClassViewController *_instance = nil;
         [CommonCode writeToUserD:self.act_id andKey:playAct_id];
         Exact_id = self.act_id;
         [CommonCode writeToUserD:Exact_id andKey:@"Exact_id"];
+        ExisRigester = NO;
     }
     _isVoicePlayEnd = NO;
     
     BOOL isTestMpPlay = NO;//判断是否在试听列表里面有选中的按钮正在播放
     for ( int i = 0 ; i < self.buttons.count; i ++ ) {
         UIButton *allDoneButton = self.buttons[i];
-        if (sender.tag == i) {
-            allDoneButton.selected = !allDoneButton.selected;
-            if (allDoneButton.selected == NO) {
-                isTestMpPlay = NO;
-            }else{
-                isTestMpPlay = YES;
+        if ([Exact_id isEqualToString:self.act_id]) {
+            if (sender.tag == i) {
+                allDoneButton.selected = !allDoneButton.selected;
+                if (allDoneButton.selected == NO) {
+                    isTestMpPlay = NO;
+                }else{
+                    isTestMpPlay = YES;
+                }
             }
-        }
-        else{
-            allDoneButton.selected = NO;
+            else{
+                allDoneButton.selected = NO;
+            }
         }
     }
     if (isTestMpPlay) {
         [[NSNotificationCenter defaultCenter] postNotificationName:@"startAnimate" object:nil];
         [self.auditionnBtn setSelected:YES];
-        [[NSNotificationCenter defaultCenter] removeObserver:[bofangVC shareInstance] name:AVPlayerItemDidPlayToEndTimeNotification object:Explayer.currentItem];
-        ExIsCleanBofangVCDidPlayToEndNotification = YES;
     }
     else{
         [[NSNotificationCenter defaultCenter] postNotificationName:@"stopAnimate" object:nil];
@@ -834,8 +827,9 @@ static ClassViewController *_instance = nil;
             //            [Explayer addObserver:self forKeyPath:@"loadedTimeRanges" options:NSKeyValueObservingOptionNew context:nil];
         }
         
-        ClassAuditionListModel *auditionModel = self.classModel.shiting[sender.tag];
-        [Explayer replaceCurrentItemWithPlayerItem:[[AVPlayerItem alloc]initWithURL:[NSURL URLWithString:auditionModel.s_mpurl]]];
+        NSArray *shitingArray = [CommonCode readFromUserD:playList];
+        NSDictionary *auditionModel = shitingArray[sender.tag];
+        [Explayer replaceCurrentItemWithPlayerItem:[[AVPlayerItem alloc]initWithURL:[NSURL URLWithString:auditionModel[@"s_mpurl"]]]];
         [Explayer play];
         _isPlaying = YES;
         _playingIndex = sender.tag;
@@ -939,7 +933,7 @@ static ClassViewController *_instance = nil;
         return cell;
     }else if(indexPath.row > self.classModel.imagesArray.count && (indexPath.row <= self.classModel.imagesArray.count + 1)){
         ClassAuditionTableViewCell *cell = [ClassAuditionTableViewCell cellWithTableView:tableView];
-        if ([[CommonCode readFromUserD:playAct_id] isEqualToString:self.act_id]) {
+        if ([Exact_id isEqualToString:self.act_id]) {
             cell.playingIndex = _playingIndex;
         }else{
             cell.playingIndex = -1;

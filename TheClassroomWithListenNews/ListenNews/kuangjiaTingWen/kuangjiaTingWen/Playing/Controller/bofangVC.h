@@ -27,7 +27,7 @@
 
 @property(nonatomic)BOOL iszhuboxiangqing;
 @property(nonatomic)BOOL isMyCollectionVC;/**<从我的收藏进入*/
-@property (assign, nonatomic) BOOL isFromzhuboXiangQingVC;/**<从主播详情页面点击播放按钮*/
+//@property (assign, nonatomic) BOOL isFromzhuboXiangQingVC;/**<从主播详情页面点击播放按钮*/
 @property(nonatomic)BOOL isPlay;
 @property (assign, nonatomic) BOOL isPushNews;
 @property (assign, nonatomic) BOOL isFirst;

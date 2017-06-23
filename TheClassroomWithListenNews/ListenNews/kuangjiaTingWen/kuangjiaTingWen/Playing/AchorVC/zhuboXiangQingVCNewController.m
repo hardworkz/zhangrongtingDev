@@ -1456,7 +1456,6 @@
             [self.navigationController popViewControllerAnimated:YES];
             [[NSNotificationCenter defaultCenter]postNotificationName:@"getAhocComment" object:xinwenArr[indexPath.row][@"id"]];
         }
-        [bofangVC shareInstance].isFromzhuboXiangQingVC = YES;
         if ([bofangVC shareInstance].isPlay) {
         }
         else{
