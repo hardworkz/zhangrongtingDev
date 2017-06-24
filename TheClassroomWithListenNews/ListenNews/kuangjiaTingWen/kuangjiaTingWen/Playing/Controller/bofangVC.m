@@ -767,6 +767,7 @@ static AVPlayer *_instancePlay = nil;
                 if (self.isFirst == YES){
                     if (self.isPushNews) {
                         [Explayer play];
+                        [ExclassPlayer pause];
                     }
                     else{
                         [self performSelector:@selector(doPlay:) withObject:nil afterDelay:0.5f];
@@ -806,6 +807,7 @@ static AVPlayer *_instancePlay = nil;
         isPlaying = YES;
         self.isPlay = isPlaying;
         [Explayer play];
+        [ExclassPlayer pause];
         [bofangCenterBtn setImage:[UIImage imageNamed:@"home_news_ic_pause"] forState:UIControlStateNormal];
         bofangCenterBtn.accessibilityLabel = @"暂停、播放";
         //获取当前播放音视频的总长度（s秒)

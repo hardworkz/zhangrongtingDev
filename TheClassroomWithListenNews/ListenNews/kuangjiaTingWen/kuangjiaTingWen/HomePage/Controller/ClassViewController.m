@@ -57,16 +57,25 @@ static NSString *const playAct_id = @"playAct_id";/**<当前正在播放的课�
 @property (weak, nonatomic) UIScrollView *scrollView;
 @property (weak, nonatomic) UIImageView *lastImageView;
 @property (assign, nonatomic) CGRect originalFrame;
-@property (strong, nonatomic) AVPlayer *voicePlayer;
+//@property (strong, nonatomic) AVPlayer *voicePlayer;
 @property (strong, nonatomic) AVAudioSession *session;
 @property (assign, nonatomic) BOOL isPlaying;
 @property (assign, nonatomic) NSInteger playingIndex;
 @property (assign, nonatomic) BOOL isVoicePlayEnd;//判断是否是播放完成回调
+@property (strong, nonatomic) AVPlayer *Player;
 @end
 
 static ClassViewController *_instance = nil;
+static AVPlayer *_instancePlay = nil;
 @implementation ClassViewController
-
+- (AVPlayer *)Player
+{
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        _instancePlay = [[AVPlayer alloc]init];
+    });
+    return _instancePlay;
+}
 + (instancetype)shareInstance {
     static dispatch_once_t onceToken ;
     dispatch_once(&onceToken, ^{
@@ -97,12 +106,6 @@ static ClassViewController *_instance = nil;
     //单例模式刷新数据
     RTLog(@"act_id:%@----Exact_id:%@",self.act_id,Exact_id);
     if (![Exact_id isEqualToString:self.act_id]) {//当前为不同页面，需要重新初始化控件状态
-        if ([Exact_id isEqualToString:self.act_id] && _isPlaying)
-        {
-            self.auditionnBtn.selected = YES;
-        }else{
-            self.auditionnBtn.selected = NO;
-        }
         
         if (Exact_id == nil) {
             Exact_id = self.act_id;
@@ -111,6 +114,12 @@ static ClassViewController *_instance = nil;
         [self.helpTableView setContentOffset:CGPointZero animated:NO];
     }
     [self loadData];
+    if ([Exact_id isEqualToString:self.act_id] && ExclassPlayer.rate == 1.0)
+    {
+        self.auditionnBtn.selected = YES;
+    }else{
+        self.auditionnBtn.selected = NO;
+    }
     
 }
 
@@ -129,7 +138,7 @@ static ClassViewController *_instance = nil;
     
     _isPlaying = NO;
     _playingIndex = -1;
-    ExisRigester = NO;
+//    ExisRigester = NO;
     //AudioSession负责应用音频的设置，比如支不支持后台，打断等等
     NSError *error;
     //设置音频会话
@@ -139,7 +148,7 @@ static ClassViewController *_instance = nil;
     //激活会话
     [self.session setActive:YES error:&error];
     //接收播放完毕后发出的通知
-    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(voicePlayEnd:) name:AVPlayerItemDidPlayToEndTimeNotification object:Explayer.currentItem];
+    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(voicePlayEnd:) name:AVPlayerItemDidPlayToEndTimeNotification object:ExclassPlayer.currentItem];
     
 }
 
@@ -190,7 +199,7 @@ static ClassViewController *_instance = nil;
     DefineWeakSelf;
     [NetWorkTool getAuditionListWithaccessToken:accessToken act_id:self.act_id sccess:^(NSDictionary *responseObject) {
         if ([responseObject[@"status"] integerValue] == 1) {
-            ExisRigester = NO;
+//            ExisRigester = NO;
             if ([responseObject[@"results"][@"shiting"] isKindOfClass:[NSArray class]]) {
                 self.playShiTingListArr = responseObject[@"results"][@"shiting"];
             }
@@ -254,7 +263,7 @@ static ClassViewController *_instance = nil;
     return frameArray;
 }
 - (void)back {
-//    [Explayer pause];
+//    [ExclassPlayer pause];
     [self.navigationController popViewControllerAnimated:YES];
 }
 
@@ -438,14 +447,14 @@ static ClassViewController *_instance = nil;
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSString *,id> *)change context:(void *)context{
     //当播放器状态（status）改变时，会进入此判断
     if ([keyPath isEqualToString:@"statu"]){
-        switch (Explayer.status) {
+        switch (ExclassPlayer.status) {
             case AVPlayerStatusUnknown:
                 NSLog(@"KVO：未知状态，此时不能播放");
                 break;
             case AVPlayerStatusReadyToPlay:
                 NSLog(@"KVO：准备完毕，可以播放");
                 //自动播放
-                //                [Explayer play];
+                //                [ExclassPlayer play];
                 break;
             case AVPlayerStatusFailed:
                 NSLog(@"KVO：加载失败，网络或者服务器出现问题");
@@ -458,6 +467,9 @@ static ClassViewController *_instance = nil;
 
 #pragma mark - NSNotification
 - (void)voicePlayEnd:(NSNotification *)notice {
+    if (!ExIsClassVCPlay) {
+        return;
+    }
     NSArray *shitingArray = [CommonCode readFromUserD:playList];
     if (_playingIndex < [shitingArray count] - 1) {
         _isVoicePlayEnd = YES;
@@ -475,9 +487,9 @@ static ClassViewController *_instance = nil;
     if (!ExIsClassVCPlay) {
         return;
     }
-    if (ExisRigester == YES){
-        ExisRigester = NO;
-    }
+//    if (ExisRigester == YES){
+//        ExisRigester = NO;
+//    }
     //设置按钮状态为未播放图片
     _auditionnBtn.selected = NO;
     for ( int i = 0 ; i < self.buttons.count; i ++ ) {
@@ -485,8 +497,8 @@ static ClassViewController *_instance = nil;
         anotherButton.selected = NO;
         continue;
     }
-    [Explayer pause];
-    [CommonCode writeToUserD:@"YES" andKey:TINGYOUQUANBOFANGWANBI];
+    [ExclassPlayer pause];
+//    [CommonCode writeToUserD:@"YES" andKey:TINGYOUQUANBOFANGWANBI];
     _isPlaying = NO;
 }
 
@@ -715,7 +727,7 @@ static ClassViewController *_instance = nil;
 }
 //点击底部试听按钮
 - (void)auditionnBtnAction:(UIButton *)sender{
-    ExisRigester = NO;
+//    ExisRigester = NO;
     Exact_id = self.act_id;
     [CommonCode writeToUserD:Exact_id andKey:@"Exact_id"];
     [CommonCode writeToUserD:self.playShiTingListArr andKey:playList];
@@ -728,7 +740,7 @@ static ClassViewController *_instance = nil;
             continue;
         }
         _playingIndex = -1;
-        [Explayer pause];
+        [ExclassPlayer pause];
         _isPlaying = NO;
         [[NSNotificationCenter defaultCenter] postNotificationName:@"stopAnimate" object:nil];
     }
@@ -754,20 +766,23 @@ static ClassViewController *_instance = nil;
         else{
             
         }
-        [Explayer pause];
-        if (Explayer == nil) {
-            Explayer = [[AVPlayer alloc]init];
-        }
-        ClassAuditionListModel *auditionModel = [self.classModel.shiting firstObject];
-        [Explayer replaceCurrentItemWithPlayerItem:[[AVPlayerItem alloc]initWithURL:[NSURL URLWithString:auditionModel.s_mpurl]]];
+        [ExclassPlayer pause];
         
-        [Explayer play];
+        ExclassPlayer = self.Player;
+//        if (ExclassPlayer == nil) {
+//            ExclassPlayer = [[AVPlayer alloc]init];
+//        }
+        ClassAuditionListModel *auditionModel = [self.classModel.shiting firstObject];
+        [ExclassPlayer replaceCurrentItemWithPlayerItem:[[AVPlayerItem alloc]initWithURL:[NSURL URLWithString:auditionModel.s_mpurl]]];
+        
+        [ExclassPlayer play];
+        [Explayer pause];
         _isPlaying = YES;
         _playingIndex = 0;
-        [CommonCode writeToUserD:@"YES" andKey:TINGYOUQUANBOFANGWANBI];
-        if (ExisRigester == NO){
-            ExisRigester = YES;
-        }
+//        [CommonCode writeToUserD:@"YES" andKey:TINGYOUQUANBOFANGWANBI];
+//        if (ExisRigester == NO){
+//            ExisRigester = YES;
+//        }
     }
 }
 //列表试听按钮点击
@@ -777,7 +792,7 @@ static ClassViewController *_instance = nil;
         [CommonCode writeToUserD:self.act_id andKey:playAct_id];
         Exact_id = self.act_id;
         [CommonCode writeToUserD:Exact_id andKey:@"Exact_id"];
-        ExisRigester = NO;
+//        ExisRigester = NO;
     }
     _isVoicePlayEnd = NO;
     
@@ -808,7 +823,7 @@ static ClassViewController *_instance = nil;
     }
     //播放试听音频
     if (_isPlaying && (_playingIndex == sender.tag)) {
-        [Explayer pause];
+        [ExclassPlayer pause];
         _isPlaying = NO;
     }
     else{
@@ -818,29 +833,31 @@ static ClassViewController *_instance = nil;
         else{
             
         }
-        [Explayer pause];
-        if (Explayer == nil) {
-            Explayer = [[AVPlayer alloc]init];
+        [ExclassPlayer pause];
+//        if (ExclassPlayer == nil) {
+//            ExclassPlayer = [[AVPlayer alloc]init];
             //添加观察者，用来监视播放器的状态变化
-//            [Explayer addObserver:self forKeyPath:@"statu" options:NSKeyValueObservingOptionNew context:nil];
+//            [ExclassPlayer addObserver:self forKeyPath:@"statu" options:NSKeyValueObservingOptionNew context:nil];
             //添加观察者，用来监听播放器的缓冲进度loadedTimeRanges属性
-            //            [Explayer addObserver:self forKeyPath:@"loadedTimeRanges" options:NSKeyValueObservingOptionNew context:nil];
-        }
+            //            [ExclassPlayer addObserver:self forKeyPath:@"loadedTimeRanges" options:NSKeyValueObservingOptionNew context:nil];
+//        }
+        ExclassPlayer = self.Player;
         
         NSArray *shitingArray = [CommonCode readFromUserD:playList];
         NSDictionary *auditionModel = shitingArray[sender.tag];
-        [Explayer replaceCurrentItemWithPlayerItem:[[AVPlayerItem alloc]initWithURL:[NSURL URLWithString:auditionModel[@"s_mpurl"]]]];
-        [Explayer play];
+        [ExclassPlayer replaceCurrentItemWithPlayerItem:[[AVPlayerItem alloc]initWithURL:[NSURL URLWithString:auditionModel[@"s_mpurl"]]]];
+        [ExclassPlayer play];
+        [Explayer pause];
         _isPlaying = YES;
         _playingIndex = sender.tag;
-        [CommonCode writeToUserD:@"YES" andKey:TINGYOUQUANBOFANGWANBI];
-        if (ExisRigester == NO){
+//        [CommonCode writeToUserD:@"YES" andKey:TINGYOUQUANBOFANGWANBI];
+//        if (ExisRigester == NO){
             //添加观察者，用来监视播放器的状态变化
-//            [Explayer addObserver:self forKeyPath:@"statu" options:NSKeyValueObservingOptionNew context:nil];
+//            [ExclassPlayer addObserver:self forKeyPath:@"statu" options:NSKeyValueObservingOptionNew context:nil];
             //添加观察者，用来监听播放器的缓冲进度loadedTimeRanges属性
-            //[Explayer addObserver:self forKeyPath:@"loadedTimeRange" options:NSKeyValueObservingOptionNew context:nil];
-            ExisRigester = YES;
-        }
+            //[ExclassPlayer addObserver:self forKeyPath:@"loadedTimeRange" options:NSKeyValueObservingOptionNew context:nil];
+//            ExisRigester = YES;
+//        }
     }
 }
 - (void)pinglundianzanAction:(PinglundianzanCustomBtn *)pinglundianzanBtn frameModel:(PlayVCCommentFrameModel *)frameModel
@@ -1056,12 +1073,12 @@ static ClassViewController *_instance = nil;
     return _purchaseBtn;
 }
 
-- (AVPlayer *)voicePlayer {
-    if (!_voicePlayer) {
-        _voicePlayer = [[AVPlayer alloc]init];
-    }
-    return _voicePlayer;
-}
+//- (AVPlayer *)voicePlayer {
+//    if (!_voicePlayer) {
+//        _voicePlayer = [[AVPlayer alloc]init];
+//    }
+//    return _voicePlayer;
+//}
 
 - (NSMutableArray *)dataSourceArr{
     if (!_dataSourceArr) {

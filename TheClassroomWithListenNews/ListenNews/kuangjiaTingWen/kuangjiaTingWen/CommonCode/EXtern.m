@@ -40,4 +40,6 @@ NSString *ExDangQianUserAccessToken = nil;
 //课堂模块全局保存数据
 BOOL ExIsClassVCPlay = NO;//是否正在播放课堂界面
 NSString *Exact_id = nil;//保存当前课堂ID
+//课堂试听播放器
+AVPlayer *ExclassPlayer = nil;
 @end
