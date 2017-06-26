@@ -19,29 +19,13 @@
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "kuangjiaTingWen/kuangjiaTingWen/HomePage/View/ClassCells/ClassAuditionTableViewCell.m"
-            timestampString = "519900054.529862"
+            filePath = "kuangjiaTingWen/kuangjiaTingWen/Mine/Login/LoginVC.m"
+            timestampString = "520138296.391702"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "187"
-            endingLineNumber = "187"
-            landmarkName = "-dealloc"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "kuangjiaTingWen/kuangjiaTingWen/HomePage/Controller/ClassViewController.m"
-            timestampString = "519904698.402079"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "786"
-            endingLineNumber = "786"
-            landmarkName = "-playTestMp:"
+            startingLineNumber = "456"
+            endingLineNumber = "456"
+            landmarkName = "-WechatSSOSuccessWithCode:"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

@@ -57,8 +57,8 @@
     NSMutableArray *jiaDianZanShuJv;
     NSString *dianzanshu;
     UIView *dibuView;
-    UIButton *bofangCenterBtn;
     UIButton *bofangLeftBtn;
+    UIButton *bofangCenterBtn;
     NSTimer *ShangTimer;
     UILabel *dangqianTime;
     UILabel *PingLundianzanNumLab;
@@ -157,8 +157,12 @@ static AVPlayer *_instancePlay = nil;
     self.view.backgroundColor = [UIColor whiteColor];
     isJiaZaiWan = NO;
     _isCollected = NO;
-    self.titleFontSize = 19.0;
-//    self.dateFont = gFontMain14;
+    
+    //设置正文和日期字体
+    self.titleFontSize = [[CommonCode readFromUserD:TitleFontSize] floatValue]?[[CommonCode readFromUserD:TitleFontSize] floatValue]:19.0;
+    [CommonCode writeToUserD:@(self.titleFontSize) andKey:TitleFontSize];
+    self.dateFont = [[CommonCode readFromUserD:DateFont] floatValue]?[[CommonCode readFromUserD:DateFont] floatValue]:14.0;
+    
     ExdangqianUserUid = [CommonCode readFromUserD:@"dangqianUserUid"];
     angle = 0.0f;
     [self.view addSubview:self.tableView];
@@ -2348,7 +2352,7 @@ static AVPlayer *_instancePlay = nil;
         AVAudioSessionInterruptionOptions options = [info[AVAudioSessionInterruptionOptionKey] unsignedIntegerValue];
         if (options == AVAudioSessionInterruptionOptionShouldResume) {
             //Handle Resume 重新开始播放
-            [self doPlay:bofangCenterBtn];
+//            [self doPlay:bofangCenterBtn];
         }
     }
 }
@@ -3160,7 +3164,7 @@ static AVPlayer *_instancePlay = nil;
         _riqiLab.textAlignment = NSTextAlignmentCenter;
         _riqiLab.textColor = nTextColorSub;
         //TODO: 设置字体导致崩溃的bug
-        _riqiLab.font = gFontMain14;/**<这一行存在bug,导致应用崩溃*/
+        _riqiLab.font = [UIFont systemFontOfSize:self.dateFont];/**<这一行存在bug,导致应用崩溃*/
     }
     return _riqiLab;
 }

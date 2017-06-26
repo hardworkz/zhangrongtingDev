@@ -30,14 +30,7 @@ static NSString *const playAct_id = @"playAct_id";/**<当前正在播放的课�
     NSString *rewardMoney;
     NSString *orderNum;
 }
-
-/**
- 系统字体大小
- */
-@property(assign,nonatomic)CGFloat titleFontSize;
-
 @property (strong, nonatomic) CustomAlertView *alertView;
-@property (nonatomic, strong) UITableView *helpTableView;
 @property (nonatomic, strong) NSMutableArray *buttons;
 @property (nonatomic, strong) NSMutableArray *dataSourceArr;
 @property (nonatomic, strong) NSMutableArray *playShiTingListArr;
@@ -59,7 +52,6 @@ static NSString *const playAct_id = @"playAct_id";/**<当前正在播放的课�
 @property (assign, nonatomic) CGRect originalFrame;
 //@property (strong, nonatomic) AVPlayer *voicePlayer;
 @property (strong, nonatomic) AVAudioSession *session;
-@property (assign, nonatomic) BOOL isPlaying;
 @property (assign, nonatomic) NSInteger playingIndex;
 @property (assign, nonatomic) BOOL isVoicePlayEnd;//判断是否是播放完成回调
 @property (strong, nonatomic) AVPlayer *Player;
@@ -87,7 +79,8 @@ static AVPlayer *_instancePlay = nil;
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    self.titleFontSize = 19.0;
+    self.titleFontSize = [[CommonCode readFromUserD:TitleFontSize] floatValue]?[[CommonCode readFromUserD:TitleFontSize] floatValue]:19.0;
+    [CommonCode writeToUserD:@(self.titleFontSize) andKey:TitleFontSize];
     
     [self setUpData];
     [self setUpView];
@@ -107,14 +100,13 @@ static AVPlayer *_instancePlay = nil;
     RTLog(@"act_id:%@----Exact_id:%@",self.act_id,Exact_id);
     if (![Exact_id isEqualToString:self.act_id]) {//当前为不同页面，需要重新初始化控件状态
         
-        if (Exact_id == nil) {
-            Exact_id = self.act_id;
-        }
         playIndex = -1;
         [self.helpTableView setContentOffset:CGPointZero animated:NO];
     }
+    
     [self loadData];
-    if ([Exact_id isEqualToString:self.act_id] && ExclassPlayer.rate == 1.0)
+    
+    if ([Exact_id isEqualToString:self.act_id] && _isPlaying)
     {
         self.auditionnBtn.selected = YES;
     }else{
@@ -126,7 +118,6 @@ static AVPlayer *_instancePlay = nil;
 - (void)viewWillDisappear:(BOOL)animated{
     [super viewWillDisappear:animated];
     [self.navigationController setNavigationBarHidden:NO animated:YES];
-    
 }
 
 - (void)setUpData{
@@ -230,9 +221,11 @@ static AVPlayer *_instancePlay = nil;
  */
 - (NSMutableArray *)frameArrayWithClassModel:(ClassModel *)classModel
 {
+    classModel = classModel?classModel:self.classModel;
     NSMutableArray *array = [NSMutableArray array];
     //课堂内容frame
     ClassContentCellFrameModel *contentFrameModel = [ClassContentCellFrameModel new];
+    contentFrameModel.titleFontSize = self.titleFontSize;
     contentFrameModel.excerpt = classModel.excerpt;
     [array addObject:contentFrameModel];
     //课堂图片frame
@@ -473,8 +466,12 @@ static AVPlayer *_instancePlay = nil;
     NSArray *shitingArray = [CommonCode readFromUserD:playList];
     if (_playingIndex < [shitingArray count] - 1) {
         _isVoicePlayEnd = YES;
-        UIButton *nextTextMPButton = self.buttons[_playingIndex + 1];
-        [self playTestMp:nextTextMPButton];
+        if (self.buttons.count == 0) {
+            UIButton *nextTextMPButton = self.buttons[_playingIndex + 1];
+            [self playTestMp:nextTextMPButton];
+        }else{
+            [self playTestMpWithIndex:_playingIndex + 1];
+        }
     }
     else{
         [self performSelector:@selector(wanbi:) withObject:notice afterDelay:0.5f];
@@ -544,7 +541,7 @@ static AVPlayer *_instancePlay = nil;
                 RTLog(@"%@",responseObject);
                 if ([responseObject[@"status"] intValue] == 1) {
                     APPDELEGATE.isClassPay = YES;
-                    rewardMoney = responseObject[@"results"][@"money"];
+                    rewardMoney = [NSString stringWithFormat:@"%@",responseObject[@"results"][@"money"]];
                     orderNum = responseObject[@"results"][@"order_num"];
                     [CommonCode writeToUserD:orderNum andKey:@"orderNumber"];
                     _alertView = [[CustomAlertView alloc] initWithCustomView:[self setupPayAlertWithIAP:NO]];
@@ -650,7 +647,7 @@ static AVPlayer *_instancePlay = nil;
 {
     [_alertView coverClick];
     PayOnlineViewController *vc = [PayOnlineViewController new];
-    vc.rewardCount = [rewardMoney floatValue];
+    vc.rewardCount = [rewardMoney doubleValue];
     vc.uid = self.classModel.act_id;
     vc.post_id = self.classModel.ID;
     vc.isPayClass = YES;
@@ -661,7 +658,7 @@ static AVPlayer *_instancePlay = nil;
 {
     [_alertView coverClick];
     PayOnlineViewController *vc = [PayOnlineViewController new];
-    vc.rewardCount = [rewardMoney floatValue];
+    vc.rewardCount = [rewardMoney doubleValue];
     vc.uid = self.classModel.act_id;
     vc.post_id = self.classModel.ID;
     vc.isPayClass = YES;
@@ -860,6 +857,42 @@ static AVPlayer *_instancePlay = nil;
 //        }
     }
 }
+//列表试听按钮点击
+- (void)playTestMpWithIndex:(NSInteger)index{
+    if (!_isVoicePlayEnd) {//判断不是播放完成调用该方法
+        [CommonCode writeToUserD:self.playShiTingListArr andKey:playList];
+        [CommonCode writeToUserD:self.act_id andKey:playAct_id];
+        Exact_id = self.act_id;
+        [CommonCode writeToUserD:Exact_id andKey:@"Exact_id"];
+        //        ExisRigester = NO;
+    }
+    
+    _isVoicePlayEnd = NO;
+    
+    //播放试听音频
+    if (_isPlaying && (_playingIndex == index)) {
+        [ExclassPlayer pause];
+        _isPlaying = NO;
+    }
+    else{
+        if ([bofangVC shareInstance].isPlay) {
+            [[bofangVC shareInstance] doplay2];
+        }
+        else{
+            
+        }
+        [ExclassPlayer pause];
+        ExclassPlayer = self.Player;
+        
+        NSArray *shitingArray = [CommonCode readFromUserD:playList];
+        NSDictionary *auditionModel = shitingArray[index];
+        [ExclassPlayer replaceCurrentItemWithPlayerItem:[[AVPlayerItem alloc]initWithURL:[NSURL URLWithString:auditionModel[@"s_mpurl"]]]];
+        [ExclassPlayer play];
+        [Explayer pause];
+        _isPlaying = YES;
+        _playingIndex = index;
+    }
+}
 - (void)pinglundianzanAction:(PinglundianzanCustomBtn *)pinglundianzanBtn frameModel:(PlayVCCommentFrameModel *)frameModel
 {
     PlayVCCommentModel *model = frameModel.model;
@@ -937,6 +970,7 @@ static AVPlayer *_instancePlay = nil;
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
     if (indexPath.row == 0) {
         ClassContentTableViewCell *cell = [ClassContentTableViewCell cellWithTableView:tableView];
+        cell.titleFontSize = self.titleFontSize;
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
         cell.frameModel = self.frameArray[indexPath.row];
         return cell;
@@ -950,7 +984,7 @@ static AVPlayer *_instancePlay = nil;
         return cell;
     }else if(indexPath.row > self.classModel.imagesArray.count && (indexPath.row <= self.classModel.imagesArray.count + 1)){
         ClassAuditionTableViewCell *cell = [ClassAuditionTableViewCell cellWithTableView:tableView];
-        if ([Exact_id isEqualToString:self.act_id]) {
+        if ([Exact_id isEqualToString:self.act_id] && _isPlaying) {
             cell.playingIndex = _playingIndex;
         }else{
             cell.playingIndex = -1;
@@ -1026,8 +1060,9 @@ static AVPlayer *_instancePlay = nil;
     if (!_auditionnBtn) {
         _auditionnBtn = [UIButton buttonWithType:UIButtonTypeCustom];
         [_auditionnBtn setFrame:CGRectMake(0, SCREEN_HEIGHT - 49, SCREEN_WIDTH / 4 *2, 49)];
-        [_auditionnBtn setImage:[UIImage imageNamed:@"classpause"] forState:UIControlStateNormal];
-        [_auditionnBtn setImage:[UIImage imageNamed:@"classplay"] forState:UIControlStateSelected];
+        [_auditionnBtn setImage:[UIImage imageNamed:@"play"] forState:UIControlStateNormal];
+        [_auditionnBtn setImage:[UIImage imageNamed:@"pause"] forState:UIControlStateSelected];
+        _auditionnBtn.imageEdgeInsets = UIEdgeInsetsMake(0, 0, 0, 0);
         [_auditionnBtn setTitle:@"试听" forState:UIControlStateNormal];
         _auditionnBtn.titleEdgeInsets = UIEdgeInsetsMake(0, 15, 0, 0);
         [_auditionnBtn setTitleColor:nTextColorMain forState:UIControlStateNormal];
@@ -1112,6 +1147,7 @@ static AVPlayer *_instancePlay = nil;
         //支付成功
         title=@"PaySuccess1",msg=@"您已支付成功",sureTitle=@"确定";
         av= [AKAlertView alertView:title des:msg  type:AKAlertFaild effect:AKAlertEffectDrop sureTitle:sureTitle cancelTitle:cancelTitle];
+        
         [[NSNotificationCenter defaultCenter] postNotificationName:ReloadClassList object:nil];
         [self back];
     }
@@ -1153,7 +1189,7 @@ static AVPlayer *_instancePlay = nil;
     AKAlertView* av;
     if ([notification.object integerValue] == 0) {
         title=@"PaySuccess1",msg=@"您已支付成功",sureTitle=@"确定";
-        av= [AKAlertView alertView:title des:msg  type:AKAlertSuccess effect:AKAlertEffectDrop sureTitle:sureTitle cancelTitle:cancelTitle];
+        av= [AKAlertView alertView:title des:msg  type:AKAlertFaild effect:AKAlertEffectDrop sureTitle:sureTitle cancelTitle:cancelTitle];
         [[NSNotificationCenter defaultCenter] postNotificationName:ReloadClassList object:nil];
         [self back];
     }

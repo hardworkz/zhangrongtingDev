@@ -187,10 +187,10 @@ selector:_selector name:_name object:nil];
 #pragma mark -- 第三方切换配置
 //FM
 #pragma mark 微信分享
-#define KweChatappID @"wx4041964cf987e1e0"
+#define KweChatappID @"wx53ca9b29537db1d2"
 #pragma mark 微信登录
-#define KweChatLoginAppID @"wx4bad076e5dba3fab"
-#define KweChatLoginAppSecret @"8e6c48652d522868c9ec792e06c4d639"
+#define KweChatLoginAppID @"wx53ca9b29537db1d2"
+#define KweChatLoginAppSecret @"9d20a57b114b0cc0d30d47a4a88e079f"
 #pragma mark 听闻（FM）
 //微博appkey
 #define KweiBoappkey @"2382842831"

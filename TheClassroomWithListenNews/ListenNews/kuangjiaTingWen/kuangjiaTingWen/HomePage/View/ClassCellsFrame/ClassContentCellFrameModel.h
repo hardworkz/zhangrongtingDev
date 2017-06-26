@@ -9,6 +9,10 @@
 #import <Foundation/Foundation.h>
 
 @interface ClassContentCellFrameModel : NSObject
+/**
+ 正文字体大小
+ */
+@property(assign,nonatomic)CGFloat titleFontSize;
 @property (strong, nonatomic) NSString *excerpt;/**< */
 @property (assign, nonatomic) CGRect contentLabelF;
 @property (assign, nonatomic) CGFloat cellHeight;

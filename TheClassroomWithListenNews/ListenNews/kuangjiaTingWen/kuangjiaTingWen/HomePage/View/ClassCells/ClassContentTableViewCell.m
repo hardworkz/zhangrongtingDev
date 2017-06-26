@@ -35,7 +35,7 @@
         zhengwenTextView.editable = NO;
         zhengwenTextView.scrollsToTop = NO;
 //        zhengwenTextView.delegate = self;
-        zhengwenTextView.font = gFontMajor16;
+//        zhengwenTextView.font = [UIFont systemFontOfSize:self.titleFontSize];
         [self.contentView addSubview:zhengwenTextView];
 
     }
@@ -47,6 +47,7 @@
     //设置文本内容和frame
     NSString *str1 = [frameModel.excerpt stringByReplacingOccurrencesOfString:@"\r" withString:@""];
     zhengwenTextView.text = str1;
+    zhengwenTextView.font = [UIFont systemFontOfSize:self.titleFontSize];
     NSMutableParagraphStyle *paragraphStyle = [[NSMutableParagraphStyle alloc]init];
     [paragraphStyle setLineSpacing:8.0];
     [paragraphStyle setAlignment:NSTextAlignmentLeft];
@@ -54,7 +55,7 @@
     [paragraphStyle setLineBreakMode:NSLineBreakByCharWrapping];
     [zhengwenTextView sizeToFit];
     if (zhengwenTextView.text.length != 0){
-        NSMutableAttributedString *attributedString =  [[NSMutableAttributedString alloc] initWithString:zhengwenTextView.text attributes:@{NSForegroundColorAttributeName : gTextDownload,NSFontAttributeName : gFontMajor16}];
+        NSMutableAttributedString *attributedString =  [[NSMutableAttributedString alloc] initWithString:zhengwenTextView.text attributes:@{NSForegroundColorAttributeName : gTextDownload,NSFontAttributeName : [UIFont systemFontOfSize:self.titleFontSize]}];
         [attributedString addAttribute:NSParagraphStyleAttributeName value:paragraphStyle range:NSMakeRange(0, zhengwenTextView.text.length)];
         zhengwenTextView.attributedText = attributedString;
     }

@@ -191,7 +191,8 @@
     
     //分页tableView
     for (int i = 0; i < 4; i ++ ){
-        UITableView *tableView = [[UITableView alloc]initWithFrame:CGRectMake(IPHONE_W * i, 0, IPHONE_W , IPHONE_H - 20/ 667 * SCREEN_HEIGHT) style:UITableViewStyleGrouped];
+        UITableView *tableView = [[UITableView alloc]initWithFrame:CGRectMake(IPHONE_W * i, 0, IPHONE_W , IPHONE_H - 24.0/ 667 * SCREEN_HEIGHT) style:UITableViewStyleGrouped];
+        tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
         tableView.backgroundColor = [UIColor whiteColor];
         
         if (i == 0){
@@ -207,7 +208,7 @@
             tableView.frame = CGRectMake(IPHONE_W * i + 2, 0, IPHONE_W, IPHONE_H - 20.0 / 667 * SCREEN_HEIGHT);
             pinglunhoushuaxinTableView = tableView;
         }else if (i == 3){
-            tableView.frame = CGRectMake(IPHONE_W * i + 2, 0, IPHONE_W, IPHONE_H - 20.0 / 667 * SCREEN_HEIGHT);
+            tableView.frame = CGRectMake(IPHONE_W * i + 3, 0, IPHONE_W, IPHONE_H - 20.0 / 667 * SCREEN_HEIGHT);
             tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
             ImageTableView = tableView;
         }
@@ -306,14 +307,14 @@
                 }];
             }
         }else if (switchIndex == 4) {//点击下载跳转
-            self.hidesBottomBarWhenPushed=YES;
+//            self.hidesBottomBarWhenPushed=YES;
             [self.navigationController setNavigationBarHidden:NO animated:YES];
             BatchDownloadTableTableViewController *vc = [BatchDownloadTableTableViewController new];
             vc.downloadSource = @"1";
             vc.programID = self.jiemuID;
             vc.headTitleStr = [NSString stringWithFormat:@"【%@】节目批量下载",self.jiemuName ];
             [self.navigationController pushViewController:vc animated:YES];
-            self.hidesBottomBarWhenPushed=YES;
+//            self.hidesBottomBarWhenPushed=YES;
         }
         if (switchIndex != 4) {
             selectedSwitchIndex = switchIndex;
@@ -371,7 +372,7 @@
     manager.enableAutoToolbar = NO;
     
     [self.navigationController setNavigationBarHidden:YES animated:YES];
-    self.hidesBottomBarWhenPushed = YES;
+//    self.hidesBottomBarWhenPushed = YES;
     if (_isRewardLoginBack) {
         _isRewardLoginBack = NO;
         [self rewardAlert];
@@ -514,8 +515,11 @@
         {
             [xinwenArr addObjectsFromArray:responseObject[@"results"]];
             [tableView reloadData];
+            [tableView.mj_footer endRefreshing];
+        }else{
+            [tableView reloadData];
+            [tableView.mj_footer endRefreshingWithNoMoreData];
         }
-        [tableView.mj_footer endRefreshing];
     } failure:^(NSError *error) {
         NSLog(@"error = %@",error);
         [tableView.mj_footer endRefreshing];
@@ -1276,9 +1280,9 @@
     gerenzhuye.fan_num = components[@"fan_num"];
     gerenzhuye.guan_num = components[@"guan_num"];
     gerenzhuye.user_id = components[@"uid"];
-    self.hidesBottomBarWhenPushed = YES;
+//    self.hidesBottomBarWhenPushed = YES;
     [self.navigationController pushViewController:gerenzhuye animated:YES];
-    self.hidesBottomBarWhenPushed = YES;
+//    self.hidesBottomBarWhenPushed = YES;
 }
 
 
@@ -1398,10 +1402,10 @@
                 vc.uid = weakSelf.jiemuID;
                 vc.post_id = @"";
                 vc.isPayClass = NO;
-                weakSelf.hidesBottomBarWhenPushed=YES;
+//                weakSelf.hidesBottomBarWhenPushed=YES;
                 [weakSelf.navigationController setNavigationBarHidden:NO animated:YES];
                 [weakSelf.navigationController pushViewController:vc animated:YES];
-                weakSelf.hidesBottomBarWhenPushed = YES;
+//                weakSelf.hidesBottomBarWhenPushed = YES;
             }
             
         } failure:^(NSError *error) {
@@ -1441,6 +1445,13 @@
 //点击播放按钮
 - (void)playBtnPlay:(zhuboxiangqingNewVCPlayBtn *)button
 {
+    ExIsClassVCPlay = NO;
+    //当前选中按钮为播放状态，设置为未播放状态并停止播放
+    if (button.selected == YES) {
+        [[bofangVC shareInstance] doPlay:[bofangVC shareInstance].centerBtn];
+        button.selected = NO;
+        return;
+    }
     NSIndexPath *indexPath = button.indexPath;
     button.selected = YES;
     button.titleLab.textColor = gMainColor;
@@ -1448,7 +1459,7 @@
     if ([[CommonCode readFromUserD:@"dangqianbofangxinwenID"] isEqualToString:xinwenArr[indexPath.row][@"id"]]){
         
         if (self.isfaxian) {
-            self.hidesBottomBarWhenPushed = YES;
+//            self.hidesBottomBarWhenPushed = YES;
             [self.navigationController.navigationBar setHidden:NO];
             [[NSNotificationCenter defaultCenter]postNotificationName:@"getAhocComment" object:xinwenArr[indexPath.row][@"id"]];
         }
@@ -1724,6 +1735,16 @@
         riqiLab.font = [UIFont systemFontOfSize:8.0f];
         [cell.contentView addSubview:riqiLab];
         
+        if (self.isClass) {
+            UIView *devider = [[UIView alloc] initWithFrame:CGRectMake(10.0 / 375 * IPHONE_W, 70.0 / 667 * SCREEN_HEIGHT - 0.5, SCREEN_WIDTH, 0.5)];
+            devider.backgroundColor = [UIColor lightGrayColor];
+            [cell.contentView addSubview:devider];
+        }else{
+            UIView *devider = [[UIView alloc] initWithFrame:CGRectMake(10.0 / 375 * IPHONE_W, 99.0 / 667 * SCREEN_HEIGHT - 0.5, SCREEN_WIDTH, 0.5)];
+            devider.backgroundColor = [UIColor lightGrayColor];
+            [cell.contentView addSubview:devider];
+        }
+        
         return cell;
     }
     //粉丝榜
@@ -1882,6 +1903,11 @@
             PingLundianzanNumLab.alpha = 1.0f;
         }
         cell.tag = indexPath.row + 1000;
+        
+        UIView *devider = [[UIView alloc] initWithFrame:CGRectMake(10.0 / 375 * IPHONE_W,(CGRectGetMaxY(pinglunLab.frame) + 20.0) / 667 * IPHONE_H - 0.5, SCREEN_WIDTH, 0.5)];
+        devider.backgroundColor = [UIColor lightGrayColor];
+        [cell.contentView addSubview:devider];
+        
         return cell;
     }else if ([tableView isEqual:ImageTableView]){
         AutoImageTableViewCell *cell = [AutoImageTableViewCell cellWithTableView:tableView];
@@ -1934,7 +1960,7 @@
         if ([[CommonCode readFromUserD:@"dangqianbofangxinwenID"] isEqualToString:xinwenArr[indexPath.row][@"id"]]){
             
             if (self.isfaxian) {
-                self.hidesBottomBarWhenPushed = YES;
+//                self.hidesBottomBarWhenPushed = YES;
                 [self.navigationController.navigationBar setHidden:NO];
                 [self.navigationController pushViewController:[bofangVC shareInstance ] animated:YES];
                 [[bofangVC shareInstance] scrollToTop];
@@ -1987,7 +2013,7 @@
             ExIsKaiShiBoFang = YES;
             ExwhichBoFangYeMianStr = @"zhuboxiangqingbofang";
             if (self.isfaxian) {
-                self.hidesBottomBarWhenPushed = YES;
+//                self.hidesBottomBarWhenPushed = YES;
                 [self.navigationController.navigationBar setHidden:NO];
                 [self.navigationController pushViewController:[bofangVC shareInstance ] animated:YES];
                 [[bofangVC shareInstance] scrollToTop];
@@ -2029,9 +2055,9 @@
         gerenzhuye.user_nicename = components[@"user_nicename"];
         gerenzhuye.avatar = components[@"user_avatar"];
         gerenzhuye.user_id = components[@"user_id"];
-        self.hidesBottomBarWhenPushed=YES;
+//        self.hidesBottomBarWhenPushed=YES;
         [self.navigationController pushViewController:gerenzhuye animated:YES];
-        self.hidesBottomBarWhenPushed=YES;
+//        self.hidesBottomBarWhenPushed=YES;
         
     }
     else if ([tableView isEqual:pinglunhoushuaxinTableView]){
@@ -2206,9 +2232,9 @@ didSelectLinkWithTransitInformation:(NSDictionary *)components {
     gerenzhuye.user_login = components[@"user_login"];
     gerenzhuye.avatar = components[@"avatar"];
     gerenzhuye.user_id = components[@"id"];
-    self.hidesBottomBarWhenPushed=YES;
+//    self.hidesBottomBarWhenPushed=YES;
     [self.navigationController pushViewController:gerenzhuye animated:YES];
-    self.hidesBottomBarWhenPushed=YES;
+//    self.hidesBottomBarWhenPushed=YES;
 }
 
 - (UILabel *)myRanking{

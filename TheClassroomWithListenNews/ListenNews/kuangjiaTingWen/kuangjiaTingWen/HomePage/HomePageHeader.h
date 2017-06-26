@@ -26,6 +26,8 @@
 #import "ClassAuditionCellFrameModel.h"
 
 
+static NSString *const TitleFontSize = @"titleFontSize";/**<新闻标题和内容，课堂标题和内容的字体大小*/
+static NSString *const DateFont = @"dateFont";/**<新闻发布日期的字体大小*/
 static NSString *const orderNumber = @"orderNumber";/**<课堂购买订单号*/
 static NSString *const ReloadClassList = @"reloadClassList";/**<刷新课堂列表通知*/
 

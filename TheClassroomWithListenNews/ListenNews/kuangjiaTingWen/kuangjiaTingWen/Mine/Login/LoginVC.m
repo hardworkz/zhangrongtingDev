@@ -431,6 +431,7 @@
     
     AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
     manager.requestSerializer.timeoutInterval = 40;
+    manager.responseSerializer.acceptableContentTypes = [NSSet setWithObjects:@"text/plain",nil];
     [manager GET:[NSString stringWithFormat:@"https://api.weixin.qq.com/sns/oauth2/access_token?appid=%@&secret=%@&code=%@&grant_type=authorization_code",KweChatLoginAppID ,KweChatLoginAppSecret,code] parameters:nil success:^(NSURLSessionDataTask *task, NSDictionary *responseObject1) {
         //得到accesstoken
         [manager GET:[NSString stringWithFormat:@"https://api.weixin.qq.com/sns/userinfo?access_token=%@&openid=%@",responseObject1[@"access_token"],responseObject1[@"openid"]] parameters:nil success:^(NSURLSessionDataTask *task, id responseObject) {
@@ -609,20 +610,5 @@
 {
     [[NSNotificationCenter defaultCenter]removeObserver:self];
 }
-
-//- (void)didReceiveMemoryWarning {
-//    [super didReceiveMemoryWarning];
-//    // Dispose of any resources that can be recreated.
-//}
-
-/*
-#pragma mark - Navigation
-
-// In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
-}
-*/
 
 @end

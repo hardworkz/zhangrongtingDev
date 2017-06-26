@@ -57,7 +57,7 @@
     DefineWeakSelf;
     APPDELEGATE.faxianSkipToPlayingVC = ^(NSString *pushNewsID){
         
-        if (ExIsClassVCPlay) {
+        if (ExIsClassVCPlay && Exact_id != nil&& [ClassViewController shareInstance].isPlaying) {
             ClassViewController *vc = [ClassViewController shareInstance];
             vc.act_id = Exact_id;
             weakSelf.hidesBottomBarWhenPushed = YES;

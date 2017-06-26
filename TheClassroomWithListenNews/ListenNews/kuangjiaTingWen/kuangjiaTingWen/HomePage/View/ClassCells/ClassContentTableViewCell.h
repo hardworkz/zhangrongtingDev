@@ -10,6 +10,11 @@
 
 @class ClassContentCellFrameModel;
 @interface ClassContentTableViewCell : UITableViewCell
+/**
+ 正文字体大小
+ */
+@property(assign,nonatomic)CGFloat titleFontSize;
+
 @property (strong, nonatomic) ClassContentCellFrameModel *frameModel;
 +(ClassContentTableViewCell *)cellWithTableView:(UITableView *)tableView;
 @end

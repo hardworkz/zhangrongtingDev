@@ -466,7 +466,8 @@
     //注册微信
     [WXApi registerApp:kAppId_WeiXin];
 
-    [NetWorkTool netwokingPostZhiFu:@"http://admin.tingwen.me/weixin/example/app.php" andParameters:@{@"total_fees" : @(self.rewardCount * 100)} success:^(id obj) {
+    RTLog(@"rewardCount:%f",self.rewardCount * 100);
+    [NetWorkTool netwokingPostZhiFu:@"http://admin.tingwen.me/weixin/example/app.php" andParameters:@{@"total_fees" : [NSString stringWithFormat:@"%.2f",self.rewardCount * 100]} success:^(id obj) {
         
         //微信
         //创建支付签名对象

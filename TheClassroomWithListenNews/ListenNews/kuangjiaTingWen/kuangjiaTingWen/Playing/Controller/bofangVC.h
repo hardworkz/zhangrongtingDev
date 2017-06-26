@@ -16,7 +16,7 @@
 @property(strong,nonatomic)NewsModel *newsModel;
 
 @property(assign,nonatomic)CGFloat titleFontSize;
-@property(assign,nonatomic)UIFont *dateFont;
+@property(assign,nonatomic)CGFloat dateFont;
 
 @property(strong,nonatomic)UITableView *tableView;
 @property(strong,nonatomic)UILabel *yinpinzongTime;

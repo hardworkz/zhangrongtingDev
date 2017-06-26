@@ -37,7 +37,8 @@
             [childView removeFromSuperview];
         }
     }
-    if ([bofangVC shareInstance].isPlay) {
+    //判断是否当前需要开始播放按钮动画
+    if ([bofangVC shareInstance].isPlay || [ClassViewController shareInstance].isPlaying) {
         [[NSNotificationCenter defaultCenter] postNotificationName:@"startAnimate" object:nil];
     }
     else{

@@ -66,7 +66,7 @@ typedef void(^animateBlock)();
     DefineWeakSelf;
     APPDELEGATE.woSkipToPlayingVC = ^ (NSString *pushNewsID){
         
-        if (ExIsClassVCPlay) {
+        if (ExIsClassVCPlay && Exact_id != nil&& [ClassViewController shareInstance].isPlaying) {
             ClassViewController *vc = [ClassViewController shareInstance];
             vc.act_id = Exact_id;
             weakSelf.hidesBottomBarWhenPushed = YES;
@@ -1149,6 +1149,7 @@ typedef void(^animateBlock)();
 //            //TODO:听友圈
             self.hidesBottomBarWhenPushed=YES;
             BlogViewController *blogVC = [BlogViewController new];
+            blogVC.view.backgroundColor = [UIColor whiteColor];
             blogVC.isFeedbackVC = NO;
             [self.navigationController pushViewController:blogVC animated:YES];
             self.hidesBottomBarWhenPushed=NO;

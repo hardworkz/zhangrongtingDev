@@ -66,6 +66,7 @@
 @implementation BlogViewController
 - (void)viewDidLoad{
     [super viewDidLoad];
+//    self.navBarBgAlpha = @"0.0";
     [self setupData];
     [self setupView];
 }
@@ -94,6 +95,15 @@
     [AddNewBlogImage addGestureRecognizer:LongPress];
     UIBarButtonItem *barItem = [[UIBarButtonItem alloc] initWithCustomView:AddNewBlogImage];
     self.navigationItem.rightBarButtonItem = barItem;
+    
+    UIButton *backImage = [UIButton buttonWithType:UIButtonTypeCustom];
+    [backImage setFrame:CGRectMake(0, 0, 44, 30)];
+    backImage.contentEdgeInsets = UIEdgeInsetsMake(0, 0, 0, 20);
+    [backImage setImage:[UIImage imageNamed:@"back"] forState:UIControlStateNormal];
+    [backImage addTarget:self action:@selector(back) forControlEvents:UIControlEventTouchUpInside];
+    
+    UIBarButtonItem *backItem = [[UIBarButtonItem alloc] initWithCustomView:backImage];
+    self.navigationItem.leftBarButtonItem = backItem;
     
     UISwipeGestureRecognizer *rightSwipe = [[UISwipeGestureRecognizer alloc]initWithTarget:self action:@selector(back)];
     [rightSwipe setDirection:UISwipeGestureRecognizerDirectionRight];
@@ -234,7 +244,7 @@
 
 - (UITableView *)blogTableview {
     if (!_blogTableview) {
-        _blogTableview = [[UITableView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT - 64) style:UITableViewStylePlain];
+        _blogTableview = [[UITableView alloc]initWithFrame:CGRectMake(0, 64, SCREEN_WIDTH, SCREEN_HEIGHT - 64) style:UITableViewStylePlain];
         [_blogTableview setDelegate:self];
         [_blogTableview setDataSource:self];
         _blogTableview.tableFooterView =  [UIView new];

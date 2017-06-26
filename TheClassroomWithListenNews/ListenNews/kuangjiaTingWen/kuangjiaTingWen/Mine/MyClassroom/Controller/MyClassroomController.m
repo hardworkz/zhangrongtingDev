@@ -70,7 +70,7 @@
 }
 - (void)viewWillAppear:(BOOL)animated{
     [super viewWillAppear:animated];
-    self.hidesBottomBarWhenPushed = YES;
+//    self.hidesBottomBarWhenPushed = YES;
     [self.navigationController setNavigationBarHidden:YES animated:YES];
 }
 
@@ -140,9 +140,9 @@
     faxianzhuboVC.jiemuName = frameModel.model.name;
     faxianzhuboVC.isfaxian = YES;
     faxianzhuboVC.isClass = YES;
-    self.hidesBottomBarWhenPushed=YES;
+//    self.hidesBottomBarWhenPushed=YES;
     [self.navigationController pushViewController:faxianzhuboVC animated:YES];
-    self.hidesBottomBarWhenPushed=NO;
+//    self.hidesBottomBarWhenPushed=NO;
 
 }
 #pragma mark - UITableViewDataSource

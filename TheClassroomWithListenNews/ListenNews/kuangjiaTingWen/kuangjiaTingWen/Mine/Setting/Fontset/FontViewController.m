@@ -107,41 +107,48 @@ static UITableViewCell *cell1;
     }
     //新闻界面的字体大小 与设置_字体设置相关联
     CGFloat titleFontSize;
-    UIFont *dateFont;
+    CGFloat dateFont;
     if (indexPath.row == 0) {
         titleFontSize = 25.0;
-        dateFont = gFontSelected19;
+        dateFont = 19.0;
     }
     else if (indexPath.row == 1){
         titleFontSize = 23.0;
-        dateFont = gFontMajor17;
+        dateFont = 17.0;
     }
     else if (indexPath.row == 2){
         titleFontSize = 21.0;
-        dateFont = gFontMajor16;
+        dateFont = 16.0;
     }
     else if (indexPath.row == 3){
         titleFontSize = 19.0;
-        dateFont = gFontMain14;
+        dateFont = 14.0;
     }
     else if (indexPath.row == 4){
         titleFontSize = 17.0;
-        dateFont = gFontMain12;
+        dateFont = 12.0;
     }
     else{
         titleFontSize = 15.0;
-        dateFont = gFontSub11;
+        dateFont = 11.0;
     }
     
     [bofangVC shareInstance].titleFontSize = titleFontSize;
     [bofangVC shareInstance].dateFont = dateFont;
     [[bofangVC shareInstance].tableView reloadData];
     
+    [ClassViewController shareInstance].titleFontSize = titleFontSize;
+    [[ClassViewController shareInstance] frameArrayWithClassModel:nil];
+    [[ClassViewController shareInstance].helpTableView reloadData];
+    
     [CommonCode writeToUserD:cell.textLabel.text andKey:NEWSFONTKEY];
+    [CommonCode writeToUserD:@(titleFontSize) andKey:TitleFontSize];
+    [CommonCode writeToUserD:@(dateFont) andKey:DateFont];
 
     [[NSUserDefaults standardUserDefaults] setValue:cell.textLabel.text forKey:@"fontSize"];
     [[NSUserDefaults standardUserDefaults]synchronize];
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"changeSheZhi" object:@"font"];
+    
+//    [[NSNotificationCenter defaultCenter] postNotificationName:@"changeSheZhi" object:@"font"];
     
     [self.navigationController popViewControllerAnimated:YES];
 }
