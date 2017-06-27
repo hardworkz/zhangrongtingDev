@@ -548,7 +548,6 @@
                         [UIImagePNGRepresentation(userAvatar) writeToFile:avatarPath atomically:YES];
                         [[NSNotificationCenter defaultCenter] postNotificationName:@"loginSccess" object:responseObject];
                         [CommonCode writeToUserD:@"ShouJi" andKey:@"isWhatLogin"];
-//                        ExDangQianUserAccessToken = [DES encryptUseDES:ExdangqianUser];
                     }
                 }
             } failure:^(NSError *error) {

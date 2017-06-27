@@ -392,7 +392,12 @@
             [weakSelf.classroomInfoArr addObjectsFromArray:classArray];
             weakSelf.classroomInfoArr = [[NSMutableArray alloc]initWithArray:weakSelf.classroomInfoArr];
             [weakSelf.classroomTableView reloadData];
-            [weakSelf endClassroomRefreshing];
+            if (classArray.count < self.classPageSize) {
+                [weakSelf.classroomTableView.mj_footer endRefreshingWithNoMoreData];
+                [weakSelf.classroomTableView.mj_header endRefreshing];
+            }else{
+                [weakSelf endClassroomRefreshing];
+            }
         }
         else{
             [weakSelf endClassroomRefreshing];

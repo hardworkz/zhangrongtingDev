@@ -252,7 +252,26 @@
         self.hidesBottomBarWhenPushed=YES;
     }
     else{
-        [self loginFirst];
+        if ([[CommonCode readFromUserD:@"isIAP"] boolValue] == YES) {
+            UIAlertController *qingshuruyonghuming = [UIAlertController alertControllerWithTitle:@"温馨提示" message:@"您还没登录，如果不进行登录，则当前充值数据无法绑定账号，会丢失充值数据，确定前往充值？" preferredStyle:UIAlertControllerStyleAlert];
+            [qingshuruyonghuming addAction:[UIAlertAction actionWithTitle:@"仍去充值" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+                
+                self.hidesBottomBarWhenPushed=YES;
+                [self.navigationController pushViewController:[PayViewController new] animated:YES];
+                self.hidesBottomBarWhenPushed=YES;
+            }]];
+            [qingshuruyonghuming addAction:[UIAlertAction actionWithTitle:@"去登录" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+                LoginVC *loginFriVC = [LoginVC new];
+                LoginNavC *loginNavC = [[LoginNavC alloc]initWithRootViewController:loginFriVC];
+                [loginNavC.navigationBar setBackgroundColor:[UIColor whiteColor]];
+                loginNavC.navigationBar.tintColor = [UIColor blackColor];
+                [self presentViewController:loginNavC animated:YES completion:nil];
+            }]];
+            
+            [self presentViewController:qingshuruyonghuming animated:YES completion:nil];
+        }else{
+            [self loginFirst];
+        }
     }
 }
 

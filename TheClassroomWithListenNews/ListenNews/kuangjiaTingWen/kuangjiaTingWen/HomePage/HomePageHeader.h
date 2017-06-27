@@ -31,4 +31,7 @@ static NSString *const DateFont = @"dateFont";/**<新闻发布日期的字体大
 static NSString *const orderNumber = @"orderNumber";/**<课堂购买订单号*/
 static NSString *const ReloadClassList = @"reloadClassList";/**<刷新课堂列表通知*/
 
+static NSString *const status = @"status";
+static NSString *const msg = @"msg";
+static NSString *const results = @"results";
 #endif /* HomePageHeader_h */

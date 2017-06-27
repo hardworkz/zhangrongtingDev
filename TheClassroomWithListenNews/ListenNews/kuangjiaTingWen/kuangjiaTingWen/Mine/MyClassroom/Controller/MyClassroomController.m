@@ -88,8 +88,12 @@
                 currentPage ++;
             }
             [self.tableView reloadData];
+            if (dataArray.count < 10) {
+                [self.tableView.mj_footer endRefreshingWithNoMoreData];
+            }
         }else{
             if (self.dataSourceArr.count == 0) {
+                [self.tableView.mj_footer endRefreshingWithNoMoreData];
                 [[BJNoDataView shareNoDataView] showCenterWithSuperView:self.tableView icon:nil iconClicked:^{
                     //图片点击回调
                     [self setUpData];//刷新数据

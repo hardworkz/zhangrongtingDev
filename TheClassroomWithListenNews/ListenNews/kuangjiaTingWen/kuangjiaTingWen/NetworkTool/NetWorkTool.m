@@ -2149,4 +2149,22 @@ NSMutableDictionary *dic = [[NSMutableDictionary alloc]initWithCapacity:1
     dic[@"id"] = comment_id;
     [self asyncNetworkingUrl:@"/interfaceYou/delSelfComment" andDict:dic success:success failure:failure];
 }
+//添加学员信息接口
++ (void)get_userInfoWithaccessToken:(NSString *)accessToken
+                         name:(NSString *)name
+                         phone:(NSString *)phone
+                         wx_num:(NSString *)wx_num
+                         city:(NSString *)city
+                         job:(NSString *)job
+                         sccess:(void (^)(NSDictionary *responseObject))success
+                         failure:(void(^)(NSError *error))failure{
+    NSMutableDictionary *dic = [[NSMutableDictionary alloc]initWithCapacity:1];
+    dic[@"accessToken"] = accessToken;
+    dic[@"name"] = name;
+    dic[@"phone"] = phone;
+    dic[@"wx_num"] = wx_num;
+    dic[@"city"] = city;
+    dic[@"job"] = job;
+    [self asyncNetworkingUrl:@"/interfaceYou/get_info" andDict:dic success:success failure:failure];
+}
 @end

@@ -416,14 +416,19 @@
     numberPage ++;
     
     [NetWorkTool getPaoGuoSelfWoDeJieMuWithaccessToken:[DSE encryptUseDES:ExdangqianUser] andPage:[NSString stringWithFormat:@"%d",numberPage] andLimit:@"10" sccess:^(NSDictionary *responseObject) {
+        [self.tableView.mj_footer endRefreshing];
         if ([responseObject[@"results"] isKindOfClass:[NSArray class]])
         {
-            [self.infoArr addObjectsFromArray:responseObject[@"results"]];
+            NSArray *array = responseObject[@"results"];
+            [self.infoArr addObjectsFromArray:array];
             [CommonCode writeToUserD:self.infoArr andKey:@"zhuyeliebiao"];
             [[NSNotificationCenter defaultCenter] postNotificationName:@"dingyuejiazaichenggong" object:nil];
+            
+            if (array.count < 10) {
+                [self.tableView.mj_footer endRefreshingWithNoMoreData];
+            }
         }
         [self.tableView reloadData];
-        [self.tableView.mj_footer endRefreshing];
     } failure:^(NSError *error) {
         NSLog(@"error = %@",error);
         [self.tableView.mj_footer endRefreshing];
@@ -454,7 +459,8 @@
         [NetWorkTool getPaoGuoSelfWoDeJieMuWithaccessToken:[DSE encryptUseDES:ExdangqianUser] andPage:@"1" andLimit:@"10" sccess:^(NSDictionary *responseObject) {
             if ([responseObject[@"results"] isKindOfClass:[NSArray class]]){
                 [self.infoArr removeAllObjects];
-                [self.infoArr addObjectsFromArray:responseObject[@"results"]];
+                NSArray *array = responseObject[@"results"];
+                [self.infoArr addObjectsFromArray:array];
                 [CommonCode writeToUserD:self.infoArr andKey:@"wodejiemu"];
                 [self.tipBtn removeFromSuperview];
             }
@@ -464,6 +470,7 @@
             }
             [self.tableView reloadData];
             [self.tableView.mj_header endRefreshing];
+            [self.tableView.mj_footer endRefreshing];
         } failure:^(NSError *error) {
             NSLog(@"error = %@",error);
             [self.tableView.mj_header endRefreshing];
@@ -494,12 +501,17 @@
     {
         numberPage++;
         [NetWorkTool getPaoGuoSelfWoDeJieMuWithaccessToken:[DSE encryptUseDES:ExdangqianUser] andPage:[NSString stringWithFormat:@"%d",numberPage] andLimit:@"10" sccess:^(NSDictionary *responseObject) {
+            [self.tableView.mj_footer endRefreshing];
             if ([responseObject[@"results"] isKindOfClass:[NSArray class]])
             {
-                [self.infoArr addObjectsFromArray:responseObject[@"results"]];
+                NSArray *array = responseObject[@"results"];
+                [self.infoArr addObjectsFromArray:array];
+                
+                if (array.count < 10) {
+                    [self.tableView.mj_footer endRefreshingWithNoMoreData];
+                }
             }
             [self.tableView reloadData];
-            [self.tableView.mj_footer endRefreshing];
         } failure:^(NSError *error) {
             NSLog(@"error = %@",error);
             [self.tableView.mj_footer endRefreshing];

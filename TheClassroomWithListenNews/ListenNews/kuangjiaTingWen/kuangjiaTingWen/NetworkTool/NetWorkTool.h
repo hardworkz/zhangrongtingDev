@@ -1551,5 +1551,26 @@
                       andLimit:(NSString *)limit
                         sccess:(void (^)(NSDictionary *responseObject))success
                        failure:(void(^)(NSError *error))failure;
+
+/**
+ 添加学员信息
+
+ @param accessToken accessToken
+ @param name 姓名
+ @param phone 电话
+ @param wx_num 微信号
+ @param city 城市
+ @param job 工作
+ @param success 成功
+ @param failure 失败
+ */
++ (void)get_userInfoWithaccessToken:(NSString *)accessToken
+                               name:(NSString *)name
+                              phone:(NSString *)phone
+                             wx_num:(NSString *)wx_num
+                               city:(NSString *)city
+                                job:(NSString *)job
+                             sccess:(void (^)(NSDictionary *responseObject))success
+                            failure:(void(^)(NSError *error))failure;
 @end
 
