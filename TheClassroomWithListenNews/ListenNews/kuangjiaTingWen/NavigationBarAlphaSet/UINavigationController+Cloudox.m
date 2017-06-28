@@ -18,13 +18,15 @@
     UIView *barBackgroundView = [[self.navigationBar subviews] objectAtIndex:0];// _UIBarBackground
     UIImageView *backgroundImageView = [[barBackgroundView subviews] objectAtIndex:0];// UIImageView
     if (self.navigationBar.isTranslucent) {
-        if (backgroundImageView != nil && backgroundImageView.image != nil) {
-            barBackgroundView.alpha = alpha;
-        } else {
-//            RTLog(@"%lu",(unsigned long)[barBackgroundView subviews].count);
-            UIView *backgroundEffectView = [barBackgroundView subviews].count == 1?[[barBackgroundView subviews] objectAtIndex:0]:[[barBackgroundView subviews] objectAtIndex:1];// UIVisualEffectView
-            if (backgroundEffectView != nil) {
-                backgroundEffectView.alpha = alpha;
+        if ([backgroundImageView isKindOfClass:[UIImageView class]]) {
+            if (backgroundImageView != nil && backgroundImageView.image != nil) {
+                barBackgroundView.alpha = alpha;
+            } else {
+                //            RTLog(@"%lu",(unsigned long)[barBackgroundView subviews].count);
+                UIView *backgroundEffectView = [barBackgroundView subviews].count == 1?[[barBackgroundView subviews] objectAtIndex:0]:[[barBackgroundView subviews] objectAtIndex:1];// UIVisualEffectView
+                if (backgroundEffectView != nil) {
+                    backgroundEffectView.alpha = alpha;
+                }
             }
         }
     } else {

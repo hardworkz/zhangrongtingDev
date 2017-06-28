@@ -55,7 +55,7 @@
     [paragraphStyle setLineBreakMode:NSLineBreakByCharWrapping];
     [zhengwenTextView sizeToFit];
     if (zhengwenTextView.text.length != 0){
-        NSMutableAttributedString *attributedString =  [[NSMutableAttributedString alloc] initWithString:zhengwenTextView.text attributes:@{NSForegroundColorAttributeName : gTextDownload,NSFontAttributeName : [UIFont systemFontOfSize:self.titleFontSize]}];
+        NSMutableAttributedString *attributedString =  [[NSMutableAttributedString alloc] initWithString:zhengwenTextView.text attributes:@{NSForegroundColorAttributeName : HEXCOLOR(0x505050),NSFontAttributeName : [UIFont systemFontOfSize:self.titleFontSize]}];
         [attributedString addAttribute:NSParagraphStyleAttributeName value:paragraphStyle range:NSMakeRange(0, zhengwenTextView.text.length)];
         zhengwenTextView.attributedText = attributedString;
     }

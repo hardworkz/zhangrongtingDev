@@ -77,8 +77,9 @@ typedef enum : NSUInteger {
                       delegate:(id<WHCDownloadDelegate>)delegate {
     if (self = [super init]) {
         for (NSMutableDictionary *d in [ProManager downloadAllNewObjArrar]) {
+            RTLog(@"%@---%@",d,obj);
             if ([d[@"post_mp"] rangeOfString:[obj[@"post_mp"] stringByReplacingOccurrencesOfString:@"/" withString:@""]].location != NSNotFound) {
-                            NSLog(@"存在");
+                            RTLog(@"存在");
                 [ProManager removeSaveObject:obj];
                 return nil;
             }

@@ -839,30 +839,26 @@
                                             andpage:[NSString stringWithFormat:@"%lu",(unsigned long)self.page]
                                            andlimit:[NSString stringWithFormat:@"%ld",(long)limit]
                                              sccess:^(NSDictionary *responseObject) {
-                                                 NSLog(@"%@",[NetWorkTool dictionaryToJson:responseObject[@"results"]]);
+//                                                 NSLog(@"%@",[NetWorkTool dictionaryToJson:responseObject[@"results"]]);
                                                  if ([responseObject[@"results"] isKindOfClass:[NSArray class]]) {
                                                      if (self.page == 1) {
                                                          [weakSelf.blogArray removeAllObjects];
                                                      }
                                                      NSMutableArray *resultsArr = [FeedBackAndListenFriendModel mj_objectArrayWithKeyValuesArray:responseObject[@"results"]];
                                                      [weakSelf.blogArray addObjectsFromArray:[self frameArrayWithDataArray:resultsArr]];
-                                                     
-//                                                     NSMutableArray *resultsArr = responseObject[@"results"];
-//                                                     [weakSelf.blogArray addObjectsFromArray:resultsArr];
-                                                     
-                                                     //                                                                                                  if ( [resultsArr count]< limit) {
-                                                     //                                                                                                      [weakSelf.blogTableview.mj_footer endRefreshingWithNoMoreData];
-                                                     //                                                                                                  }
-                                                     //                                                                                                  else{
-                                                     //                                                                                                      [weakSelf.blogTableview.mj_footer resetNoMoreData];
-                                                     //                                                                                                  }
+                                                     if (resultsArr.count < limit) {
+                                                         [weakSelf.blogTableview.mj_footer endRefreshingWithNoMoreData];
+                                                     }else{
+                                                         [weakSelf.blogTableview.mj_footer endRefreshing];
+                                                     }
                                                  }else{
                                                      NSLog(@"没有相关信息");
+                                                     [weakSelf.blogTableview.mj_footer endRefreshingWithNoMoreData];
                                                  }
                                                  
                                                  [weakSelf.blogTableview reloadData];
                                                  [weakSelf.blogTableview.mj_header endRefreshing];
-                                                 [weakSelf.blogTableview.mj_footer endRefreshing];
+                                                 
                                                   ExisRigester = NO;
                                                  
                                              } failure:^(NSError *error) {
@@ -880,13 +876,18 @@
                 NSMutableArray *resultsArr = [FeedBackAndListenFriendModel mj_objectArrayWithKeyValuesArray:responseObject[@"results"]];
                 
                 [weakSelf.blogArray addObjectsFromArray:[self frameArrayWithDataArray:resultsArr]];
+                if (resultsArr.count < limit) {
+                    [weakSelf.blogTableview.mj_footer endRefreshingWithNoMoreData];
+                }else{
+                    [weakSelf.blogTableview.mj_footer endRefreshing];
+                }
             }else{
                 NSLog(@"没有相关信息");
+                [weakSelf.blogTableview.mj_footer endRefreshingWithNoMoreData];
             }
             
             [weakSelf.blogTableview reloadData];
             [weakSelf.blogTableview.mj_header endRefreshing];
-            [weakSelf.blogTableview.mj_footer endRefreshing];
             
         } failure:^(NSError *error) {
             NSLog(@"error = %@",error);

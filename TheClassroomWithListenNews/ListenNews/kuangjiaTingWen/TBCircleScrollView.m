@@ -21,7 +21,8 @@
     NSMutableArray *_curImageArray; //当前显示的图片数组
     NSInteger          _curPage;    //当前显示的图片位置
     NSTimer           *_timer;      //定时器
-    NSArray *newArr;
+    NSArray *newArr;//当前轮播图数据
+    NSMutableArray *newsArr;//当前为新闻的数据：（轮播 图中包含课程，url）
     NSMutableArray *chuanchuquArr;  //要点击传出去的数组
     /** 图片下方的下划线  */
     UIView *lineView;
@@ -43,6 +44,17 @@
         [self addSubview:self.scrollView];
         
         newArr = [NSArray arrayWithArray:infoArr];
+        //筛选轮播图中是新闻的列表
+        if (newsArr.count != 0) {
+            [newsArr removeAllObjects];
+        }else{
+            newsArr = [NSMutableArray array];
+        }
+        for (int i = 0; i<newArr.count; i++) {
+            if ([newArr[i][@"cate"] intValue] == 1) {
+                [newsArr addObject:newArr[i][@"post_list"]];
+            }
+        }
         //分页控件
         _pageControl = [[UIPageControl alloc] initWithFrame:CGRectMake(self.scrollView.frame.size.width - 5.0 * infoArr.count, 10.0 , 5.0 , 5.0 )];
         _pageControl.userInteractionEnabled = NO;
@@ -168,10 +180,12 @@
 //设置当用户拖拽轮播图停止定时器，当用户停止拖拽轮播图启动定时器
 - (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate
 {
+    RTLog(@"addTimer");
     [self addTimer];
 }
 - (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView
 {
+    RTLog(@"removeTimer");
     [self removeTimer];
 }
 - (void)reloadData{
@@ -303,6 +317,7 @@
             [bofangVC shareInstance].hidesBottomBarWhenPushed = NO;
             [[NSNotificationCenter defaultCenter] postNotificationName:@"yuanpanzhuan" object:nil];
             [[NSNotificationCenter defaultCenter] postNotificationName:@"qiehuanxinwen" object:nil];
+            [CommonCode writeToUserD:newsArr andKey:@"zhuyeliebiao"];
             [CommonCode writeToUserD:newArr[_curPage][@"post_list"][@"id"] andKey:@"dangqianbofangxinwenID"];
         }
         
@@ -326,7 +341,6 @@
         [nav pushViewController:classVC animated:YES];
         classVC.hidesBottomBarWhenPushed = NO;
     }
-//    [[NSNotificationCenter defaultCenter] postNotificationName:@"lunboxiangqingVCAction" object:chuanchuquArr];
 }
 - (void)dealloc
 {

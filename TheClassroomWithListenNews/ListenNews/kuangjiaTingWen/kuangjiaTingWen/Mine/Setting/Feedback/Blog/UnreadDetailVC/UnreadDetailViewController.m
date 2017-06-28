@@ -60,6 +60,15 @@
     [self.toolBarView setHidden:YES];
     self.commentTextStr = @"";
     
+    UIButton *backImage = [UIButton buttonWithType:UIButtonTypeCustom];
+    backImage.bounds = CGRectMake(0, 0, 9, 15);
+    [backImage setBackgroundImage:[UIImage imageNamed:@"back"] forState:UIControlStateNormal];
+    [backImage addTarget:self action:@selector(back) forControlEvents:UIControlEventTouchUpInside];
+    
+    UIBarButtonItem *backItem = [[UIBarButtonItem alloc] initWithCustomView:backImage];
+    self.navigationItem.leftBarButtonItem = backItem;
+
+    
     UISwipeGestureRecognizer *rightSwipe = [[UISwipeGestureRecognizer alloc]initWithTarget:self action:@selector(back)];
     [rightSwipe setDirection:UISwipeGestureRecognizerDirectionRight];
     [self.unreadTableview addGestureRecognizer:rightSwipe];

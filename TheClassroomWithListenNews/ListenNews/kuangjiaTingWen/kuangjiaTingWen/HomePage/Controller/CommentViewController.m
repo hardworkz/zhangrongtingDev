@@ -167,10 +167,16 @@
             if (weakSelf.commentIndex == 1) {
                 [weakSelf.commentInfoArr removeAllObjects];
             }
-            [weakSelf.commentInfoArr addObjectsFromArray:[PlayVCCommentModel mj_objectArrayWithKeyValuesArray:responseObject[@"results"]]];
+            NSArray *array = responseObject[@"results"];
+            [weakSelf.commentInfoArr addObjectsFromArray:[PlayVCCommentModel mj_objectArrayWithKeyValuesArray:array]];
             weakSelf.commentInfoArr = [[NSMutableArray alloc]initWithArray:[self pinglunFrameModelArrayWithModelArray:weakSelf.commentInfoArr]];
             [weakSelf.commentTableView reloadData];
-            [weakSelf endRefreshing];
+            if (array.count < self.commentPageSize) {
+                [self.commentTableView.mj_header endRefreshing];
+                [self.commentTableView.mj_footer endRefreshingWithNoMoreData];
+            }else{
+                [weakSelf endRefreshing];
+            }
         }
     } failure:^(NSError *error) {
         [weakSelf endRefreshing];

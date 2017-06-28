@@ -166,8 +166,10 @@
 + (NSString*)dictionaryToJson:(NSDictionary *)dic {
     
     NSError *parseError   = nil;
-    
-    NSData *jsonData      = [NSJSONSerialization dataWithJSONObject:dic options:NSJSONWritingPrettyPrinted error:&parseError];
+    NSData *jsonData;
+    if ([dic isKindOfClass:[NSDictionary class]]) {
+        jsonData      = [NSJSONSerialization dataWithJSONObject:dic options:NSJSONWritingPrettyPrinted error:&parseError];
+    }
     
     return [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
     

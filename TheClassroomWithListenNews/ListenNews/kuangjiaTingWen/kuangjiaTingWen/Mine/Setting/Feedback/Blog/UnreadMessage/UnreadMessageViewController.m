@@ -59,7 +59,7 @@
     self.navigationController.navigationBar.titleTextAttributes = @{NSForegroundColorAttributeName: [UIColor blackColor],
                                                                     NSFontAttributeName : [UIFont boldSystemFontOfSize:18]};
     UIButton *leftBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    [leftBtn setBackgroundImage:[UIImage imageNamed:@"back"] forState:UIControlStateNormal];
+    [leftBtn setImage:[UIImage imageNamed:@"back"] forState:UIControlStateNormal];
     leftBtn.bounds = CGRectMake(0, 0, 9, 15);
     UIBarButtonItem *back = [[UIBarButtonItem alloc]initWithCustomView:leftBtn];
     [leftBtn addTarget:self action:@selector(back) forControlEvents:UIControlEventTouchUpInside];

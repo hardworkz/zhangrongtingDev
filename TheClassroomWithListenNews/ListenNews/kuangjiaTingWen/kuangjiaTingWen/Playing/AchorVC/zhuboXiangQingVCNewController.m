@@ -378,10 +378,11 @@
 //    self.navBarBgAlpha = @"0.0";
     
     IQKeyboardManager *manager = [IQKeyboardManager sharedManager];
-    manager.enable = YES;
-    manager.shouldResignOnTouchOutside = YES;
-    manager.shouldToolbarUsesTextFieldTintColor = NO;
-    manager.enableAutoToolbar = NO;
+    [manager setKeyboardDistanceFromTextField:0];
+//    manager.enable = YES;
+//    manager.shouldResignOnTouchOutside = YES;
+//    manager.shouldToolbarUsesTextFieldTintColor = NO;
+//    manager.enableAutoToolbar = NO;
     
     [self.navigationController setNavigationBarHidden:YES animated:YES];
 //    self.hidesBottomBarWhenPushed = YES;
@@ -2292,9 +2293,9 @@ didSelectLinkWithTransitInformation:(NSDictionary *)components {
         _alertCommitBuyUserDataView.backgroundColor = [UIColor whiteColor];
         _alertCommitBuyUserDataView.layer.cornerRadius = 5;
         _alertCommitBuyUserDataView.layer.borderWidth = 1;
-        _alertCommitBuyUserDataView.layer.borderColor = [UIColor blackColor].CGColor;
+        _alertCommitBuyUserDataView.layer.borderColor = [UIColor lightGrayColor].CGColor;
         
-        UILabel *tipLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, _alertCommitBuyUserDataView.width, 30)];
+        UILabel *tipLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, _alertCommitBuyUserDataView.width, 40)];
         tipLabel.text = @"恭喜您，购买成功!";
         tipLabel.textColor = gMainColor;
         tipLabel.font = gFontMajor16;
@@ -2311,55 +2312,50 @@ didSelectLinkWithTransitInformation:(NSDictionary *)components {
         
         CGFloat height = 30;
         for (int i = 0; i<5; i++) {
-            UIView *contentView = [[UIView alloc] initWithFrame:CGRectMake(0, CGRectGetMaxY(describeLabel.frame) + i * height, _alertCommitBuyUserDataView.width, height)];
-            contentView.backgroundColor = [UIColor whiteColor];
+            UIView *contentView = [[UIView alloc] initWithFrame:CGRectMake(0, CGRectGetMaxY(describeLabel.frame) + i * (height + 5), _alertCommitBuyUserDataView.width, height)];
+            contentView.backgroundColor = [UIColor clearColor];
             [_alertCommitBuyUserDataView addSubview:contentView];
             
-            UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(15,0,35, height)];
-            label.textColor = [UIColor blackColor];
+            UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(20,0,35, height)];
+            label.textColor = [UIColor lightGrayColor];
             label.font = gFontMain15;
             label.textAlignment = NSTextAlignmentRight;
             [contentView addSubview:label];
             
             UITextField *textField = [[UITextField alloc] init];
             textField.delegate = self;
+            textField.backgroundColor = [UIColor clearColor];
             textField.font = gFontMain15;
-            textField.textAlignment = NSTextAlignmentCenter;
-            textField.returnKeyType = UIReturnKeyDone;
+            textField.returnKeyType = UIReturnKeyNext;
             textField.textColor = [UIColor blackColor];
             textField.tintColor = [UIColor lightGrayColor];
-            textField.frame = CGRectMake(CGRectGetMaxX(label.frame), 0, _alertCommitBuyUserDataView.width - label.width - 30, height-1);
-            textField.backgroundColor = [UIColor whiteColor];
+            textField.frame = CGRectMake(CGRectGetMaxX(label.frame) + 5, 0, _alertCommitBuyUserDataView.width - label.width - 45, height-1);
             [contentView addSubview:textField];
             
-            UIView *devider = [[UIView alloc] initWithFrame:CGRectMake(textField.x, height - 1, textField.width, 0.5)];
+            UIView *devider = [[UIView alloc] initWithFrame:CGRectMake(textField.x,height - 1, textField.width, 1)];
             devider.backgroundColor = [UIColor lightGrayColor];
             [contentView addSubview:devider];
             
             if (i == 0) {
                 label.text = @"姓名:";
-                textField.placeholder = @"请输入真实姓名";
                 nameTextField = textField;
             }else if (i == 1) {
                 label.text = @"电话:";
-                textField.placeholder = @"请输入联系电话";
                 phoneTextField = textField;
             }else if (i == 2) {
                 label.text = @"微信:";
-                textField.placeholder = @"请输入微信号";
                 wxTextField = textField;
             }else if (i == 3) {
                 label.text = @"城市:";
-                textField.placeholder = @"请输入所在城市";
                 cityTextField = textField;
             }else if (i == 4) {
                 label.text = @"工作:";
-                textField.placeholder = @"请输入工作名称";
+                textField.returnKeyType = UIReturnKeyDone;
                 jobTextField = textField;
             }
         }
         
-        UIButton *cancleBtn = [[UIButton alloc] initWithFrame:CGRectMake(0, CGRectGetMaxY(describeLabel.frame) + 5 * height, _alertCommitBuyUserDataView.width * 0.5 - 0.5, 44)];
+        UIButton *cancleBtn = [[UIButton alloc] initWithFrame:CGRectMake(0, CGRectGetMaxY(describeLabel.frame) + 5 *(height + 5), _alertCommitBuyUserDataView.width * 0.5 - 0.5, 44)];
         [cancleBtn setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
         [cancleBtn setTitle:@"取消" forState:UIControlStateNormal];
         cancleBtn.titleLabel.font = gFontMain15;
@@ -2370,7 +2366,7 @@ didSelectLinkWithTransitInformation:(NSDictionary *)components {
         devider.backgroundColor = [UIColor lightGrayColor];
         [_alertCommitBuyUserDataView addSubview:devider];
         
-        UIButton *commitBtn = [[UIButton alloc] initWithFrame:CGRectMake(_alertCommitBuyUserDataView.width * 0.5 + 0.5, CGRectGetMaxY(describeLabel.frame) + 5 * height, _alertCommitBuyUserDataView.width * 0.5 - 0.5, 44)];
+        UIButton *commitBtn = [[UIButton alloc] initWithFrame:CGRectMake(_alertCommitBuyUserDataView.width * 0.5 + 0.5, cancleBtn.y, _alertCommitBuyUserDataView.width * 0.5 - 0.5, 44)];
         [commitBtn setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
         [commitBtn setTitle:@"提交" forState:UIControlStateNormal];
         commitBtn.titleLabel.font = gFontMain15;
@@ -2386,7 +2382,7 @@ didSelectLinkWithTransitInformation:(NSDictionary *)components {
 {
     if (_cover == nil) {
         _cover = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)];
-        _cover.backgroundColor = ColorWithRGBA(1, 1, 1, 0.5);
+        _cover.backgroundColor = [UIColor clearColor];
         [_cover addTarget:self action:@selector(cancelBtnClick:)];
     }
     return _cover;
@@ -2395,7 +2391,6 @@ didSelectLinkWithTransitInformation:(NSDictionary *)components {
 {
     [UIView animateWithDuration:0.5 animations:^{
         _alertCommitBuyUserDataView.alpha = 0.;
-        _cover.alpha = 0.;
     }completion:^(BOOL finished) {
         [_alertCommitBuyUserDataView removeFromSuperview];
         [_cover removeFromSuperview];
@@ -2453,15 +2448,42 @@ didSelectLinkWithTransitInformation:(NSDictionary *)components {
     [UIView animateWithDuration:0.5 // 动画时长
                      animations:^{
                          _alertCommitBuyUserDataView.alpha = 1.;
-                         _cover.alpha = 1;
                      } completion:^(BOOL finished) {
-                         [nameTextField becomeFirstResponder];
+                         //                         [nameTextField becomeFirstResponder];
                      }];
 }
+
 #pragma mark - textfieldDelegate
+- (void)textFieldDidBeginEditing:(UITextField *)textField
+{
+    IQKeyboardManager *manager = [IQKeyboardManager sharedManager];
+    if ([textField isEqual:nameTextField]) {
+        [manager setKeyboardDistanceFromTextField:50 + 35*4];
+    }else if ([textField isEqual:phoneTextField]) {
+        [manager setKeyboardDistanceFromTextField:50 + 35*3];
+    }else if ([textField isEqual:wxTextField]) {
+        [manager setKeyboardDistanceFromTextField:50 + 35*2];
+    }else if ([textField isEqual:cityTextField]) {
+        [manager setKeyboardDistanceFromTextField:50 + 35];
+    }else if ([textField isEqual:jobTextField]) {
+        [manager setKeyboardDistanceFromTextField:50];
+    }
+}
 - (BOOL)textFieldShouldReturn:(UITextField *)textField
 {
-    [textField resignFirstResponder];
+    if ([textField isEqual:jobTextField]) {
+        [textField resignFirstResponder];
+    }else{
+        if ([textField isEqual:nameTextField]) {
+            [phoneTextField becomeFirstResponder];
+        }else if ([textField isEqual:phoneTextField]) {
+            [wxTextField becomeFirstResponder];
+        }else if ([textField isEqual:wxTextField]) {
+            [cityTextField becomeFirstResponder];
+        }else if ([textField isEqual:cityTextField]) {
+            [jobTextField becomeFirstResponder];
+        }
+    }
     return YES;
 }
 - (void)dealloc

@@ -14,7 +14,7 @@
     _excerpt = excerpt;
     //计算文字的宽高
     //新闻内容
-    UITextView *zhengwenTextView = [[UITextView alloc]initWithFrame:CGRectMake(20.0 / 375 * IPHONE_W, 24.0 / 667 * IPHONE_H, IPHONE_W - 40.0 / 375 * IPHONE_W, 50.0 / 667 * IPHONE_H)];
+    UITextView *zhengwenTextView = [[UITextView alloc]initWithFrame:CGRectMake(10.0 / 375 * IPHONE_W, 24.0 / 667 * IPHONE_H, IPHONE_W - 20.0 / 375 * IPHONE_W, 50.0 / 667 * IPHONE_H)];
     zhengwenTextView.scrollEnabled = NO;
     zhengwenTextView.editable = NO;
     zhengwenTextView.scrollsToTop = NO;

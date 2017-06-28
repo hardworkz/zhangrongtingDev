@@ -1604,14 +1604,14 @@ static AVPlayer *_instancePlay = nil;
     [self performSelector:@selector(SVPDismiss) withObject:nil afterDelay:1.0];
     //TODO:下载单条新闻
     NSArray *nowarr = [CommonCode readFromUserD:@"zhuyeliebiao"];
-     NSMutableDictionary *dic = [NSMutableDictionary dictionary];
+    NSMutableDictionary *dic = [NSMutableDictionary dictionary];
     for ( int i = 0 ; i < [nowarr count]; i ++) {
         if ([nowarr[i][@"id"] isEqualToString:[CommonCode readFromUserD:@"dangqianbofangxinwenID"]]) {
             dic = nowarr[i];
             break;
         }
     }
-    if (dic != nil) {
+    if (dic != nil && [dic allKeys].count != 0) {
         dispatch_async(dispatch_get_main_queue(), ^{
             ProjiectDownLoadManager *manager = [ProjiectDownLoadManager defaultProjiectDownLoadManager];
             [manager insertSevaDownLoadArray:dic];
@@ -1619,6 +1619,9 @@ static AVPlayer *_instancePlay = nil;
             WHC_Download *op = [[WHC_Download alloc]initStartDownloadWithURL:[NSURL URLWithString:dic[@"post_mp"]] savePath:manager.userDownLoadPath savefileName:[dic[@"post_mp"] stringByReplacingOccurrencesOfString:@"/" withString:@""] withObj:dic delegate:nil];
             [manager.downLoadQueue addOperation:op];
         });
+    }else{
+        XWAlerLoginView *xw = [[XWAlerLoginView alloc]initWithTitle:@"下载路径为空"];
+        [xw show];
     }
     
 }
@@ -2641,7 +2644,7 @@ static AVPlayer *_instancePlay = nil;
         [_zhengwenTextView sizeToFit];
         if (_zhengwenTextView.text.length != 0)
         {
-            NSMutableAttributedString *attributedString =  [[NSMutableAttributedString alloc] initWithString:_zhengwenTextView.text attributes:@{NSForegroundColorAttributeName : gTextDownload,NSFontAttributeName : [UIFont systemFontOfSize:self.titleFontSize]}];
+            NSMutableAttributedString *attributedString =  [[NSMutableAttributedString alloc] initWithString:_zhengwenTextView.text attributes:@{NSForegroundColorAttributeName : HEXCOLOR(0x505050),NSFontAttributeName : [UIFont systemFontOfSize:self.titleFontSize]}];
             [attributedString addAttribute:NSParagraphStyleAttributeName value:paragraphStyle range:NSMakeRange(0, _zhengwenTextView.text.length)];
             _zhengwenTextView.attributedText = attributedString;
         }

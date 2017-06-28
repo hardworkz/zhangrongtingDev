@@ -373,22 +373,7 @@
             if (weakSelf.classIndex == 1) {
                 [weakSelf.classroomInfoArr removeAllObjects];
             }
-            else{
-//                NSRange range = {NSNotFound, NSNotFound};
-//                for (int i = 0 ; i < [weakSelf.classroomInfoArr count]; i ++) {
-//                    if ([weakSelf.classroomInfoArr[i][@"id"] isEqualToString:[responseObject[@"results"] firstObject][@"id"] ]) {
-//                        range = NSMakeRange(i, [weakSelf.classroomInfoArr count] - i);
-//                        break;
-//                    }
-//                }
-//                if (range.location < [weakSelf.classroomInfoArr count]) {
-//                    [weakSelf.classroomInfoArr removeObjectsInRange:range];
-//                }
-            }
             NSMutableArray *classArray = [self frameWithDataArray:[MyClassroomListModel mj_objectArrayWithKeyValuesArray:responseObject[@"results"]]];
-//            if (classArray.count == self.classPageSize) {
-//                self.classIndex ++;
-//            }
             [weakSelf.classroomInfoArr addObjectsFromArray:classArray];
             weakSelf.classroomInfoArr = [[NSMutableArray alloc]initWithArray:weakSelf.classroomInfoArr];
             [weakSelf.classroomTableView reloadData];
