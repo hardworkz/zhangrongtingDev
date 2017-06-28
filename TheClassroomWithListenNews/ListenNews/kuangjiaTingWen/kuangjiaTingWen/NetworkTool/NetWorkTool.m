@@ -1303,7 +1303,7 @@ NSMutableDictionary *dic = [[NSMutableDictionary alloc]initWithCapacity:1
     NSMutableDictionary *dic = [[NSMutableDictionary alloc]initWithCapacity:1];
     dic[@"term_id"] = term_id;
     dic[@"page"] = page;
-    dic[@"limit"] = limit;
+//    dic[@"limit"] = limit;
     dic[@"accessToken"] = accessToken;
     [self asyncNetworkingUrl:@"/interface/postList" andDict:dic success:success failure:failure];
 }

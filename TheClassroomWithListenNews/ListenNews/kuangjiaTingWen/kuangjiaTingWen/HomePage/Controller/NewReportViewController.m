@@ -311,7 +311,6 @@
         if ([responseObject[@"results"] isKindOfClass:[NSArray class]]){
             [weakSelf.infoArr removeAllObjects];
             [weakSelf.infoArr addObjectsFromArray:responseObject[@"results"]];
-//            [CommonCode writeToUserD:self.infoArr andKey:@"wodejiemu"];
         }
         [weakSelf.tableView reloadData];
         [weakSelf.tableView.mj_header endRefreshing];
@@ -326,11 +325,15 @@
     numberPage++;
     DefineWeakSelf;
     [NetWorkTool postPaoGuoFenLeiZhuBoBoBaoXinWenWithterm_id:self.term_id andpage:[NSString stringWithFormat:@"%d",numberPage] andlimit:@"10" andaccessToken:AvatarAccessToken sccess:^(NSDictionary *responseObject) {
+        [weakSelf.tableView.mj_footer endRefreshing];
         if ([responseObject[@"results"] isKindOfClass:[NSArray class]]){
-            [weakSelf.infoArr addObjectsFromArray:responseObject[@"results"]];
+            NSArray *array = responseObject[@"results"];
+            [weakSelf.infoArr addObjectsFromArray:array];
+            if (array.count < 10) {
+                [weakSelf.tableView.mj_footer endRefreshingWithNoMoreData];
+            }
         }
         [weakSelf.tableView reloadData];
-        [weakSelf.tableView.mj_footer endRefreshing];
     } failure:^(NSError *error) {
         NSLog(@"error = %@",error);
         [weakSelf.tableView.mj_footer endRefreshing];
@@ -342,7 +345,7 @@
 {
     if (!_tableView)
     {
-        _tableView = [[UITableView alloc]initWithFrame:CGRectMake(0, 0, IPHONE_W, IPHONE_H) style:UITableViewStylePlain];
+        _tableView = [[UITableView alloc]initWithFrame:CGRectMake(0, 0, IPHONE_W, IPHONE_H - 64) style:UITableViewStylePlain];
         _tableView.delegate = self;
         _tableView.dataSource = self;
         _tableView.tableFooterView = [UIView new];

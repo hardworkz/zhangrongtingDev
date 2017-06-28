@@ -140,7 +140,6 @@ static AVPlayer *_instancePlay = nil;
 - (void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
-
 }
 - (void)setUpData{
     _pinglunArr = [NSMutableArray new];
