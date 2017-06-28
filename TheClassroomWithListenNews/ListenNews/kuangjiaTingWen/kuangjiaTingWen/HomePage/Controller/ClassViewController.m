@@ -22,7 +22,6 @@ static NSString *const playList = @"playList";/**<当前正在播放的课堂试
 static NSString *const playAct_id = @"playAct_id";/**<当前正在播放的课堂ID*/
 
 @interface ClassViewController ()<UITableViewDelegate,UITableViewDataSource,UITextViewDelegate,TTTAttributedLabelDelegate,UITextFieldDelegate>{
-    UIView *xiangqingView;
     UILabel *PingLundianzanNumLab;
     NSInteger playIndex;
 //    NSString *currentClassID;
@@ -67,6 +66,14 @@ static NSString *const playAct_id = @"playAct_id";/**<当前正在播放的课�
  */
 @property (strong, nonatomic) UIView *alertCommitBuyUserDataView;
 @property (strong, nonatomic) UIButton *cover;
+
+/**
+ tableviewHeader控件
+ */
+@property (strong, nonatomic) UIView *xiangqingView;
+@property (strong, nonatomic) UIImageView *zhengwenImg;
+@property (strong, nonatomic) UILabel *titleLab;
+@property (strong, nonatomic) UIView *seperatorLine;
 @end
 
 static ClassViewController *_instance = nil;
@@ -109,13 +116,16 @@ static AVPlayer *_instancePlay = nil;
     
     ExIsClassVCPlay = YES;
     //单例模式刷新数据
-    RTLog(@"act_id:%@----Exact_id:%@",self.act_id,Exact_id);
     if (![Exact_id isEqualToString:self.act_id]) {//当前为不同页面，需要重新初始化控件状态
         
         playIndex = -1;
         [self.helpTableView setContentOffset:CGPointZero animated:NO];
     }
-    
+    //清空上一个页面图片数据
+    if (self.zhengwenImg) {
+        [_zhengwenImg sd_setImageWithURL:[NSURL URLWithString:@""] placeholderImage:[UIImage imageNamed:@"thumbnailsdefault"]];
+        _titleLab.text = @"";
+    }
     [self loadData];
     
     if ([Exact_id isEqualToString:self.act_id] && _isPlaying)
@@ -140,6 +150,7 @@ static AVPlayer *_instancePlay = nil;
 - (void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
+    
 }
 - (void)setUpData{
     _pinglunArr = [NSMutableArray new];
@@ -300,66 +311,44 @@ static AVPlayer *_instancePlay = nil;
 }
 
 - (void)setTableHeadView{
-    xiangqingView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, IPHONE_W, IPHONE_H)];
-    xiangqingView.backgroundColor = [UIColor whiteColor];
-    //新闻图片
-    UIImageView *zhengwenImg = [[UIImageView alloc]initWithFrame:CGRectMake(0, -20, IPHONE_W, 209.0 / 667 * SCREEN_HEIGHT)];
-    [zhengwenImg setUserInteractionEnabled:YES];
     
-    UIBezierPath *maskPath = [UIBezierPath bezierPathWithRoundedRect:zhengwenImg.bounds byRoundingCorners:UIRectCornerBottomRight cornerRadii:CGSizeMake(160.0 / 667 * SCREEN_HEIGHT, 160.0 / 667 * SCREEN_HEIGHT)];
-    CAShapeLayer *maskLayer = [[CAShapeLayer alloc] init];
-    maskLayer.frame = zhengwenImg.bounds;
-    maskLayer.path = maskPath.CGPath;
-    zhengwenImg.layer.mask = maskLayer;
-    
-    //生成图片
+    [self.xiangqingView addSubview:self.zhengwenImg];
+    //设置图片
     if ([NEWSSEMTPHOTOURL(self.classModel.smeta) rangeOfString:@"userDownLoadPathImage"].location != NSNotFound) {
-        [zhengwenImg sd_setImageWithURL:[NSURL fileURLWithPath:NEWSSEMTPHOTOURL(self.classModel.smeta)] placeholderImage:[UIImage imageNamed:@"thumbnailsdefault"]];
+        [_zhengwenImg sd_setImageWithURL:[NSURL fileURLWithPath:NEWSSEMTPHOTOURL(self.classModel.smeta)] placeholderImage:[UIImage imageNamed:@"thumbnailsdefault"]];
     }
     else if ([NEWSSEMTPHOTOURL(self.classModel.smeta)  rangeOfString:@"http"].location != NSNotFound)
     {
-        [zhengwenImg sd_setImageWithURL:[NSURL URLWithString:NEWSSEMTPHOTOURL(self.classModel.smeta)] placeholderImage:[UIImage imageNamed:@"thumbnailsdefault"]];
+        [_zhengwenImg sd_setImageWithURL:[NSURL URLWithString:NEWSSEMTPHOTOURL(self.classModel.smeta)] placeholderImage:[UIImage imageNamed:@"thumbnailsdefault"]];
     }
     else{
         NSString *str = USERPHOTOHTTPSTRINGZhuBo(NEWSSEMTPHOTOURL(self.classModel.smeta));
-        [zhengwenImg sd_setImageWithURL:[NSURL URLWithString:str] placeholderImage:[UIImage imageNamed:@"thumbnailsdefault"]];
+        [_zhengwenImg sd_setImageWithURL:[NSURL URLWithString:str] placeholderImage:[UIImage imageNamed:@"thumbnailsdefault"]];
     }
     
-    //添加单击手势
-    UITapGestureRecognizer *tapZhengwenImg = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(showZoomImageView:)];
-    [zhengwenImg addGestureRecognizer:tapZhengwenImg];
-    zhengwenImg.contentMode = UIViewContentModeScaleAspectFill;
-    zhengwenImg.clipsToBounds = YES;
-    [xiangqingView addSubview:zhengwenImg];
-    
-    //标题
-    UILabel *titleLab = [[UILabel alloc]initWithFrame:CGRectMake(20.0 / 375 * IPHONE_W,CGRectGetMaxY(zhengwenImg.frame) + 20.0 / 667 * SCREEN_HEIGHT, IPHONE_W - 40.0 / 375 * IPHONE_W, 40.0 / 667 * IPHONE_H)];
-    titleLab.text = self.classModel.title;
-    titleLab.textAlignment = NSTextAlignmentCenter;
-    titleLab.textColor = nTextColorMain;
-    titleLab.font = [UIFont boldSystemFontOfSize:self.titleFontSize];
-//    titleLab.font = [UIFont fontWithName:@"Semibold" size:19];
+    _titleLab.text = self.classModel.title;
     CGFloat titleHight = [self computeTextHeightWithString:self.classModel.title andWidth:(SCREEN_WIDTH-20) andFontSize:gFontMain14];
-    [titleLab setFrame:CGRectMake(20.0 / 375 * IPHONE_W, CGRectGetMaxY(zhengwenImg.frame) + 20.0 / 667 * SCREEN_HEIGHT, IPHONE_W - 40.0 / 375 * IPHONE_W, (titleHight + 20) / 667 * IPHONE_H)];
-    [titleLab setNumberOfLines:0];
-    titleLab.lineBreakMode = NSLineBreakByWordWrapping;
-    [xiangqingView addSubview:titleLab];
+    [_titleLab setFrame:CGRectMake(20.0 / 375 * IPHONE_W, CGRectGetMaxY(_zhengwenImg.frame) + 20.0 / 667 * SCREEN_HEIGHT, IPHONE_W - 40.0 / 375 * IPHONE_W, (titleHight + 20) / 667 * IPHONE_H)];
     
-    //分割线
-    UIView *seperatorLine = [[UIView alloc]initWithFrame:CGRectMake(20.0 / 375 * SCREEN_WIDTH, CGRectGetMaxY(titleLab.frame) +  12.0 / 667 * SCREEN_HEIGHT, SCREEN_WIDTH - 40.0 / 375 * SCREEN_WIDTH, 1.0)];
-    [seperatorLine setBackgroundColor:gThickLineColor];
-    [xiangqingView addSubview:seperatorLine];
+    [_xiangqingView addSubview:self.titleLab];
     
-    xiangqingView.frame = CGRectMake(xiangqingView.frame.origin.x, xiangqingView.frame.origin.y, xiangqingView.frame.size.width, CGRectGetMaxY(seperatorLine.frame));
-    self.helpTableView.tableHeaderView = xiangqingView;
+    _seperatorLine.frame = CGRectMake(20.0 / 375 * SCREEN_WIDTH, CGRectGetMaxY(_titleLab.frame) +  12.0 / 667 * SCREEN_HEIGHT, SCREEN_WIDTH - 40.0 / 375 * SCREEN_WIDTH, 1.0);
+    
+    [_xiangqingView addSubview:self.seperatorLine];
+    
+    _xiangqingView.frame = CGRectMake(_xiangqingView.frame.origin.x, _xiangqingView.frame.origin.y, _xiangqingView.frame.size.width, CGRectGetMaxY(_seperatorLine.frame));
+    self.helpTableView.tableHeaderView = _xiangqingView;
+    
     //footer
-    UIButton *moreComment = [UIButton buttonWithType:UIButtonTypeCustom];
-    [moreComment setFrame:CGRectMake(0, 0, SCREEN_WIDTH, 44)];
-    [moreComment setTitle:@"查看更多评价" forState:UIControlStateNormal];
-    [moreComment.titleLabel setFont:gFontMain14];
-    [moreComment setTitleColor:gTextColorSub forState:UIControlStateNormal];
-    [moreComment addTarget:self action:@selector(morecommetAction:) forControlEvents:UIControlEventTouchUpInside];
-    self.helpTableView.tableFooterView = moreComment;
+    if (self.helpTableView.tableFooterView == nil) {
+        UIButton *moreComment = [UIButton buttonWithType:UIButtonTypeCustom];
+        [moreComment setFrame:CGRectMake(0, 0, SCREEN_WIDTH, 44)];
+        [moreComment setTitle:@"查看更多评价" forState:UIControlStateNormal];
+        [moreComment.titleLabel setFont:gFontMain14];
+        [moreComment setTitleColor:gTextColorSub forState:UIControlStateNormal];
+        [moreComment addTarget:self action:@selector(morecommetAction:) forControlEvents:UIControlEventTouchUpInside];
+        self.helpTableView.tableFooterView = moreComment;
+    }
     
     [self.helpTableView reloadData];
 }
@@ -1129,6 +1118,65 @@ static AVPlayer *_instancePlay = nil;
     return _purchaseBtn;
 }
 
+/**
+ tableViewHeader控件懒加载
+
+ @return zhengwenImg
+ */
+- (UIView *)xiangqingView
+{
+    if (_xiangqingView == nil) {
+        _xiangqingView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, IPHONE_W, IPHONE_H)];
+        _xiangqingView.backgroundColor = [UIColor whiteColor];
+    }
+    return _xiangqingView;
+}
+- (UIImageView *)zhengwenImg
+{
+    if (_zhengwenImg == nil) {
+        //新闻图片
+        _zhengwenImg = [[UIImageView alloc] initWithFrame:CGRectMake(0, -20, IPHONE_W, 209.0 / 667 * SCREEN_HEIGHT)];
+        [_zhengwenImg setUserInteractionEnabled:YES];
+        
+        UIBezierPath *maskPath = [UIBezierPath bezierPathWithRoundedRect:_zhengwenImg.bounds byRoundingCorners:UIRectCornerBottomRight cornerRadii:CGSizeMake(160.0 / 667 * SCREEN_HEIGHT, 160.0 / 667 * SCREEN_HEIGHT)];
+        CAShapeLayer *maskLayer = [[CAShapeLayer alloc] init];
+        maskLayer.frame = _zhengwenImg.bounds;
+        maskLayer.path = maskPath.CGPath;
+        _zhengwenImg.layer.mask = maskLayer;
+
+        //添加单击手势
+        UITapGestureRecognizer *tapZhengwenImg = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(showZoomImageView:)];
+        [_zhengwenImg addGestureRecognizer:tapZhengwenImg];
+        _zhengwenImg.contentMode = UIViewContentModeScaleAspectFill;
+        _zhengwenImg.clipsToBounds = YES;
+    }
+    return _zhengwenImg;
+}
+- (UILabel *)titleLab
+{
+    if (_titleLab == nil) {
+        //课堂标题
+        _titleLab = [[UILabel alloc] initWithFrame:CGRectMake(20.0 / 375 * IPHONE_W,CGRectGetMaxY(_zhengwenImg.frame) + 20.0 / 667 * SCREEN_HEIGHT, IPHONE_W - 40.0 / 375 * IPHONE_W, 40.0 / 667 * IPHONE_H)];
+//        _titleLab.text = self.classModel.title;
+        _titleLab.textAlignment = NSTextAlignmentCenter;
+        _titleLab.textColor = nTextColorMain;
+        _titleLab.font = [UIFont boldSystemFontOfSize:self.titleFontSize];
+        //    titleLab.font = [UIFont fontWithName:@"Semibold" size:19];
+        [_titleLab setNumberOfLines:0];
+        _titleLab.lineBreakMode = NSLineBreakByWordWrapping;
+
+    }
+    return _titleLab;
+}
+- (UIView *)seperatorLine
+{
+    if (_seperatorLine == nil) {
+        //分割线
+        _seperatorLine = [[UIView alloc] initWithFrame:CGRectMake(20.0 / 375 * SCREEN_WIDTH, CGRectGetMaxY(_titleLab.frame) +  12.0 / 667 * SCREEN_HEIGHT, SCREEN_WIDTH - 40.0 / 375 * SCREEN_WIDTH, 1.0)];
+        [_seperatorLine setBackgroundColor:gThickLineColor];
+    }
+    return _seperatorLine;
+}
 /**
  提交购买人信息弹窗view
 
