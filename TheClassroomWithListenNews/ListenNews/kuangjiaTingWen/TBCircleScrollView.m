@@ -334,12 +334,31 @@
         }
         HomePageViewController *homePageVC = (HomePageViewController *)object;
         UINavigationController *nav = homePageVC.navigationController;
-        ClassViewController *classVC = [ClassViewController shareInstance];
-        classVC.act_id = newArr[_curPage][@"url"];
-        classVC.hidesBottomBarWhenPushed = YES;
-        [nav.navigationBar setHidden:YES];
-        [nav pushViewController:classVC animated:YES];
-        classVC.hidesBottomBarWhenPushed = NO;
+        if ([[CommonCode readFromUserD:@"isLogin"]boolValue] == YES) {
+            if ([newArr[_curPage][@"is_free"] isEqualToString:@"1"]) {
+                zhuboXiangQingVCNewController *faxianzhuboVC = [[zhuboXiangQingVCNewController alloc]init];
+                faxianzhuboVC.jiemuDescription = newArr[_curPage][@"description"];
+                faxianzhuboVC.jiemuFan_num = newArr[_curPage][@"fan_num"];
+                faxianzhuboVC.jiemuID = newArr[_curPage][@"url"];
+                faxianzhuboVC.jiemuImages = newArr[_curPage][@"images"];
+                faxianzhuboVC.jiemuIs_fan = newArr[_curPage][@"is_fan"];
+                faxianzhuboVC.jiemuMessage_num = newArr[_curPage][@"message_num"];
+                faxianzhuboVC.jiemuName = newArr[_curPage][@"name"];
+                faxianzhuboVC.isfaxian = YES;
+                faxianzhuboVC.isClass = YES;
+                [nav pushViewController:faxianzhuboVC animated:YES];
+            }else{
+                ClassViewController *classVC = [ClassViewController shareInstance];
+                classVC.act_id = newArr[_curPage][@"url"];
+                [nav.navigationBar setHidden:YES];
+                [nav pushViewController:classVC animated:YES];
+            }
+        }else{
+            ClassViewController *classVC = [ClassViewController shareInstance];
+            classVC.act_id = newArr[_curPage][@"url"];
+            [nav.navigationBar setHidden:YES];
+            [nav pushViewController:classVC animated:YES];
+        }
     }
 }
 - (void)dealloc

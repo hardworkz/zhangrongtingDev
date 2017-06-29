@@ -35,6 +35,7 @@ static NSString *const playAct_id = @"playAct_id";/**<当前正在播放的课�
     UITextField *wxTextField;
     UITextField *cityTextField;
     UITextField *jobTextField;
+    UITextField *selectedTextField;
 }
 @property (strong, nonatomic) CustomAlertView *alertView;
 @property (nonatomic, strong) NSMutableArray *buttons;
@@ -134,10 +135,6 @@ static AVPlayer *_instancePlay = nil;
     }else{
         self.auditionnBtn.selected = NO;
     }
-    
-    //自动处理键盘事件的第三方库
-    IQKeyboardManager *manager = [IQKeyboardManager sharedManager];
-    [manager setKeyboardDistanceFromTextField:0];
 }
 
 - (void)viewWillDisappear:(BOOL)animated{
@@ -151,6 +148,12 @@ static AVPlayer *_instancePlay = nil;
 {
     [super viewDidAppear:animated];
     
+    IQKeyboardManager *manager = [IQKeyboardManager sharedManager];
+    [manager setKeyboardDistanceFromTextField:0];
+    manager.enable = YES;
+    manager.shouldToolbarUsesTextFieldTintColor = YES;
+    
+    [self show];
 }
 - (void)setUpData{
     _pinglunArr = [NSMutableArray new];
@@ -172,7 +175,6 @@ static AVPlayer *_instancePlay = nil;
     [self.session setActive:YES error:&error];
     //接收播放完毕后发出的通知
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(voicePlayEnd:) name:AVPlayerItemDidPlayToEndTimeNotification object:ExclassPlayer.currentItem];
-    
 }
 
 - (void)setUpView{
@@ -1285,12 +1287,16 @@ static AVPlayer *_instancePlay = nil;
 }
 - (void)cancelBtnClick:(UIButton *)button
 {
-    [UIView animateWithDuration:0.5 animations:^{
-        _alertCommitBuyUserDataView.alpha = 0.;
-    }completion:^(BOOL finished) {
-        [_alertCommitBuyUserDataView removeFromSuperview];
-        [_cover removeFromSuperview];
-    }];
+    if ([button isEqual:_cover]) {
+        [selectedTextField resignFirstResponder];
+    }else{
+        [UIView animateWithDuration:0.5 animations:^{
+            _alertCommitBuyUserDataView.alpha = 0.;
+        }completion:^(BOOL finished) {
+            [_alertCommitBuyUserDataView removeFromSuperview];
+            [_cover removeFromSuperview];
+        }];
+    }
 }
 - (void)commitClick
 {
@@ -1349,6 +1355,24 @@ static AVPlayer *_instancePlay = nil;
 }
 
 #pragma mark - textfieldDelegate
+- (BOOL)textFieldShouldBeginEditing:(UITextField *)textField
+{
+    IQKeyboardManager *manager = [IQKeyboardManager sharedManager];
+    if ([textField isEqual:nameTextField]) {
+        [manager setKeyboardDistanceFromTextField:50 + 35*4];
+    }else if ([textField isEqual:phoneTextField]) {
+        [manager setKeyboardDistanceFromTextField:50 + 35*3];
+    }else if ([textField isEqual:wxTextField]) {
+        [manager setKeyboardDistanceFromTextField:50 + 35*2];
+    }else if ([textField isEqual:cityTextField]) {
+        [manager setKeyboardDistanceFromTextField:50 + 35];
+    }else if ([textField isEqual:jobTextField]) {
+        [manager setKeyboardDistanceFromTextField:50];
+    }
+    selectedTextField = textField;
+    
+    return YES;
+}
 - (void)textFieldDidBeginEditing:(UITextField *)textField
 {
     IQKeyboardManager *manager = [IQKeyboardManager sharedManager];
@@ -1363,6 +1387,7 @@ static AVPlayer *_instancePlay = nil;
     }else if ([textField isEqual:jobTextField]) {
         [manager setKeyboardDistanceFromTextField:50];
     }
+    selectedTextField = textField;
 }
 - (BOOL)textFieldShouldReturn:(UITextField *)textField
 {

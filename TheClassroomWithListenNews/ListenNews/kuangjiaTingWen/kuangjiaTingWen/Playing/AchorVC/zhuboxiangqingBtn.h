@@ -9,6 +9,7 @@
 #import <UIKit/UIKit.h>
 
 @interface zhuboxiangqingBtn : UIButton
+@property (assign, nonatomic) BOOL isClass;
 - (instancetype)initWithImage:(UIImage *)image andTitle:(NSString *)title;
 
 - (void)ChangeBlueToBlack:(UIImage *)image;

@@ -50,10 +50,18 @@
 //}
 - (CGRect)imageRectForContentRect:(CGRect)contentRect
 {
-    if (SCREEN_WIDTH >= 375) {
-        return CGRectMake(10, (62.0 / 667 * SCREEN_HEIGHT - 25)*0.5, 25, 25);
+    if (self.isClass) {
+        if (SCREEN_WIDTH >= 375) {
+            return CGRectMake(35, (62.0 / 667 * SCREEN_HEIGHT - 25)*0.5, 25, 25);
+        }else{
+            return CGRectMake(30, (62.0 / 667 * SCREEN_HEIGHT - 20)*0.5, 20, 20);
+        }
     }else{
-        return CGRectMake(5, (62.0 / 667 * SCREEN_HEIGHT - 20)*0.5, 20, 20);
+        if (SCREEN_WIDTH >= 375) {
+            return CGRectMake(10, (62.0 / 667 * SCREEN_HEIGHT - 25)*0.5, 25, 25);
+        }else{
+            return CGRectMake(5, (62.0 / 667 * SCREEN_HEIGHT - 20)*0.5, 20, 20);
+        }
     }
 }
 @end

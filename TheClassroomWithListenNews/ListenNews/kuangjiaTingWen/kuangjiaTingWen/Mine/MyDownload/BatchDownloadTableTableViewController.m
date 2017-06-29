@@ -61,8 +61,6 @@
     [self.tableView setAllowsMultipleSelection:YES];
     
     self.isAllSelected = NO;
-    
-    
 }
 
 - (void)setupView {
@@ -72,6 +70,16 @@
     UISwipeGestureRecognizer *rightSwipe = [[UISwipeGestureRecognizer alloc]initWithTarget:self action:@selector(rightSwipeAction)];
     [rightSwipe setDirection:UISwipeGestureRecognizerDirectionRight];
     [self.tableView addGestureRecognizer:rightSwipe];
+    
+    UIButton *backImage = [UIButton buttonWithType:UIButtonTypeCustom];
+    [backImage setFrame:CGRectMake(0, 0, 44, 30)];
+    backImage.contentEdgeInsets = UIEdgeInsetsMake(0, 0, 0, 20);
+    [backImage setImage:[UIImage imageNamed:@"back"] forState:UIControlStateNormal];
+    [backImage addTarget:self action:@selector(back) forControlEvents:UIControlEventTouchUpInside];
+    
+    UIBarButtonItem *backItem = [[UIBarButtonItem alloc] initWithCustomView:backImage];
+    self.navigationItem.leftBarButtonItem = backItem;
+
     
     if ([self.downloadSource isEqualToString:@"1"]){
         DefineWeakSelf;
@@ -84,10 +92,10 @@
             [weakSelf loadData];
         }];
     }
-    
-    
 }
-
+- (void)back{
+    [self.navigationController popViewControllerAnimated:YES];
+}
 - (UIButton *)allSelecteButton{
     if (!_allSelecteButton) {
         _allSelecteButton = [UIButton buttonWithType:UIButtonTypeCustom];

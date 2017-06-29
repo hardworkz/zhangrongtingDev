@@ -259,10 +259,10 @@ static AVPlayer *_instancePlay = nil;
     [CommonCode writeToUserD:nil andKey:@"Exact_id"];
     
     IQKeyboardManager *manager = [IQKeyboardManager sharedManager];
-    manager.enable = YES;
-    manager.shouldResignOnTouchOutside = YES;
+//    manager.enable = YES;
+//    manager.shouldResignOnTouchOutside = YES;
     manager.shouldToolbarUsesTextFieldTintColor = NO;
-    manager.enableAutoToolbar = NO;
+//    manager.enableAutoToolbar = NO;
     if (!isPlaying) {
         [[UIDevice currentDevice] setProximityMonitoringEnabled:NO];
         [[NSNotificationCenter defaultCenter] postNotificationName:@"stopAnimate" object:nil];
@@ -1939,8 +1939,10 @@ static AVPlayer *_instancePlay = nil;
     }
     WXMediaMessage *message = [WXMediaMessage message];
     message.title = self.newsModel.Titlejiemu;
-    NSString *musicUrl = [NSString stringWithFormat:@"http://tingwen.me/index.php/article/yulan/id/%@.html",self.newsModel.jiemuID];
+    message.description = self.newsModel.jiemuDescription;
+    NSString *musicUrl = [NSString stringWithFormat:@"http://admin.tingwen.me/index.php/article/yulan/id/%@.html",self.newsModel.jiemuID];
 //    NSString *musicUrl = @"https://zhidao.baidu.com/question/2143697514695119428.html";
+    
     [self getImageWithURLStr:self.newsModel.ImgStrjiemu OnSucceed:^(UIImage *image) {
         //压缩图片大小
         CGFloat compression = 0.8f;

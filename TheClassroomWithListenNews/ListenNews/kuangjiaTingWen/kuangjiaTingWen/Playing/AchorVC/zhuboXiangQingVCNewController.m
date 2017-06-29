@@ -144,122 +144,211 @@
     [self addHeaderView];
     
     NSMutableArray *buttonArray = [NSMutableArray array];
-    for (int i = 0; i < 5; i ++ ){
-        zhuboxiangqingBtn *btn = [[zhuboxiangqingBtn alloc] init];
-        if (SCREEN_WIDTH >= 375) {
-            btn.titleEdgeInsets = UIEdgeInsetsMake(10, 10, 0, 0);
+    CustomPageView *pagingView;
+//    if (self.isClass) {//课程页面布局
+//        for (int i = 0; i < 3; i ++ ){
+//            zhuboxiangqingBtn *btn = [[zhuboxiangqingBtn alloc] init];
+//            btn.isClass = YES;
+//            if (SCREEN_WIDTH >= 375) {
+//                btn.titleEdgeInsets = UIEdgeInsetsMake(10, 10, 0, 0);
+//            }
+//            btn.backgroundColor = [UIColor whiteColor];
+//            if (i == 0){
+//                [btn setImage:@"BmentButton1"];
+//                [btn setSelectedImage:@"mentButton1"];
+//                [btn setTitleColor:gTextColorSub];
+//                [btn setSelectedTitleColor:nMainColor];
+//                btn.titleLabel.font = gFontSub11;
+//                [btn setTitle:@"节目"];
+//                selectedSwitchIndex = 0;
+//                btn.accessibilityLabel = @"节目";
+//                btn.selected = YES;
+//            }
+//            else if (i == 1){
+//                [btn setImage:@"BmentButton3"];
+//                [btn setSelectedImage:@"mentButton3"];
+//                [btn setTitleColor:gTextColorSub];
+//                [btn setSelectedTitleColor:nMainColor];
+//                btn.titleLabel.font = gFontSub11;
+//                [btn setTitle:@"留言"];
+//                btn.accessibilityLabel = @"留言";
+//            }
+//            else if (i == 2){
+//                [btn setImage:@"BmentButton4"];
+//                [btn setSelectedImage:@"mentButton4"];
+//                [btn setTitleColor:gTextColorSub];
+//                [btn setSelectedTitleColor:nMainColor];
+//                btn.titleLabel.font = gFontSub11;
+//                [btn setTitle:@"图片"];
+//                btn.accessibilityLabel = @"图片";
+//            }
+//            btn.frame = CGRectMake((75.0 / 375 * SCREEN_WIDTH) * i, 0, 75.0 / 375 * SCREEN_WIDTH, 52.0 / 667 * SCREEN_HEIGHT);
+//            [buttonArray addObject:btn];
+//        }
+//        
+//        //分页tableView
+//        for (int i = 0; i < 4; i ++ ){
+//            UITableView *tableView = [[UITableView alloc]initWithFrame:CGRectMake(IPHONE_W * i, 0, IPHONE_W , IPHONE_H - 24.0/ 667 * SCREEN_HEIGHT) style:UITableViewStyleGrouped];
+//            tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
+//            tableView.backgroundColor = [UIColor whiteColor];
+//            
+//            if (i == 0){
+//                xinwenshuaxinTableView = tableView;
+//            }
+//            else if (i == 1){
+//                tableView = [[UITableView alloc]initWithFrame:CGRectMake(IPHONE_W * i + 1, 0, IPHONE_W , IPHONE_H - 20.0/ 667 * SCREEN_HEIGHT) style:UITableViewStyleGrouped];
+//                tableView.backgroundColor = [UIColor whiteColor];
+//                fansWallTableView = tableView;
+//                tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
+//            }
+//            else if (i == 2){
+//                tableView.frame = CGRectMake(IPHONE_W * i + 2, 0, IPHONE_W, IPHONE_H - 20.0 / 667 * SCREEN_HEIGHT);
+//                pinglunhoushuaxinTableView = tableView;
+//            }else if (i == 3){
+//                tableView.frame = CGRectMake(IPHONE_W * i + 3, 0, IPHONE_W, IPHONE_H - 20.0 / 667 * SCREEN_HEIGHT);
+//                tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
+//                ImageTableView = tableView;
+//            }
+//            //        tableView.bounces = NO;
+//            tableView.delegate = self;
+//            tableView.dataSource = self;
+//            tableView.tag = 3 + i; // 3：节目 4：粉丝榜 5：留言
+//            tableView.scrollsToTop = NO;
+//            tableView.tableFooterView = [UIView new];
+//            if (i == 0){
+//                tableView.mj_footer = [MJRefreshAutoNormalFooter footerWithRefreshingBlock:^{
+//                    [self xinwenshanglajiazai:tableView];
+//                }];
+//                [tableView.mj_header beginRefreshing];
+//            }
+//            else if (i == 1){
+//                [tableView.mj_header beginRefreshing];
+//            }
+//            else if (i == 2){
+//                tableView.mj_footer = [MJRefreshAutoNormalFooter footerWithRefreshingBlock:^{
+//                    [self liuyanshanglajiazai:tableView];
+//                }];
+//                [tableView.mj_header beginRefreshing];
+//            }
+//        }
+//        //详情页移动导航栏主框架
+//        pagingView = [CustomPageView pagingViewWithHeaderView:headerView headerHeight:273.0 / 667 * SCREEN_HEIGHT segmentButtons:buttonArray segmentHeight:52.0 / 667 * SCREEN_HEIGHT contentViews:@[xinwenshuaxinTableView, pinglunhoushuaxinTableView,ImageTableView]];
+//    }else{//主播详情页面布局
+        for (int i = 0; i < 5; i ++ ){
+            zhuboxiangqingBtn *btn = [[zhuboxiangqingBtn alloc] init];
+            if (SCREEN_WIDTH >= 375) {
+                btn.titleEdgeInsets = UIEdgeInsetsMake(10, 10, 0, 0);
+            }
+            btn.backgroundColor = [UIColor whiteColor];
+            if (i == 0){
+                [btn setImage:@"BmentButton1"];
+                [btn setSelectedImage:@"mentButton1"];
+                [btn setTitleColor:gTextColorSub];
+                [btn setSelectedTitleColor:nMainColor];
+                btn.titleLabel.font = gFontSub11;
+                [btn setTitle:@"节目"];
+                selectedSwitchIndex = 0;
+                btn.accessibilityLabel = @"节目";
+                btn.selected = YES;
+            }
+            else if (i == 1){
+                [btn setImage:@"BmentButton2"];
+                [btn setSelectedImage:@"mentButton2"];
+                [btn setTitleColor:gTextColorSub];
+                [btn setSelectedTitleColor:nMainColor];
+                btn.titleLabel.font = gFontSub11;
+                [btn setTitle:@"粉丝榜"];
+                btn.accessibilityLabel = @"粉丝榜";
+            }
+            else if (i == 2){
+                [btn setImage:@"BmentButton3"];
+                [btn setSelectedImage:@"mentButton3"];
+                [btn setTitleColor:gTextColorSub];
+                [btn setSelectedTitleColor:nMainColor];
+                btn.titleLabel.font = gFontSub11;
+                [btn setTitle:@"留言"];
+                btn.accessibilityLabel = @"留言";
+            }
+            else if (i == 3){
+                [btn setImage:@"BmentButton4"];
+                [btn setSelectedImage:@"mentButton4"];
+                [btn setTitleColor:gTextColorSub];
+                [btn setSelectedTitleColor:nMainColor];
+                btn.titleLabel.font = gFontSub11;
+                [btn setTitle:@"图片"];
+                btn.accessibilityLabel = @"图片";
+            }
+            else{
+                [btn setImage:@"BmentButton5"];
+                [btn setSelectedImage:@"mentButton5"];
+                [btn setTitleColor:gTextColorSub];
+                [btn setSelectedTitleColor:nMainColor];
+                btn.titleLabel.font = gFontSub11;
+                [btn setTitle:@"下载"];
+                btn.accessibilityLabel = @"下载";
+            }
+            btn.frame = CGRectMake((75.0 / 375 * SCREEN_WIDTH) * i, 0, 75.0 / 375 * SCREEN_WIDTH, 52.0 / 667 * SCREEN_HEIGHT);
+            [buttonArray addObject:btn];
         }
-        btn.backgroundColor = [UIColor whiteColor];
-        if (i == 0){
-            [btn setImage:@"BmentButton1"];
-            [btn setSelectedImage:@"mentButton1"];
-            [btn setTitleColor:gTextColorSub];
-            [btn setSelectedTitleColor:nMainColor];
-            btn.titleLabel.font = gFontSub11;
-            [btn setTitle:@"节目"];
-            selectedSwitchIndex = 0;
-            btn.accessibilityLabel = @"节目";
-            btn.selected = YES;
-        }
-        else if (i == 1){
-            [btn setImage:@"BmentButton2"];
-            [btn setSelectedImage:@"mentButton2"];
-            [btn setTitleColor:gTextColorSub];
-            [btn setSelectedTitleColor:nMainColor];
-            btn.titleLabel.font = gFontSub11;
-            [btn setTitle:@"粉丝榜"];
-            btn.accessibilityLabel = @"粉丝榜";
-        }
-        else if (i == 2){
-            [btn setImage:@"BmentButton3"];
-            [btn setSelectedImage:@"mentButton3"];
-            [btn setTitleColor:gTextColorSub];
-            [btn setSelectedTitleColor:nMainColor];
-            btn.titleLabel.font = gFontSub11;
-            [btn setTitle:@"留言"];
-            btn.accessibilityLabel = @"留言";
-        }
-        else if (i == 3){
-            [btn setImage:@"BmentButton4"];
-            [btn setSelectedImage:@"mentButton4"];
-            [btn setTitleColor:gTextColorSub];
-            [btn setSelectedTitleColor:nMainColor];
-            btn.titleLabel.font = gFontSub11;
-            [btn setTitle:@"图片"];
-            btn.accessibilityLabel = @"图片";
-        }
-        else{
-            [btn setImage:@"BmentButton5"];
-            [btn setSelectedImage:@"mentButton5"];
-            [btn setTitleColor:gTextColorSub];
-            [btn setSelectedTitleColor:nMainColor];
-            btn.titleLabel.font = gFontSub11;
-            [btn setTitle:@"下载"];
-            btn.accessibilityLabel = @"下载";
-        }
-        btn.frame = CGRectMake((75.0 / 375 * SCREEN_WIDTH) * i, 0, 75.0 / 375 * SCREEN_WIDTH, 52.0 / 667 * SCREEN_HEIGHT);
-        [buttonArray addObject:btn];
-    }
-    
-    //分页tableView
-    for (int i = 0; i < 4; i ++ ){
-        UITableView *tableView = [[UITableView alloc]initWithFrame:CGRectMake(IPHONE_W * i, 0, IPHONE_W , IPHONE_H - 24.0/ 667 * SCREEN_HEIGHT) style:UITableViewStyleGrouped];
-        tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
-        tableView.backgroundColor = [UIColor whiteColor];
         
-        if (i == 0){
-            xinwenshuaxinTableView = tableView;
-        }
-        else if (i == 1){
-            tableView = [[UITableView alloc]initWithFrame:CGRectMake(IPHONE_W * i + 1, 0, IPHONE_W , IPHONE_H - 20.0/ 667 * SCREEN_HEIGHT) style:UITableViewStyleGrouped];
+        //分页tableView
+        for (int i = 0; i < 4; i ++ ){
+            UITableView *tableView = [[UITableView alloc]initWithFrame:CGRectMake(IPHONE_W * i, 0, IPHONE_W , IPHONE_H - 24.0/ 667 * SCREEN_HEIGHT) style:UITableViewStyleGrouped];
+            tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
             tableView.backgroundColor = [UIColor whiteColor];
-            fansWallTableView = tableView;
-            tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
+            
+            if (i == 0){
+                xinwenshuaxinTableView = tableView;
+            }
+            else if (i == 1){
+                tableView = [[UITableView alloc]initWithFrame:CGRectMake(IPHONE_W * i + 1, 0, IPHONE_W , IPHONE_H - 20.0/ 667 * SCREEN_HEIGHT) style:UITableViewStyleGrouped];
+                tableView.backgroundColor = [UIColor whiteColor];
+                fansWallTableView = tableView;
+                tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
+            }
+            else if (i == 2){
+                tableView.frame = CGRectMake(IPHONE_W * i + 2, 0, IPHONE_W, IPHONE_H - 20.0 / 667 * SCREEN_HEIGHT);
+                pinglunhoushuaxinTableView = tableView;
+            }else if (i == 3){
+                tableView.frame = CGRectMake(IPHONE_W * i + 3, 0, IPHONE_W, IPHONE_H - 20.0 / 667 * SCREEN_HEIGHT);
+                tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
+                ImageTableView = tableView;
+            }
+            //        tableView.bounces = NO;
+            tableView.delegate = self;
+            tableView.dataSource = self;
+            tableView.tag = 3 + i; // 3：节目 4：粉丝榜 5：留言
+            tableView.scrollsToTop = NO;
+            tableView.tableFooterView = [UIView new];
+            if (i == 0){
+                tableView.mj_footer = [MJRefreshAutoNormalFooter footerWithRefreshingBlock:^{
+                    [self xinwenshanglajiazai:tableView];
+                }];
+                [tableView.mj_header beginRefreshing];
+            }
+            else if (i == 1){
+                [tableView.mj_header beginRefreshing];
+            }
+            else if (i == 2){
+                tableView.mj_footer = [MJRefreshAutoNormalFooter footerWithRefreshingBlock:^{
+                    [self liuyanshanglajiazai:tableView];
+                }];
+                [tableView.mj_header beginRefreshing];
+            }
         }
-        else if (i == 2){
-            tableView.frame = CGRectMake(IPHONE_W * i + 2, 0, IPHONE_W, IPHONE_H - 20.0 / 667 * SCREEN_HEIGHT);
-            pinglunhoushuaxinTableView = tableView;
-        }else if (i == 3){
-            tableView.frame = CGRectMake(IPHONE_W * i + 3, 0, IPHONE_W, IPHONE_H - 20.0 / 667 * SCREEN_HEIGHT);
-            tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
-            ImageTableView = tableView;
-        }
-//        tableView.bounces = NO;
-        tableView.delegate = self;
-        tableView.dataSource = self;
-        tableView.tag = 3 + i; // 3：节目 4：粉丝榜 5：留言
-        tableView.scrollsToTop = NO;
-        tableView.tableFooterView = [UIView new];
-        if (i == 0){
-            tableView.mj_footer = [MJRefreshAutoNormalFooter footerWithRefreshingBlock:^{
-                [self xinwenshanglajiazai:tableView];
-            }];
-            [tableView.mj_header beginRefreshing];
-        }
-        else if (i == 1){
-            [tableView.mj_header beginRefreshing];
-        }
-        else if (i == 2){
-            tableView.mj_footer = [MJRefreshAutoNormalFooter footerWithRefreshingBlock:^{
-                [self liuyanshanglajiazai:tableView];
-            }];
-            [tableView.mj_header beginRefreshing];
-        }
-    }
+        //详情页移动导航栏主框架
+        pagingView = [CustomPageView pagingViewWithHeaderView:headerView headerHeight:273.0 / 667 * SCREEN_HEIGHT segmentButtons:buttonArray segmentHeight:52.0 / 667 * SCREEN_HEIGHT contentViews:@[xinwenshuaxinTableView, fansWallTableView, pinglunhoushuaxinTableView,ImageTableView]];
+//    }
+    
     UIView *picView = [[UIView alloc]initWithFrame:CGRectMake(IPHONE_W * 3, 0, IPHONE_W, IPHONE_H - 50.0 / 667 * SCREEN_HEIGHT - 50.0 / 667 * IPHONE_H)];
     [picView setBackgroundColor:[UIColor whiteColor]];
     
-    //详情页移动导航栏主框架
-    
-    CustomPageView *pagingView = [CustomPageView pagingViewWithHeaderView:headerView headerHeight:273.0 / 667 * SCREEN_HEIGHT segmentButtons:buttonArray segmentHeight:52.0 / 667 * SCREEN_HEIGHT contentViews:@[xinwenshuaxinTableView, fansWallTableView, pinglunhoushuaxinTableView,ImageTableView]];
     self.pagingView = pagingView;
     pagingView.pagingViewSwitchBlock = ^(NSInteger switchIndex) {
         RTLog(@"switchIndex---%ld",switchIndex);
         switch (switchIndex) {
             case 0:
                 if (selectedSwitchIndex == switchIndex) {
-//                    XWAlerLoginView *xw = [[XWAlerLoginView alloc] initWithTitle:@"刷新成功"];
-//                    [xw show];
                     [self xinwenRefresh:xinwenshuaxinTableView];
                 }else{
                     if (xinwenArr.count == 0) {
@@ -269,8 +358,6 @@
                 break;
             case 1:
                 if (selectedSwitchIndex == switchIndex) {
-//                    XWAlerLoginView *xw = [[XWAlerLoginView alloc] initWithTitle:@"刷新成功"];
-//                    [xw show];
                     [self fansRefresh:fansWallTableView];
                 }else{
                     if (_rewardListArray.count == 0) {
@@ -280,8 +367,6 @@
                 break;
             case 2:
                 if (selectedSwitchIndex == switchIndex) {
-//                    XWAlerLoginView *xw = [[XWAlerLoginView alloc] initWithTitle:@"刷新成功"];
-//                    [xw show];
                     [self liuyanRefresh:pinglunhoushuaxinTableView];
                 }else{
                     if (liuyanArr.count == 0) {
@@ -377,15 +462,7 @@
     [super viewWillAppear:animated];
 //    self.navBarBgAlpha = @"0.0";
     
-    IQKeyboardManager *manager = [IQKeyboardManager sharedManager];
-    [manager setKeyboardDistanceFromTextField:0];
-//    manager.enable = YES;
-//    manager.shouldResignOnTouchOutside = YES;
-//    manager.shouldToolbarUsesTextFieldTintColor = NO;
-//    manager.enableAutoToolbar = NO;
-    
     [self.navigationController setNavigationBarHidden:YES animated:YES];
-//    self.hidesBottomBarWhenPushed = YES;
     if (_isRewardLoginBack) {
         _isRewardLoginBack = NO;
         [self rewardAlert];
@@ -416,6 +493,10 @@
 {
     [super viewDidAppear:animated];
     
+    IQKeyboardManager *manager = [IQKeyboardManager sharedManager];
+    manager.enable = YES;
+    manager.shouldToolbarUsesTextFieldTintColor = YES;
+    [manager setKeyboardDistanceFromTextField:0];
     //在登录状态下,课堂购买完成界面，判断用户是否提交学员信息，如果未提交则进行弹窗
     if ([[CommonCode readFromUserD:@"isLogin"]boolValue] == YES &&_isClass) {
         NSDictionary *userInfoDict = [CommonCode readFromUserD:@"dangqianUserInfo"];
@@ -813,16 +894,16 @@
     UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(showHeadImageView:)];
     [img addGestureRecognizer:tap];
     
-    //姓名
+    //姓名,课程名称
     UILabel *name = [[UILabel alloc]init];
     if (!self.isClass) {
         name.frame = CGRectMake(CGRectGetMaxX(imgBorderView.frame) + 12, imgBorderView.frame.origin.y + 20.0 / 667 * IPHONE_H, 150, 20.0 / 667 * IPHONE_H);
     }else{//课堂
         name.frame = CGRectMake(CGRectGetMaxX(imgBorderView.frame) + 12, imgBorderView.frame.origin.y + 20.0 / 667 * IPHONE_H, SCREEN_WIDTH - CGRectGetMaxX(imgBorderView.frame) - 12 - 20, 60.0 / 667 * IPHONE_H);
     }
+    name.font = [UIFont boldSystemFontOfSize:17.0];
     name.numberOfLines = 0;
     name.textColor = nTextColorMain;
-    name.font = gFontMajor17;
     name.textAlignment = NSTextAlignmentLeft;
     name.text = self.jiemuName;
     [headerView addSubview:name];
@@ -1664,12 +1745,12 @@
         UILabel *titleLab = [[UILabel alloc]init];
         zhuboxiangqingNewVCPlayBtn *playBtn = [[zhuboxiangqingNewVCPlayBtn alloc] init];
         if (self.isClass) {
-            titleLab.frame = CGRectMake(72.0 / 375 * IPHONE_W, 12.0 / 667 * IPHONE_H, SCREEN_WIDTH - 137.0 / 375 * IPHONE_W, 21 * 3);
+            titleLab.frame = CGRectMake(20.0 / 375 * IPHONE_W, 12.0 / 667 * IPHONE_H, SCREEN_WIDTH - 80.0 / 375 * IPHONE_W, 21 * 3);
             //播放按钮
             playBtn.titleLab = titleLab;
             playBtn.frame = CGRectMake(SCREEN_WIDTH - 50 - 10, 10, 50, 50);
-            [playBtn setImage:[UIImage imageNamed:@"classpause"] forState:UIControlStateNormal];
-            [playBtn setImage:[UIImage imageNamed:@"classplay"] forState:UIControlStateSelected];
+            [playBtn setImage:[UIImage imageNamed:@"play"] forState:UIControlStateNormal];
+            [playBtn setImage:[UIImage imageNamed:@"pause"] forState:UIControlStateSelected];
             //            playBtn.tag = indexPath.row;
             playBtn.indexPath = indexPath;
             [playBtn addTarget:self action:@selector(playBtnPlay:) forControlEvents:UIControlEventTouchUpInside];
@@ -1711,7 +1792,7 @@
         }
         titleLab.numberOfLines = 0;
         titleLab.textAlignment = NSTextAlignmentLeft;
-        titleLab.font = [UIFont boldSystemFontOfSize:17.0f];
+        titleLab.font = [UIFont boldSystemFontOfSize:16.0f];
         [cell.contentView addSubview:titleLab];
         [titleLab setNumberOfLines:3];
         titleLab.lineBreakMode = NSLineBreakByWordWrapping;
@@ -1744,21 +1825,22 @@
             [cell.contentView addSubview:dataLab];
         }
         
-        
-        TTTAttributedLabel *riqiLab = [[TTTAttributedLabel alloc]initWithFrame:CGRectMake(20.0 / 375 * IPHONE_W, 12.0 / 667 * SCREEN_HEIGHT, 52.0 / 375 * IPHONE_W, 30.0 / 667 * SCREEN_HEIGHT)];
-        riqiLab.text = xinwenArr[indexPath.row][@"post_modified"];
-        NSDate *date = [NSDate dateFromString:xinwenArr[indexPath.row][@"post_modified"]];
-        riqiLab.text = [date showTimeFormatD];
-        
-        NSRange rangeD = NSMakeRange(0,2);
-        [riqiLab setLinkAttributes:@{NSForegroundColorAttributeName : nTextColorMain,NSFontAttributeName :[UIFont systemFontOfSize:20.0f]}];
-        [riqiLab addLinkToTransitInformation:nil withRange:rangeD];
-        NSRange rangeM = NSMakeRange(2,3);
-        [riqiLab setLinkAttributes:@{NSForegroundColorAttributeName : nTextColorMain,NSFontAttributeName :[UIFont systemFontOfSize:8.0f]}];
-        [riqiLab addLinkToTransitInformation:nil withRange:rangeM];
-        riqiLab.textColor = nTextColorMain;
-        riqiLab.font = [UIFont systemFontOfSize:8.0f];
-        [cell.contentView addSubview:riqiLab];
+        if (!self.isClass) {
+            TTTAttributedLabel *riqiLab = [[TTTAttributedLabel alloc]initWithFrame:CGRectMake(20.0 / 375 * IPHONE_W, 12.0 / 667 * SCREEN_HEIGHT, 52.0 / 375 * IPHONE_W, 30.0 / 667 * SCREEN_HEIGHT)];
+            riqiLab.text = xinwenArr[indexPath.row][@"post_modified"];
+            NSDate *date = [NSDate dateFromString:xinwenArr[indexPath.row][@"post_modified"]];
+            riqiLab.text = [date showTimeFormatD];
+            
+            NSRange rangeD = NSMakeRange(0,2);
+            [riqiLab setLinkAttributes:@{NSForegroundColorAttributeName : nTextColorMain,NSFontAttributeName :[UIFont systemFontOfSize:20.0f]}];
+            [riqiLab addLinkToTransitInformation:nil withRange:rangeD];
+            NSRange rangeM = NSMakeRange(2,3);
+            [riqiLab setLinkAttributes:@{NSForegroundColorAttributeName : nTextColorMain,NSFontAttributeName :[UIFont systemFontOfSize:8.0f]}];
+            [riqiLab addLinkToTransitInformation:nil withRange:rangeM];
+            riqiLab.textColor = nTextColorMain;
+            riqiLab.font = [UIFont systemFontOfSize:8.0f];
+            [cell.contentView addSubview:riqiLab];
+        }
         
         if (self.isClass) {
             UIView *devider = [[UIView alloc] initWithFrame:CGRectMake(10.0 / 375 * IPHONE_W, 70.0 / 667 * SCREEN_HEIGHT - 0.5, SCREEN_WIDTH, 0.5)];
@@ -2389,12 +2471,16 @@ didSelectLinkWithTransitInformation:(NSDictionary *)components {
 }
 - (void)cancelBtnClick:(UIButton *)button
 {
-    [UIView animateWithDuration:0.5 animations:^{
-        _alertCommitBuyUserDataView.alpha = 0.;
-    }completion:^(BOOL finished) {
-        [_alertCommitBuyUserDataView removeFromSuperview];
-        [_cover removeFromSuperview];
-    }];
+    if ([button isEqual:_cover]) {
+        [self.view resignFirstResponder];
+    }else{
+        [UIView animateWithDuration:0.5 animations:^{
+            _alertCommitBuyUserDataView.alpha = 0.;
+        }completion:^(BOOL finished) {
+            [_alertCommitBuyUserDataView removeFromSuperview];
+            [_cover removeFromSuperview];
+        }];
+    }
 }
 - (void)commitClick
 {
