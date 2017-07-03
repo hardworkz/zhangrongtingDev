@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
-@interface wodeguanzhuVC : UIViewController
+@interface wodeguanzhuVC : RootViewController
 
 @property (strong, nonatomic)NSString *user_login;
 

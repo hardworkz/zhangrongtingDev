@@ -19,13 +19,13 @@
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "kuangjiaTingWen/TBCircleScrollView.m"
-            timestampString = "520393886.567476"
+            filePath = "kuangjiaTingWen/AppDelegate.m"
+            timestampString = "520757141.840248"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "266"
-            endingLineNumber = "266"
-            landmarkName = "-tapImage:"
+            startingLineNumber = "120"
+            endingLineNumber = "120"
+            landmarkName = "-application:didFinishLaunchingWithOptions:"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

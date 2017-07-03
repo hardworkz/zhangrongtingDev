@@ -54,6 +54,7 @@
         [auditionLabel setText:@"免费试听"];
         [auditionLabel setTextColor:nTextColorMain];
         [auditionLabel setTextAlignment:NSTextAlignmentLeft];
+        auditionLabel.font = [UIFont boldSystemFontOfSize:17];
         [self.contentView addSubview:auditionLabel];
         
         topLine = [[UIView alloc]init];
@@ -65,6 +66,7 @@
         CommentLabel = [[UILabel alloc]init];
         [CommentLabel setText:@"用户评价"];
         [CommentLabel setTextColor:nTextColorMain];
+        auditionLabel.font = [UIFont boldSystemFontOfSize:17]; 
         [CommentLabel setTextAlignment:NSTextAlignmentLeft];
         [self.contentView addSubview:CommentLabel];
         
@@ -82,15 +84,15 @@
             UILabel *titleLab = [[UILabel alloc]init];
             titleLab.textAlignment = NSTextAlignmentLeft;
             titleLab.textColor = nTextColorMain;
-            titleLab.font = gFontMain14;
+            titleLab.font = gFontMain15;
             [titleLab setNumberOfLines:0];
             titleLab.lineBreakMode = NSLineBreakByWordWrapping;
             [self.contentView addSubview:titleLab];
             [self.titles addObject:titleLab];
             
             UIButton *playTestMp = [UIButton buttonWithType:UIButtonTypeCustom];
-            [playTestMp setImage:[UIImage imageNamed:@"classpause"] forState:UIControlStateNormal];
-            [playTestMp setImage:[UIImage imageNamed:@"classplay"] forState:UIControlStateSelected];
+            [playTestMp setImage:[UIImage imageNamed:@"play"] forState:UIControlStateNormal];
+            [playTestMp setImage:[UIImage imageNamed:@"pause"] forState:UIControlStateSelected];
             playTestMp.tag = i;
             [playTestMp addTarget:self action:@selector(playTestMp:) forControlEvents:UIControlEventTouchUpInside];
             [self.contentView addSubview:playTestMp];
@@ -113,15 +115,15 @@
                 titleLab = [[UILabel alloc]init];
                 titleLab.textAlignment = NSTextAlignmentLeft;
                 titleLab.textColor = nTextColorMain;
-                titleLab.font = gFontMain14;
+                titleLab.font = gFontMain15;
                 [titleLab setNumberOfLines:0];
                 titleLab.lineBreakMode = NSLineBreakByWordWrapping;
                 [self.contentView addSubview:titleLab];
                 [self.titles addObject:titleLab];
                 
                 playTestMp = [UIButton buttonWithType:UIButtonTypeCustom];
-                [playTestMp setImage:[UIImage imageNamed:@"classpause"] forState:UIControlStateNormal];
-                [playTestMp setImage:[UIImage imageNamed:@"classplay"] forState:UIControlStateSelected];
+                [playTestMp setImage:[UIImage imageNamed:@"play"] forState:UIControlStateNormal];
+                [playTestMp setImage:[UIImage imageNamed:@"pause"] forState:UIControlStateSelected];
                 playTestMp.tag = i;
                 [self.buttons addObject:playTestMp];
                 [playTestMp addTarget:self action:@selector(playTestMp:) forControlEvents:UIControlEventTouchUpInside];

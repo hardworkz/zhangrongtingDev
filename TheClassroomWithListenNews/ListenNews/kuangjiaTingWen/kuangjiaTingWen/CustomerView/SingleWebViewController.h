@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
-@interface SingleWebViewController : UIViewController
+@interface SingleWebViewController : RootViewController
 
 - (instancetype)initWithTitle:(NSString *)title url:(NSURL *)url;
 

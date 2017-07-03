@@ -209,42 +209,52 @@
         
     }
     else if (sender.tag == 102) {
-        
-        SelectedNewsTypeView *selectedNewsTypeView = [[SelectedNewsTypeView alloc]init];
-        AppDelegate *appDelegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
-        [appDelegate.window addSubview:selectedNewsTypeView];
-        
-        NSMutableArray *itemArr = [CommonCode readFromUserD:@"topCollectionArr"];
-        if ([itemArr count]) {
-            
-        }
-        else{
-            itemArr = [CommonCode readFromUserD:@"topNameArr"];
-        }
-        
-        NSMutableArray *selecteArr = [NSMutableArray array];
-        for ( int i = 0 ; i < [itemArr count]; i ++) {
-            if ([itemArr[i][@"type"] isEqualToString:@"推荐"]) {
+        [NetWorkTool getPaoGuoFenLeiLieBiaoWithWhateverSomething:@"q" sccess:^(NSDictionary *responseObject) {
+            RTLog(@"%@",responseObject[@"results"]);
+            if ([responseObject[status] intValue] == 1) {
+                SelectedNewsTypeView *selectedNewsTypeView = [[SelectedNewsTypeView alloc]init];
+                AppDelegate *appDelegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
+                [appDelegate.window addSubview:selectedNewsTypeView];
                 
+                NSMutableArray *itemArr = responseObject[results];
+                if ([itemArr count]) {
+                    
+                }
+                else{
+                    itemArr = [CommonCode readFromUserD:@"topNameArr"];
+                }
+                
+                NSMutableArray *selecteArr = [NSMutableArray array];
+                for ( int i = 0 ; i < [itemArr count]; i ++) {
+                    if ([itemArr[i][@"type"] isEqualToString:@"推荐"]) {
+                        
+                    }
+                    else{
+                        [selecteArr addObject:itemArr[i][@"type"]];
+                    }
+                }
+                [selectedNewsTypeView setSelectItemWithTitleArr:selecteArr];
+                DefineWeakSelf;
+                selectedNewsTypeView.selectedTypeBlock = ^ (NSString *selectedStr) {
+                    NSLog(@"selectedStr=%@",selectedStr);
+                    if ([selectedStr length]) {
+                        self.newsType = selectedStr;
+                        [weakSelf.newsTypeButton setTitle:selectedStr forState:UIControlStateNormal];
+                    }
+                    else{
+                        self.newsType = nil;
+                        [weakSelf.newsTypeButton setTitle:@"点击选择" forState:UIControlStateNormal];
+                    }
+                    
+                };
+            }else{
+                XWAlerLoginView *alert = [[XWAlerLoginView alloc] initWithTitle:responseObject[msg]];
+                [alert show];
             }
-            else{
-                [selecteArr addObject:itemArr[i][@"type"]];
-            }
-        }
-        [selectedNewsTypeView setSelectItemWithTitleArr:selecteArr];
-        DefineWeakSelf;
-        selectedNewsTypeView.selectedTypeBlock = ^ (NSString *selectedStr) {
-            NSLog(@"selectedStr=%@",selectedStr);
-            if ([selectedStr length]) {
-                self.newsType = selectedStr;
-                [weakSelf.newsTypeButton setTitle:selectedStr forState:UIControlStateNormal];
-            }
-            else{
-                self.newsType = nil;
-                [weakSelf.newsTypeButton setTitle:@"点击选择" forState:UIControlStateNormal];
-            }
-            
-        };
+        } failure:^(NSError *error) {
+            XWAlerLoginView *alert = [[XWAlerLoginView alloc] initWithTitle:@"网络错误~"];
+            [alert show];
+        }];
     }
     
 }

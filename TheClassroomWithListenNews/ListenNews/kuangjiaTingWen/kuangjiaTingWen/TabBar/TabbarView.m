@@ -160,20 +160,6 @@
 - (void)rotationBarBtnAction:(UIButton *)sender{
     
     NSString *pushNewsID = @"";
-//    if (ExIsClassVCPlay) {
-//        UITabBarController *topTabVC = (UITabBarController *)[NetWorkTool currentViewController];
-//        UIViewController *topVC = topTabVC.selectedViewController;
-//        UINavigationController *currenNavVC = [NetWorkTool currentNavigationController];
-//        id object = [self nextResponder];
-//        
-//        while (![object isKindOfClass:[UIViewController class]] &&
-//               object != nil) {
-//            object = [object nextResponder];
-//        }
-//        UINavigationController *navVC = (UINavigationController *)object;
-        
-//        return;
-//    }
     if (_isPushSkip) {
         pushNewsID = [[NSUserDefaults standardUserDefaults]valueForKey:@"pushNews"];
         [[NSUserDefaults standardUserDefaults] synchronize];
@@ -277,7 +263,7 @@
             
             }
             else{
-                [SVProgressHUD showInfoWithStatus:@"请至少选择一条新闻"];
+                [SVProgressHUD showInfoWithStatus:@"请至少选择一条新闻或者课堂"];
                 [self performSelector:@selector(SVPDismiss) withObject:nil afterDelay:1.0];
                 
             }
@@ -350,31 +336,6 @@
 }
 
 - (void)pushNewsDetail:(NSNotification *)notification {
-//    DefineWeakSelf;
-//    [NetWorkTool getpostinfoWithpost_id:[[NSUserDefaults standardUserDefaults]valueForKey:@"pushNews"] andpage:nil andlimit:nil sccess:^(NSDictionary *responseObject) {
-//        if ([responseObject[@"status"] integerValue] == 1) {
-//            weakSelf.pushNewsInfo = [responseObject[@"results"] mutableCopy];
-//            [NetWorkTool getAllActInfoListWithAccessToken:nil ac_id:weakSelf.pushNewsInfo[@"post_news"] keyword:nil andPage:nil andLimit:nil sccess:^(NSDictionary *responseObject) {
-//                if ([responseObject[@"status"] integerValue] == 1){
-//                    [weakSelf.pushNewsInfo setObject:[responseObject[@"results"] firstObject] forKey:@"post_act"];
-//                    [weakSelf presentPushNews];
-//                }
-//                else{
-//                    [SVProgressHUD showErrorWithStatus:responseObject[@"msg"]];
-//                }
-//            } failure:^(NSError *error) {
-//                //
-//                [SVProgressHUD showErrorWithStatus:@"网络请求失败"];
-//            }];
-//        }
-//        else{
-//            [SVProgressHUD showErrorWithStatus:responseObject[@"msg"]];
-//        }
-//        
-//    } failure:^(NSError *error) {
-//        [SVProgressHUD showErrorWithStatus:@"网络请求失败"];
-//        NSLog(@"%@",error);
-//    }];
     
     UIButton *playBtn = (UIButton *)[self viewWithTag:110];
     _isPushSkip = YES;
@@ -410,5 +371,8 @@
     }
     return _newMessageButton;
 }
-
+- (void)dealloc
+{
+    RTLog(@"TabbarView---dealloc");
+}
 @end

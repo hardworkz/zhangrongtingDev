@@ -9,6 +9,7 @@
 #import <UIKit/UIKit.h>
 
 @interface zhuboXiangQingVCNewController : UIViewController
+
 @property(nonatomic)NSString *jiemuID;
 @property(nonatomic)NSString *jiemuName;
 @property(nonatomic)NSString *jiemuDescription;
@@ -26,4 +27,6 @@
 @property(nonatomic)BOOL isClass;/**<是否为课堂详情*/
 @property(nonatomic)BOOL isbofangye;/**<是否从播放器进入主播详情*/
 @property(nonatomic)BOOL isfaxian;/**<是否从发现页面进入*/
+
+@property (strong, nonatomic) UIViewController *listVC;/**<外层列表页面控制器*/
 @end

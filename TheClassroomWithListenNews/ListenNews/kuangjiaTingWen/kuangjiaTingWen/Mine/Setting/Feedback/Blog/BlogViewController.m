@@ -835,7 +835,7 @@
         else{
             accessToken = nil;
         }
-        [NetWorkTool getFeedBackListWithaccessToken:accessToken
+        [NetWorkTool getFeedBackListWithaccessToken:AvatarAccessToken
                                             andpage:[NSString stringWithFormat:@"%lu",(unsigned long)self.page]
                                            andlimit:[NSString stringWithFormat:@"%ld",(long)limit]
                                              sccess:^(NSDictionary *responseObject) {

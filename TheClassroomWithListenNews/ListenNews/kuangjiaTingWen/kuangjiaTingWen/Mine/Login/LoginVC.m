@@ -367,37 +367,44 @@
             
             [CommonCode writeToUserD:access_token andKey:@"wbtoken"];
             
-            [NetWorkTool postPaoGuoDiSanFangDengLuJieKouwithname:name
-                                                         andhead:head
-                                                         andtype:type
-                                                       andopenid:openid
-                                                 andaccess_token:access_token
-                                                   andexpires_in:expires_in
-                                                          sccess:^(NSDictionary *responseObject) {
-                        
-                ExdangqianUser = responseObject[@"results"][@"user_login"];
-                [CommonCode writeToUserD:[NSString stringWithFormat:@"%@",ExdangqianUser] andKey:@"dangqianUser"];
-                [CommonCode writeToUserD:responseObject[@"results"][@"id"] andKey:@"dangqianUserUid"];
-                [self dismissViewControllerAnimated:YES completion:nil];
-                [CommonCode writeToUserD:@(YES) andKey:@"isLogin"];
-                [CommonCode writeToUserD:responseObject andKey:@"dangqianUserInfo"];
-                //拿到图片
-                                                              //拿到图片
-              UIImage *userAvatar = [UIImage imageWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:USERPHOTOHTTPSTRING(responseObject[@"results"][@"avatar"])]]];
-                                                              
-                NSString *path_sandox = NSHomeDirectory();
-                //设置一个图片的存储路径
-                NSString *avatarPath = [path_sandox stringByAppendingString:@"/Documents/userAvatar.png"];
-                //把图片直接保存到指定的路径（同时应该把图片的路径imagePath存起来，下次就可以直接用来取）
-                [UIImagePNGRepresentation(userAvatar) writeToFile:avatarPath atomically:YES];
-                [[NSNotificationCenter defaultCenter] postNotificationName:@"loginSccess" object:responseObject];
-                [CommonCode writeToUserD:@"Weibo" andKey:@"isWhatLogin"];
-                ExdangqianUser = responseObject[@"results"][@"user_login"];
-                [CommonCode writeToUserD:ExdangqianUser andKey:@"user_login"];
-                                                              [self dismissViewControllerAnimated:YES completion:nil];
-            } failure:^(NSError *error) {
-                NSLog(@"error = %@",error);
-            }];
+            [self oauthLoginWithName:name
+                                head:head
+                                type:type
+                              openid:openid
+                        access_token:access_token
+                          expires_in:expires_in
+                         isWhatLogin:@"WeiBo"];
+//            [NetWorkTool postPaoGuoDiSanFangDengLuJieKouwithname:name
+//                                                         andhead:head
+//                                                         andtype:type
+//                                                       andopenid:openid
+//                                                 andaccess_token:access_token
+//                                                   andexpires_in:expires_in
+//                                                          sccess:^(NSDictionary *responseObject) {
+//                        
+//                ExdangqianUser = responseObject[@"results"][@"user_login"];
+//                [CommonCode writeToUserD:[NSString stringWithFormat:@"%@",ExdangqianUser] andKey:@"dangqianUser"];
+//                [CommonCode writeToUserD:responseObject[@"results"][@"id"] andKey:@"dangqianUserUid"];
+//                [self dismissViewControllerAnimated:YES completion:nil];
+//                [CommonCode writeToUserD:@(YES) andKey:@"isLogin"];
+//                [CommonCode writeToUserD:responseObject andKey:@"dangqianUserInfo"];
+//                //拿到图片
+//                                                              //拿到图片
+//              UIImage *userAvatar = [UIImage imageWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:USERPHOTOHTTPSTRING(responseObject[@"results"][@"avatar"])]]];
+//                                                              
+//                NSString *path_sandox = NSHomeDirectory();
+//                //设置一个图片的存储路径
+//                NSString *avatarPath = [path_sandox stringByAppendingString:@"/Documents/userAvatar.png"];
+//                //把图片直接保存到指定的路径（同时应该把图片的路径imagePath存起来，下次就可以直接用来取）
+//                [UIImagePNGRepresentation(userAvatar) writeToFile:avatarPath atomically:YES];
+//                [[NSNotificationCenter defaultCenter] postNotificationName:@"loginSccess" object:responseObject];
+//                [CommonCode writeToUserD:@"WeiBo" andKey:@"isWhatLogin"];
+//                ExdangqianUser = responseObject[@"results"][@"user_login"];
+//                [CommonCode writeToUserD:ExdangqianUser andKey:@"user_login"];
+//                [self dismissViewControllerAnimated:YES completion:nil];
+//            } failure:^(NSError *error) {
+//                NSLog(@"error = %@",error);
+//            }];
         }];
         [self getIAPInfomation];
     }
@@ -517,42 +524,49 @@
         }
         else{
             [NetWorkTool getPaoGuoUserInfoWithUserName:[DSE encryptUseDES:userTF.text] andPassWord:[DSE encryptUseDES:passWTF.text] sccess:^(NSDictionary *responseObject) {
-                if ([responseObject[@"msg"] isEqualToString:@"用户名不存在!"])
-                {
-                    UIAlertController *mimacuowu = [UIAlertController alertControllerWithTitle:@"用户名不存在！" message:nil preferredStyle:UIAlertControllerStyleAlert];
-                    [mimacuowu addAction:[UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-                    }]];
-                    [self presentViewController:mimacuowu animated:YES completion:nil];
-                }else
-                {
-                    if ([responseObject[@"msg"] isEqualToString:@"密码错误!"])
-                    {
-                        UIAlertController *mimacuowu = [UIAlertController alertControllerWithTitle:@"密码错误！" message:nil preferredStyle:UIAlertControllerStyleAlert];
-                        [mimacuowu addAction:[UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-                        }]];
-                        [self presentViewController:mimacuowu animated:YES completion:nil];
-                    }
-                    else{
-                        ExdangqianUser = responseObject[@"results"][@"user_phone"];
-                        [CommonCode writeToUserD:[NSString stringWithFormat:@"%@",ExdangqianUser] andKey:@"dangqianUser"];
-                        [CommonCode writeToUserD:responseObject[@"results"][@"id"] andKey:@"dangqianUserUid"];
-                        [self dismissViewControllerAnimated:YES completion:nil];
-                        [CommonCode writeToUserD:@(YES) andKey:@"isLogin"];
-                        [CommonCode writeToUserD:responseObject andKey:@"dangqianUserInfo"];
-                        //    //拿到图片
-                        UIImage *userAvatar = [UIImage imageWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:USERPHOTOHTTPSTRING(responseObject[@"results"][@"avatar"])]]];
-                        NSString *path_sandox = NSHomeDirectory();
-                        //设置一个图片的存储路径
-                        NSString *avatarPath = [path_sandox stringByAppendingString:@"/Documents/userAvatar.png"];
-                        //把图片直接保存到指定的路径（同时应该把图片的路径imagePath存起来，下次就可以直接用来取）
-                        [UIImagePNGRepresentation(userAvatar) writeToFile:avatarPath atomically:YES];
-                        [[NSNotificationCenter defaultCenter] postNotificationName:@"loginSccess" object:responseObject];
-                        [CommonCode writeToUserD:@"ShouJi" andKey:@"isWhatLogin"];
-                    }
+                if ([responseObject[status] intValue] == 1) {
+                    ExdangqianUser = responseObject[@"results"][@"user_phone"];
+                    [CommonCode writeToUserD:[NSString stringWithFormat:@"%@",ExdangqianUser] andKey:@"dangqianUser"];
+                    [CommonCode writeToUserD:responseObject[@"results"][@"id"] andKey:@"dangqianUserUid"];
+                    [self dismissViewControllerAnimated:YES completion:nil];
+                    [CommonCode writeToUserD:@(YES) andKey:@"isLogin"];
+                    [CommonCode writeToUserD:responseObject andKey:@"dangqianUserInfo"];
+                    //    //拿到图片
+                    UIImage *userAvatar = [UIImage imageWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:USERPHOTOHTTPSTRING(responseObject[@"results"][@"avatar"])]]];
+                    NSString *path_sandox = NSHomeDirectory();
+                    //设置一个图片的存储路径
+                    NSString *avatarPath = [path_sandox stringByAppendingString:@"/Documents/userAvatar.png"];
+                    //把图片直接保存到指定的路径（同时应该把图片的路径imagePath存起来，下次就可以直接用来取）
+                    [UIImagePNGRepresentation(userAvatar) writeToFile:avatarPath atomically:YES];
+                    [[NSNotificationCenter defaultCenter] postNotificationName:@"loginSccess" object:responseObject];
+                    [CommonCode writeToUserD:@"ShouJi" andKey:@"isWhatLogin"];
+                }else{
+                    XWAlerLoginView *alert = [[XWAlerLoginView alloc] initWithTitle:responseObject[msg]];
+                    [alert show];
                 }
+//                if ([responseObject[@"msg"] isEqualToString:@"用户名不存在!"])
+//                {
+//                    UIAlertController *mimacuowu = [UIAlertController alertControllerWithTitle:@"用户名不存在！" message:nil preferredStyle:UIAlertControllerStyleAlert];
+//                    [mimacuowu addAction:[UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+//                    }]];
+//                    [self presentViewController:mimacuowu animated:YES completion:nil];
+//                }else
+//                {
+//                    if ([responseObject[@"msg"] isEqualToString:@"密码错误!"])
+//                    {
+//                        UIAlertController *mimacuowu = [UIAlertController alertControllerWithTitle:@"密码错误！" message:nil preferredStyle:UIAlertControllerStyleAlert];
+//                        [mimacuowu addAction:[UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+//                        }]];
+//                        [self presentViewController:mimacuowu animated:YES completion:nil];
+//                    }
+//                    else{
+                
+//                    }
+//                }
             } failure:^(NSError *error) {
                 NSLog(@"error = %@",error);
             }];
+            
             [self getIAPInfomation];
         }
     }
@@ -571,9 +585,9 @@
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 
-- (void)updateUserInfo{
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"updateUserInfo" object:nil];
-}
+//- (void)updateUserInfo{
+//    [[NSNotificationCenter defaultCenter] postNotificationName:@"updateUserInfo" object:nil];
+//}
 
 - (void)getIAPInfomation{
     //请求是否为内购的接口

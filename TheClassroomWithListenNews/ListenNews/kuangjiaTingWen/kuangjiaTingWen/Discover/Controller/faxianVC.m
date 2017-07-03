@@ -28,7 +28,7 @@
 @interface faxianVC ()<UITableViewDataSource,UITableViewDelegate,UISearchBarDelegate>
 {
     UILabel *SouSuotitleLab;          //cell内标题lab
-    int SouSuonumberPage;
+    int SouSuonumberPage; //搜索结果页数
     UILabel *titleLab;          //cell内标题lab
     
     NSIndexPath *SouSuoquanjvIndexPath;
@@ -46,24 +46,30 @@
 
 @property (strong, nonatomic) NSMutableDictionary *pushNewsInfo;
 
-
+@property (assign, nonatomic) BOOL isSelectedSearchTip;
 @end
 
 @implementation faxianVC
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-//    self.navigationItem.title = @"发现";
     DefineWeakSelf;
     APPDELEGATE.faxianSkipToPlayingVC = ^(NSString *pushNewsID){
         
-        if (ExIsClassVCPlay && Exact_id != nil&& [ClassViewController shareInstance].isPlaying) {
+        if (ExIsClassVCPlay && Exact_id != nil) {
+            NSMutableDictionary *dict = [CommonCode readFromUserD:@"is_free_data"];
             ClassViewController *vc = [ClassViewController shareInstance];
+            vc.jiemuDescription = dict[@"jiemuDescription"];
+            vc.jiemuFan_num = dict[@"jiemuFan_num"];
+            vc.jiemuID = dict[@"jiemuID"];
+            vc.jiemuImages = dict[@"jiemuImages"];
+            vc.jiemuIs_fan = dict[@"jiemuIs_fan"];
+            vc.jiemuMessage_num = dict[@"jiemuMessage_num"];
+            vc.jiemuName = dict[@"jiemuName"];
             vc.act_id = Exact_id;
-            weakSelf.hidesBottomBarWhenPushed = YES;
+            vc.listVC = self;
             [weakSelf.navigationController.navigationBar setHidden:YES];
             [weakSelf.navigationController pushViewController:vc animated:YES];
-            weakSelf.hidesBottomBarWhenPushed = NO;
             return;
         }
         if ([pushNewsID isEqualToString:@"NO"]) {
@@ -133,6 +139,7 @@
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(zidongjiazai:) name:@"faxianbofangyaojiazaishujv" object:nil];
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(gaibianyanse:) name:@"gaibianyanse" object:nil];
     
+    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(reloadClassList) name:ReloadClassList object:nil];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -146,7 +153,11 @@
     [super viewWillDisappear:animated];
     [self.navigationController setNavigationBarHidden:YES animated:YES];
 }
-
+//刷新课堂列表数据
+- (void)reloadClassList
+{
+    [self loadData];
+}
 #pragma mark - UITableViewDataSource
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
@@ -216,9 +227,8 @@
         
         if (self.SouSuodataArrM.count == 0 && self.SearchActResultsArrM.count == 0){
             return cell;
-        }
-        else {
-            if ([self.SearchActResultsArrM count]) {
+        }else {
+            if ([self.SearchActResultsArrM count] != 0) {
                 if (indexPath.section == 0) {
                     //搜索的节目分区内容
                     UIImageView *imgV = [[UIImageView alloc]initWithFrame:CGRectMake(10.0 / 375 * IPHONE_W, 11, 45, 45)];
@@ -285,12 +295,11 @@
                     return cell;
                 }
                 else {
-//                    UIImageView *imgLeft = [[UIImageView alloc]initWithFrame:CGRectMake(5.0 / 375 * SCREEN_WIDTH, 19.0 / 667 * SCREEN_HEIGHT, 112.0 / 375 * IPHONE_W, 62.72 / 375 *IPHONE_W)];
                     UIImageView *imgLeft = [[UIImageView alloc]initWithFrame:CGRectMake(SCREEN_WIDTH - 125.0 / 375 * IPHONE_W, 19, 105.0 / 375 * IPHONE_W,   84.72 / 375 *IPHONE_W)];
                     if (IS_IPAD) {
                         [imgLeft setFrame:CGRectMake(SCREEN_WIDTH - 125.0 / 375 * IPHONE_W, 19, 105.0 / 375 * IPHONE_W, 70.0 / 375 *IPHONE_W)];
                     }
-                    RTLog(@"%@----%@",NEWSSEMTPHOTOURL(self.SouSuodataArrM[indexPath.row][@"smeta"]),self.SouSuodataArrM[indexPath.row][@"smeta"]);
+#warning self.SouSuodataArrM 数组越界 已解决
                     [imgLeft sd_setImageWithURL:[NSURL URLWithString:NEWSSEMTPHOTOURL(self.SouSuodataArrM[indexPath.row][@"smeta"])]];
                     imgLeft.contentMode = UIViewContentModeScaleAspectFill;
                     imgLeft.clipsToBounds = YES;
@@ -298,28 +307,6 @@
                     imgLeft.contentMode = UIViewContentModeScaleToFill;
                     titleLab =[[UILabel alloc]initWithFrame:CGRectMake(20.0 / 375 * IPHONE_W, 16.0 / 667 * IPHONE_H , SCREEN_WIDTH - 155.0 / 375 * IPHONE_W, 21.0 / 667 *IPHONE_H)];
                     titleLab.text = self.SouSuodataArrM[indexPath.row][@"post_title"];
-//                    if ([[CommonCode readFromUserD:@"yitingguoxinwenID"] isKindOfClass:[NSArray class]]){
-//                        
-//                        NSArray *yitingguoArr = [NSArray arrayWithArray:[CommonCode readFromUserD:@"yitingguoxinwenID"]];
-//                        for (int i = 0; i < yitingguoArr.count - 1; i ++ ){
-//                            
-//                            if ([self.SouSuodataArrM[indexPath.row][@"id"] isEqualToString:yitingguoArr[i]]){
-//                                
-//                                if ([[CommonCode readFromUserD:@"dangqianbofangxinwenID"] isEqualToString:self.SouSuodataArrM[indexPath.row][@"id"]]){
-//                                    
-//                                    titleLab.textColor = gMainColor;
-//                                    break;
-//                                }
-//                                else{
-//                                    titleLab.textColor = [[UIColor grayColor]colorWithAlphaComponent:0.7f];
-//                                    break;
-//                                }
-//                            }
-//                            else{
-//                                titleLab.textColor = [UIColor blackColor];
-//                            }
-//                        }
-//                    }
                     if ([[CommonCode readFromUserD:@"yitingguoxinwenID"] isKindOfClass:[NSArray class]]){
                         NSArray *yitingguoArr = [NSArray arrayWithArray:[CommonCode readFromUserD:@"yitingguoxinwenID"]];
                         for (int i = 0; i < yitingguoArr.count - 1; i ++ ){
@@ -360,14 +347,6 @@
                     //大小
                     UILabel *dataLab = [[UILabel alloc]initWithFrame:CGRectMake(SCREEN_WIDTH - 213.0 / 375 * IPHONE_W, 86.0 / 667 *IPHONE_H, 45.0 / 375 * IPHONE_W, 21.0 / 667 *IPHONE_H)];
                     dataLab.text = [NSString stringWithFormat:@"%.1lf%@",[self.SouSuodataArrM[indexPath.row][@"post_size"] intValue] / 1024.0 / 1024.0,@"M"];
-//                    NSString *str = [NSString stringWithFormat:@"%@",dataLab.text];
-//                    if (str.length > 5)
-//                    {
-//                        dataLab.frame = CGRectMake(dataLab.frame.origin.x, dataLab.frame.origin.y, (str.length - 1) * 9.2 / 375 * IPHONE_W, 21);
-//                    }else
-//                    {
-//                        dataLab.frame = CGRectMake(dataLab.frame.origin.x, dataLab.frame.origin.y, (str.length - 1) * 11.0 / 375 * IPHONE_W, 21);
-//                    }
                     dataLab.textColor = gTextColorSub;
                     dataLab.font = [UIFont systemFontOfSize:13.0f];
                     dataLab.textAlignment = NSTextAlignmentCenter;
@@ -385,92 +364,83 @@
                     
                     return cell;
                 }
-                
             }
             else {
-            UIImageView *imgLeft = [[UIImageView alloc]initWithFrame:CGRectMake(SCREEN_WIDTH - 125.0 / 375 * IPHONE_W, 19, 105.0 / 375 * IPHONE_W,   84.72 / 375 *IPHONE_W)];
-            [imgLeft sd_setImageWithURL:[NSURL URLWithString:NEWSSEMTPHOTOURL(self.SouSuodataArrM[indexPath.row][@"smeta"])]];
-            //placeholderImage:[UIImage imageNamed:@"thumbnailsdefault"]
-            [cell.contentView addSubview:imgLeft];
-            imgLeft.contentMode = UIViewContentModeScaleAspectFill;
-            imgLeft.clipsToBounds = YES;
-                
-            titleLab = [[UILabel alloc]initWithFrame:CGRectMake(20.0 / 375 * IPHONE_W, 16.0 / 667 * IPHONE_H , SCREEN_WIDTH - 155.0 / 375 * IPHONE_W, 21.0 / 667 *IPHONE_H)];
-            titleLab.text = self.SouSuodataArrM[indexPath.row][@"post_title"];
-            if ([[CommonCode readFromUserD:@"yitingguoxinwenID"] isKindOfClass:[NSArray class]]){
-                
-                NSArray *yitingguoArr = [NSArray arrayWithArray:[CommonCode readFromUserD:@"yitingguoxinwenID"]];
-                for (int i = 0; i < yitingguoArr.count - 1; i ++ ){
+                UIImageView *imgLeft = [[UIImageView alloc]initWithFrame:CGRectMake(SCREEN_WIDTH - 125.0 / 375 * IPHONE_W, 19, 105.0 / 375 * IPHONE_W,   84.72 / 375 *IPHONE_W)];
+                [imgLeft sd_setImageWithURL:[NSURL URLWithString:NEWSSEMTPHOTOURL(self.SouSuodataArrM[indexPath.row][@"smeta"])]];
+                //placeholderImage:[UIImage imageNamed:@"thumbnailsdefault"]
+                [cell.contentView addSubview:imgLeft];
+                imgLeft.contentMode = UIViewContentModeScaleAspectFill;
+                imgLeft.clipsToBounds = YES;
                     
-                    if ([self.SouSuodataArrM[indexPath.row][@"id"] isEqualToString:yitingguoArr[i]]){
+                titleLab = [[UILabel alloc]initWithFrame:CGRectMake(20.0 / 375 * IPHONE_W, 16.0 / 667 * IPHONE_H , SCREEN_WIDTH - 155.0 / 375 * IPHONE_W, 21.0 / 667 *IPHONE_H)];
+                titleLab.text = self.SouSuodataArrM[indexPath.row][@"post_title"];
+                if ([[CommonCode readFromUserD:@"yitingguoxinwenID"] isKindOfClass:[NSArray class]]){
+                    
+                    NSArray *yitingguoArr = [NSArray arrayWithArray:[CommonCode readFromUserD:@"yitingguoxinwenID"]];
+                    for (int i = 0; i < yitingguoArr.count - 1; i ++ ){
                         
-                        if ([[CommonCode readFromUserD:@"dangqianbofangxinwenID"] isEqualToString:self.SouSuodataArrM[indexPath.row][@"id"]]){
-                            titleLab.textColor = gMainColor;
-                            break;
+                        if ([self.SouSuodataArrM[indexPath.row][@"id"] isEqualToString:yitingguoArr[i]]){
+                            
+                            if ([[CommonCode readFromUserD:@"dangqianbofangxinwenID"] isEqualToString:self.SouSuodataArrM[indexPath.row][@"id"]]){
+                                titleLab.textColor = gMainColor;
+                                break;
+                            }
+                            else{
+                                titleLab.textColor = [[UIColor grayColor]colorWithAlphaComponent:0.7f];
+                                break;
+                            }
                         }
                         else{
-                            titleLab.textColor = [[UIColor grayColor]colorWithAlphaComponent:0.7f];
-                            break;
+                            titleLab.textColor = [UIColor blackColor];
                         }
                     }
-                    else{
-                        titleLab.textColor = [UIColor blackColor];
+                }
+                
+                titleLab.textAlignment = NSTextAlignmentLeft;
+                titleLab.font = [UIFont boldSystemFontOfSize:17.0f];
+                [cell.contentView addSubview:titleLab];
+                [titleLab setNumberOfLines:3];
+                titleLab.lineBreakMode = NSLineBreakByWordWrapping;
+                CGSize size = [titleLab sizeThatFits:CGSizeMake(titleLab.frame.size.width, MAXFLOAT)];
+                titleLab.frame = CGRectMake(titleLab.frame.origin.x, titleLab.frame.origin.y, titleLab.frame.size.width, size.height);
+                    if (IS_IPAD) {
+                        //正文
+                        UILabel *detailNews = [[UILabel alloc]initWithFrame:CGRectMake(titleLab.frame.origin.x, titleLab.frame.origin.y + titleLab.frame.size.height + 20.0 / 667 * SCREEN_HEIGHT, titleLab.frame.size.width, 21.0 / 667 *IPHONE_H)];
+                        detailNews.text = self.SouSuodataArrM[indexPath.row][@"post_excerpt"];
+                        detailNews.textColor = gTextColorSub;
+                        detailNews.font = [UIFont systemFontOfSize:15.0f];
+                        [cell.contentView addSubview:detailNews];
                     }
-                }
-            }
-            
-            titleLab.textAlignment = NSTextAlignmentLeft;
-            titleLab.font = [UIFont boldSystemFontOfSize:17.0f];
-            [cell.contentView addSubview:titleLab];
-            [titleLab setNumberOfLines:3];
-            titleLab.lineBreakMode = NSLineBreakByWordWrapping;
-            CGSize size = [titleLab sizeThatFits:CGSizeMake(titleLab.frame.size.width, MAXFLOAT)];
-            titleLab.frame = CGRectMake(titleLab.frame.origin.x, titleLab.frame.origin.y, titleLab.frame.size.width, size.height);
-                if (IS_IPAD) {
-                    //正文
-                    UILabel *detailNews = [[UILabel alloc]initWithFrame:CGRectMake(titleLab.frame.origin.x, titleLab.frame.origin.y + titleLab.frame.size.height + 20.0 / 667 * SCREEN_HEIGHT, titleLab.frame.size.width, 21.0 / 667 *IPHONE_H)];
-                    detailNews.text = self.SouSuodataArrM[indexPath.row][@"post_excerpt"];
-                    detailNews.textColor = gTextColorSub;
-                    detailNews.font = [UIFont systemFontOfSize:15.0f];
-                    [cell.contentView addSubview:detailNews];
-                }
+                    
+                    
+                    
+                //日期
+                UILabel *riqiLab =  [[UILabel alloc]initWithFrame:CGRectMake(20.0 / 375 * IPHONE_W, 86.0 / 667 *IPHONE_H, 135.0 / 375 * IPHONE_W, 21.0 / 667 *IPHONE_H)];
+                NSDate *date = [NSDate dateFromString:self.SouSuodataArrM[indexPath.row][@"post_modified"]];
+                riqiLab.text = [date showTimeByTypeA];
+                riqiLab.textColor = gTextColorSub;
+                riqiLab.font = [UIFont systemFontOfSize:13.0f ];
+                [cell.contentView addSubview:riqiLab];
+                //大小
+                UILabel *dataLab = [[UILabel alloc]initWithFrame:CGRectMake(SCREEN_WIDTH - 213.0 / 375 * IPHONE_W, 86.0 / 667 *IPHONE_H, 45.0 / 375 * IPHONE_W, 21.0 / 667 *IPHONE_H)];
+                dataLab.text = [NSString stringWithFormat:@"%.1lf%@",[self.SouSuodataArrM[indexPath.row][@"post_size"] intValue] / 1024.0 / 1024.0,@"M"];
+                dataLab.textColor = gTextColorSub;
+                dataLab.font = [UIFont systemFontOfSize:13.0f ];
+                dataLab.textAlignment = NSTextAlignmentCenter;
+                [cell.contentView addSubview:dataLab];
+                //下载
+                UIButton *download = [UIButton buttonWithType:UIButtonTypeCustom];
+                [download setFrame:CGRectMake(CGRectGetMaxX(dataLab.frame), 86.0 / 667 *IPHONE_H, 30.0 / 667 *IPHONE_H, 30.0 / 667 *IPHONE_H)];
+                [download setImage:[UIImage imageNamed:@"download_grey"] forState:UIControlStateNormal];
+                [download setImageEdgeInsets:UIEdgeInsetsMake(0, 0, 10, 10)];
+                [download setTag:(indexPath.row + 100)];
+                [download addTarget:self action:@selector(downloadNewsAction:) forControlEvents:UIControlEventTouchUpInside];
+                [cell.contentView addSubview:download];
                 
+                cell.selectionStyle = UITableViewCellSelectionStyleNone;
                 
-                
-            //日期
-            UILabel *riqiLab =  [[UILabel alloc]initWithFrame:CGRectMake(20.0 / 375 * IPHONE_W, 86.0 / 667 *IPHONE_H, 135.0 / 375 * IPHONE_W, 21.0 / 667 *IPHONE_H)];
-            NSDate *date = [NSDate dateFromString:self.SouSuodataArrM[indexPath.row][@"post_modified"]];
-            riqiLab.text = [date showTimeByTypeA];
-            riqiLab.textColor = gTextColorSub;
-            riqiLab.font = [UIFont systemFontOfSize:13.0f ];
-            [cell.contentView addSubview:riqiLab];
-            //大小
-            UILabel *dataLab = [[UILabel alloc]initWithFrame:CGRectMake(SCREEN_WIDTH - 213.0 / 375 * IPHONE_W, 86.0 / 667 *IPHONE_H, 45.0 / 375 * IPHONE_W, 21.0 / 667 *IPHONE_H)];
-            dataLab.text = [NSString stringWithFormat:@"%.1lf%@",[self.SouSuodataArrM[indexPath.row][@"post_size"] intValue] / 1024.0 / 1024.0,@"M"];
-//            NSString *str = [NSString stringWithFormat:@"%@",dataLab.text];
-//            if (str.length > 5)
-//            {
-//                dataLab.frame = CGRectMake(dataLab.frame.origin.x, dataLab.frame.origin.y, (str.length - 1) * 9.2 / 375 * IPHONE_W, 21.0 / 667 * SCREEN_HEIGHT);
-//            }else
-//            {
-//                dataLab.frame = CGRectMake(dataLab.frame.origin.x, dataLab.frame.origin.y, (str.length - 1) * 11.0 / 375 * IPHONE_W, 21.0 / 667 * SCREEN_HEIGHT);
-//            }
-            dataLab.textColor = gTextColorSub;
-            dataLab.font = [UIFont systemFontOfSize:13.0f ];
-            dataLab.textAlignment = NSTextAlignmentCenter;
-            [cell.contentView addSubview:dataLab];
-            //下载
-            UIButton *download = [UIButton buttonWithType:UIButtonTypeCustom];
-            [download setFrame:CGRectMake(CGRectGetMaxX(dataLab.frame), 86.0 / 667 *IPHONE_H, 30.0 / 667 *IPHONE_H, 30.0 / 667 *IPHONE_H)];
-            [download setImage:[UIImage imageNamed:@"download_grey"] forState:UIControlStateNormal];
-            [download setImageEdgeInsets:UIEdgeInsetsMake(0, 0, 10, 10)];
-            [download setTag:(indexPath.row + 100)];
-            [download addTarget:self action:@selector(downloadNewsAction:) forControlEvents:UIControlEventTouchUpInside];
-            [cell.contentView addSubview:download];
-            
-            cell.selectionStyle = UITableViewCellSelectionStyleNone;
-            
-            return cell;
+                return cell;
             }
         }
     }
@@ -510,7 +480,6 @@
         UIButton *faxianjiantou = [UIButton buttonWithType:UIButtonTypeCustom];
         faxianjiantou.frame = CGRectMake(IPHONE_W - 25.0 / 375 * IPHONE_W, faxiangengduoBtn.frame.origin.y + 1.0 / 667 * IPHONE_H, faxiangengduoBtn.frame.size.height - 5.0 / 667 * IPHONE_H, faxiangengduoBtn.frame.size.height - 5.0 / 667 * IPHONE_H);
         [faxianjiantou setImage:[UIImage imageNamed:@"fine_list_ic_more"] forState:UIControlStateNormal];
-        
         [faxianjiantou addTarget:self action:@selector(faxianliebiaoGengDuoAction:) forControlEvents:UIControlEventTouchUpInside];
         //TODO:发现课堂模块时需注释
 //        [cell.contentView addSubview:faxiantitleLab];
@@ -519,7 +488,6 @@
 //        faxiantitleLab.text = self.faxianArrM[indexPath.row][@"type"];
         
 //        //TODO:发现课堂模块
-        RTLog(@"%ld",indexPath.row);
         faxianModel *firstModel = [self.faxianArrM firstObject];
         faxianSubModel *subModel;
         faxianModel *model2;
@@ -677,14 +645,19 @@
 }
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
     if (tableView == self.SouSuosousuoTableView){
+        _isSelectedSearchTip = YES;
         self.SouSuosearchBar.text = self.SouSuosousuoArrM[self.SouSuosousuoArrM.count - indexPath.row - 1];
+        [self.SouSuosearchBar setShowsCancelButton:NO animated:YES];
+        [self.SouSuosearchBar resignFirstResponder];
         [self.SouSuosousuoArrM addObject:self.SouSuosearchBar.text];
+        NSSet *set = [NSSet setWithArray:self.SouSuosousuoArrM];
+        self.SouSuosousuoArrM = [NSMutableArray arrayWithArray:[set allObjects]];
         [self.SouSuosousuoTableView reloadData];
         
         self.SouSuosousuoTableView.hidden = YES;
         self.SouSuotableView.hidden = NO;
         
-        [self.SouSuodataArrM removeAllObjects];
+//        [self.SouSuodataArrM removeAllObjects];
         
         [self.SouSuotableView.mj_header beginRefreshing];
     }
@@ -692,7 +665,7 @@
         if ([self.SearchActResultsArrM count]) {
             if (indexPath.section == 0) {
                 NSDictionary *dic = [[NSDictionary alloc]initWithDictionary:self.SearchActResultsArrM[indexPath.row]];
-                if ([dic[@"is_free"] isEqualToString:@"1"]) {
+//                if ([dic[@"is_free"] isEqualToString:@"1"]) {
                     zhuboXiangQingVCNewController *faxianzhuboVC = [[zhuboXiangQingVCNewController alloc]init];
                     faxianzhuboVC.jiemuDescription = dic[@"description"];
                     faxianzhuboVC.jiemuFan_num = dic[@"fan_num"];
@@ -701,21 +674,21 @@
                     faxianzhuboVC.jiemuIs_fan = dic[@"is_fan"];
                     faxianzhuboVC.jiemuMessage_num = dic[@"message_num"];
                     faxianzhuboVC.jiemuName = dic[@"name"];                    faxianzhuboVC.isfaxian = YES;
-                    faxianzhuboVC.isClass = YES;
-                    self.hidesBottomBarWhenPushed=YES;
+                    faxianzhuboVC.isClass = NO;
+//                    self.hidesBottomBarWhenPushed=YES;
                     [self.navigationController pushViewController:faxianzhuboVC animated:YES];
-                    self.hidesBottomBarWhenPushed=NO;
-                    
-                }
+//                    self.hidesBottomBarWhenPushed=NO;
+                
+//                }
                 //跳转未购买课堂界面
-                else if ([dic[@"is_free"] isEqualToString:@"0"]){
-                    ClassViewController *vc = [ClassViewController shareInstance];
-                    vc.act_id = dic[@"id"];
-                    self.hidesBottomBarWhenPushed = YES;
-                    [self.navigationController.navigationBar setHidden:YES];
-                    [self.navigationController pushViewController:vc animated:YES];
-                    self.hidesBottomBarWhenPushed = NO;
-                }
+//                else if ([dic[@"is_free"] isEqualToString:@"0"]){
+//                    ClassViewController *vc = [ClassViewController shareInstance];
+//                    vc.act_id = dic[@"id"];
+//                    self.hidesBottomBarWhenPushed = YES;
+//                    [self.navigationController.navigationBar setHidden:YES];
+//                    [self.navigationController pushViewController:vc animated:YES];
+//                    self.hidesBottomBarWhenPushed = NO;
+//                }
 
             }
             else{
@@ -767,14 +740,9 @@
                     [bofangVC shareInstance].newsModel.post_keywords = self.SouSuodataArrM[indexPath.row][@"post_keywords"];
                     [bofangVC shareInstance].newsModel.url = self.SouSuodataArrM[indexPath.row][@"url"];
                     [[bofangVC shareInstance].tableView reloadData];
-                    //        Explayer = [[AVPlayer alloc]initWithPlayerItem:[[AVPlayerItem alloc]initWithURL:[NSURL URLWithString:arr[indexPath.row][@"post_mp"]]]];
                     [Explayer replaceCurrentItemWithPlayerItem:[[AVPlayerItem alloc]initWithURL:[NSURL URLWithString:self.SouSuodataArrM[indexPath.row][@"post_mp"]]]];
                     ExisRigester = YES;
                     ExIsKaiShiBoFang = YES;
-//                    [UIView animateWithDuration:0.3f animations:^{
-//                        ExwhichBoFangYeMianStr = @"faxianbofang";
-//                        [bofangVC shareInstance].newsModel.view.frame = CGRectMake(0, 0, IPHONE_W, IPHONE_H);
-//                    }];
                     self.hidesBottomBarWhenPushed = YES;
                     [self.navigationController.navigationBar setHidden:YES];
                     [self.navigationController pushViewController:[bofangVC shareInstance ] animated:YES];
@@ -902,11 +870,17 @@
             //跳转未购买课堂界面
             else if ([dic.is_free isEqualToString:@"0"]){
                 ClassViewController *vc = [ClassViewController shareInstance];
+                vc.jiemuDescription = dic.Description;
+                vc.jiemuFan_num = dic.fan_num;
+                vc.jiemuID = dic.ID;
+                vc.jiemuImages = dic.images;
+                vc.jiemuIs_fan = dic.is_fan;
+                vc.jiemuMessage_num = dic.message_num;
+                vc.jiemuName = dic.name;
                 vc.act_id = dic.ID;
-                self.hidesBottomBarWhenPushed = YES;
+                vc.listVC = self;
                 [self.navigationController.navigationBar setHidden:YES];
                 [self.navigationController pushViewController:vc animated:YES];
-                self.hidesBottomBarWhenPushed = NO;
             }
         }
     }
@@ -931,7 +905,7 @@
 }
 //将要结束编辑时的回调
 - (void)searchBarTextDidEndEditing:(UISearchBar *)searchBar {
-    self.CurrentSearchKeyWords = searchBar.text;
+    RTLog(@"searchBarTextDidEndEditing");
     [searchBar setShowsCancelButton:NO animated:YES];
     [searchBar resignFirstResponder];
     
@@ -943,6 +917,9 @@
     [searchBar resignFirstResponder];
     
     [self.SouSuosousuoArrM addObject:searchBar.text];
+    NSSet *set = [NSSet setWithArray:self.SouSuosousuoArrM];
+    self.SouSuosousuoArrM = [NSMutableArray arrayWithArray:[set allObjects]];
+    
     [CommonCode writeToUserD:self.SouSuosousuoArrM andKey:@"lishisousuoci"];
     [self.SouSuosousuoTableView reloadData];
     
@@ -958,13 +935,14 @@
 - (void)zhuboBtnAction:(faxianBtn *)sender {
     UITableViewCell *cell = (UITableViewCell *)[[sender superview] superview];
     NSIndexPath *indexPath = [self.faxianTableView indexPathForCell:cell];
+    if (indexPath == nil) {
+        return;
+    }
     //TODO:发现课堂模块
 #warning 越界bug,崩溃
     faxianModel *model = [self.faxianArrM firstObject];
-    faxianModel *model2 = self.faxianArrM[indexPath.row - [model.data count] + 1 ];
+    faxianModel *model2 = self.faxianArrM[indexPath.row - [model.data count] + 1];
     faxianSubModel *dic = model2.data[sender.tag];
-//    NSDictionary *dic = [[NSDictionary alloc]initWithDictionary:[@"data"][sender.tag]];
-//    NSDictionary *dic = [[NSDictionary alloc]initWithDictionary:self.faxianArrM[indexPath.row][@"data"][sender.tag]];
     
     zhuboXiangQingVCNewController *faxianzhuboVC = [[zhuboXiangQingVCNewController alloc]init];
     faxianzhuboVC.isfaxian = YES;
@@ -976,41 +954,24 @@
     faxianzhuboVC.jiemuMessage_num = dic.message_num;
     faxianzhuboVC.jiemuName = dic.name;
     faxianzhuboVC.post_content = dic.post_content;
-//    if (indexPath.row > 0){
-//        faxianzhuboVC.act_table = @"act";
-//    }
-//    else{
-//        faxianzhuboVC.act_table = @"posts";
-//    }
-    self.hidesBottomBarWhenPushed=YES;
+//    self.hidesBottomBarWhenPushed=YES;
     [self.navigationController pushViewController:faxianzhuboVC animated:YES];
-    self.hidesBottomBarWhenPushed=NO;
+//    self.hidesBottomBarWhenPushed=NO;
     
 }
 - (void)faxianliebiaoGengDuoAction:(UIButton *)sender{
-//    UITableViewCell *cell = (UITableViewCell *)[[sender superview] superview];
-//    NSIndexPath *indexPath = [self.faxianTableView indexPathForCell:cell];
-    //TODO:发现课堂模块
-//    faxianModel *model = [self.faxianArrM firstObject];
-//    faxianModel *model2 = self.faxianArrM[indexPath.row - [model.data count] + 1];
-//    if (indexPath.row >= [model.data count]) {
-//        faxianGengDuoVC *faxiangengduoVC = [[faxianGengDuoVC alloc]init];
-//        faxiangengduoVC.term_id = [NSString stringWithFormat:@"%@",model2.ID];
-//        self.hidesBottomBarWhenPushed=YES;
-//        [self.navigationController pushViewController:faxiangengduoVC animated:YES];
-//        self.hidesBottomBarWhenPushed=NO;
-//    }
-//    else{
+    UITableViewCell *cell = (UITableViewCell *)[[sender superview] superview];
+    NSIndexPath *indexPath = [self.faxianTableView indexPathForCell:cell];
+    RTLog(@"%ld",indexPath.row);
+    if (indexPath.row == 0) {
         MoreClassViewController *classVC = [[MoreClassViewController alloc]init];
-        self.hidesBottomBarWhenPushed=YES;
         [self.navigationController pushViewController:classVC animated:YES];
-        self.hidesBottomBarWhenPushed=NO;
-//    }
-//    faxianGengDuoVC *faxiangengduoVC = [[faxianGengDuoVC alloc]init];
-//    faxiangengduoVC.term_id = [NSString stringWithFormat:@"%@",self.faxianArrM[indexPath.row][@"id"]];
-//    self.hidesBottomBarWhenPushed=YES;
-//    [self.navigationController pushViewController:faxiangengduoVC animated:YES];
-//    self.hidesBottomBarWhenPushed=NO;
+    }else{
+        faxianModel *model = self.faxianArrM[indexPath.row - 2];
+        faxianGengDuoVC *faxiangengduoVC = [[faxianGengDuoVC alloc]init];
+        faxiangengduoVC.term_id = model.ID;
+        [self.navigationController pushViewController:faxiangengduoVC animated:YES];
+    }
 }
 
 - (void)SouSuorightCellBtnAction:(UIButton *)sender {
@@ -1122,10 +1083,11 @@
         accessToken = nil;
     }
     
-    if ([self.CurrentSearchKeyWords length]) {
+    RTLog(@"SouSuorefreshData");
+    if ([self.SouSuosearchBar.text length]) {
         [NetWorkTool getAllActInfoListWithAccessToken:accessToken
                                                 ac_id:nil
-                                              keyword:self.CurrentSearchKeyWords
+                                              keyword:self.SouSuosearchBar.text
                                               andPage:@"1"
                                              andLimit:@"10"
                                                sccess:^(NSDictionary *responseObject) {
@@ -1144,8 +1106,7 @@
                                                    [self.SouSuotableView.mj_header endRefreshing];
                                                }];
     }
-    
-    [NetWorkTool getPaoguoSearchNewsWithaccessToken:accessToken
+    [NetWorkTool getPaoguoSearchNewsWithaccessToken:AvatarAccessToken
                                             term_id:nil
                                             keyword:self.SouSuosearchBar.text
                                             andPage:@"1"
@@ -1253,7 +1214,7 @@
         accessToken = nil;
     }
     //搜索主播、节目
-    [NetWorkTool getAllActInfoListWithAccessToken:accessToken
+    [NetWorkTool getAllActInfoListWithAccessToken:AvatarAccessToken
                                             ac_id:nil
                                           keyword:kewwords
                                           andPage:@"1"
@@ -1515,10 +1476,8 @@
         _faxianTableView.dataSource = self;
         _faxianTableView.tag = 4;
         _faxianTableView.hidden = NO;
-//        _faxianTableView.separatorStyle = UITableViewCellSeparatorStyleNone;
         _faxianTableView.tableFooterView = [UIView new];
         _faxianTableView.userInteractionEnabled = YES;
-//        _faxianTableView.separatorStyle = UITableViewCellSeparatorStyleNone;
     }
     return _faxianTableView;
 }
@@ -1538,9 +1497,10 @@
         _SouSuotableView.tag = 1;
         _SouSuotableView.hidden = YES;
         _SouSuotableView.mj_header = [MJRefreshNormalHeader headerWithRefreshingBlock:^{
+            SouSuonumberPage = 1;
             [self SouSuorefreshData];
         }];
-        _SouSuotableView.mj_footer = [MJRefreshAutoStateFooter footerWithRefreshingBlock:^{
+        _SouSuotableView.mj_footer = [MJRefreshAutoNormalFooter footerWithRefreshingBlock:^{
             [self SouSuoshanglajiazai];
         }];
         _SouSuotableView.tableFooterView = [UIView new];

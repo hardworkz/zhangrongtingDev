@@ -115,7 +115,6 @@ static AVPlayer *_instancePlay = nil;
     self.hidesBottomBarWhenPushed = YES;
     [self.navigationController setNavigationBarHidden:YES animated:YES];
     
-    ExIsClassVCPlay = YES;
     //单例模式刷新数据
     if (![Exact_id isEqualToString:self.act_id]) {//当前为不同页面，需要重新初始化控件状态
         
@@ -135,25 +134,47 @@ static AVPlayer *_instancePlay = nil;
     }else{
         self.auditionnBtn.selected = NO;
     }
+    //保存跳转已经购买课堂界面数据，tabbar中心按钮点击需要使用
+    NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+    [dict setObject:self.jiemuID forKey:@"jiemuID"];
+    [dict setObject:self.jiemuName forKey:@"jiemuName"];
+    [dict setObject:self.jiemuImages forKey:@"jiemuImages"];
+    [dict setObject:self.jiemuDescription forKey:@"jiemuDescription"];
+    [dict setObject:self.jiemuFan_num forKey:@"jiemuFan_num"];
+    [dict setObject:self.jiemuIs_fan forKey:@"jiemuIs_fan"];
+    [dict setObject:self.jiemuMessage_num forKey:@"jiemuMessage_num"];
+    [CommonCode writeToUserD:dict andKey:@"is_free_data"];
 }
 
 - (void)viewWillDisappear:(BOOL)animated{
     [super viewWillDisappear:animated];
     [self.navigationController setNavigationBarHidden:NO animated:YES];
     //自动处理键盘事件的第三方库
-    IQKeyboardManager *manager = [IQKeyboardManager sharedManager];
-    [manager setKeyboardDistanceFromTextField:0];
+//    IQKeyboardManager *manager = [IQKeyboardManager sharedManager];
+//    [manager setKeyboardDistanceFromTextField:0];
 }
 - (void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
     
-    IQKeyboardManager *manager = [IQKeyboardManager sharedManager];
-    [manager setKeyboardDistanceFromTextField:0];
-    manager.enable = YES;
-    manager.shouldToolbarUsesTextFieldTintColor = YES;
+//    IQKeyboardManager *manager = [IQKeyboardManager sharedManager];
+//    [manager setKeyboardDistanceFromTextField:0];
+//    manager.enable = YES;
     
-    [self show];
+    //测试代码
+//    zhuboXiangQingVCNewController *faxianzhuboVC = [[zhuboXiangQingVCNewController alloc]init];
+//    faxianzhuboVC.jiemuDescription = self.jiemuDescription;
+//    faxianzhuboVC.jiemuFan_num = self.jiemuFan_num;
+//    faxianzhuboVC.jiemuID = self.jiemuID;
+//    faxianzhuboVC.jiemuImages = self.jiemuImages;
+//    faxianzhuboVC.jiemuIs_fan = self.jiemuIs_fan;
+//    faxianzhuboVC.jiemuMessage_num = self.jiemuMessage_num;
+//    faxianzhuboVC.jiemuName = self.jiemuName;
+//    faxianzhuboVC.isfaxian = YES;
+//    faxianzhuboVC.isClass = YES;
+//    faxianzhuboVC.listVC = self.listVC;
+//    [self.navigationController pushViewController:faxianzhuboVC animated:YES];
+//    [[NSNotificationCenter defaultCenter] postNotificationName:ReloadClassList object:nil];
 }
 - (void)setUpData{
     _pinglunArr = [NSMutableArray new];
@@ -222,7 +243,7 @@ static AVPlayer *_instancePlay = nil;
         accessToken = [DSE encryptUseDES:ExdangqianUser];
     }
     DefineWeakSelf;
-    [NetWorkTool getAuditionListWithaccessToken:accessToken act_id:self.act_id sccess:^(NSDictionary *responseObject) {
+    [NetWorkTool getAuditionListWithaccessToken:AvatarAccessToken act_id:self.act_id sccess:^(NSDictionary *responseObject) {
         if ([responseObject[@"status"] integerValue] == 1) {
 //            ExisRigester = NO;
             if ([responseObject[@"results"][@"shiting"] isKindOfClass:[NSArray class]]) {
@@ -290,7 +311,6 @@ static AVPlayer *_instancePlay = nil;
     return frameArray;
 }
 - (void)back {
-//    [ExclassPlayer pause];
     [self.navigationController popViewControllerAnimated:YES];
 }
 
@@ -478,7 +498,7 @@ static AVPlayer *_instancePlay = nil;
     NSArray *shitingArray = [CommonCode readFromUserD:playList];
     if (_playingIndex < [shitingArray count] - 1) {
         _isVoicePlayEnd = YES;
-        if (self.buttons.count == 0) {
+        if (self.buttons.count != 0) {
             UIButton *nextTextMPButton = self.buttons[_playingIndex + 1];
             [self playTestMp:nextTextMPButton];
         }else{
@@ -741,6 +761,12 @@ static AVPlayer *_instancePlay = nil;
     [CommonCode writeToUserD:Exact_id andKey:@"Exact_id"];
     [CommonCode writeToUserD:self.playShiTingListArr andKey:playList];
     [CommonCode writeToUserD:self.act_id andKey:playAct_id];
+    ExIsClassVCPlay = YES;
+    [CommonCode writeToUserD:@(YES) andKey:@"ExIsClassVCPlay"];
+//    ExIsFree = NO;
+//    [CommonCode writeToUserD:@(NO) andKey:@"ExIsFree"];
+    //有上一次浏览的课堂
+    [CommonCode writeToUserD:@"YES" andKey:@"haveTheLastNewsData"];
     if (sender.selected == YES) {//选中状态，为播放状态,则将列表按钮设置全部设置为暂停
         sender.selected = NO;
         for ( int i = 0 ; i < self.buttons.count; i ++ ) {
@@ -801,7 +827,12 @@ static AVPlayer *_instancePlay = nil;
         [CommonCode writeToUserD:self.act_id andKey:playAct_id];
         Exact_id = self.act_id;
         [CommonCode writeToUserD:Exact_id andKey:@"Exact_id"];
-//        ExisRigester = NO;
+//        ExIsFree = NO;
+//        [CommonCode writeToUserD:@(NO) andKey:@"ExIsFree"];
+        //有上一次浏览的课堂
+        [CommonCode writeToUserD:@"YES" andKey:@"haveTheLastNewsData"];
+        ExIsClassVCPlay = YES;
+        [CommonCode writeToUserD:@(YES) andKey:@"ExIsClassVCPlay"];
     }
     _isVoicePlayEnd = NO;
     
@@ -831,7 +862,7 @@ static AVPlayer *_instancePlay = nil;
         [self.auditionnBtn setSelected:NO];
     }
     //播放试听音频
-    if (_isPlaying && (_playingIndex == sender.tag)) {
+    if (_isPlaying && (_playingIndex == sender.tag)) {//如果为点击当前正在播放按钮则暂停
         [ExclassPlayer pause];
         _isPlaying = NO;
     }
@@ -876,34 +907,24 @@ static AVPlayer *_instancePlay = nil;
         [CommonCode writeToUserD:self.act_id andKey:playAct_id];
         Exact_id = self.act_id;
         [CommonCode writeToUserD:Exact_id andKey:@"Exact_id"];
-        //        ExisRigester = NO;
     }
     
     _isVoicePlayEnd = NO;
     
     //播放试听音频
-    if (_isPlaying && (_playingIndex == index)) {
-        [ExclassPlayer pause];
-        _isPlaying = NO;
+    if ([bofangVC shareInstance].isPlay) {
+        [[bofangVC shareInstance] doplay2];
     }
-    else{
-        if ([bofangVC shareInstance].isPlay) {
-            [[bofangVC shareInstance] doplay2];
-        }
-        else{
-            
-        }
-        [ExclassPlayer pause];
-        ExclassPlayer = self.Player;
-        
-        NSArray *shitingArray = [CommonCode readFromUserD:playList];
-        NSDictionary *auditionModel = shitingArray[index];
-        [ExclassPlayer replaceCurrentItemWithPlayerItem:[[AVPlayerItem alloc]initWithURL:[NSURL URLWithString:auditionModel[@"s_mpurl"]]]];
-        [ExclassPlayer play];
-        [Explayer pause];
-        _isPlaying = YES;
-        _playingIndex = index;
-    }
+    [ExclassPlayer pause];
+    ExclassPlayer = self.Player;
+    
+    NSArray *shitingArray = [CommonCode readFromUserD:playList];
+    NSDictionary *auditionModel = shitingArray[index];
+    [ExclassPlayer replaceCurrentItemWithPlayerItem:[[AVPlayerItem alloc]initWithURL:[NSURL URLWithString:auditionModel[@"s_mpurl"]]]];
+    [ExclassPlayer play];
+    [Explayer pause];
+    _isPlaying = YES;
+    _playingIndex = index;
 }
 - (void)pinglundianzanAction:(PinglundianzanCustomBtn *)pinglundianzanBtn frameModel:(PlayVCCommentFrameModel *)frameModel
 {
@@ -1184,228 +1205,227 @@ static AVPlayer *_instancePlay = nil;
 
  @return view
  */
-- (UIView *)alertCommitBuyUserDataView
-{
-    if (_alertCommitBuyUserDataView == nil) {
-        _alertCommitBuyUserDataView = [[UIView alloc] initWithFrame:CGRectMake((SCREEN_WIDTH - SCREEN_WIDTH * 0.7)*0.5, 0, SCREEN_WIDTH * 0.7, 0)];
-        _alertCommitBuyUserDataView.backgroundColor = [UIColor whiteColor];
-        _alertCommitBuyUserDataView.layer.cornerRadius = 5;
-        _alertCommitBuyUserDataView.layer.borderWidth = 1;
-        _alertCommitBuyUserDataView.layer.borderColor = [UIColor lightGrayColor].CGColor;
-        
-        UILabel *tipLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, _alertCommitBuyUserDataView.width, 40)];
-        tipLabel.text = @"恭喜您，购买成功!";
-        tipLabel.textColor = gMainColor;
-        tipLabel.font = gFontMajor16;
-        tipLabel.textAlignment = NSTextAlignmentCenter;
-        [_alertCommitBuyUserDataView addSubview:tipLabel];
-        
-        UILabel *describeLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, CGRectGetMaxY(tipLabel.frame), _alertCommitBuyUserDataView.width, 40)];
-        describeLabel.text = @"为了方便日后搭建学员与老师\n的社群,请您填写以下信息,谢谢！";
-        describeLabel.textColor = [UIColor lightGrayColor];
-        describeLabel.font = SCREEN_WIDTH == 375?gFontMain14:gFontMain12;
-        describeLabel.numberOfLines = 0;
-        describeLabel.textAlignment = NSTextAlignmentCenter;
-        [_alertCommitBuyUserDataView addSubview:describeLabel];
-        
-        CGFloat height = 30;
-        for (int i = 0; i<5; i++) {
-            UIView *contentView = [[UIView alloc] initWithFrame:CGRectMake(0, CGRectGetMaxY(describeLabel.frame) + i * (height + 5), _alertCommitBuyUserDataView.width, height)];
-            contentView.backgroundColor = [UIColor clearColor];
-            [_alertCommitBuyUserDataView addSubview:contentView];
-            
-            UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(20,0,35, height)];
-            label.textColor = [UIColor lightGrayColor];
-            label.font = gFontMain15;
-            label.textAlignment = NSTextAlignmentRight;
-            [contentView addSubview:label];
-            
-            UITextField *textField = [[UITextField alloc] init];
-            textField.delegate = self;
-            textField.backgroundColor = [UIColor clearColor];
-            textField.font = gFontMain15;
-            textField.returnKeyType = UIReturnKeyNext;
-            textField.textColor = [UIColor blackColor];
-            textField.tintColor = [UIColor lightGrayColor];
-            textField.frame = CGRectMake(CGRectGetMaxX(label.frame) + 5, 0, _alertCommitBuyUserDataView.width - label.width - 45, height-1);
-            [contentView addSubview:textField];
-            
-            UIView *devider = [[UIView alloc] initWithFrame:CGRectMake(textField.x,height - 1, textField.width, 1)];
-            devider.backgroundColor = [UIColor lightGrayColor];
-            [contentView addSubview:devider];
-            
-            if (i == 0) {
-                label.text = @"姓名:";
-                nameTextField = textField;
-            }else if (i == 1) {
-                label.text = @"电话:";
-                phoneTextField = textField;
-            }else if (i == 2) {
-                label.text = @"微信:";
-                wxTextField = textField;
-            }else if (i == 3) {
-                label.text = @"城市:";
-                cityTextField = textField;
-            }else if (i == 4) {
-                label.text = @"工作:";
-                textField.returnKeyType = UIReturnKeyDone;
-                jobTextField = textField;
-            }
-        }
-        
-        UIButton *cancleBtn = [[UIButton alloc] initWithFrame:CGRectMake(0, CGRectGetMaxY(describeLabel.frame) + 5 *(height + 5), _alertCommitBuyUserDataView.width * 0.5 - 0.5, 44)];
-        [cancleBtn setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
-        [cancleBtn setTitle:@"取消" forState:UIControlStateNormal];
-        cancleBtn.titleLabel.font = gFontMain15;
-        [cancleBtn addTarget:self action:@selector(cancelBtnClick:)];
-        [_alertCommitBuyUserDataView addSubview:cancleBtn];
-        
-        UIView *devider = [[UIView alloc] initWithFrame:CGRectMake(_alertCommitBuyUserDataView.width * 0.5 - 0.5, cancleBtn.y + 10, 1, cancleBtn.height - 20)];
-        devider.backgroundColor = [UIColor lightGrayColor];
-        [_alertCommitBuyUserDataView addSubview:devider];
-        
-        UIButton *commitBtn = [[UIButton alloc] initWithFrame:CGRectMake(_alertCommitBuyUserDataView.width * 0.5 + 0.5, cancleBtn.y, _alertCommitBuyUserDataView.width * 0.5 - 0.5, 44)];
-        [commitBtn setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
-        [commitBtn setTitle:@"提交" forState:UIControlStateNormal];
-        commitBtn.titleLabel.font = gFontMain15;
-        [commitBtn addTarget:self action:@selector(commitClick)];
-        [_alertCommitBuyUserDataView addSubview:commitBtn];
-        
-        _alertCommitBuyUserDataView.height = CGRectGetMaxY(commitBtn.frame);
-        _alertCommitBuyUserDataView.y = (SCREEN_HEIGHT - _alertCommitBuyUserDataView.height) * 0.5;
-    }
-    return _alertCommitBuyUserDataView;
-}
-- (UIButton *)cover
-{
-    if (_cover == nil) {
-        _cover = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)];
-        _cover.backgroundColor = [UIColor clearColor];
-        [_cover addTarget:self action:@selector(cancelBtnClick:)];
-    }
-    return _cover;
-}
-- (void)cancelBtnClick:(UIButton *)button
-{
-    if ([button isEqual:_cover]) {
-        [selectedTextField resignFirstResponder];
-    }else{
-        [UIView animateWithDuration:0.5 animations:^{
-            _alertCommitBuyUserDataView.alpha = 0.;
-        }completion:^(BOOL finished) {
-            [_alertCommitBuyUserDataView removeFromSuperview];
-            [_cover removeFromSuperview];
-        }];
-    }
-}
-- (void)commitClick
-{
-    if ([nameTextField.text isEqualToString:@""]) {
-        XWAlerLoginView *alert = [[XWAlerLoginView alloc] initWithTitle:@"请输入姓名"];
-        [alert show];
-        return;
-    }else if ([phoneTextField.text isEqualToString:@""]) {
-        XWAlerLoginView *alert = [[XWAlerLoginView alloc] initWithTitle:@"请输入手机号"];
-        [alert show];
-        return;
-    }else if (phoneTextField.text.length != 11) {
-        XWAlerLoginView *alert = [[XWAlerLoginView alloc] initWithTitle:@"请输入正确手机号"];
-        [alert show];
-        return;
-    }else if ([wxTextField.text isEqualToString:@""]) {
-        XWAlerLoginView *alert = [[XWAlerLoginView alloc] initWithTitle:@"请输入微信号"];
-        [alert show];
-        return;
-    }else if ([cityTextField.text isEqualToString:@""]) {
-        XWAlerLoginView *alert = [[XWAlerLoginView alloc] initWithTitle:@"请输入所在城市"];
-        [alert show];
-        return;
-    }else if ([jobTextField.text isEqualToString:@""]) {
-        XWAlerLoginView *alert = [[XWAlerLoginView alloc] initWithTitle:@"请输入工作名称"];
-        [alert show];
-        return;
-    }
-    [NetWorkTool get_userInfoWithaccessToken:AvatarAccessToken name:nameTextField.text phone:phoneTextField.text wx_num:wxTextField.text city:cityTextField.text job:jobTextField.text sccess:^(NSDictionary *responseObject) {
-        if ([responseObject[status] intValue] == 1) {
-            XWAlerLoginView *alert = [[XWAlerLoginView alloc] initWithTitle:@"恭喜您，信息提交成功"];
-            [alert show];
-            
-            NSDictionary *userInfoDict = [CommonCode readFromUserD:@"dangqianUserInfo"];
-            [userInfoDict setValue:@"1" forKey:@"is_record"];
-            [CommonCode writeToUserD:userInfoDict andKey:@"dangqianUserInfo"];
-        }else{
-            XWAlerLoginView *alert = [[XWAlerLoginView alloc] initWithTitle:@"很抱歉，信息提交失败了"];
-            [alert show];
-        }
-    } failure:^(NSError *error) {
-        XWAlerLoginView *alert = [[XWAlerLoginView alloc] initWithTitle:@"网络错误"];
-        [alert show];
-    }];
-}
-- (void)show
-{
-    [self.navigationController.view addSubview:self.cover];
-    [self.navigationController.view addSubview:self.alertCommitBuyUserDataView];
-    
-    [UIView animateWithDuration:0.5 // 动画时长
-                     animations:^{
-                         _alertCommitBuyUserDataView.alpha = 1.;
-                     } completion:^(BOOL finished) {
-                     }];
-}
-
-#pragma mark - textfieldDelegate
-- (BOOL)textFieldShouldBeginEditing:(UITextField *)textField
-{
-    IQKeyboardManager *manager = [IQKeyboardManager sharedManager];
-    if ([textField isEqual:nameTextField]) {
-        [manager setKeyboardDistanceFromTextField:50 + 35*4];
-    }else if ([textField isEqual:phoneTextField]) {
-        [manager setKeyboardDistanceFromTextField:50 + 35*3];
-    }else if ([textField isEqual:wxTextField]) {
-        [manager setKeyboardDistanceFromTextField:50 + 35*2];
-    }else if ([textField isEqual:cityTextField]) {
-        [manager setKeyboardDistanceFromTextField:50 + 35];
-    }else if ([textField isEqual:jobTextField]) {
-        [manager setKeyboardDistanceFromTextField:50];
-    }
-    selectedTextField = textField;
-    
-    return YES;
-}
-- (void)textFieldDidBeginEditing:(UITextField *)textField
-{
-    IQKeyboardManager *manager = [IQKeyboardManager sharedManager];
-    if ([textField isEqual:nameTextField]) {
-        [manager setKeyboardDistanceFromTextField:50 + 35*4];
-    }else if ([textField isEqual:phoneTextField]) {
-        [manager setKeyboardDistanceFromTextField:50 + 35*3];
-    }else if ([textField isEqual:wxTextField]) {
-        [manager setKeyboardDistanceFromTextField:50 + 35*2];
-    }else if ([textField isEqual:cityTextField]) {
-        [manager setKeyboardDistanceFromTextField:50 + 35];
-    }else if ([textField isEqual:jobTextField]) {
-        [manager setKeyboardDistanceFromTextField:50];
-    }
-    selectedTextField = textField;
-}
-- (BOOL)textFieldShouldReturn:(UITextField *)textField
-{
-    if ([textField isEqual:jobTextField]) {
-        [textField resignFirstResponder];
-    }else{
-        if ([textField isEqual:nameTextField]) {
-            [phoneTextField becomeFirstResponder];
-        }else if ([textField isEqual:phoneTextField]) {
-            [wxTextField becomeFirstResponder];
-        }else if ([textField isEqual:wxTextField]) {
-            [cityTextField becomeFirstResponder];
-        }else if ([textField isEqual:cityTextField]) {
-            [jobTextField becomeFirstResponder];
-        }
-    }
-    return YES;
-}
+//- (UIView *)alertCommitBuyUserDataView
+//{
+//    if (_alertCommitBuyUserDataView == nil) {
+//        _alertCommitBuyUserDataView = [[UIView alloc] initWithFrame:CGRectMake((SCREEN_WIDTH - SCREEN_WIDTH * 0.7)*0.5, 0, SCREEN_WIDTH * 0.7, 0)];
+//        _alertCommitBuyUserDataView.backgroundColor = [UIColor whiteColor];
+//        _alertCommitBuyUserDataView.layer.cornerRadius = 5;
+//        _alertCommitBuyUserDataView.layer.borderWidth = 1;
+//        _alertCommitBuyUserDataView.layer.borderColor = [UIColor lightGrayColor].CGColor;
+//        
+//        UILabel *tipLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, _alertCommitBuyUserDataView.width, 40)];
+//        tipLabel.text = @"恭喜您，购买成功!";
+//        tipLabel.textColor = gMainColor;
+//        tipLabel.font = gFontMajor16;
+//        tipLabel.textAlignment = NSTextAlignmentCenter;
+//        [_alertCommitBuyUserDataView addSubview:tipLabel];
+//        
+//        UILabel *describeLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, CGRectGetMaxY(tipLabel.frame), _alertCommitBuyUserDataView.width, 40)];
+//        describeLabel.text = @"为了方便日后搭建学员与老师\n的社群,请您填写以下信息,谢谢！";
+//        describeLabel.textColor = [UIColor lightGrayColor];
+//        describeLabel.font = SCREEN_WIDTH == 375?gFontMain14:gFontMain12;
+//        describeLabel.numberOfLines = 0;
+//        describeLabel.textAlignment = NSTextAlignmentCenter;
+//        [_alertCommitBuyUserDataView addSubview:describeLabel];
+//        
+//        CGFloat height = 30;
+//        for (int i = 0; i<5; i++) {
+//            UIView *contentView = [[UIView alloc] initWithFrame:CGRectMake(0, CGRectGetMaxY(describeLabel.frame) + i * (height + 5), _alertCommitBuyUserDataView.width, height)];
+//            contentView.backgroundColor = [UIColor clearColor];
+//            [_alertCommitBuyUserDataView addSubview:contentView];
+//            
+//            UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(20,0,35, height)];
+//            label.textColor = HEXCOLOR(0x505050);
+//            label.font = gFontMain15;
+//            label.textAlignment = NSTextAlignmentRight;
+//            [contentView addSubview:label];
+//            
+//            UITextField *textField = [[UITextField alloc] init];
+//            textField.delegate = self;
+//            textField.backgroundColor = [UIColor clearColor];
+//            textField.font = gFontMain15;
+//            textField.returnKeyType = UIReturnKeyNext;
+//            textField.textColor = [UIColor blackColor];
+//            textField.tintColor = [UIColor lightGrayColor];
+//            textField.frame = CGRectMake(CGRectGetMaxX(label.frame) + 5, 0, _alertCommitBuyUserDataView.width - label.width - 45, height-1);
+//            [contentView addSubview:textField];
+//            
+//            UIView *devider = [[UIView alloc] initWithFrame:CGRectMake(textField.x,height - 1, textField.width, 1)];
+//            devider.backgroundColor = [UIColor lightGrayColor];
+//            [contentView addSubview:devider];
+//            
+//            if (i == 0) {
+//                label.text = @"姓名:";
+//                nameTextField = textField;
+//            }else if (i == 1) {
+//                label.text = @"电话:";
+//                phoneTextField = textField;
+//            }else if (i == 2) {
+//                label.text = @"微信:";
+//                wxTextField = textField;
+//            }else if (i == 3) {
+//                label.text = @"城市:";
+//                cityTextField = textField;
+//            }else if (i == 4) {
+//                label.text = @"工作:";
+//                textField.returnKeyType = UIReturnKeyDone;
+//                jobTextField = textField;
+//            }
+//        }
+//        
+//        UIButton *cancleBtn = [[UIButton alloc] initWithFrame:CGRectMake(0, CGRectGetMaxY(describeLabel.frame) + 5 *(height + 5), _alertCommitBuyUserDataView.width * 0.5 - 0.5, 44)];
+//        [cancleBtn setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+//        [cancleBtn setTitle:@"取消" forState:UIControlStateNormal];
+//        cancleBtn.titleLabel.font = gFontMain15;
+//        [cancleBtn addTarget:self action:@selector(cancelBtnClick:)];
+//        [_alertCommitBuyUserDataView addSubview:cancleBtn];
+//        
+//        UIView *devider = [[UIView alloc] initWithFrame:CGRectMake(_alertCommitBuyUserDataView.width * 0.5 - 0.5, cancleBtn.y + 10, 1, cancleBtn.height - 20)];
+//        devider.backgroundColor = [UIColor lightGrayColor];
+//        [_alertCommitBuyUserDataView addSubview:devider];
+//        
+//        UIButton *commitBtn = [[UIButton alloc] initWithFrame:CGRectMake(_alertCommitBuyUserDataView.width * 0.5 + 0.5, cancleBtn.y, _alertCommitBuyUserDataView.width * 0.5 - 0.5, 44)];
+//        [commitBtn setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+//        [commitBtn setTitle:@"提交" forState:UIControlStateNormal];
+//        commitBtn.titleLabel.font = gFontMain15;
+//        [commitBtn addTarget:self action:@selector(commitClick)];
+//        [_alertCommitBuyUserDataView addSubview:commitBtn];
+//        
+//        _alertCommitBuyUserDataView.height = CGRectGetMaxY(commitBtn.frame);
+//        _alertCommitBuyUserDataView.y = (SCREEN_HEIGHT - _alertCommitBuyUserDataView.height) * 0.5;
+//    }
+//    return _alertCommitBuyUserDataView;
+//}
+//- (UIButton *)cover
+//{
+//    if (_cover == nil) {
+//        _cover = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)];
+//        _cover.backgroundColor = [UIColor clearColor];
+//        [_cover addTarget:self action:@selector(cancelBtnClick:)];
+//    }
+//    return _cover;
+//}
+//- (void)cancelBtnClick:(UIButton *)button
+//{
+//    if ([button isEqual:_cover]) {
+//        [selectedTextField resignFirstResponder];
+//    }else{
+//        [UIView animateWithDuration:0.5 animations:^{
+//            _alertCommitBuyUserDataView.alpha = 0.;
+//        }completion:^(BOOL finished) {
+//            [_alertCommitBuyUserDataView removeFromSuperview];
+//            [_cover removeFromSuperview];
+//        }];
+//    }
+//}
+//- (void)commitClick
+//{
+//    if ([nameTextField.text isEqualToString:@""]) {
+//        XWAlerLoginView *alert = [[XWAlerLoginView alloc] initWithTitle:@"请输入姓名"];
+//        [alert show];
+//        return;
+//    }else if ([phoneTextField.text isEqualToString:@""]) {
+//        XWAlerLoginView *alert = [[XWAlerLoginView alloc] initWithTitle:@"请输入手机号"];
+//        [alert show];
+//        return;
+//    }else if ([wxTextField.text isEqualToString:@""]) {
+//        XWAlerLoginView *alert = [[XWAlerLoginView alloc] initWithTitle:@"请输入微信号"];
+//        [alert show];
+//        return;
+//    }else if ([cityTextField.text isEqualToString:@""]) {
+//        XWAlerLoginView *alert = [[XWAlerLoginView alloc] initWithTitle:@"请输入所在城市"];
+//        [alert show];
+//        return;
+//    }else if ([jobTextField.text isEqualToString:@""]) {
+//        XWAlerLoginView *alert = [[XWAlerLoginView alloc] initWithTitle:@"请输入工作名称"];
+//        [alert show];
+//        return;
+//    }
+//    [NetWorkTool get_userInfoWithaccessToken:AvatarAccessToken name:nameTextField.text phone:phoneTextField.text wx_num:wxTextField.text city:cityTextField.text job:jobTextField.text sccess:^(NSDictionary *responseObject) {
+//        if ([responseObject[status] intValue] == 1) {
+//            XWAlerLoginView *alert = [[XWAlerLoginView alloc] initWithTitle:@"恭喜您，信息提交成功"];
+//            [alert show];
+//            
+//            NSDictionary *userInfoDict = [CommonCode readFromUserD:@"dangqianUserInfo"];
+//            [userInfoDict setValue:@"1" forKey:@"is_record"];
+//            [CommonCode writeToUserD:userInfoDict andKey:@"dangqianUserInfo"];
+//            //退出提交
+//            [self cancelBtnClick:nil];
+//        }else{
+//            XWAlerLoginView *alert = [[XWAlerLoginView alloc] initWithTitle:responseObject[msg]];
+//            [alert show];
+//        }
+//    } failure:^(NSError *error) {
+//        RTLog(@"%@",error);
+//        XWAlerLoginView *alert = [[XWAlerLoginView alloc] initWithTitle:@"网络错误"];
+//        [alert show];
+//    }];
+//}
+//- (void)show
+//{
+//    [self.navigationController.view addSubview:self.cover];
+//    [self.navigationController.view addSubview:self.alertCommitBuyUserDataView];
+//    
+//    [UIView animateWithDuration:0.5 // 动画时长
+//                     animations:^{
+//                         _alertCommitBuyUserDataView.alpha = 1.;
+//                     } completion:^(BOOL finished) {
+//                     }];
+//}
+//
+//#pragma mark - textfieldDelegate
+//- (BOOL)textFieldShouldBeginEditing:(UITextField *)textField
+//{
+//    IQKeyboardManager *manager = [IQKeyboardManager sharedManager];
+//    if ([textField isEqual:nameTextField]) {
+//        [manager setKeyboardDistanceFromTextField:50 + 35*4];
+//    }else if ([textField isEqual:phoneTextField]) {
+//        [manager setKeyboardDistanceFromTextField:50 + 35*3];
+//    }else if ([textField isEqual:wxTextField]) {
+//        [manager setKeyboardDistanceFromTextField:50 + 35*2];
+//    }else if ([textField isEqual:cityTextField]) {
+//        [manager setKeyboardDistanceFromTextField:50 + 35];
+//    }else if ([textField isEqual:jobTextField]) {
+//        [manager setKeyboardDistanceFromTextField:50];
+//    }
+//    selectedTextField = textField;
+//    
+//    return YES;
+//}
+//- (void)textFieldDidBeginEditing:(UITextField *)textField
+//{
+//    IQKeyboardManager *manager = [IQKeyboardManager sharedManager];
+//    if ([textField isEqual:nameTextField]) {
+//        [manager setKeyboardDistanceFromTextField:50 + 35*4];
+//    }else if ([textField isEqual:phoneTextField]) {
+//        [manager setKeyboardDistanceFromTextField:50 + 35*3];
+//    }else if ([textField isEqual:wxTextField]) {
+//        [manager setKeyboardDistanceFromTextField:50 + 35*2];
+//    }else if ([textField isEqual:cityTextField]) {
+//        [manager setKeyboardDistanceFromTextField:50 + 35];
+//    }else if ([textField isEqual:jobTextField]) {
+//        [manager setKeyboardDistanceFromTextField:50];
+//    }
+//    selectedTextField = textField;
+//}
+//- (BOOL)textFieldShouldReturn:(UITextField *)textField
+//{
+//    if ([textField isEqual:jobTextField]) {
+//        [textField resignFirstResponder];
+//    }else{
+//        if ([textField isEqual:nameTextField]) {
+//            [phoneTextField becomeFirstResponder];
+//        }else if ([textField isEqual:phoneTextField]) {
+//            [wxTextField becomeFirstResponder];
+//        }else if ([textField isEqual:wxTextField]) {
+//            [cityTextField becomeFirstResponder];
+//        }else if ([textField isEqual:cityTextField]) {
+//            [jobTextField becomeFirstResponder];
+//        }
+//    }
+//    return YES;
+//}
 
 - (NSMutableArray *)dataSourceArr{
     if (!_dataSourceArr) {
@@ -1440,12 +1460,24 @@ static AVPlayer *_instancePlay = nil;
 //        title=@"PaySuccess1",msg=@"您已支付成功",sureTitle=@"确定";
 //        av= [AKAlertView alertView:title des:msg  type:AKAlertFaild effect:AKAlertEffectDrop sureTitle:sureTitle cancelTitle:cancelTitle];
         //填写学员信息弹窗
-        if ([[CommonCode readFromUserD:@"isLogin"]boolValue] == YES) {
-            NSDictionary *userInfoDict = [CommonCode readFromUserD:@"dangqianUserInfo"];
-            if ([userInfoDict[results][@"is_record"] intValue] == 0) {
-                [self show];
-            }
-        }
+//        if ([[CommonCode readFromUserD:@"isLogin"]boolValue] == YES) {
+//            NSDictionary *userInfoDict = [CommonCode readFromUserD:@"dangqianUserInfo"];
+//            if ([userInfoDict[results][@"is_record"] intValue] == 0) {
+//                [self show];
+//            }
+//        }
+        zhuboXiangQingVCNewController *faxianzhuboVC = [[zhuboXiangQingVCNewController alloc]init];
+        faxianzhuboVC.jiemuDescription = self.jiemuDescription;
+        faxianzhuboVC.jiemuFan_num = self.jiemuFan_num;
+        faxianzhuboVC.jiemuID = self.jiemuID;
+        faxianzhuboVC.jiemuImages = self.jiemuImages;
+        faxianzhuboVC.jiemuIs_fan = self.jiemuIs_fan;
+        faxianzhuboVC.jiemuMessage_num = self.jiemuMessage_num;
+        faxianzhuboVC.jiemuName = self.jiemuName;
+        faxianzhuboVC.isfaxian = YES;
+        faxianzhuboVC.isClass = YES;
+        faxianzhuboVC.listVC = self.listVC;
+        [self.navigationController pushViewController:faxianzhuboVC animated:YES];
         [[NSNotificationCenter defaultCenter] postNotificationName:ReloadClassList object:nil];
     }
     else if ([resultDic[@"resultStatus"]integerValue] == 8000){
@@ -1488,14 +1520,27 @@ static AVPlayer *_instancePlay = nil;
 //        title=@"PaySuccess1",msg=@"您已支付成功",sureTitle=@"确定";
 //        av= [AKAlertView alertView:title des:msg  type:AKAlertFaild effect:AKAlertEffectDrop sureTitle:sureTitle cancelTitle:cancelTitle];
         //填写学员信息弹窗
-        if ([[CommonCode readFromUserD:@"isLogin"]boolValue] == YES) {
-            NSDictionary *userInfoDict = [CommonCode readFromUserD:@"dangqianUserInfo"];
-            if ([userInfoDict[results][@"is_record"] intValue] == 0) {
-                [self show];
-            }
-        }
+//        if ([[CommonCode readFromUserD:@"isLogin"]boolValue] == YES) {
+//            NSDictionary *userInfoDict = [CommonCode readFromUserD:@"dangqianUserInfo"];
+//            if ([userInfoDict[results][@"is_record"] intValue] == 0) {
+//                [self show];
+//            }
+//        }
+        zhuboXiangQingVCNewController *faxianzhuboVC = [[zhuboXiangQingVCNewController alloc]init];
+        faxianzhuboVC.jiemuDescription = self.jiemuDescription;
+        faxianzhuboVC.jiemuFan_num = self.jiemuFan_num;
+        faxianzhuboVC.jiemuID = self.jiemuID;
+        faxianzhuboVC.jiemuImages = self.jiemuImages;
+        faxianzhuboVC.jiemuIs_fan = self.jiemuIs_fan;
+        faxianzhuboVC.jiemuMessage_num = self.jiemuMessage_num;
+        faxianzhuboVC.jiemuName = self.jiemuName;
+        faxianzhuboVC.isfaxian = YES;
+        faxianzhuboVC.isClass = YES;
+        faxianzhuboVC.listVC = self.listVC;
+        [self.navigationController pushViewController:faxianzhuboVC animated:YES];
+        
         [[NSNotificationCenter defaultCenter] postNotificationName:ReloadClassList object:nil];
-//        [self back];
+        
     }
     else if ([notification.object integerValue] == -2){
         title=@"PayFail1";msg=@"用户中途取消，请稍后再试";sureTitle=@"确定";

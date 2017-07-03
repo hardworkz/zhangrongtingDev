@@ -85,13 +85,20 @@
     DefineWeakSelf;
     APPDELEGATE.shouyeSkipToPlayingVC = ^ (NSString *pushNewsID){
         
-        if (ExIsClassVCPlay && Exact_id != nil && [ClassViewController shareInstance].isPlaying) {
+        if (ExIsClassVCPlay && Exact_id != nil) {
+                NSMutableDictionary *dict = [CommonCode readFromUserD:@"is_free_data"];
             ClassViewController *vc = [ClassViewController shareInstance];
+            vc.jiemuDescription = dict[@"jiemuDescription"];
+            vc.jiemuFan_num = dict[@"jiemuFan_num"];
+            vc.jiemuID = dict[@"jiemuID"];
+            vc.jiemuImages = dict[@"jiemuImages"];
+            vc.jiemuIs_fan = dict[@"jiemuIs_fan"];
+            vc.jiemuMessage_num = dict[@"jiemuMessage_num"];
+            vc.jiemuName = dict[@"jiemuName"];
             vc.act_id = Exact_id;
-            weakSelf.hidesBottomBarWhenPushed = YES;
+            vc.listVC = self;
             [weakSelf.navigationController.navigationBar setHidden:YES];
             [weakSelf.navigationController pushViewController:vc animated:YES];
-            weakSelf.hidesBottomBarWhenPushed = NO;
             return;
         }
         
@@ -142,6 +149,7 @@
     RegisterNotify(ReloadHomeSelectPageData, @selector(reloadSelectedList))
     RegisterNotify(@"loginSccess", @selector(reloadClassList))
     RegisterNotify(@"tuichuLoginSeccess", @selector(reloadClassList))
+    RegisterNotify(@"setMyunreadMessageTips", @selector(reloadClassList))
 }
 
 - (void)setUpView{
@@ -285,7 +293,7 @@
     }
     DefineWeakSelf;
     RTLog(@"loadNewsData:%ld",self.newsIndex);
-    [NetWorkTool getInformationListWithaccessToken:accessToken andPage:[NSString stringWithFormat:@"%ld",(long)self.newsIndex] andLimit:[NSString stringWithFormat:@"%ld",(long)self.newsPageSize] sccess:^(NSDictionary *responseObject) {
+    [NetWorkTool getInformationListWithaccessToken:AvatarAccessToken andPage:[NSString stringWithFormat:@"%ld",(long)self.newsIndex] andLimit:[NSString stringWithFormat:@"%ld",(long)self.newsPageSize] sccess:^(NSDictionary *responseObject) {
         if ([responseObject[@"results"] isKindOfClass:[NSArray class]]){
             if (weakSelf.newsIndex == 1) {
                 [weakSelf.newsInfoArr removeAllObjects];
@@ -328,7 +336,7 @@
         accessToken = [DSE encryptUseDES:ExdangqianUser];
     }
     DefineWeakSelf;
-    [NetWorkTool getColumnListWithaccessToken:accessToken andPage:[NSString stringWithFormat:@"%ld",(long)self.columnIndex] andLimit:[NSString stringWithFormat:@"%ld",(long)self.columnPageSize] sccess:^(NSDictionary *responseObject) {
+    [NetWorkTool getColumnListWithaccessToken:AvatarAccessToken andPage:[NSString stringWithFormat:@"%ld",(long)self.columnIndex] andLimit:[NSString stringWithFormat:@"%ld",(long)self.columnPageSize] sccess:^(NSDictionary *responseObject) {
         if ([responseObject[@"results"] isKindOfClass:[NSArray class]]){
             if (weakSelf.columnIndex == 1) {
                 [weakSelf.columnInfoArr removeAllObjects];
@@ -368,7 +376,7 @@
         accessToken = [DSE encryptUseDES:ExdangqianUser];
     }
     DefineWeakSelf;
-    [NetWorkTool getClassroomListWithaccessToken:accessToken andPage:[NSString stringWithFormat:@"%ld",(long)self.classIndex] andLimit:[NSString stringWithFormat:@"%ld",(long)self.classPageSize] sccess:^(NSDictionary *responseObject) {
+    [NetWorkTool getClassroomListWithaccessToken:AvatarAccessToken andPage:[NSString stringWithFormat:@"%ld",(long)self.classIndex] andLimit:[NSString stringWithFormat:@"%ld",(long)self.classPageSize] sccess:^(NSDictionary *responseObject) {
         if ([responseObject[@"results"] isKindOfClass:[NSArray class]]){
             if (weakSelf.classIndex == 1) {
                 [weakSelf.classroomInfoArr removeAllObjects];
@@ -1156,19 +1164,23 @@
             faxianzhuboVC.jiemuName = frameModel.model.name;
             faxianzhuboVC.isfaxian = YES;
             faxianzhuboVC.isClass = YES;
-            self.hidesBottomBarWhenPushed=YES;
             [self.navigationController pushViewController:faxianzhuboVC animated:YES];
-            self.hidesBottomBarWhenPushed=NO;
 
         }
         //跳转未购买课堂界面
         else if ([frameModel.model.is_free isEqualToString:@"0"]){
             ClassViewController *vc = [ClassViewController shareInstance];
+            vc.jiemuDescription = frameModel.model.Description;
+            vc.jiemuFan_num = frameModel.model.fan_num;
+            vc.jiemuID = frameModel.model.ID;
+            vc.jiemuImages = frameModel.model.images;
+            vc.jiemuIs_fan = frameModel.model.is_fan;
+            vc.jiemuMessage_num = frameModel.model.message_num;
+            vc.jiemuName = frameModel.model.name;
             vc.act_id = frameModel.model.ID;
-            self.hidesBottomBarWhenPushed = YES;
+            vc.listVC = self;
             [self.navigationController.navigationBar setHidden:YES];
             [self.navigationController pushViewController:vc animated:YES];
-            self.hidesBottomBarWhenPushed = NO;
         }
     }
 }

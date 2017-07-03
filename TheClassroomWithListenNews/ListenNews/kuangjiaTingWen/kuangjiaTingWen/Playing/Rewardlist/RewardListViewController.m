@@ -65,7 +65,7 @@
 //        //
 //    }];
     
-    [NetWorkTool getZan_boardWithaccessToken:accesstoken act_id:self.act_id sccess:^(NSDictionary *responseObject) {
+    [NetWorkTool getZan_boardWithaccessToken:AvatarAccessToken act_id:self.act_id sccess:^(NSDictionary *responseObject) {
         _myRank = [responseObject[@"results"][@"rank"] integerValue];
         if (_myRank == 0 ) {
             [self.myRanking setText:[NSString stringWithFormat:@"我的排名：暂无排名"]];

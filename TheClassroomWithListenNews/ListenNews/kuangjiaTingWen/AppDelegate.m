@@ -92,6 +92,7 @@
     }
     
     ExIsKaiShiBoFang = NO;
+    RTLog(@"%@",[CommonCode readFromUserD:@"isWhatLogin"]);
     if ([[CommonCode readFromUserD:@"isWhatLogin"] isEqualToString:@"QQ"]){
         ExdangqianUser = [CommonCode readFromUserD:@"user_login"];
     }
@@ -110,14 +111,15 @@
     //获取缓存的课堂ID，判断当前ID是否有值，没有值则不跳转课堂试听页面
     Exact_id = [CommonCode readFromUserD:@"Exact_id"];
     if (Exact_id != nil) {
-        ExIsClassVCPlay = YES;
+        ExIsClassVCPlay = [[CommonCode readFromUserD:@"ExIsClassVCPlay"] boolValue];
     }else{
         ExIsClassVCPlay = NO;
     }
+//    ExIsFree = [[CommonCode readFromUserD:@"ExIsFree"] boolValue];
     
     [self getAppVersion];
     //启动时获取已登录用户的信息、未读消息
-    if ([[CommonCode readFromUserD:@"isLogin"]boolValue] == YES) {
+    if ([[CommonCode readFromUserD:@"isLogin"] boolValue] == YES) {
         
         //获取个人经验值，听币，金币,签到情况以及个人信息，粉丝数，关注数
         [NetWorkTool getMyuserinfoWithaccessToken:AvatarAccessToken user_id:ExdangqianUserUid  sccess:^(NSDictionary *responseObject) {

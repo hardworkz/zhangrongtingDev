@@ -40,6 +40,7 @@ extern BOOL ExIsKaiShiBoFang;           //是否开始播放，一进入app是�
 extern NSString *ExDangQianUserAccessToken;
 //课堂模块全局保存数据
 extern BOOL ExIsClassVCPlay;//是否跳转播放课堂界面
+extern BOOL ExIsFree;
 extern NSString *Exact_id;//保存当前课堂ID
 //课堂试听播放器
 extern AVPlayer *ExclassPlayer;

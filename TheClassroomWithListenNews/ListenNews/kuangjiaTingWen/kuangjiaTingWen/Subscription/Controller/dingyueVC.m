@@ -61,13 +61,20 @@
     DefineWeakSelf;
     APPDELEGATE.dingyueSkipToPlayingVC = ^(NSString *pushNewsID){
         
-        if (ExIsClassVCPlay && Exact_id != nil&& [ClassViewController shareInstance].isPlaying) {
+        if (ExIsClassVCPlay && Exact_id != nil) {
+            NSMutableDictionary *dict = [CommonCode readFromUserD:@"is_free_data"];
             ClassViewController *vc = [ClassViewController shareInstance];
+            vc.jiemuDescription = dict[@"jiemuDescription"];
+            vc.jiemuFan_num = dict[@"jiemuFan_num"];
+            vc.jiemuID = dict[@"jiemuID"];
+            vc.jiemuImages = dict[@"jiemuImages"];
+            vc.jiemuIs_fan = dict[@"jiemuIs_fan"];
+            vc.jiemuMessage_num = dict[@"jiemuMessage_num"];
+            vc.jiemuName = dict[@"jiemuName"];
             vc.act_id = Exact_id;
-            weakSelf.hidesBottomBarWhenPushed = YES;
+            vc.listVC = self;
             [weakSelf.navigationController.navigationBar setHidden:YES];
             [weakSelf.navigationController pushViewController:vc animated:YES];
-            weakSelf.hidesBottomBarWhenPushed = NO;
             return;
         }
         if ([pushNewsID isEqualToString:@"NO"]) {

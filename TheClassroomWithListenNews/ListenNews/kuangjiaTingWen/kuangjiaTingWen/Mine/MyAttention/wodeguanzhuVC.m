@@ -347,6 +347,7 @@
             self.infoArr = [NSMutableArray array];
         }
         [weakSelf.tableView reloadData];
+        [self.tableView.mj_header endRefreshing];
         
     } failure:^(NSError *error) {
         NSLog(@"error = %@",error);

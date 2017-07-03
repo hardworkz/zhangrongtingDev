@@ -39,6 +39,7 @@ BOOL ExIsKaiShiBoFang = NO;           //是否开始播放，一进入app是默�
 NSString *ExDangQianUserAccessToken = nil;
 //课堂模块全局保存数据
 BOOL ExIsClassVCPlay = NO;//是否播放课堂界面播放
+BOOL ExIsFree = NO;//是否播放课堂界面播放
 NSString *Exact_id = nil;//保存当前课堂ID
 //课堂试听播放器
 AVPlayer *ExclassPlayer = nil;

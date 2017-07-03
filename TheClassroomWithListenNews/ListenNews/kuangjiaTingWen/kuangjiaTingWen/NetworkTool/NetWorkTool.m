@@ -219,6 +219,10 @@
     [mgr.requestSerializer didChangeValueForKey:@"timeoutInterval"];
     NSString *urlStr=[NSString stringWithFormat:@"%@",url];
     //发送请求
+    if ([[CommonCode readFromUserD:@"isLogin"]boolValue] == NO) {//拦截判断当前是否登录，未登录则清空accessToken
+        [param setValue:@"" forKey:@"accessToken"];
+    }
+    //发送请求
     [mgr GET:urlStr parameters:param success:^(AFHTTPRequestOperation *operation, NSDictionary* responseObject) {
         
         //数据保护
@@ -228,6 +232,10 @@
                 success([self changeType:responseObject]); //成功回调
             });
             
+            //判断是否token失效，失效则从新刷新token
+//            if ([responseObject[msg] containsString:@"解密异常"]) {
+//                [[NSNotificationCenter defaultCenter] postNotificationName:@"updateUserInfo" object:nil];
+//            }
             return ;
         }
     } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
@@ -254,12 +262,15 @@
     AFHTTPRequestOperationManager *mgr    = [AFHTTPRequestOperationManager manager];
     
     //修改afn 支持新浪返回的JSON结构
-    mgr.requestSerializer                 = [AFHTTPRequestSerializer serializer ];
+    mgr.requestSerializer                 = [AFHTTPRequestSerializer serializer];
     mgr.responseSerializer                = [AFJSONResponseSerializer serializer];
     [mgr.requestSerializer willChangeValueForKey:@"timeoutInterval"];
     mgr.requestSerializer.timeoutInterval = TimeOutSecond;
     [mgr.requestSerializer didChangeValueForKey:@"timeoutInterval"];
     NSString *urlStr=[NSString stringWithFormat:@"%@%@",APPHostURL,url];
+    if ([[CommonCode readFromUserD:@"isLogin"] boolValue] == NO && ![url isEqualToString:@"/interfaceNew/login"] && ![url isEqualToString:@"/interfaceNew/oauthLogin"]) {//拦截判断当前是否登录，未登录则清空accessToken
+        [param setValue:@"" forKey:@"accessToken"];
+    }
     //发送请求
     [mgr POST:urlStr parameters:param success:^(AFHTTPRequestOperation *operation, NSDictionary* responseObject) {
         //数据保护
@@ -268,7 +279,10 @@
             dispatch_async(dispatch_get_main_queue(), ^{
                 success([self changeType:responseObject]); //成功回调
              });
-            
+            //判断是否token失效，失效则从新刷新token
+//            if ([responseObject[msg] containsString:@"解密异常"]) {
+//                [[NSNotificationCenter defaultCenter] postNotificationName:@"updateUserInfo" object:nil];
+//            }
             return ;
         }
     } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
@@ -2167,6 +2181,6 @@ NSMutableDictionary *dic = [[NSMutableDictionary alloc]initWithCapacity:1
     dic[@"wx_num"] = wx_num;
     dic[@"city"] = city;
     dic[@"job"] = job;
-    [self asyncNetworkingUrl:@"/interfaceYou/get_info" andDict:dic success:success failure:failure];
+    [self asyncNetworkingUrl:@"/interfaceNew/get_info" andDict:dic success:success failure:failure];
 }
 @end

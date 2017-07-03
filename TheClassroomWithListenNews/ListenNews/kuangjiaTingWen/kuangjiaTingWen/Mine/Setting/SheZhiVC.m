@@ -345,7 +345,7 @@
 - (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex {
     
     if (buttonIndex == 0){
-        if ([[CommonCode readFromUserD:@"isWhatLogin"] isEqualToString:@"Weibo"]) {
+        if ([[CommonCode readFromUserD:@"isWhatLogin"] isEqualToString:@"WeiBo"]) {
             [WeiboSDK logOutWithToken:[CommonCode readFromUserD:@"wbtoken"] delegate:self withTag:@"user1"];
         }
         

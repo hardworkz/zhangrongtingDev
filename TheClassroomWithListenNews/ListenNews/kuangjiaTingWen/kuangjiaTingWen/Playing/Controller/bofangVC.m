@@ -256,6 +256,7 @@ static AVPlayer *_instancePlay = nil;
     [super viewWillAppear:animated];
     
     ExIsClassVCPlay = NO;
+    [CommonCode writeToUserD:@(NO) andKey:@"ExIsClassVCPlay"];
     [CommonCode writeToUserD:nil andKey:@"Exact_id"];
     
     IQKeyboardManager *manager = [IQKeyboardManager sharedManager];
@@ -1685,7 +1686,7 @@ static AVPlayer *_instancePlay = nil;
         accesstoken = nil;
     }
     //postDetail
-    [NetWorkTool getPostDetailWithaccessToken:accesstoken post_id:self.newsModel.jiemuID sccess:^(NSDictionary *responseObject) {
+    [NetWorkTool getPostDetailWithaccessToken:AvatarAccessToken post_id:self.newsModel.jiemuID sccess:^(NSDictionary *responseObject) {
         if ([responseObject[@"status"] intValue] == 1){
             newsDetailModel *detailModel = [newsDetailModel mj_objectWithKeyValues:responseObject[@"results"]];
             if (detailModel.reward.count != 0) {
@@ -2941,6 +2942,7 @@ static AVPlayer *_instancePlay = nil;
     else{
         RTLog(@"indexPath-------------%ld",indexPath.row);
         PlayVCCommentTableViewCell *cell = [PlayVCCommentTableViewCell cellWithTableView:tableView];
+        cell.hideZanBtn = YES;
         PlayVCCommentFrameModel *frameModel = self.pinglunArr[indexPath.row - 2];
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
         cell.frameModel = frameModel;

@@ -66,13 +66,20 @@ typedef void(^animateBlock)();
     DefineWeakSelf;
     APPDELEGATE.woSkipToPlayingVC = ^ (NSString *pushNewsID){
         
-        if (ExIsClassVCPlay && Exact_id != nil&& [ClassViewController shareInstance].isPlaying) {
+        if (ExIsClassVCPlay && Exact_id != nil) {
+            NSMutableDictionary *dict = [CommonCode readFromUserD:@"is_free_data"];
             ClassViewController *vc = [ClassViewController shareInstance];
+            vc.jiemuDescription = dict[@"jiemuDescription"];
+            vc.jiemuFan_num = dict[@"jiemuFan_num"];
+            vc.jiemuID = dict[@"jiemuID"];
+            vc.jiemuImages = dict[@"jiemuImages"];
+            vc.jiemuIs_fan = dict[@"jiemuIs_fan"];
+            vc.jiemuMessage_num = dict[@"jiemuMessage_num"];
+            vc.jiemuName = dict[@"jiemuName"];
             vc.act_id = Exact_id;
-            weakSelf.hidesBottomBarWhenPushed = YES;
+            vc.listVC = self;
             [weakSelf.navigationController.navigationBar setHidden:YES];
             [weakSelf.navigationController pushViewController:vc animated:YES];
-            weakSelf.hidesBottomBarWhenPushed = NO;
             return;
         }
         
@@ -227,7 +234,7 @@ typedef void(^animateBlock)();
                 ExdangqianUser = responseObject[@"results"][@"user_login"];
             }
 //            ExdangqianUser = responseObject[@"results"][@"user_login"];
-            [CommonCode writeToUserD:[NSString stringWithFormat:@"%@",ExdangqianUser] andKey:@"dangqianUser"];
+            [CommonCode writeToUserD:ExdangqianUser andKey:@"dangqianUser"];
             [CommonCode writeToUserD:responseObject[@"results"][@"id"] andKey:@"dangqianUserUid"];
             [CommonCode writeToUserD:@(YES) andKey:@"isLogin"];
             [CommonCode writeToUserD:responseObject andKey:@"dangqianUserInfo"];
@@ -537,7 +544,7 @@ typedef void(^animateBlock)();
         else{
             accesstoken = AvatarAccessToken;
         }
-        [NetWorkTool signInWithaccessToken:accesstoken sccess:^(NSDictionary *responseObject) {
+        [NetWorkTool signInWithaccessToken:AvatarAccessToken sccess:^(NSDictionary *responseObject) {
             if ([responseObject[@"msg"] isEqualToString:@"签到成功!"]) {
                 self.isSigned = YES;
                 [self.signInImageView setImage:[UIImage imageNamed:@"sign_ined"]];
@@ -569,9 +576,7 @@ typedef void(^animateBlock)();
     
     NSURL *url = [NSURL URLWithString:@"http://admin.tingwen.me/help/help_core.html"];
     SingleWebViewController *singleWebVC = [[SingleWebViewController alloc] initWithTitle:@"帮助中心" url:url];
-    self.hidesBottomBarWhenPushed=YES;
     [self.navigationController pushViewController:singleWebVC animated:YES];
-    self.hidesBottomBarWhenPushed=NO;
 }
 
 - (void)showUpAnimations{

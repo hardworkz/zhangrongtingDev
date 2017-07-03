@@ -24,8 +24,14 @@
     [super viewDidLoad];
     [self setUpData];
     [self setUpView];
+    
+    RegisterNotify(ReloadClassList, @selector(reloadClassList))
 }
-
+- (void)reloadClassList
+{
+    self.commentIndex = 1;
+    [self loadData];
+}
 - (void)viewWillAppear:(BOOL)animated{
     [super viewWillAppear:animated];
     [self.navigationController.navigationBar setHidden:YES];
@@ -104,7 +110,7 @@
     else{
         accessToken = [DSE encryptUseDES:ExdangqianUser];
     }
-    [NetWorkTool getClassroomListWithaccessToken:accessToken andPage:[NSString stringWithFormat:@"%ld",(long)self.commentIndex] andLimit:[NSString stringWithFormat:@"%ld",(long)self.commentPageSize] sccess:^(NSDictionary *responseObject) {
+    [NetWorkTool getClassroomListWithaccessToken:AvatarAccessToken andPage:[NSString stringWithFormat:@"%ld",(long)self.commentIndex] andLimit:[NSString stringWithFormat:@"%ld",(long)self.commentPageSize] sccess:^(NSDictionary *responseObject) {
         if ([responseObject[@"results"] isKindOfClass:[NSArray class]]){
             if (weakSelf.commentIndex == 1) {
                 [weakSelf.commentInfoArr removeAllObjects];
@@ -195,11 +201,17 @@
     }
     else if ([frameModel.model.is_free isEqualToString:@"0"]){
         ClassViewController *vc = [ClassViewController shareInstance];
+        vc.jiemuDescription = frameModel.model.Description;
+        vc.jiemuFan_num = frameModel.model.fan_num;
+        vc.jiemuID = frameModel.model.ID;
+        vc.jiemuImages = frameModel.model.images;
+        vc.jiemuIs_fan = frameModel.model.is_fan;
+        vc.jiemuMessage_num = frameModel.model.message_num;
+        vc.jiemuName = frameModel.model.name;
         vc.act_id = frameModel.model.ID;
-        self.hidesBottomBarWhenPushed = YES;
+        vc.listVC = self;
         [self.navigationController.navigationBar setHidden:YES];
         [self.navigationController pushViewController:vc animated:YES];
-        self.hidesBottomBarWhenPushed = YES;
     }
 }
 

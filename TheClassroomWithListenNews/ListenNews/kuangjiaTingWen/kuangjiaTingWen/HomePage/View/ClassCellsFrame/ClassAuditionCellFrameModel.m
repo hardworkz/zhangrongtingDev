@@ -40,7 +40,7 @@
             ClassAuditionListModel *model = _auditionArray[i];
             //试听标题
             CGRect titleLabF = CGRectMake(20.0 / 375 * IPHONE_W,CGRectGetMaxY(_topLineF) + ShitingContentHeight + 10.0 / 667 * SCREEN_HEIGHT, IPHONE_W - 70.0 / 375 * IPHONE_W, 40.0 / 667 * IPHONE_H);
-            CGRect playTestMpF = CGRectMake(SCREEN_WIDTH - 50.0 / 375 * SCREEN_WIDTH, titleLabF.origin.y, 40, 40);
+            CGRect playTestMpF = CGRectMake(SCREEN_WIDTH - 50.0 / 375 * SCREEN_WIDTH, titleLabF.origin.y, 50, 50);
             
             CGFloat titleHight = [self computeTextHeightWithString:model.s_title andWidth:(SCREEN_WIDTH- 60.0 / 375 * IPHONE_W) andFontSize:gFontMain14];
             ShitingContentHeight += titleHight + 20.0 / 667 * SCREEN_HEIGHT;

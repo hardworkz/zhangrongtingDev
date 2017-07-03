@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
-@interface fensiliebiaoVC : UIViewController
+@interface fensiliebiaoVC : RootViewController
 
 @property (strong, nonatomic)NSString *user_login;
 

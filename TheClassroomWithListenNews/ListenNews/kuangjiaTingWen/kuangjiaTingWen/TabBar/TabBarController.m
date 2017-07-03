@@ -28,15 +28,25 @@
 @end
 
 @implementation TabBarController
-
-- (void)viewWillAppear:(BOOL)animated{
-    [super viewWillAppear:animated];
-    for (UIView *childView in self.tabBar.subviews) {
-        if (![childView isKindOfClass:[TabbarView class]]) {
-            // 移除添加到TabbarView之外的视图
-            [childView removeFromSuperview];
+//防止使用 popToViewController 或者 popToRootViewControllerAnimated 导致自定义tabbar出现重复tabbarItem 移除系统自带按钮，使用该方法还能防止popToViewController调用后到导致按钮状态无法改变的奇怪问题，所以不放在viewWillAppear 方法调用
+-(void)viewWillLayoutSubviews{
+    [super viewWillLayoutSubviews];
+    for (UIView *child in self.tabBar.subviews) {
+        if ([child isKindOfClass:NSClassFromString(@"UITabBarButton")]) {
+            [child removeFromSuperview];
         }
     }
+}
+- (void)viewWillAppear:(BOOL)animated{
+    
+//    for (UIView *childView in self.tabBar.subviews) {
+//        if (![childView isKindOfClass:[TabbarView class]]) {
+//            // 移除添加到TabbarView之外的视图
+//            [childView removeFromSuperview];
+//        }
+//    }
+    [super viewWillAppear:animated];
+    
     //判断是否当前需要开始播放按钮动画
     if ([bofangVC shareInstance].isPlay || [ClassViewController shareInstance].isPlaying) {
         [[NSNotificationCenter defaultCenter] postNotificationName:@"startAnimate" object:nil];

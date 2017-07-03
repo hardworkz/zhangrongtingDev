@@ -24,12 +24,10 @@
     currentPage = 1;
     [self setUpView];
     [self setUpData];
-    
 }
 - (void)setUpView{
     
     [self setTitle:@"我的课堂"];
-    //    [self enableAutoBack];
     self.automaticallyAdjustsScrollViewInsets = NO;
     self.extendedLayoutIncludesOpaqueBars = NO;
     [self.view setBackgroundColor:[UIColor whiteColor]];
@@ -67,6 +65,8 @@
     UISwipeGestureRecognizer *rightSwipe = [[UISwipeGestureRecognizer alloc]initWithTarget:self action:@selector(back)];
     [rightSwipe setDirection:UISwipeGestureRecognizerDirectionRight];
     [self.tableView addGestureRecognizer:rightSwipe];
+    
+    
 }
 - (void)viewWillAppear:(BOOL)animated{
     [super viewWillAppear:animated];
@@ -88,12 +88,18 @@
                 currentPage ++;
             }
             [self.tableView reloadData];
+            if (dataArray.count != 0) {
+                self.tableView.mj_footer = [MJRefreshAutoNormalFooter footerWithRefreshingBlock:^{
+                    [self setUpData];
+                }];
+            }
             if (dataArray.count < 10) {
                 [self.tableView.mj_footer endRefreshingWithNoMoreData];
             }
         }else{
             if (self.dataSourceArr.count == 0) {
-                [self.tableView.mj_footer endRefreshingWithNoMoreData];
+//                [self.tableView.mj_footer endRefreshingWithNoMoreData];
+                self.tableView.mj_footer = nil;
                 [[BJNoDataView shareNoDataView] showCenterWithSuperView:self.tableView icon:nil iconClicked:^{
                     //图片点击回调
                     [self setUpData];//刷新数据
@@ -144,9 +150,7 @@
     faxianzhuboVC.jiemuName = frameModel.model.name;
     faxianzhuboVC.isfaxian = YES;
     faxianzhuboVC.isClass = YES;
-//    self.hidesBottomBarWhenPushed=YES;
     [self.navigationController pushViewController:faxianzhuboVC animated:YES];
-//    self.hidesBottomBarWhenPushed=NO;
 
 }
 #pragma mark - UITableViewDataSource

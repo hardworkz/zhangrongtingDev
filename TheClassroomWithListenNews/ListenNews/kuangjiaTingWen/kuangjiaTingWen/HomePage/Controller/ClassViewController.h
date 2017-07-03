@@ -10,6 +10,15 @@
 
 @class ClassModel;
 @interface ClassViewController : UIViewController
+
+@property(nonatomic)NSString *jiemuID;
+@property(nonatomic)NSString *jiemuName;
+@property(nonatomic)NSString *jiemuDescription;
+@property(nonatomic)NSString *jiemuImages;
+@property(nonatomic)NSString *jiemuFan_num;
+@property(nonatomic)NSString *jiemuMessage_num;
+@property(nonatomic)NSString *jiemuIs_fan;
+
 /**
  课堂ID
  */
@@ -30,6 +39,8 @@
  试听课堂是否播放
  */
 @property (assign, nonatomic) BOOL isPlaying;
+
+@property (strong, nonatomic) UIViewController *listVC;/**<外层列表页面控制器*/
 /**
  单例模式创建
 

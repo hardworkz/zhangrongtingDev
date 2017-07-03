@@ -1032,11 +1032,18 @@ didSelectLinkWithTransitInformation:(NSDictionary *)components {
         if ([responseObject[@"results"] isKindOfClass:[NSArray class]]){
             NSMutableArray *array = [FeedBackAndListenFriendModel mj_objectArrayWithKeyValuesArray:responseObject[@"results"]];
             [self.infoArr addObjectsFromArray:[self frameArrayWithDataArray:array]];
+            if (array.count < 10) {
+                [self.zhuyetableView.mj_footer endRefreshingWithNoMoreData];
+            }else{
+                [self.zhuyetableView.mj_footer endRefreshing];
+            }
+            [self.zhuyetableView reloadData];
+        }else
+        {
+            [self.zhuyetableView.mj_footer endRefreshingWithNoMoreData];
         }
-        [self.zhuyetableView reloadData];
-        [self.zhuyetableView.mj_footer endRefreshing];
     } failure:^(NSError *error) {
-        NSLog(@"error = %@",error);
+        RTLog(@"error = %@",error);
         [self.zhuyetableView.mj_footer endRefreshing];
     }];
 
@@ -1467,9 +1474,7 @@ didSelectLinkWithTransitInformation:(NSDictionary *)components {
     _isToEditInfomation = YES;
     NSURL *url = [NSURL URLWithString:@"http://admin.tingwen.me/help/help_core.html"];
     SingleWebViewController *singleWebVC = [[SingleWebViewController alloc] initWithTitle:@"帮助中心" url:url];
-    self.hidesBottomBarWhenPushed=YES;
     [self.navigationController pushViewController:singleWebVC animated:YES];
-    self.hidesBottomBarWhenPushed=YES;
     
 }
 
