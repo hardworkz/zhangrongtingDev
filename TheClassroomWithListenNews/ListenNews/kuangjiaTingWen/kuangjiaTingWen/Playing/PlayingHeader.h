@@ -8,7 +8,7 @@
 
 #ifndef PlayingHeader_h
 #define PlayingHeader_h
-
+#import "CustomPageViewTwo.h"
 #import "zhuboXiangQingVCNewController.h"
 
 #import "AppDelegate.h"

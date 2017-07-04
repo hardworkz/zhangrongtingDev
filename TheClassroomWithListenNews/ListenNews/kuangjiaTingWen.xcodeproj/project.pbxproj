@@ -127,6 +127,7 @@
 		69711B0D1EBC140C00A01728 /* openssl_wrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 69711B061EBC140C00A01728 /* openssl_wrapper.m */; };
 		69711B0E1EBC140C00A01728 /* RSADataSigner.m in Sources */ = {isa = PBXBuildFile; fileRef = 69711B081EBC140C00A01728 /* RSADataSigner.m */; };
 		69711B0F1EBC140C00A01728 /* RSADataVerifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 69711B0A1EBC140C00A01728 /* RSADataVerifier.m */; };
+		6978E3161F0B803300FEBED5 /* CustomPageViewTwo.m in Sources */ = {isa = PBXBuildFile; fileRef = 6978E3151F0B803300FEBED5 /* CustomPageViewTwo.m */; };
 		697CA2991EF3678F00F853AF /* zhuboXiangQingVCNewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 697CA2981EF3678F00F853AF /* zhuboXiangQingVCNewController.m */; };
 		697CA29F1EF384BE00F853AF /* UINavigationController+Cloudox.m in Sources */ = {isa = PBXBuildFile; fileRef = 697CA29C1EF384BE00F853AF /* UINavigationController+Cloudox.m */; };
 		697CA2A01EF384BE00F853AF /* UIViewController+Cloudox.m in Sources */ = {isa = PBXBuildFile; fileRef = 697CA29E1EF384BE00F853AF /* UIViewController+Cloudox.m */; };
@@ -729,6 +730,8 @@
 		69711B581EBC143500A01728 /* x509_vfy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = x509_vfy.h; path = openssl/x509_vfy.h; sourceTree = SOURCE_ROOT; };
 		69711B591EBC143500A01728 /* x509.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = x509.h; path = openssl/x509.h; sourceTree = SOURCE_ROOT; };
 		69711B5A1EBC143500A01728 /* x509v3.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = x509v3.h; path = openssl/x509v3.h; sourceTree = SOURCE_ROOT; };
+		6978E3141F0B803300FEBED5 /* CustomPageViewTwo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CustomPageViewTwo.h; sourceTree = "<group>"; };
+		6978E3151F0B803300FEBED5 /* CustomPageViewTwo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CustomPageViewTwo.m; sourceTree = "<group>"; };
 		697CA2971EF3678F00F853AF /* zhuboXiangQingVCNewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = zhuboXiangQingVCNewController.h; sourceTree = "<group>"; };
 		697CA2981EF3678F00F853AF /* zhuboXiangQingVCNewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = zhuboXiangQingVCNewController.m; sourceTree = "<group>"; };
 		697CA29B1EF384BE00F853AF /* UINavigationController+Cloudox.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UINavigationController+Cloudox.h"; sourceTree = "<group>"; };
@@ -1948,6 +1951,8 @@
 				69A0E3D11EF28F8B008A0A48 /* HHHorizontalPagingView.m */,
 				74023B7E1EF6AD61001782A2 /* CustomPageView.h */,
 				74023B7F1EF6AD61001782A2 /* CustomPageView.m */,
+				6978E3141F0B803300FEBED5 /* CustomPageViewTwo.h */,
+				6978E3151F0B803300FEBED5 /* CustomPageViewTwo.m */,
 			);
 			path = HHHorizontalPagingView;
 			sourceTree = "<group>";
@@ -3681,6 +3686,7 @@
 				691907A31D3F74B00012A42E /* SVIndefiniteAnimatedView.m in Sources */,
 				699165261EE0F933001914EB /* ClassCommentTableViewCell.m in Sources */,
 				699CA1F91EFA23B300670704 /* newsDetailModel.m in Sources */,
+				6978E3161F0B803300FEBED5 /* CustomPageViewTwo.m in Sources */,
 				69C713A01EC0740F00F2729E /* RewardListTableViewCell.m in Sources */,
 				69C713401EC0740F00F2729E /* faxianGengDuoVC.m in Sources */,
 				698907641F05FC9100DFF431 /* AFHTTPRequestOperation.m in Sources */,

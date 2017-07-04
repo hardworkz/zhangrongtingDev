@@ -1,14 +1,15 @@
 //
-//  CustomPageView.m
+//  CustomPageViewTwo.m
 //  kuangjiaTingWen
 //
-//  Created by zhangrongting on 2017/6/18.
+//  Created by 泡果 on 2017/7/4.
 //  Copyright © 2017年 zhimi. All rights reserved.
 //
 
-#import "CustomPageView.h"
+#import "CustomPageViewTwo.h"
 
-@interface CustomPageView ()<UIScrollViewDelegate>
+
+@interface CustomPageViewTwo ()<UIScrollViewDelegate>
 @property (nonatomic, weak)   UIView             *headerView;
 @property (nonatomic, strong) NSArray            *segmentButtons;
 @property (nonatomic, strong) NSArray            *contentViews;
@@ -32,7 +33,7 @@
 @property (assign, nonatomic) NSInteger currenPageIndex;
 @end
 
-@implementation CustomPageView
+@implementation CustomPageViewTwo
 
 static void *CustomPageViewScrollContext = &CustomPageViewScrollContext;
 static void *CustomPageViewPanContext    = &CustomPageViewPanContext;
@@ -40,13 +41,13 @@ static NSString *pagingCellIdentifier            = @"PagingCellIdentifier";
 static NSInteger pagingButtonTag                 = 1000;
 
 #pragma mark - CustomPageView
-+ (CustomPageView *)pagingViewWithHeaderView:(UIView *)headerView
-                                        headerHeight:(CGFloat)headerHeight
-                                      segmentButtons:(NSArray *)segmentButtons
-                                       segmentHeight:(CGFloat)segmentHeight
-                                        contentViews:(NSArray *)contentViews {
++ (CustomPageViewTwo *)pagingViewWithHeaderView:(UIView *)headerView
+                                headerHeight:(CGFloat)headerHeight
+                              segmentButtons:(NSArray *)segmentButtons
+                               segmentHeight:(CGFloat)segmentHeight
+                                contentViews:(NSArray *)contentViews {
     //创建容器view
-    CustomPageView *pagingView = [[CustomPageView alloc] initWithFrame:CGRectMake(0., 0., [[UIScreen mainScreen] bounds].size.width, [[UIScreen mainScreen] bounds].size.height)];
+    CustomPageViewTwo *pagingView = [[CustomPageViewTwo alloc] initWithFrame:CGRectMake(0., 0., [[UIScreen mainScreen] bounds].size.width, [[UIScreen mainScreen] bounds].size.height)];
     //创建滚动控件view
     pagingView.horizontalScrollView = [[UIScrollView alloc] initWithFrame:pagingView.bounds];
     pagingView.horizontalScrollView.backgroundColor                = [UIColor clearColor];
@@ -192,7 +193,7 @@ static NSInteger pagingButtonTag                 = 1000;
         }
         self.currentScrollView = self.contentViews[clickIndex];
         
-        [self adjustContentViewOffset];
+//        [self adjustContentViewOffset];
         
     }
     
@@ -256,7 +257,6 @@ static NSInteger pagingButtonTag                 = 1000;
         
         self.horizontalScrollView.scrollEnabled = YES;
         UIGestureRecognizerState state = [change[NSKeyValueChangeNewKey] integerValue];
-        //        RTLog(@"observeValueForKeyPath--state%ld",(long)state);
         //failed说明是点击事件
         if(state == UIGestureRecognizerStateFailed) {
             if(self.currentTouchButton) {
@@ -268,7 +268,8 @@ static NSInteger pagingButtonTag                 = 1000;
             self.currentTouchButton = nil;
         }
         
-    }else if (context == &CustomPageViewScrollContext) {
+    }
+    else if ([keyPath isEqualToString:NSStringFromSelector(@selector(contentOffset))]) {
         self.currentTouchView = nil;
         self.currentTouchButton = nil;
         
@@ -284,11 +285,12 @@ static NSInteger pagingButtonTag                 = 1000;
         CGFloat deltaY              = newOffsetY - oldOffsetY;
         
         CGFloat headerViewHeight    = self.headerViewHeight;
-        CGFloat headerDisplayHeight = self.headerViewHeight+self.headerOriginYConstraint.constant;
-        RTLog(@"%f",deltaY);
+        CGFloat headerDisplayHeight = headerViewHeight+self.headerOriginYConstraint.constant;
         if(deltaY >= 0 ) {//向上滚动
+            RTLog(@"%f---:%f---:%f",deltaY,oldOffsetY,newOffsetY);
             if(headerDisplayHeight - deltaY <= self.segmentTopSpace) {//判断是否到达悬停位置
                 self.headerOriginYConstraint.constant = -headerViewHeight+self.segmentTopSpace;
+//                RTLog(@"headerOriginYConstraint:%f-----headerDisplayHeight:%f------deltaY:%f------segmentTopSpace:%f",self.headerOriginYConstraint.constant,headerDisplayHeight,deltaY,self.segmentTopSpace);
             }else {//上拉约束
                 self.headerOriginYConstraint.constant -= deltaY;
             }
@@ -301,6 +303,7 @@ static NSInteger pagingButtonTag                 = 1000;
             
             if (headerDisplayHeight+self.segmentBarHeight <= -newOffsetY) {//下拉约束
                 self.headerOriginYConstraint.constant = -self.headerViewHeight-self.segmentBarHeight-self.currentScrollView.contentOffset.y;
+                //                RTLog(@"%f----%f----",self.headerOriginYConstraint.constant,self.currentScrollView.contentOffset.y);
             }
             
             if (self.headerOriginYConstraint.constant > 0 && self.magnifyTopConstraint) {
@@ -321,6 +324,7 @@ static NSInteger pagingButtonTag                 = 1000;
         [self.currentScrollView setContentOffset:CGPointMake(0, self.currentScrollView.contentOffset.y-headerViewDisplayHeight)];
     }
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0)), dispatch_get_main_queue(), ^{
+        RTLog(@"self.isSwitching = NO;");
         self.isSwitching = NO;
     });
 }
@@ -341,7 +345,27 @@ static NSInteger pagingButtonTag                 = 1000;
     }
 }
 #pragma mark - UIScrollViewDelegate //侧滑切换底部多个View
-
+float lastContentOffsetY;
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView
+{
+    if ([scrollView isEqual:self.currentScrollView]) {
+        CGFloat headerViewHeight    = self.headerViewHeight;
+        CGFloat headerDisplayHeight = self.headerViewHeight+self.headerOriginYConstraint.constant;
+        float deltaY = lastContentOffsetY - scrollView.contentOffset.y;
+        if (deltaY > 0) {//向上滚动
+            if (self.headerOriginYConstraint.constant == -headerViewHeight) {
+                
+            }else{
+                self.headerOriginYConstraint.constant -= deltaY;
+            }
+        }else{//向下滚动
+            if (headerDisplayHeight >= 0) {//下拉约束
+                self.headerOriginYConstraint.constant = -self.headerViewHeight-self.segmentBarHeight-self.currentScrollView.contentOffset.y;
+            }
+        }
+        lastContentOffsetY = scrollView.contentOffset.y;
+    }
+}
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
 {
     NSInteger currentPage = scrollView.contentOffset.x/[[UIScreen mainScreen] bounds].size.width;
@@ -370,6 +394,11 @@ static NSInteger pagingButtonTag                 = 1000;
         [v removeObserver:self forKeyPath:NSStringFromSelector(@selector(contentOffset)) context:&CustomPageViewScrollContext];
     }
 }
+/**
+ 设置按钮选中按钮方法
+ 
+ @param index 选中按钮index
+ */
 - (void)pagingViewDidSelectedIndex:(NSInteger)index
 {
     [self segmentButtonEvent:self.segmentButtons[index]];
