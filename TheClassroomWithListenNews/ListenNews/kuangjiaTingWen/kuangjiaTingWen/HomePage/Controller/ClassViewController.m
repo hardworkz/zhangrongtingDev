@@ -135,15 +135,17 @@ static AVPlayer *_instancePlay = nil;
         self.auditionnBtn.selected = NO;
     }
     //保存跳转已经购买课堂界面数据，tabbar中心按钮点击需要使用
-    NSMutableDictionary *dict = [NSMutableDictionary dictionary];
-    [dict setObject:self.jiemuID forKey:@"jiemuID"];
-    [dict setObject:self.jiemuName forKey:@"jiemuName"];
-    [dict setObject:self.jiemuImages forKey:@"jiemuImages"];
-    [dict setObject:self.jiemuDescription forKey:@"jiemuDescription"];
-    [dict setObject:self.jiemuFan_num forKey:@"jiemuFan_num"];
-    [dict setObject:self.jiemuIs_fan forKey:@"jiemuIs_fan"];
-    [dict setObject:self.jiemuMessage_num forKey:@"jiemuMessage_num"];
-    [CommonCode writeToUserD:dict andKey:@"is_free_data"];
+    if (self.jiemuID) {
+        NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+        [dict setObject:self.jiemuID forKey:@"jiemuID"];
+        [dict setObject:self.jiemuName forKey:@"jiemuName"];
+        [dict setObject:self.jiemuImages forKey:@"jiemuImages"];
+        [dict setObject:self.jiemuDescription forKey:@"jiemuDescription"];
+        [dict setObject:self.jiemuFan_num forKey:@"jiemuFan_num"];
+        [dict setObject:self.jiemuIs_fan forKey:@"jiemuIs_fan"];
+        [dict setObject:self.jiemuMessage_num forKey:@"jiemuMessage_num"];
+        [CommonCode writeToUserD:dict andKey:@"is_free_data"];
+    }
 }
 
 - (void)viewWillDisappear:(BOOL)animated{

@@ -349,12 +349,27 @@
                 [nav pushViewController:faxianzhuboVC animated:YES];
             }else{
                 ClassViewController *classVC = [ClassViewController shareInstance];
+                classVC.jiemuDescription = newArr[_curPage][@"description"];
+                classVC.jiemuFan_num = newArr[_curPage][@"fan_num"];
+                classVC.jiemuID = newArr[_curPage][@"url"];
+                classVC.jiemuImages = newArr[_curPage][@"images"];
+                classVC.jiemuIs_fan = newArr[_curPage][@"is_fan"];
+                classVC.jiemuMessage_num = newArr[_curPage][@"message_num"];
+                classVC.jiemuName = newArr[_curPage][@"name"];
+                classVC.act_id = newArr[_curPage][@"url"];
                 classVC.act_id = newArr[_curPage][@"url"];
                 [nav.navigationBar setHidden:YES];
                 [nav pushViewController:classVC animated:YES];
             }
         }else{
             ClassViewController *classVC = [ClassViewController shareInstance];
+            classVC.jiemuDescription = newArr[_curPage][@"description"];
+            classVC.jiemuFan_num = newArr[_curPage][@"fan_num"];
+            classVC.jiemuID = newArr[_curPage][@"url"];
+            classVC.jiemuImages = newArr[_curPage][@"images"];
+            classVC.jiemuIs_fan = newArr[_curPage][@"is_fan"];
+            classVC.jiemuMessage_num = newArr[_curPage][@"message_num"];
+            classVC.jiemuName = newArr[_curPage][@"name"];
             classVC.act_id = newArr[_curPage][@"url"];
             [nav.navigationBar setHidden:YES];
             [nav pushViewController:classVC animated:YES];
