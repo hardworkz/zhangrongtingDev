@@ -27,12 +27,16 @@
 #import "UMMobClick/MobClick.h"
 #import "TabBarController.h"
 #import "SVProgressHUD.h"
+#import "GDTTrack.h"
 
 @interface AppDelegate ()<WeiboSDKDelegate,WXApiDelegate,QQApiInterfaceDelegate,MiPushSDKDelegate,UNUserNotificationCenterDelegate>
 
 @end
 
 @implementation AppDelegate
+
+@synthesize splash = _splash;
+
 + (AppDelegate *)delegate {
     return (AppDelegate *)[UIApplication sharedApplication].delegate;
 }
@@ -49,9 +53,39 @@
     
     self.window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
     self.window.backgroundColor = [UIColor whiteColor];
+    
+    //开屏广告初始化并展示代码
+    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)
+    {
+        GDTSplashAd *splashAd = [[GDTSplashAd alloc] initWithAppkey:@"1105344611" placementId:@"9040714184494018"];
+        splashAd.delegate = self;//设置代理1ez
+        //针对不同设备尺寸设置不同的默认图片，拉取广告等待时间会展示该默认图片。
+        if ([[UIScreen mainScreen] bounds].size.height >= 568.0f) {
+            splashAd.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"LaunchImage-1-568h"]];
+        } else {
+            splashAd.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"LaunchImage-1"]];
+        }
+        //跳过按钮位置
+        splashAd.skipButtonCenter = CGPointMake(0, 0);
+        //设置开屏拉取时长限制，若超时则不再展示广告
+        splashAd.fetchDelay = 3;
+        //［可选］拉取并展示全屏开屏广告
+        //[splashAd loadAdAndShowInWindow:self.window];
+        //设置开屏底部自定义LogoView，展示半屏开屏广告
+        _bottomView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, [[UIScreen mainScreen] bounds].size.width, 100)];
+        UIImageView *logo = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"flash_slogen"]];
+        [_bottomView addSubview:logo];
+        logo.center = _bottomView.center;
+        _bottomView.backgroundColor = [UIColor whiteColor];
+        
+        [splashAd loadAdAndShowInWindow:self.window withBottomView:_bottomView];
+        self.splash = splashAd;
+    }
+    
     self.window.rootViewController = [[TabBarController alloc] init];
     
     [self.window makeKeyAndVisible];
+    
     
     //监听网络变化
     [[SuNetworkMonitor monitor] startMonitorNetwork];
@@ -573,6 +607,7 @@
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {
     // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
+    [GDTTrack activateApp];
 }
 
 - (void)applicationWillTerminate:(UIApplication *)application {
@@ -940,5 +975,43 @@ fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler{
         //
     }];
 }
+#pragma mark - 广告代理
+/**
+ 广告位展示代理方法
+ */
+-(void)splashAdSuccessPresentScreen:(GDTSplashAd *)splashAd
+{
+    NSLog(@"%s",__FUNCTION__);
+}
 
+-(void)splashAdFailToPresent:(GDTSplashAd *)splashAd withError:(NSError *)error
+{
+    NSLog(@"%s%@",__FUNCTION__,error);
+}
+-(void)splashAdApplicationWillEnterBackground:(GDTSplashAd *)splashAd
+{
+    NSLog(@"%s",__FUNCTION__);
+}
+-(void)splashAdClicked:(GDTSplashAd *)splashAd
+{
+    NSLog(@"%s",__FUNCTION__);
+}
+
+- (void)splashAdWillClosed:(GDTSplashAd *)splashAd
+{
+    NSLog(@"%s",__FUNCTION__);
+}
+-(void)splashAdClosed:(GDTSplashAd *)splashAd
+{
+    NSLog(@"%s",__FUNCTION__);
+    _splash = nil;
+}
+-(void)splashAdWillPresentFullScreenModal:(GDTSplashAd *)splashAd
+{
+    NSLog(@"%s",__FUNCTION__);
+}
+-(void)splashAdDidDismissFullScreenModal:(GDTSplashAd *)splashAd
+{
+    NSLog(@"%s",__FUNCTION__);
+}
 @end

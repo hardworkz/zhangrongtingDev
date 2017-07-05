@@ -8,6 +8,7 @@
 
 #import <UIKit/UIKit.h>
 #import "Reachability.h"
+#import "GDTSplashAd.h"
 
 typedef void (^SkipToPlayingVCBlock)(NSString *) ;
 typedef void (^WeibodidReceiveResponse)(NSDictionary *);
@@ -19,7 +20,7 @@ typedef void (^WechatdidReceiveCode)(NSString *);
 
 @end
 
-@interface AppDelegate : UIResponder <UIApplicationDelegate>
+@interface AppDelegate : UIResponder <UIApplicationDelegate,GDTSplashAdDelegate>
 
 @property (strong, nonatomic) UIWindow *window;
 
@@ -42,6 +43,12 @@ typedef void (^WechatdidReceiveCode)(NSString *);
  * 网络状态
  */
 @property (nonatomic, assign) NetworkStatus networkStatus;
+
+/**
+ 启动页广告展示对象，底部view
+ */
+@property (retain, nonatomic) GDTSplashAd *splash;
+@property (retain, nonatomic) UIView *bottomView;
 /*
  * 获取app代理
  */

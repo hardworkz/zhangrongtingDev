@@ -150,6 +150,7 @@
 		6989076C1F05FC9100DFF431 /* AFURLSessionManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 6989075E1F05FC9000DFF431 /* AFURLSessionManager.m */; };
 		6989076E1F05FC9100DFF431 /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = 698907631F05FC9100DFF431 /* Reachability.m */; };
 		698CBDAA1ECE7C7200040108 /* Foundation+Log.m in Sources */ = {isa = PBXBuildFile; fileRef = 698CBDA91ECE7C7200040108 /* Foundation+Log.m */; };
+		698E60CF1F0CD60C006D7EC0 /* libGDTMobSDK.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 698E60CE1F0CD60C006D7EC0 /* libGDTMobSDK.a */; };
 		6991651C1EE0F83A001914EB /* ClassContentTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 6991651B1EE0F83A001914EB /* ClassContentTableViewCell.m */; };
 		6991651F1EE0F863001914EB /* ClassImageViewTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 6991651E1EE0F863001914EB /* ClassImageViewTableViewCell.m */; };
 		699165221EE0F891001914EB /* ClassAuditionTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 699165211EE0F891001914EB /* ClassAuditionTableViewCell.m */; };
@@ -770,6 +771,12 @@
 		698907621F05FC9100DFF431 /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Reachability.h; sourceTree = "<group>"; };
 		698907631F05FC9100DFF431 /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Reachability.m; sourceTree = "<group>"; };
 		698CBDA91ECE7C7200040108 /* Foundation+Log.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "Foundation+Log.m"; sourceTree = "<group>"; };
+		698E60C91F0CD60C006D7EC0 /* GDTMobBannerView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GDTMobBannerView.h; sourceTree = "<group>"; };
+		698E60CA1F0CD60C006D7EC0 /* GDTMobInterstitial.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GDTMobInterstitial.h; sourceTree = "<group>"; };
+		698E60CB1F0CD60C006D7EC0 /* GDTNativeAd.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GDTNativeAd.h; sourceTree = "<group>"; };
+		698E60CC1F0CD60C006D7EC0 /* GDTSplashAd.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GDTSplashAd.h; sourceTree = "<group>"; };
+		698E60CD1F0CD60C006D7EC0 /* GDTTrack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GDTTrack.h; sourceTree = "<group>"; };
+		698E60CE1F0CD60C006D7EC0 /* libGDTMobSDK.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libGDTMobSDK.a; sourceTree = "<group>"; };
 		6991651A1EE0F83A001914EB /* ClassContentTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ClassContentTableViewCell.h; sourceTree = "<group>"; };
 		6991651B1EE0F83A001914EB /* ClassContentTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ClassContentTableViewCell.m; sourceTree = "<group>"; };
 		6991651D1EE0F863001914EB /* ClassImageViewTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ClassImageViewTableViewCell.h; sourceTree = "<group>"; };
@@ -1314,6 +1321,7 @@
 				6968EF6E1D66CE2C001590D7 /* UITableView_FDTemplateLayoutCell.framework in Frameworks */,
 				6968EF6F1D66CE2C001590D7 /* UIView_FDCollapsibleConstraints.framework in Frameworks */,
 				695CAD061EC31AE100FED470 /* libSocialQQ.a in Frameworks */,
+				698E60CF1F0CD60C006D7EC0 /* libGDTMobSDK.a in Frameworks */,
 				E9FC0F581E78EC6D008A36AE /* TencentOpenAPI.framework in Frameworks */,
 				6968EF701D66CE2C001590D7 /* UIView_Positioning.framework in Frameworks */,
 				E9FC0F621E78EC6D008A36AE /* UMSocialCore.framework in Frameworks */,
@@ -1364,6 +1372,7 @@
 		6300DB141D05647F00B82C42 /* External */ = {
 			isa = PBXGroup;
 			children = (
+				698E60C81F0CD60C006D7EC0 /* GDTMobSDKlibs */,
 				6989074B1F05FC9000DFF431 /* AFNetworking */,
 				69DB00481EFB9E8400048B8E /* SDWebImage */,
 				697E3B321EF8EB9500D5151D /* BJNoDataView */,
@@ -1890,6 +1899,19 @@
 				698907631F05FC9100DFF431 /* Reachability.m */,
 			);
 			path = AFNetworking;
+			sourceTree = "<group>";
+		};
+		698E60C81F0CD60C006D7EC0 /* GDTMobSDKlibs */ = {
+			isa = PBXGroup;
+			children = (
+				698E60C91F0CD60C006D7EC0 /* GDTMobBannerView.h */,
+				698E60CA1F0CD60C006D7EC0 /* GDTMobInterstitial.h */,
+				698E60CB1F0CD60C006D7EC0 /* GDTNativeAd.h */,
+				698E60CC1F0CD60C006D7EC0 /* GDTSplashAd.h */,
+				698E60CD1F0CD60C006D7EC0 /* GDTTrack.h */,
+				698E60CE1F0CD60C006D7EC0 /* libGDTMobSDK.a */,
+			);
+			path = GDTMobSDKlibs;
 			sourceTree = "<group>";
 		};
 		699165191EE0F818001914EB /* ClassCells */ = {
@@ -4027,6 +4049,7 @@
 					"$(PROJECT_DIR)/kuangjiaTingWen/UMSocial/UMSocialSDK",
 					"$(PROJECT_DIR)/kuangjiaTingWen/UMSocial/SocialLibraries/Douban",
 					"$(PROJECT_DIR)/kuangjiaTingWen/UMSocial/SocialLibraries/Renren",
+					"$(PROJECT_DIR)/kuangjiaTingWen/GDTMobSDKlibs",
 				);
 				MiSDKRun = debug;
 				ONLY_ACTIVE_ARCH = YES;
@@ -4113,6 +4136,7 @@
 					"$(PROJECT_DIR)/kuangjiaTingWen/UMSocial/UMSocialSDK",
 					"$(PROJECT_DIR)/kuangjiaTingWen/UMSocial/SocialLibraries/Douban",
 					"$(PROJECT_DIR)/kuangjiaTingWen/UMSocial/SocialLibraries/Renren",
+					"$(PROJECT_DIR)/kuangjiaTingWen/GDTMobSDKlibs",
 				);
 				MiSDKRun = online;
 				ONLY_ACTIVE_ARCH = NO;
