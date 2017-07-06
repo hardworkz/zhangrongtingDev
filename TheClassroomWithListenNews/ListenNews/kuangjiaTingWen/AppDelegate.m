@@ -50,18 +50,19 @@
     }
 }
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+    
+    self.window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
     //开屏广告初始化并展示代码
-    GDTSplashAd *splashAd;
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)
     {
-        splashAd = [[GDTSplashAd alloc] initWithAppkey:GDTAppKey placementId:GDTPlacementId];
+        GDTSplashAd *splashAd = [[GDTSplashAd alloc] initWithAppkey:GDTAppKey placementId:GDTPlacementId];
         splashAd.delegate = self;//设置代理1ez
         //针对不同设备尺寸设置不同的默认图片，拉取广告等待时间会展示该默认图片。
-        if ([[UIScreen mainScreen] bounds].size.height >= 568.0f) {
-            splashAd.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"LaunchImage-1-568h"]];
-        } else {
-            splashAd.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"LaunchImage-1"]];
-        }
+        //        if ([[UIScreen mainScreen] bounds].size.height >= 568.0f) {
+        //            splashAd.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"LaunchImage-1-568h"]];
+        //        } else {
+        //            splashAd.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"LaunchImage-1"]];
+        //        }
         //跳过按钮位置
         //        splashAd.skipButtonCenter = CGPointMake(0, 0);
         //设置开屏拉取时长限制，若超时则不再展示广告
@@ -74,15 +75,15 @@
         [_bottomView addSubview:logo];
         logo.center = _bottomView.center;
         _bottomView.backgroundColor = [UIColor whiteColor];
-        
+        //添加开屏广告空间到窗口
+        [splashAd loadAdAndShowInWindow:self.window withBottomView:_bottomView];
         self.splash = splashAd;
     }
-    self.window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
+
     self.window.backgroundColor = [UIColor whiteColor];
     self.window.rootViewController = [[TabBarController alloc] init];
-    //添加开屏广告空间到窗口
-    [splashAd loadAdAndShowInWindow:self.window withBottomView:_bottomView];
     [self.window makeKeyAndVisible];
+    
     
     //监听网络变化
     [[SuNetworkMonitor monitor] startMonitorNetwork];

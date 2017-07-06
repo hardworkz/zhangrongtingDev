@@ -2623,10 +2623,9 @@ static AVPlayer *_instancePlay = nil;
         //标题
         self.titleLab.frame = CGRectMake(20.0 / 375 * IPHONE_W,CGRectGetMaxY(_seperatorLine.frame) + 20.0 / 667 * SCREEN_HEIGHT, IPHONE_W - 40.0 / 375 * IPHONE_W, 40.0 / 667 * IPHONE_H);
         _titleLab.text = self.newsModel.Titlejiemu;
-        _titleLab.numberOfLines = 0;
         _titleLab.font = [UIFont boldSystemFontOfSize:self.titleFontSize];
         CGFloat titleHight = [self computeTextHeightWithString:self.newsModel.Titlejiemu andWidth:(SCREEN_WIDTH-20) andFontSize:[UIFont systemFontOfSize:self.titleFontSize]];
-        [_titleLab setFrame:CGRectMake(20.0 / 375 * IPHONE_W, CGRectGetMaxY(_seperatorLine.frame) + 20.0 / 667 * SCREEN_HEIGHT, IPHONE_W - 40.0 / 375 * IPHONE_W, (titleHight + 20) / 667 * IPHONE_H)];
+        [_titleLab setFrame:CGRectMake(20.0 / 375 * IPHONE_W, CGRectGetMaxY(_seperatorLine.frame) + 20.0 / 667 * SCREEN_HEIGHT, IPHONE_W - 40.0 / 375 * IPHONE_W, (titleHight + 25) / 667 * IPHONE_H)];
         [xiangqingView addSubview:_titleLab];
         //日期
         self.riqiLab.frame = CGRectMake(10.0 / 375 * IPHONE_W, CGRectGetMaxY(_titleLab.frame) + 10.0 / 667 * IPHONE_H, IPHONE_W - 20.0 / 375 * IPHONE_W, 10.0 / 667 * IPHONE_H);
@@ -3157,10 +3156,10 @@ static AVPlayer *_instancePlay = nil;
 {
     if (_titleLab == nil) {
         _titleLab = [[UILabel alloc] init];
-        _titleLab.textAlignment = NSTextAlignmentCenter;
+        _titleLab.textAlignment = NSTextAlignmentLeft;
         _titleLab.textColor = nTextColorMain;
         _titleLab.lineBreakMode = NSLineBreakByWordWrapping;
-        [_titleLab setNumberOfLines:0];
+        _titleLab.numberOfLines = 0;
     }
     return _titleLab;
 }

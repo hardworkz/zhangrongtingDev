@@ -151,6 +151,7 @@
 		6989076E1F05FC9100DFF431 /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = 698907631F05FC9100DFF431 /* Reachability.m */; };
 		698CBDAA1ECE7C7200040108 /* Foundation+Log.m in Sources */ = {isa = PBXBuildFile; fileRef = 698CBDA91ECE7C7200040108 /* Foundation+Log.m */; };
 		698E60CF1F0CD60C006D7EC0 /* libGDTMobSDK.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 698E60CE1F0CD60C006D7EC0 /* libGDTMobSDK.a */; };
+		698F4A121F0E07C200A191A5 /* AdSupport.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 698F4A111F0E07C200A191A5 /* AdSupport.framework */; };
 		6991651C1EE0F83A001914EB /* ClassContentTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 6991651B1EE0F83A001914EB /* ClassContentTableViewCell.m */; };
 		6991651F1EE0F863001914EB /* ClassImageViewTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 6991651E1EE0F863001914EB /* ClassImageViewTableViewCell.m */; };
 		699165221EE0F891001914EB /* ClassAuditionTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 699165211EE0F891001914EB /* ClassAuditionTableViewCell.m */; };
@@ -777,6 +778,7 @@
 		698E60CC1F0CD60C006D7EC0 /* GDTSplashAd.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GDTSplashAd.h; sourceTree = "<group>"; };
 		698E60CD1F0CD60C006D7EC0 /* GDTTrack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GDTTrack.h; sourceTree = "<group>"; };
 		698E60CE1F0CD60C006D7EC0 /* libGDTMobSDK.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libGDTMobSDK.a; sourceTree = "<group>"; };
+		698F4A111F0E07C200A191A5 /* AdSupport.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AdSupport.framework; path = System/Library/Frameworks/AdSupport.framework; sourceTree = SDKROOT; };
 		6991651A1EE0F83A001914EB /* ClassContentTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ClassContentTableViewCell.h; sourceTree = "<group>"; };
 		6991651B1EE0F83A001914EB /* ClassContentTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ClassContentTableViewCell.m; sourceTree = "<group>"; };
 		6991651D1EE0F863001914EB /* ClassImageViewTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ClassImageViewTableViewCell.h; sourceTree = "<group>"; };
@@ -1288,13 +1290,14 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				698F4A121F0E07C200A191A5 /* AdSupport.framework in Frameworks */,
+				696272A71EC2F904003ACCD0 /* StoreKit.framework in Frameworks */,
 				695CAD041EC30FBE00FED470 /* UserNotifications.framework in Frameworks */,
 				695CAD021EC30FB300FED470 /* libxml2.tbd in Frameworks */,
 				695CAD001EC30FA600FED470 /* libresolv.tbd in Frameworks */,
 				E965A6B81E1F467700845E18 /* CoreMotion.framework in Frameworks */,
 				E965A6B61E1F465100845E18 /* Foundation.framework in Frameworks */,
 				E9FC0F631E78EC6D008A36AE /* UMSocialNetwork.framework in Frameworks */,
-				696272A71EC2F904003ACCD0 /* StoreKit.framework in Frameworks */,
 				E9FC0F5C1E78EC6D008A36AE /* libWeiboSDK.a in Frameworks */,
 				E965A6B41E1F40F800845E18 /* UIKit.framework in Frameworks */,
 				E9FC0F5A1E78EC6D008A36AE /* libSocialRenren.a in Frameworks */,
@@ -2879,6 +2882,7 @@
 		7A1612954C777F572787B5A2 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				698F4A111F0E07C200A191A5 /* AdSupport.framework */,
 				695CAD031EC30FBE00FED470 /* UserNotifications.framework */,
 				695CAD011EC30FB300FED470 /* libxml2.tbd */,
 				695CACFF1EC30FA600FED470 /* libresolv.tbd */,
