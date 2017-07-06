@@ -228,7 +228,9 @@ selector:_selector name:_name object:nil];
 #pragma mark 微信支付（听闻FM、听闻电台都是用的旧版的支付key）
 //微信支付key
 #define kAppId_WeiXin @"wx53ca9b29537db1d2"
-
+#pragma mark 腾讯广告联盟
+#define GDTAppKey @"1106193847"
+#define GDTPlacementId @"9040422398889422"
 /**
  *  详情页显示格式
  */

@@ -50,14 +50,11 @@
     }
 }
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    
-    self.window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
-    self.window.backgroundColor = [UIColor whiteColor];
-    
     //开屏广告初始化并展示代码
+    GDTSplashAd *splashAd;
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)
     {
-        GDTSplashAd *splashAd = [[GDTSplashAd alloc] initWithAppkey:@"1105344611" placementId:@"9040714184494018"];
+        splashAd = [[GDTSplashAd alloc] initWithAppkey:GDTAppKey placementId:GDTPlacementId];
         splashAd.delegate = self;//设置代理1ez
         //针对不同设备尺寸设置不同的默认图片，拉取广告等待时间会展示该默认图片。
         if ([[UIScreen mainScreen] bounds].size.height >= 568.0f) {
@@ -66,9 +63,9 @@
             splashAd.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"LaunchImage-1"]];
         }
         //跳过按钮位置
-        splashAd.skipButtonCenter = CGPointMake(0, 0);
+        //        splashAd.skipButtonCenter = CGPointMake(0, 0);
         //设置开屏拉取时长限制，若超时则不再展示广告
-        splashAd.fetchDelay = 3;
+        splashAd.fetchDelay = 5;
         //［可选］拉取并展示全屏开屏广告
         //[splashAd loadAdAndShowInWindow:self.window];
         //设置开屏底部自定义LogoView，展示半屏开屏广告
@@ -78,14 +75,14 @@
         logo.center = _bottomView.center;
         _bottomView.backgroundColor = [UIColor whiteColor];
         
-        [splashAd loadAdAndShowInWindow:self.window withBottomView:_bottomView];
         self.splash = splashAd;
     }
-    
+    self.window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
+    self.window.backgroundColor = [UIColor whiteColor];
     self.window.rootViewController = [[TabBarController alloc] init];
-    
+    //添加开屏广告空间到窗口
+    [splashAd loadAdAndShowInWindow:self.window withBottomView:_bottomView];
     [self.window makeKeyAndVisible];
-    
     
     //监听网络变化
     [[SuNetworkMonitor monitor] startMonitorNetwork];

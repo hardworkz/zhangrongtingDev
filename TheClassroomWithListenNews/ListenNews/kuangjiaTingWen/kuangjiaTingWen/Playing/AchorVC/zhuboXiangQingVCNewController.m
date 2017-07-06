@@ -2179,7 +2179,8 @@
             ZhuscrollView.scrollEnabled = YES;
         }
     }
-    
+    //关闭下拉弹簧效果
+    scrollView.bounces = (scrollView.contentOffset.y <= 0) ? NO : YES;
 }
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView {
     if (scrollView.tag == lastBtnTag - 7){
