@@ -205,7 +205,7 @@
         
         //分页tableView
         for (int i = 0; i < 4; i ++ ){
-            UITableView *tableView = [[UITableView alloc]initWithFrame:CGRectMake(IPHONE_W * i, 0, IPHONE_W , IPHONE_H - 24.0/ 667 * SCREEN_HEIGHT) style:UITableViewStyleGrouped];
+            CustomPageScrollView *tableView = [[CustomPageScrollView alloc] initWithFrame:CGRectMake(IPHONE_W * i, 0, IPHONE_W , IPHONE_H - 24.0/ 667 * SCREEN_HEIGHT) style:UITableViewStyleGrouped];
             tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
             tableView.backgroundColor = [UIColor whiteColor];
             
@@ -213,7 +213,7 @@
                 xinwenshuaxinTableView = tableView;
             }
             else if (i == 1){
-                tableView = [[UITableView alloc]initWithFrame:CGRectMake(IPHONE_W * i + 1, 0, IPHONE_W , IPHONE_H - 20.0/ 667 * SCREEN_HEIGHT) style:UITableViewStyleGrouped];
+                tableView = [[CustomPageScrollView alloc]initWithFrame:CGRectMake(IPHONE_W * i + 1, 0, IPHONE_W , IPHONE_H - 20.0/ 667 * SCREEN_HEIGHT) style:UITableViewStyleGrouped];
                 tableView.backgroundColor = [UIColor whiteColor];
                 fansWallTableView = tableView;
                 tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
@@ -226,7 +226,6 @@
                 tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
                 ImageTableView = tableView;
             }
-            //        tableView.bounces = NO;
             tableView.delegate = self;
             tableView.dataSource = self;
             tableView.tag = 3 + i; // 3：节目 4：粉丝榜 5：留言
@@ -1975,7 +1974,7 @@
     }
     else if ([tableView isEqual:ImageTableView]){
         AutoImageViewHeightFrameModel *frameModel = imageArr[indexPath.row];
-        RTLog(@"%f",frameModel.imageViewF.size.height);
+//        RTLog(@"%f",frameModel.imageViewF.size.height);
         return frameModel.imageViewF.size.height + 10;
     }
     else{
@@ -2179,8 +2178,11 @@
             ZhuscrollView.scrollEnabled = YES;
         }
     }
-    //关闭下拉弹簧效果
-    scrollView.bounces = (scrollView.contentOffset.y <= 0) ? NO : YES;
+}
+- (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate
+{
+    //适配子tableview滚动位置
+//    [self.pagingView autoContentOffsetY];
 }
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView {
     if (scrollView.tag == lastBtnTag - 7){
@@ -2228,18 +2230,8 @@
             }
         }
     }
-    //限制下拉刷新的调用频率，防止高度适配在调用频率过高的状态下错误
-    if(touchCount<1)
-    {
-        //不是频繁操作执行对应点击事件
-        [self.pagingView autoContentOffsetY];
-        touchCount++;
-        RTLog(@"autoContentOffsetY");
-    }
-    else
-    {
-        [self performSelector:@selector(timeSetting) withObject:nil afterDelay:0.5];//4秒后点击次数清零
-    }
+    //适配子tableview滚动位置
+//    [self.pagingView autoContentOffsetY];
 }
 -(void)timeSetting
 {

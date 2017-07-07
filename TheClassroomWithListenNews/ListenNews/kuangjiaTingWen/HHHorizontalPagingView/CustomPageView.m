@@ -7,6 +7,7 @@
 //
 
 #import "CustomPageView.h"
+#import "CustomPageScrollView.h"
 
 @interface CustomPageView ()<UIScrollViewDelegate>
 @property (nonatomic, weak)   UIView             *headerView;
@@ -25,6 +26,7 @@
 @property (nonatomic, assign) BOOL               isSwitching;
 @property (assign, nonatomic) BOOL scrollLeftOrRight;
 @property (nonatomic, strong) NSMutableArray     *segmentButtonConstraintArray;
+
 
 @property (nonatomic, strong) UIView             *currentTouchView;
 @property (nonatomic, strong) UIButton           *currentTouchButton;
@@ -100,7 +102,7 @@ static NSInteger pagingButtonTag                 = 1000;
 - (void)configureContentView {
     self.horizontalScrollView.contentSize = CGSizeMake(self.contentViews.count * SCREEN_WIDTH, 0);
     for(int i = 0 ;i<self.contentViews.count;i++) {
-        UIScrollView *v = self.contentViews[i];
+        CustomPageScrollView *v = self.contentViews[i];
         [v  setContentInset:UIEdgeInsetsMake(self.headerViewHeight+self.segmentBarHeight, 0., v.contentInset.bottom, 0.)];
         v.alwaysBounceVertical = YES;
         v.showsVerticalScrollIndicator = NO;
@@ -109,6 +111,11 @@ static NSInteger pagingButtonTag                 = 1000;
         [v addObserver:self forKeyPath:NSStringFromSelector(@selector(contentOffset)) options:NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld context:&CustomPageViewScrollContext];
         v.frame = CGRectMake(SCREEN_WIDTH * i, 0, SCREEN_WIDTH, v.frame.size.height);
         [self.horizontalScrollView addSubview:v];
+        
+        ContentOffsetYDataModel *model = [[ContentOffsetYDataModel alloc] init];
+        model.currentHeaderDisplayHeight = self.headerViewHeight;
+        model.contentOffsetY = v.contentOffset.y;
+        v.dataModel = model;
     }
     self.currentScrollView = [self.contentViews firstObject];
 }
@@ -192,7 +199,7 @@ static NSInteger pagingButtonTag                 = 1000;
         }
         self.currentScrollView = self.contentViews[clickIndex];
         
-        [self adjustContentViewOffset];
+//        [self adjustContentViewOffset];
         
     }
     
@@ -272,19 +279,40 @@ static NSInteger pagingButtonTag                 = 1000;
         self.currentTouchView = nil;
         self.currentTouchButton = nil;
         
+        //判断如果当前对象不属于子页面中的一个并且不是当前选中的子页面，不往下执行
+        BOOL isSubScrollView = NO;
+        for (UIScrollView *Object in self.contentViews) {
+            if ([object isEqual:Object] && [object isEqual:self.currentScrollView]) {
+                isSubScrollView = YES;
+                break;
+            }
+        }
+        if (!isSubScrollView) {
+            RTLog(@"isSubScrollView---return");
+            return;
+        }
+        //判断是否正在切换子页面
         if (self.isSwitching) {
-            RTLog(@"return");
+            RTLog(@"isSwitching---return");
             return;
         }
         CGFloat oldOffsetY          = [change[NSKeyValueChangeOldKey] CGPointValue].y;
         CGFloat newOffsetY          = [change[NSKeyValueChangeNewKey] CGPointValue].y;
-        if (fabs(oldOffsetY - newOffsetY)>100) {
-            oldOffsetY = newOffsetY;
-        }
+        
         CGFloat deltaY              = newOffsetY - oldOffsetY;
         
         CGFloat headerViewHeight    = self.headerViewHeight;
         CGFloat headerDisplayHeight = self.headerViewHeight+self.headerOriginYConstraint.constant;
+        
+        //适配未显示子页面和头部的距离
+        [self autoContentOffsetY];
+        
+        //保存当前子页面的滚动数据和头部变化高度
+        CustomPageScrollView *view = object;
+        view.dataModel.currentHeaderDisplayHeight = headerDisplayHeight;
+        view.dataModel.contentOffsetY = newOffsetY;
+        
+        
         RTLog(@"%f",deltaY);
         if(deltaY >= 0 ) {//向上滚动
             if(headerDisplayHeight - deltaY <= self.segmentTopSpace) {//判断是否到达悬停位置
@@ -318,7 +346,7 @@ static NSInteger pagingButtonTag                 = 1000;
     if(self.currentScrollView.contentOffset.y < -self.segmentBarHeight) {
         [self.currentScrollView setContentOffset:CGPointMake(0, -headerViewDisplayHeight-self.segmentBarHeight)];
     }else {
-        [self.currentScrollView setContentOffset:CGPointMake(0, self.currentScrollView.contentOffset.y-headerViewDisplayHeight)];
+        [self.currentScrollView setContentOffset:CGPointMake(0, self.currentScrollView.contentOffset.y)];
     }
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0)), dispatch_get_main_queue(), ^{
         self.isSwitching = NO;
@@ -329,13 +357,16 @@ static NSInteger pagingButtonTag                 = 1000;
  */
 - (void)autoContentOffsetY
 {
-    CGFloat headerViewDisplayHeight = self.headerViewHeight + self.headerView.frame.origin.y;
-    for (UIScrollView *v in self.contentViews) {
+    CGFloat headerViewDisplayHeight = self.headerViewHeight + self.headerView.y;
+    for (int i = 0;i<self.contentViews.count;i++) {
+        CustomPageScrollView *v = self.contentViews[i];
+        
         if (![v isEqual:self.currentScrollView]) {
-            if(v.contentOffset.y < -self.segmentBarHeight) {
+            if(v.contentOffset.y <= -self.segmentBarHeight) {
                 [v setContentOffset:CGPointMake(0, -headerViewDisplayHeight-self.segmentBarHeight)];
             }else {
-                [v setContentOffset:CGPointMake(0, v.contentOffset.y-headerViewDisplayHeight)];
+                [v setContentOffset:CGPointMake(0, v.contentOffset.y - (headerViewDisplayHeight - v.dataModel.currentHeaderDisplayHeight))];
+                v.dataModel.currentHeaderDisplayHeight = headerViewDisplayHeight;
             }
         }
     }

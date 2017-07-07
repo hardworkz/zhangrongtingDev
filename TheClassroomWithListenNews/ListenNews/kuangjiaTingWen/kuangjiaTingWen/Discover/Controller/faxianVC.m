@@ -140,6 +140,7 @@
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(gaibianyanse:) name:@"gaibianyanse" object:nil];
     
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(reloadClassList) name:ReloadClassList object:nil];
+    RegisterNotify(@"loginSccess", @selector(reloadClassList))
 }
 
 - (void)viewWillAppear:(BOOL)animated {

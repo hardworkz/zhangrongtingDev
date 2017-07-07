@@ -183,6 +183,8 @@
 		69A7BABA1ED4177C0094E0BA /* SuNetworkMonitor.m in Sources */ = {isa = PBXBuildFile; fileRef = 69A7BAB91ED4177C0094E0BA /* SuNetworkMonitor.m */; };
 		69AA54AC1EF75F3E003053DB /* AutoImageTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 69AA54A71EF75F3E003053DB /* AutoImageTableViewCell.m */; };
 		69AA54AD1EF75F3E003053DB /* AutoImageViewHeightFrameModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 69AA54A91EF75F3E003053DB /* AutoImageViewHeightFrameModel.m */; };
+		69C1603D1F0F3A0700CB92BE /* ContentOffsetYDataModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 69C1603C1F0F3A0700CB92BE /* ContentOffsetYDataModel.m */; };
+		69C160461F0F53CF00CB92BE /* CustomPageScrollView.m in Sources */ = {isa = PBXBuildFile; fileRef = 69C160451F0F53CF00CB92BE /* CustomPageScrollView.m */; };
 		69C713341EC0740F00F2729E /* CommonCode.m in Sources */ = {isa = PBXBuildFile; fileRef = 69C711E51EC0740E00F2729E /* CommonCode.m */; };
 		69C713351EC0740F00F2729E /* CommonEnums.m in Sources */ = {isa = PBXBuildFile; fileRef = 69C711E71EC0740E00F2729E /* CommonEnums.m */; };
 		69C713361EC0740F00F2729E /* ProjiectDownLoadManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 69C711EA1EC0740E00F2729E /* ProjiectDownLoadManager.m */; };
@@ -843,6 +845,10 @@
 		69AA54A71EF75F3E003053DB /* AutoImageTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AutoImageTableViewCell.m; sourceTree = "<group>"; };
 		69AA54A81EF75F3E003053DB /* AutoImageViewHeightFrameModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AutoImageViewHeightFrameModel.h; sourceTree = "<group>"; };
 		69AA54A91EF75F3E003053DB /* AutoImageViewHeightFrameModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AutoImageViewHeightFrameModel.m; sourceTree = "<group>"; };
+		69C1603B1F0F3A0700CB92BE /* ContentOffsetYDataModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ContentOffsetYDataModel.h; sourceTree = "<group>"; };
+		69C1603C1F0F3A0700CB92BE /* ContentOffsetYDataModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ContentOffsetYDataModel.m; sourceTree = "<group>"; };
+		69C160441F0F53CF00CB92BE /* CustomPageScrollView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CustomPageScrollView.h; sourceTree = "<group>"; };
+		69C160451F0F53CF00CB92BE /* CustomPageScrollView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CustomPageScrollView.m; sourceTree = "<group>"; };
 		69C711E41EC0740E00F2729E /* CommonCode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CommonCode.h; sourceTree = "<group>"; };
 		69C711E51EC0740E00F2729E /* CommonCode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CommonCode.m; sourceTree = "<group>"; };
 		69C711E61EC0740E00F2729E /* CommonEnums.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CommonEnums.h; sourceTree = "<group>"; };
@@ -1973,6 +1979,10 @@
 				69A0E3D11EF28F8B008A0A48 /* HHHorizontalPagingView.m */,
 				74023B7E1EF6AD61001782A2 /* CustomPageView.h */,
 				74023B7F1EF6AD61001782A2 /* CustomPageView.m */,
+				69C1603B1F0F3A0700CB92BE /* ContentOffsetYDataModel.h */,
+				69C1603C1F0F3A0700CB92BE /* ContentOffsetYDataModel.m */,
+				69C160441F0F53CF00CB92BE /* CustomPageScrollView.h */,
+				69C160451F0F53CF00CB92BE /* CustomPageScrollView.m */,
 			);
 			path = HHHorizontalPagingView;
 			sourceTree = "<group>";
@@ -3642,6 +3652,7 @@
 				695745A31D5C7384001022AD /* UILabel+Night.m in Sources */,
 				69C7133D1EC0740F00F2729E /* MultiImageView.m in Sources */,
 				698907671F05FC9100DFF431 /* AFNetworkReachabilityManager.m in Sources */,
+				69C1603D1F0F3A0700CB92BE /* ContentOffsetYDataModel.m in Sources */,
 				636B58A81D34D87600290681 /* IQUIView+Hierarchy.m in Sources */,
 				69919FC31ED2D17100E31757 /* UIImage+Extension.m in Sources */,
 				69C713801EC0740F00F2729E /* xiugaimimaVC.m in Sources */,
@@ -3829,6 +3840,7 @@
 				E91D53A91D93719A008B8564 /* MJRefreshAutoNormalFooter.m in Sources */,
 				6957459B1D5C7384001022AD /* UIButton+Night.m in Sources */,
 				69C713A21EC0740F00F2729E /* AKAlertView.m in Sources */,
+				69C160461F0F53CF00CB92BE /* CustomPageScrollView.m in Sources */,
 				69C7137C1EC0740F00F2729E /* PersonalUnreadViewController.m in Sources */,
 				697CA2A31EF3D2C600F853AF /* faxianModel.m in Sources */,
 				E91D53B01D93719A008B8564 /* MJRefreshStateHeader.m in Sources */,

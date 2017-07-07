@@ -28,6 +28,7 @@
 #import "PlayVCCommentTableViewCell.h"
 #import "AutoImageTableViewCell.h"
 #import "zhuboxiangqingNewVCPlayBtn.h"
+#import "CustomPageScrollView.h"
 
 #import "AKAlertView.h"
 #import "PinglundianzanCustomBtn.h"
