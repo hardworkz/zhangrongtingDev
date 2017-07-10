@@ -43,7 +43,6 @@
 #import "MJRefresh.h"
 #import "Masonry.h"
 #import "SuNetworkMonitor.h"
-#import "HHHorizontalPagingView.h"
 #import "CustomPageView.h"
 #import "UINavigationController+Cloudox.h"
 #import "UIViewController+Cloudox.h"

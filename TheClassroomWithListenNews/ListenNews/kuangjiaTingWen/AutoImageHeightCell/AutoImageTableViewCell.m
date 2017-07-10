@@ -15,7 +15,6 @@
 }
 @end
 @implementation AutoImageTableViewCell
-static const char * KeyTapGes = "KeyTapGes";
 + (NSString *)ID
 {
     return @"AutoImageTableViewCell";
