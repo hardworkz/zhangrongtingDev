@@ -52,38 +52,48 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     
     self.window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
-    //开屏广告初始化并展示代码
-    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)
-    {
-        GDTSplashAd *splashAd = [[GDTSplashAd alloc] initWithAppkey:GDTAppKey placementId:GDTPlacementId];
-        splashAd.delegate = self;//设置代理1ez
-        //针对不同设备尺寸设置不同的默认图片，拉取广告等待时间会展示该默认图片。
-        //        if ([[UIScreen mainScreen] bounds].size.height >= 568.0f) {
-        //            splashAd.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"LaunchImage-1-568h"]];
-        //        } else {
-        //            splashAd.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"LaunchImage-1"]];
-        //        }
-        //跳过按钮位置
-        //        splashAd.skipButtonCenter = CGPointMake(0, 0);
-        //设置开屏拉取时长限制，若超时则不再展示广告
-        splashAd.fetchDelay = 5;
-        //［可选］拉取并展示全屏开屏广告
-        //[splashAd loadAdAndShowInWindow:self.window];
-        //设置开屏底部自定义LogoView，展示半屏开屏广告
-        _bottomView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, [[UIScreen mainScreen] bounds].size.width, 100)];
-        UIImageView *logo = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"flash_slogen"]];
-        [_bottomView addSubview:logo];
-        logo.center = _bottomView.center;
-        _bottomView.backgroundColor = [UIColor whiteColor];
-        //添加开屏广告空间到窗口
-        [splashAd loadAdAndShowInWindow:self.window withBottomView:_bottomView];
-        self.splash = splashAd;
-    }
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        //开屏广告初始化并展示代码
+        GDTSplashAd *splashAd;
+        if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)
+        {
+            splashAd = [[GDTSplashAd alloc] initWithAppkey:GDTAppKey placementId:GDTPlacementId];
+            splashAd.delegate = self;//设置代理1ez
+            //针对不同设备尺寸设置不同的默认图片，拉取广告等待时间会展示该默认图片。
+            //        if ([[UIScreen mainScreen] bounds].size.height >= 568.0f) {
+            //            splashAd.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"LaunchImage-1-568h"]];
+            //        } else {
+            //            splashAd.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"LaunchImage-1"]];
+            //        }
+            //跳过按钮位置
+            //        splashAd.skipButtonCenter = CGPointMake(0, 0);
+            //设置开屏拉取时长限制，若超时则不再展示广告
+            splashAd.fetchDelay = 5;
+            //［可选］拉取并展示全屏开屏广告
+            //[splashAd loadAdAndShowInWindow:self.window];
+            //设置开屏底部自定义LogoView，展示半屏开屏广告
+            _bottomView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, [[UIScreen mainScreen] bounds].size.width, 100)];
+            UIImageView *logo = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"flash_slogen"]];
+            [_bottomView addSubview:logo];
+            logo.center = _bottomView.center;
+            _bottomView.backgroundColor = [UIColor whiteColor];
+            self.splash = splashAd;
+        }
 
+        
+        /* 使用GCD返回主线程 进行UI层面的赋值 */
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            //添加开屏广告空间到窗口
+            [splashAd loadAdAndShowInWindow:self.window withBottomView:_bottomView];
+        });
+        
+    });
+    
+    
     self.window.backgroundColor = [UIColor whiteColor];
     self.window.rootViewController = [[TabBarController alloc] init];
     [self.window makeKeyAndVisible];
-    
     
     //监听网络变化
     [[SuNetworkMonitor monitor] startMonitorNetwork];
@@ -150,6 +160,7 @@
 //    ExIsFree = [[CommonCode readFromUserD:@"ExIsFree"] boolValue];
     
     [self getAppVersion];
+    [self getVipLimitData];
     //启动时获取已登录用户的信息、未读消息
     if ([[CommonCode readFromUserD:@"isLogin"] boolValue] == YES) {
         
@@ -323,6 +334,22 @@
 
     return YES;
 }
+
+/**
+ 获取每日免费收听数以及当前系统时间
+ */
+- (void)getVipLimitData
+{
+    [NetWorkTool get_VipLimitDataWithSccess:^(NSDictionary *responseObject) {
+        RTLog(@"%@",responseObject);
+        if ([responseObject[status] intValue] == 1) {
+            [CommonCode writeToUserD:responseObject[results][@"date"] andKey:@"server_date"];
+            [CommonCode writeToUserD:responseObject[results][@"num"] andKey:@"limit_num"];
+        }
+    } failure:^(NSError *error) {
+        
+    }];
+}
 - (void)getAppVersion
 {
     //请求是否为内购的接口
@@ -361,24 +388,22 @@
         // 支付跳转支付宝钱包进行支付，处理支付结果
         [[AlipaySDK defaultService] processOrderWithPaymentResult:url standbyCallback:^(NSDictionary *resultDic) {
             NSLog(@"result = %@",resultDic);
-            if (APPDELEGATE.isClassPay) {
-                if ([CommonCode readFromUserD:orderNumber] != nil && [resultDic[@"resultStatus"] intValue] == 9000) {//上传订单号
-                    [NetWorkTool order_notifyWithaccessToken:AvatarAccessToken order_num:[CommonCode readFromUserD:@"orderNumber"] sccess:^(NSDictionary *responseObject) {
-                        if ([responseObject[@"status"] integerValue] == 1) {
-                            [CommonCode writeToUserD:nil andKey:@"orderNumber"];
-                        }
-                    } failure:^(NSError *error) {
-                        
-                    }];
-                }
-                [[NSNotificationCenter defaultCenter] postNotificationName:@"AliPayResults" object:resultDic];
-            }else{
-                if (APPDELEGATE.isReward) {//打赏
-                    [[NSNotificationCenter defaultCenter] postNotificationName:@"AliPayResults" object:resultDic];
-                }
-                else{//充值
-                    [[NSNotificationCenter defaultCenter] postNotificationName:@"RechargeAliPayResults" object:resultDic];
-                }
+            switch (_payType) {
+                case PayTypeClassPay:
+                    [[NSNotificationCenter defaultCenter] postNotificationName:AliPayResultsClass object:resultDic];
+                    break;
+                case PayTypeReward:
+                    [[NSNotificationCenter defaultCenter] postNotificationName:AliPayResultsReward object:resultDic];
+                    break;
+                case PayTypeRecharge:
+                    [[NSNotificationCenter defaultCenter] postNotificationName:AliPayResultsRecharge object:resultDic];
+                    break;
+                case PayTypeMembers:
+                    [[NSNotificationCenter defaultCenter] postNotificationName:AliPayResultsMembers object:resultDic];
+                    break;
+                    
+                default:
+                    break;
             }
         }];
         
@@ -423,24 +448,22 @@
     if ([url.host isEqualToString:@"safepay"]) {
         // 支付跳转支付宝钱包进行支付，处理支付结果
         [[AlipaySDK defaultService] processOrderWithPaymentResult:url standbyCallback:^(NSDictionary *resultDic) {
-            if (APPDELEGATE.isClassPay) {
-                if ([CommonCode readFromUserD:orderNumber] != nil && [resultDic[@"resultStatus"] intValue] == 9000) {//上传订单号
-                    [NetWorkTool order_notifyWithaccessToken:AvatarAccessToken order_num:[CommonCode readFromUserD:@"orderNumber"] sccess:^(NSDictionary *responseObject) {
-                        if ([responseObject[@"status"] integerValue] == 1) {
-                            [CommonCode writeToUserD:nil andKey:@"orderNumber"];
-                        }
-                    } failure:^(NSError *error) {
-                        
-                    }];
-                }
-                [[NSNotificationCenter defaultCenter] postNotificationName:@"AliPayResults" object:resultDic];
-            }else{
-                if (APPDELEGATE.isReward) {//打赏
-                    [[NSNotificationCenter defaultCenter] postNotificationName:@"AliPayResults" object:resultDic];
-                }
-                else{//充值
-                    [[NSNotificationCenter defaultCenter] postNotificationName:@"RechargeAliPayResults" object:resultDic];
-                }
+            switch (_payType) {
+                case PayTypeClassPay:
+                    [[NSNotificationCenter defaultCenter] postNotificationName:AliPayResultsClass object:resultDic];
+                    break;
+                case PayTypeReward:
+                    [[NSNotificationCenter defaultCenter] postNotificationName:AliPayResultsReward object:resultDic];
+                    break;
+                case PayTypeRecharge:
+                    [[NSNotificationCenter defaultCenter] postNotificationName:AliPayResultsRecharge object:resultDic];
+                    break;
+                case PayTypeMembers:
+                    [[NSNotificationCenter defaultCenter] postNotificationName:AliPayResultsMembers object:resultDic];
+                    break;
+                    
+                default:
+                    break;
             }
         }];
         
@@ -492,24 +515,22 @@
         if ([url.host isEqualToString:@"safepay"]) {
             // 支付跳转支付宝钱包进行支付，处理支付结果
             [[AlipaySDK defaultService] processOrderWithPaymentResult:url standbyCallback:^(NSDictionary *resultDic) {
-                if (APPDELEGATE.isClassPay) {
-                    if ([CommonCode readFromUserD:orderNumber] != nil && [resultDic[@"resultStatus"] intValue] == 9000) {//上传订单号
-                        [NetWorkTool order_notifyWithaccessToken:AvatarAccessToken order_num:[CommonCode readFromUserD:@"orderNumber"] sccess:^(NSDictionary *responseObject) {
-                            if ([responseObject[@"status"] integerValue] == 1) {
-                                [CommonCode writeToUserD:nil andKey:@"orderNumber"];
-                            }
-                        } failure:^(NSError *error) {
-                            
-                        }];
-                    }
-                    [[NSNotificationCenter defaultCenter] postNotificationName:@"AliPayResults" object:resultDic];
-                }else{
-                    if (APPDELEGATE.isReward) {//打赏
-                        [[NSNotificationCenter defaultCenter] postNotificationName:@"AliPayResults" object:resultDic];
-                    }
-                    else{//充值
-                        [[NSNotificationCenter defaultCenter] postNotificationName:@"RechargeAliPayResults" object:resultDic];
-                    }
+                switch (_payType) {
+                    case PayTypeClassPay:
+                        [[NSNotificationCenter defaultCenter] postNotificationName:AliPayResultsClass object:resultDic];
+                        break;
+                    case PayTypeReward:
+                        [[NSNotificationCenter defaultCenter] postNotificationName:AliPayResultsReward object:resultDic];
+                        break;
+                    case PayTypeRecharge:
+                        [[NSNotificationCenter defaultCenter] postNotificationName:AliPayResultsRecharge object:resultDic];
+                        break;
+                    case PayTypeMembers:
+                        [[NSNotificationCenter defaultCenter] postNotificationName:AliPayResultsMembers object:resultDic];
+                        break;
+                        
+                    default:
+                        break;
                 }
             }];
             
@@ -741,27 +762,24 @@
             }
                 break;
         }
-        if (APPDELEGATE.isClassPay) {
-            if ([CommonCode readFromUserD:orderNumber] != nil && resp.errCode == WXSuccess) {
-                [NetWorkTool order_notifyWithaccessToken:AvatarAccessToken order_num:[CommonCode readFromUserD:@"orderNumber"] sccess:^(NSDictionary *responseObject) {
-                    if ([responseObject[@"status"] integerValue] == 1) {
-                        [CommonCode writeToUserD:nil andKey:@"orderNumber"];
-                    }
-                } failure:^(NSError *error) {
-                    
-                }];
-            }
-            //通知支付结果
-            [[NSNotificationCenter defaultCenter] postNotificationName:@"WechatPayResults" object:@(resp.errCode)];
-        }else{
-            if (APPDELEGATE.isReward) {
-                [[NSNotificationCenter defaultCenter] postNotificationName:@"WechatPayResults" object:@(resp.errCode)];
-            }
-            else{
-                [[NSNotificationCenter defaultCenter] postNotificationName:@"RechargeWechatPayResults" object:@(resp.errCode)];
-            }
+        switch (_payType) {
+            case PayTypeClassPay:
+                //通知支付结果
+                [[NSNotificationCenter defaultCenter] postNotificationName:WechatPayResultsClass object:@(resp.errCode)];
+                break;
+            case PayTypeReward:
+                [[NSNotificationCenter defaultCenter] postNotificationName:WechatPayResultsReward object:@(resp.errCode)];
+                break;
+            case PayTypeRecharge:
+                [[NSNotificationCenter defaultCenter] postNotificationName:WechatPayResultsRecharge object:@(resp.errCode)];
+                break;
+            case PayTypeMembers:
+                [[NSNotificationCenter defaultCenter] postNotificationName:WechatPayResultsMembers object:@(resp.errCode)];
+                break;
+                
+            default:
+                break;
         }
-        
     }
     else if ([resp isKindOfClass:[SendAuthResp class]]){
         

@@ -136,6 +136,12 @@
 		697E3B3A1EF8EB9500D5151D /* no_data.png in Resources */ = {isa = PBXBuildFile; fileRef = 697E3B361EF8EB9500D5151D /* no_data.png */; };
 		697E3B3B1EF8EB9500D5151D /* no_data@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 697E3B371EF8EB9500D5151D /* no_data@2x.png */; };
 		697E3B3C1EF8EB9500D5151D /* no_data@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 697E3B381EF8EB9500D5151D /* no_data@3x.png */; };
+		6981094D1F1F3837000A1AD2 /* MyVipMenbersViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6981094C1F1F3837000A1AD2 /* MyVipMenbersViewController.m */; };
+		698109501F1F3C87000A1AD2 /* MyUserVipTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 6981094F1F1F3C87000A1AD2 /* MyUserVipTableViewCell.m */; };
+		698109531F1F4531000A1AD2 /* MyVipMonthTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 698109521F1F4531000A1AD2 /* MyVipMonthTableViewCell.m */; };
+		698109561F1F5049000A1AD2 /* MembersDataModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 698109551F1F5049000A1AD2 /* MembersDataModel.m */; };
+		698109591F1F5D59000A1AD2 /* MyVipSectionTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 698109581F1F5D59000A1AD2 /* MyVipSectionTableViewCell.m */; };
+		6981095C1F1F6414000A1AD2 /* MyVipPrivilegeTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 6981095B1F1F6414000A1AD2 /* MyVipPrivilegeTableViewCell.m */; };
 		6985B9311D7404EE0081BCBD /* iAppInfos.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6985B92F1D7404EE0081BCBD /* iAppInfos.framework */; };
 		6985B9321D7404EF0081BCBD /* SAMTextView.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6985B9301D7404EE0081BCBD /* SAMTextView.framework */; };
 		6985B9341D740F6A0081BCBD /* TTTAttributedLabel.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6985B9331D740F690081BCBD /* TTTAttributedLabel.framework */; };
@@ -748,6 +754,18 @@
 		697E3B361EF8EB9500D5151D /* no_data.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = no_data.png; sourceTree = "<group>"; };
 		697E3B371EF8EB9500D5151D /* no_data@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "no_data@2x.png"; sourceTree = "<group>"; };
 		697E3B381EF8EB9500D5151D /* no_data@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "no_data@3x.png"; sourceTree = "<group>"; };
+		6981094B1F1F3837000A1AD2 /* MyVipMenbersViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MyVipMenbersViewController.h; sourceTree = "<group>"; };
+		6981094C1F1F3837000A1AD2 /* MyVipMenbersViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MyVipMenbersViewController.m; sourceTree = "<group>"; };
+		6981094E1F1F3C87000A1AD2 /* MyUserVipTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MyUserVipTableViewCell.h; sourceTree = "<group>"; };
+		6981094F1F1F3C87000A1AD2 /* MyUserVipTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MyUserVipTableViewCell.m; sourceTree = "<group>"; };
+		698109511F1F4531000A1AD2 /* MyVipMonthTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MyVipMonthTableViewCell.h; sourceTree = "<group>"; };
+		698109521F1F4531000A1AD2 /* MyVipMonthTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MyVipMonthTableViewCell.m; sourceTree = "<group>"; };
+		698109541F1F5049000A1AD2 /* MembersDataModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MembersDataModel.h; sourceTree = "<group>"; };
+		698109551F1F5049000A1AD2 /* MembersDataModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MembersDataModel.m; sourceTree = "<group>"; };
+		698109571F1F5D59000A1AD2 /* MyVipSectionTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MyVipSectionTableViewCell.h; sourceTree = "<group>"; };
+		698109581F1F5D59000A1AD2 /* MyVipSectionTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MyVipSectionTableViewCell.m; sourceTree = "<group>"; };
+		6981095A1F1F6414000A1AD2 /* MyVipPrivilegeTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MyVipPrivilegeTableViewCell.h; sourceTree = "<group>"; };
+		6981095B1F1F6414000A1AD2 /* MyVipPrivilegeTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MyVipPrivilegeTableViewCell.m; sourceTree = "<group>"; };
 		6985B92F1D7404EE0081BCBD /* iAppInfos.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = iAppInfos.framework; path = "Pods/../build/Debug-iphoneos/iAppInfos/iAppInfos.framework"; sourceTree = "<group>"; };
 		6985B9301D7404EE0081BCBD /* SAMTextView.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SAMTextView.framework; path = "Pods/../build/Debug-iphoneos/SAMTextView/SAMTextView.framework"; sourceTree = "<group>"; };
 		6985B9331D740F690081BCBD /* TTTAttributedLabel.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = TTTAttributedLabel.framework; path = "Pods/../build/Debug-iphoneos/TTTAttributedLabel/TTTAttributedLabel.framework"; sourceTree = "<group>"; };
@@ -1879,6 +1897,49 @@
 			path = no_data;
 			sourceTree = "<group>";
 		};
+		698109471F1F3802000A1AD2 /* MyVipMembers */ = {
+			isa = PBXGroup;
+			children = (
+				698109481F1F3802000A1AD2 /* Controller */,
+				698109491F1F3802000A1AD2 /* Model */,
+				6981094A1F1F3802000A1AD2 /* View */,
+			);
+			path = MyVipMembers;
+			sourceTree = "<group>";
+		};
+		698109481F1F3802000A1AD2 /* Controller */ = {
+			isa = PBXGroup;
+			children = (
+				6981094B1F1F3837000A1AD2 /* MyVipMenbersViewController.h */,
+				6981094C1F1F3837000A1AD2 /* MyVipMenbersViewController.m */,
+			);
+			path = Controller;
+			sourceTree = "<group>";
+		};
+		698109491F1F3802000A1AD2 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				698109541F1F5049000A1AD2 /* MembersDataModel.h */,
+				698109551F1F5049000A1AD2 /* MembersDataModel.m */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		6981094A1F1F3802000A1AD2 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				6981094E1F1F3C87000A1AD2 /* MyUserVipTableViewCell.h */,
+				6981094F1F1F3C87000A1AD2 /* MyUserVipTableViewCell.m */,
+				698109511F1F4531000A1AD2 /* MyVipMonthTableViewCell.h */,
+				698109521F1F4531000A1AD2 /* MyVipMonthTableViewCell.m */,
+				698109571F1F5D59000A1AD2 /* MyVipSectionTableViewCell.h */,
+				698109581F1F5D59000A1AD2 /* MyVipSectionTableViewCell.m */,
+				6981095A1F1F6414000A1AD2 /* MyVipPrivilegeTableViewCell.h */,
+				6981095B1F1F6414000A1AD2 /* MyVipPrivilegeTableViewCell.m */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
 		6989074B1F05FC9000DFF431 /* AFNetworking */ = {
 			isa = PBXGroup;
 			children = (
@@ -2195,9 +2256,10 @@
 		69C7122A1EC0740E00F2729E /* Mine */ = {
 			isa = PBXGroup;
 			children = (
+				69C7122E1EC0740E00F2729E /* Controller */,
+				698109471F1F3802000A1AD2 /* MyVipMembers */,
 				695873161EF118A20011B174 /* MyClassroom */,
 				69C7122B1EC0740E00F2729E /* APPReference */,
-				69C7122E1EC0740E00F2729E /* Controller */,
 				69C712311EC0740E00F2729E /* FriendNews */,
 				69C712341EC0740E00F2729E /* HelpAndFeedback */,
 				69C712391EC0740E00F2729E /* ListeningFriends */,
@@ -3532,6 +3594,7 @@
 				69C7136E1EC0740F00F2729E /* DownloadNewCell.m in Sources */,
 				63B690B51D2F84150013961E /* SDBrowserImageView.m in Sources */,
 				69C713AE1EC0740F00F2729E /* dingyueVC.m in Sources */,
+				6981094D1F1F3837000A1AD2 /* MyVipMenbersViewController.m in Sources */,
 				6991652A1EE0FDF9001914EB /* ClassContentCellFrameModel.m in Sources */,
 				69C713B61EC0740F00F2729E /* NSDate+TKCategory.m in Sources */,
 				63B690B61D2F84150013961E /* SDPhotoBrowser.m in Sources */,
@@ -3549,6 +3612,7 @@
 				E956E03E1E66B9DB00444F06 /* IAPShare.m in Sources */,
 				69C713491EC0740F00F2729E /* lunboxiangqingVC.m in Sources */,
 				695745AC1D5C7384001022AD /* UITextField+Night.m in Sources */,
+				698109591F1F5D59000A1AD2 /* MyVipSectionTableViewCell.m in Sources */,
 				69C713BE1EC0740F00F2729E /* UIView+tap.m in Sources */,
 				E91D53A51D93719A008B8564 /* MJRefreshComponent.m in Sources */,
 				E91D53AD1D93719A008B8564 /* MJRefreshBackStateFooter.m in Sources */,
@@ -3719,6 +3783,7 @@
 				695745AA1D5C7384001022AD /* UITabBar+Night.m in Sources */,
 				69711B0D1EBC140C00A01728 /* openssl_wrapper.m in Sources */,
 				69C713BA1EC0740F00F2729E /* NSString+WPAttributedMarkup.m in Sources */,
+				698109561F1F5049000A1AD2 /* MembersDataModel.m in Sources */,
 				69C713591EC0740F00F2729E /* UserXieYIViewController.m in Sources */,
 				E91A53421E8E3455005D2F68 /* View+MASAdditions.m in Sources */,
 				69C7136A1EC0740F00F2729E /* DownloadViewController.m in Sources */,
@@ -3736,6 +3801,7 @@
 				E91D53A31D93719A008B8564 /* MJRefreshAutoFooter.m in Sources */,
 				634EA5071D139EC200108A51 /* TYTitlePageTabBar.m in Sources */,
 				69C713601EC0740F00F2729E /* GZ_Cell.m in Sources */,
+				698109501F1F3C87000A1AD2 /* MyUserVipTableViewCell.m in Sources */,
 				69C7137E1EC0740F00F2729E /* PersonalUnreadTableViewCell.m in Sources */,
 				698907681F05FC9100DFF431 /* AFSecurityPolicy.m in Sources */,
 				69C713541EC0740F00F2729E /* HelpCenterViewController.m in Sources */,
@@ -3744,6 +3810,7 @@
 				69C713B81EC0740F00F2729E /* NSMutableString+TagReplace.m in Sources */,
 				69C7135C1EC0740F00F2729E /* zhuceVC.m in Sources */,
 				69C7135E1EC0740F00F2729E /* HUProgressView.m in Sources */,
+				6981095C1F1F6414000A1AD2 /* MyVipPrivilegeTableViewCell.m in Sources */,
 				699165331EE0FE55001914EB /* ClassCommentCellFrameModel.m in Sources */,
 				69C713B91EC0740F00F2729E /* NSString+Check.m in Sources */,
 				636B58AF1D34D87600290681 /* IQTitleBarButtonItem.m in Sources */,
@@ -3792,6 +3859,7 @@
 				69C713BC1EC0740F00F2729E /* UIImage+compress.m in Sources */,
 				69C713831EC0740F00F2729E /* NewBlogPictureController.m in Sources */,
 				691907A61D3F74B00012A42E /* SVProgressHUD.m in Sources */,
+				698109531F1F4531000A1AD2 /* MyVipMonthTableViewCell.m in Sources */,
 				69C713821EC0740F00F2729E /* BlogViewController.m in Sources */,
 				69C713741EC0740F00F2729E /* BYGraphicsView.m in Sources */,
 				69C713951EC0740F00F2729E /* ZhuBoClass.m in Sources */,

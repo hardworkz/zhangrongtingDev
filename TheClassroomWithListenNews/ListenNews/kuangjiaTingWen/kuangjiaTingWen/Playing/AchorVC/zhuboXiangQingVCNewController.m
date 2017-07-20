@@ -315,14 +315,32 @@
                 }];
             }
         }else if (switchIndex == 4) {//点击下载跳转
-//            self.hidesBottomBarWhenPushed=YES;
-            [self.navigationController setNavigationBarHidden:NO animated:YES];
-            BatchDownloadTableTableViewController *vc = [BatchDownloadTableTableViewController new];
-            vc.downloadSource = @"1";
-            vc.programID = self.jiemuID;
-            vc.headTitleStr = [NSString stringWithFormat:@"【%@】节目批量下载",self.jiemuName ];
-            [self.navigationController pushViewController:vc animated:YES];
-//            self.hidesBottomBarWhenPushed=YES;
+            if ([[CommonCode readFromUserD:@"isLogin"]boolValue] == YES) {
+                NSDictionary *userInfoDict = [CommonCode readFromUserD:@"dangqianUserInfo"];
+                if ([userInfoDict[results][@"member_type"] intValue] == 0) {//非会员
+                    UIAlertController *qingshuruyonghuming = [UIAlertController alertControllerWithTitle:@"温馨提示" message:@"您还不是会员，无法使用批量下载功能，是否前往开通会员" preferredStyle:UIAlertControllerStyleAlert];
+                    [qingshuruyonghuming addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+                    }]];
+                    [qingshuruyonghuming addAction:[UIAlertAction actionWithTitle:@"前往开通会员" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+                        LoginVC *loginFriVC = [LoginVC new];
+                        LoginNavC *loginNavC = [[LoginNavC alloc]initWithRootViewController:loginFriVC];
+                        [loginNavC.navigationBar setBackgroundColor:[UIColor whiteColor]];
+                        loginNavC.navigationBar.tintColor = [UIColor blackColor];
+                        [self presentViewController:loginNavC animated:YES completion:nil];
+                    }]];
+                    
+                    [self presentViewController:qingshuruyonghuming animated:YES completion:nil];
+                }else{//会员
+                    [self.navigationController setNavigationBarHidden:NO animated:YES];
+                    BatchDownloadTableTableViewController *vc = [BatchDownloadTableTableViewController new];
+                    vc.downloadSource = @"1";
+                    vc.programID = self.jiemuID;
+                    vc.headTitleStr = [NSString stringWithFormat:@"【%@】节目批量下载",self.jiemuName ];
+                    [self.navigationController pushViewController:vc animated:YES];
+                }
+            }else{
+                [self loginFirst];
+            }
         }
         if (switchIndex != 4) {
             selectedSwitchIndex = switchIndex;
@@ -1561,6 +1579,7 @@
         }
         [xinwenshuaxinTableView reloadData];
     }
+    [bofangVC shareInstance].isClass = YES;
 }
 
 /**
@@ -2071,6 +2090,7 @@
             }
             [tableView reloadData];
         }
+        [bofangVC shareInstance].isClass = YES;
     }
     else if ([tableView isEqual:fansWallTableView]){
         NSMutableDictionary *components = self.rewardListArray[indexPath.row];

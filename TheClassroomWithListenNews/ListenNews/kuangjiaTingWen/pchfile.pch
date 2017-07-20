@@ -23,6 +23,7 @@
 #import "WXApi.h"
 #import <TencentOpenAPI/TencentOAuth.h>
 #import "WeiboSDK.h"
+#import <AlipaySDK/AlipaySDK.h>
 #import "XWAlerLoginView.h"
 #import "IQKeyboardManager.h"
 #import "UIViewController+AutoBack.h"
@@ -279,5 +280,17 @@ selector:_selector name:_name object:nil];
 //网络状态发生改变通知
 #define NETWORKSTATUSCHANGE @"NetworkStatusChange"
 
+//支付通知常量字符串
+static NSString *const AliPayResultsClass = @"AliPayResultsClass";
+static NSString *const WechatPayResultsClass = @"WechatPayResultsClass";
+
+static NSString *const AliPayResultsReward = @"AliPayResultsReward";
+static NSString *const WechatPayResultsReward = @"WechatPayResultsReward";
+
+static NSString *const AliPayResultsRecharge = @"AliPayResultsRecharge";
+static NSString *const WechatPayResultsRecharge = @"WechatPayResultsRecharge";
+
+static NSString *const AliPayResultsMembers = @"AliPayResultsMembers";
+static NSString *const WechatPayResultsMembers = @"WechatPayResultsMembers";
 
 #endif /* pchfile_pch */

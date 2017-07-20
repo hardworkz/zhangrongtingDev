@@ -11,7 +11,7 @@
 @implementation newsActModel
 + (void)load
 {
-    [PlayVCCommentModel mj_setupReplacedKeyFromPropertyName:^NSDictionary *{
+    [newsActModel mj_setupReplacedKeyFromPropertyName:^NSDictionary *{
         return @{@"act_id":@"id",@"Description":@"description"};
     }];
 }

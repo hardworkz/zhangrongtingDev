@@ -8,6 +8,6 @@
 
 #import <UIKit/UIKit.h>
 
-@interface TradingRecordViewController : UIViewController
+@interface TradingRecordViewController : RootViewController
 
 @end

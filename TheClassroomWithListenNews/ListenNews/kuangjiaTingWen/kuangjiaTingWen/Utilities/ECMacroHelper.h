@@ -9,7 +9,7 @@
 #ifndef ECMacroHelper_h
 #define ECMacroHelper_h
 
-#define DefineWeakSelf __weak __typeof(self) weakSelf = self
+#define DefineWeakSelf __weak __typeof(self) weakSelf = self;
 
 
 #pragma mark - UIColor

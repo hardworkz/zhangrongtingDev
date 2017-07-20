@@ -665,32 +665,37 @@
     else if(tableView == self.SouSuotableView){
         if ([self.SearchActResultsArrM count]) {
             if (indexPath.section == 0) {
-                NSDictionary *dic = [[NSDictionary alloc]initWithDictionary:self.SearchActResultsArrM[indexPath.row]];
-//                if ([dic[@"is_free"] isEqualToString:@"1"]) {
-                    zhuboXiangQingVCNewController *faxianzhuboVC = [[zhuboXiangQingVCNewController alloc]init];
-                    faxianzhuboVC.jiemuDescription = dic[@"description"];
-                    faxianzhuboVC.jiemuFan_num = dic[@"fan_num"];
-                    faxianzhuboVC.jiemuID = dic[@"id"];
-                    faxianzhuboVC.jiemuImages = dic[@"images"];
-                    faxianzhuboVC.jiemuIs_fan = dic[@"is_fan"];
-                    faxianzhuboVC.jiemuMessage_num = dic[@"message_num"];
-                    faxianzhuboVC.jiemuName = dic[@"name"];                    faxianzhuboVC.isfaxian = YES;
-                    faxianzhuboVC.isClass = NO;
-//                    self.hidesBottomBarWhenPushed=YES;
-                    [self.navigationController pushViewController:faxianzhuboVC animated:YES];
-//                    self.hidesBottomBarWhenPushed=NO;
-                
+                //TODO:搜索结果，课堂判断跳转
+//                NSDictionary *dic = [[NSDictionary alloc]initWithDictionary:self.SearchActResultsArrM[indexPath.row]];
+//                NSDictionary *userInfoDict = [CommonCode readFromUserD:@"dangqianUserInfo"];
+//                if ([dic[@"is_free"] isEqualToString:@"1"]||[userInfoDict[results][@"member_type"] intValue] == 2) {
+//                    zhuboXiangQingVCNewController *faxianzhuboVC = [[zhuboXiangQingVCNewController alloc]init];
+//                    faxianzhuboVC.jiemuDescription = dic[@"description"];
+//                    faxianzhuboVC.jiemuFan_num = dic[@"fan_num"];
+//                    faxianzhuboVC.jiemuID = dic[@"id"];
+//                    faxianzhuboVC.jiemuImages = dic[@"images"];
+//                    faxianzhuboVC.jiemuIs_fan = dic[@"is_fan"];
+//                    faxianzhuboVC.jiemuMessage_num = dic[@"message_num"];
+//                    faxianzhuboVC.jiemuName = dic[@"name"];
+//                    faxianzhuboVC.isfaxian = YES;
+//                    faxianzhuboVC.isClass = YES;
+//                    [self.navigationController pushViewController:faxianzhuboVC animated:YES];
+//                    
 //                }
-                //跳转未购买课堂界面
+//                //跳转未购买课堂界面
 //                else if ([dic[@"is_free"] isEqualToString:@"0"]){
 //                    ClassViewController *vc = [ClassViewController shareInstance];
-//                    vc.act_id = dic[@"id"];
-//                    self.hidesBottomBarWhenPushed = YES;
+//                    vc.jiemuDescription = dic[@"description"];
+//                    vc.jiemuFan_num = dic[@"fan_num"];
+//                    vc.jiemuID = dic[@"id"];
+//                    vc.jiemuImages = dic[@"images"];
+//                    vc.jiemuIs_fan = dic[@"is_fan"];
+//                    vc.jiemuMessage_num = dic[@"message_num"];
+//                    vc.jiemuName = dic[@"name"];
+//                    vc.listVC = self;
 //                    [self.navigationController.navigationBar setHidden:YES];
 //                    [self.navigationController pushViewController:vc animated:YES];
-//                    self.hidesBottomBarWhenPushed = NO;
 //                }
-
             }
             else{
                 if (SouSuoquanjvIndexPath){
@@ -707,7 +712,7 @@
                     [self.navigationController.navigationBar setHidden:YES];
                     [self.navigationController pushViewController:[bofangVC shareInstance] animated:YES];
                     [[bofangVC shareInstance].tableView reloadData];
-                    self.hidesBottomBarWhenPushed = NO;
+//                    self.hidesBottomBarWhenPushed = NO;
                     if ([bofangVC shareInstance].isPlay) {
                         
                     }
@@ -744,10 +749,10 @@
                     [Explayer replaceCurrentItemWithPlayerItem:[[AVPlayerItem alloc]initWithURL:[NSURL URLWithString:self.SouSuodataArrM[indexPath.row][@"post_mp"]]]];
                     ExisRigester = YES;
                     ExIsKaiShiBoFang = YES;
-                    self.hidesBottomBarWhenPushed = YES;
+//                    self.hidesBottomBarWhenPushed = YES;
                     [self.navigationController.navigationBar setHidden:YES];
                     [self.navigationController pushViewController:[bofangVC shareInstance ] animated:YES];
-                    self.hidesBottomBarWhenPushed = NO;
+//                    self.hidesBottomBarWhenPushed = NO;
                     [[NSNotificationCenter defaultCenter] postNotificationName:@"yuanpanzhuan" object:nil];
                     [[NSNotificationCenter defaultCenter] postNotificationName:@"qiehuanxinwen" object:nil];
                     [CommonCode writeToUserD:self.SouSuodataArrM andKey:@"zhuyeliebiao"];
@@ -777,7 +782,7 @@
                 SouSuoquanjvIndexPath = nil;
             }
             if ([self.SouSuodataArrM count]) {
-                NSLog(@"8888=%@",[CommonCode readFromUserD:@"dangqianbofangxinwenID"]);
+                NSLog(@"dangqianbofangxinwenID=%@",[CommonCode readFromUserD:@"dangqianbofangxinwenID"]);
                 
                 if ([[CommonCode readFromUserD:@"dangqianbofangxinwenID"] isEqualToString:self.SouSuodataArrM[indexPath.row][@"id"]]){
                     //                [UIView animateWithDuration:0.3f animations:^{
@@ -852,7 +857,8 @@
         faxianModel *model = [self.faxianArrM firstObject];
         if (indexPath.row < [model.data count]) {
             faxianSubModel *dic = model.data[indexPath.row];
-            if ([dic.is_free isEqualToString:@"1"]) {
+            NSDictionary *userInfoDict = [CommonCode readFromUserD:@"dangqianUserInfo"];
+            if ([dic.is_free isEqualToString:@"1"]||[userInfoDict[results][@"member_type"] intValue] == 2) {
                 zhuboXiangQingVCNewController *faxianzhuboVC = [[zhuboXiangQingVCNewController alloc]init];
                 faxianzhuboVC.jiemuDescription = dic.Description;
                 faxianzhuboVC.jiemuFan_num = dic.fan_num;

@@ -10,6 +10,16 @@
 #import "Reachability.h"
 #import "GDTSplashAd.h"
 
+
+typedef NS_ENUM(NSUInteger, PayType) {
+    PayTypeReward = 0,//打赏支付
+    PayTypeClassPay,//课程购买支付
+    PayTypeMembers,//会员购买支付
+    PayTypeRecharge,//充值
+    PayTypeTingCoinPay,//听币支付
+    PayTypeNone,//无支付
+};
+
 typedef void (^SkipToPlayingVCBlock)(NSString *) ;
 typedef void (^WeibodidReceiveResponse)(NSDictionary *);
 typedef void (^WechatdidReceiveCode)(NSString *);
@@ -24,9 +34,14 @@ typedef void (^WechatdidReceiveCode)(NSString *);
 
 @property (strong, nonatomic) UIWindow *window;
 
-@property (assign, nonatomic) BOOL isReward;//打赏 ? 充值
+/**
+ 支付类型
+ */
+@property (nonatomic,assign) PayType payType;
 
-@property (assign, nonatomic) BOOL isClassPay;//购买课堂
+//@property (assign, nonatomic) BOOL isReward;//打赏 ? 充值
+//
+//@property (assign, nonatomic) BOOL isClassPay;//购买课堂
 
 @property (assign, nonatomic) BOOL isLogin;//是否登录
 

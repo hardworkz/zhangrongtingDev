@@ -10,6 +10,7 @@
 #define MineHeader_h
 
 #import "MyClassroomController.h"
+#import "MyVipMenbersViewController.h"
 
 #import "UIAlertView+MKBlockAdditions.h"
 
@@ -21,7 +22,12 @@
 #import "CommentAndReviewFrameModel.h"
 #import "MyClassroomListModel.h"
 #import "MyClassroomListFrameModel.h"
+#import "MembersDataModel.h"
 
+#import "MyVipPrivilegeTableViewCell.h"
+#import "MyVipSectionTableViewCell.h"
+#import "MyVipMonthTableViewCell.h"
+#import "MyUserVipTableViewCell.h"
 #import "BlobNewTableViewCell.h"
 #import "CommentAndReviewTableViewCell.h"
 #import "MyClassroomTableViewCell.h"

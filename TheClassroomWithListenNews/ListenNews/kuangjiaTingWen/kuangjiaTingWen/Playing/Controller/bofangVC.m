@@ -95,6 +95,7 @@
 @property (assign, nonatomic) float rewardCount;
 @property (assign, nonatomic) BOOL isReward;
 @property (assign, nonatomic) BOOL isPay;
+@property (assign, nonatomic) BOOL isClassPlay;
 @property (assign, nonatomic) BOOL isCustomRewardCount;
 @property (strong, nonatomic) UITextField *customRewardTextField;
 @property (strong, nonatomic) NSArray *rewardArray;
@@ -135,6 +136,21 @@ __weak AVPlayer *weakPlayer;
 static bofangVC *_instance = nil;
 static AVPlayer *_instancePlay = nil;
 @implementation bofangVC
+//重新set方法，不保存值
+- (void)setIsClass:(BOOL)isClass
+{
+    [CommonCode writeToUserD:@(isClass) andKey:@"isClass"];
+    if (isClass) {
+        _isClassPlay = YES;
+    }else{
+        _isClassPlay = NO;
+    }
+}
+- (void)setIsPlay:(BOOL)isPlay
+{
+    _isPlay = isPlay;
+    
+}
 - (AVPlayer *)bofangPlayer
 {
     static dispatch_once_t onceToken;
@@ -260,10 +276,8 @@ static AVPlayer *_instancePlay = nil;
     [CommonCode writeToUserD:nil andKey:@"Exact_id"];
     
     IQKeyboardManager *manager = [IQKeyboardManager sharedManager];
-//    manager.enable = YES;
-//    manager.shouldResignOnTouchOutside = YES;
-    manager.shouldToolbarUsesTextFieldTintColor = NO;
-//    manager.enableAutoToolbar = NO;
+    [manager setKeyboardDistanceFromTextField:100];
+    manager.enable = YES;
     if (!isPlaying) {
         [[UIDevice currentDevice] setProximityMonitoringEnabled:NO];
         [[NSNotificationCenter defaultCenter] postNotificationName:@"stopAnimate" object:nil];
@@ -292,9 +306,10 @@ static AVPlayer *_instancePlay = nil;
 }
 -(void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
+    
     self.isMyCollectionVC = NO;
     RTLog(@"viewWillDisappear");
-    [IQKeyboardManager sharedManager].enable = NO;
+//    [IQKeyboardManager sharedManager].enable = NO;
     [self.navigationController setNavigationBarHidden:NO animated:YES];
     if (!isPlaying) {
         [[NSNotificationCenter defaultCenter] postNotificationName:@"stopAnimate" object:nil];
@@ -1139,6 +1154,11 @@ static AVPlayer *_instancePlay = nil;
     if (ExIsClassVCPlay) {
         return;
     }
+    //判断是否是播放新闻，记录次数限制
+    if (!_isClassPlay) {
+        
+    }
+    
     RTLog(@"bofangwanbi--------");
     [bofangCenterBtn setImage:[UIImage imageNamed:@"home_news_ic_play"] forState:UIControlStateNormal];
     if ([[CommonCode readFromUserD:TINGYOUQUANBOFANGWANBI] isEqualToString:@"YES"]) {
@@ -1685,6 +1705,8 @@ static AVPlayer *_instancePlay = nil;
     else{
         accesstoken = nil;
     }
+    //开始请求前清空主播ID防止打赏错乱
+    self.newsModel.act_id = nil;
     //postDetail
     [NetWorkTool getPostDetailWithaccessToken:AvatarAccessToken post_id:self.newsModel.jiemuID sccess:^(NSDictionary *responseObject) {
         if ([responseObject[@"status"] intValue] == 1){
@@ -1693,6 +1715,7 @@ static AVPlayer *_instancePlay = nil;
                 self.isPay = YES;
                 self.rewardArray = detailModel.reward;
                 //修复广告点击进入的主播详情粉丝数错误
+                self.newsModel.act_id = detailModel.act.act_id;
                 self.newsModel.jiemuFan_num = detailModel.act.fan_num;
                 self.newsModel.jiemuMessage_num = detailModel.act.message_num;
             }
@@ -2272,6 +2295,11 @@ static AVPlayer *_instancePlay = nil;
 }
 
 - (void)rewarding{
+    if (!self.newsModel.act_id) {
+        XWAlerLoginView *alert = [[XWAlerLoginView alloc] initWithTitle:@"数据获取失败，请重新进入该新闻刷新数据"];
+        [alert show];
+        return;
+    }
     PayOnlineViewController *vc = [PayOnlineViewController new];
     NSString *accesstoken = nil;
     if ([[CommonCode readFromUserD:@"isLogin"]boolValue] == YES){
@@ -2283,6 +2311,7 @@ static AVPlayer *_instancePlay = nil;
                 vc.rewardCount = self.rewardCount;
                 vc.uid = (self.newsModel.post_news != nil) ? self.newsModel.post_news : self.newsModel.jiemuID;
                 vc.post_id = self.newsModel.jiemuID;
+                vc.act_id = self.newsModel.act_id;
                 vc.isPayClass = NO;
                 self.hidesBottomBarWhenPushed = YES;
                 [self.navigationController pushViewController:vc animated:YES];

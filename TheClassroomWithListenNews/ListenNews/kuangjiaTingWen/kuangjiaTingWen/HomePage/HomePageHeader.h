@@ -34,4 +34,6 @@ static NSString *const ReloadClassList = @"reloadClassList";/**<刷新课堂列�
 static NSString *const status = @"status";
 static NSString *const msg = @"msg";
 static NSString *const results = @"results";
+
+static NSString *const appScheme = @"zhiFuBao";
 #endif /* HomePageHeader_h */

@@ -36,7 +36,8 @@
     
 }
 //重写更改状态栏颜色方法，
-- (UIStatusBarStyle)preferredStatusBarStyle{
+- (UIStatusBarStyle)preferredStatusBarStyle
+{
     return UIStatusBarStyleDefault;
 }
 - (void)pushViewController:(UIViewController *)viewController animated:(BOOL)animated

@@ -2183,4 +2183,69 @@ NSMutableDictionary *dic = [[NSMutableDictionary alloc]initWithCapacity:1
     dic[@"job"] = job;
     [self asyncNetworkingUrl:@"/interfaceNew/get_info" andDict:dic success:success failure:failure];
 }
+//会员界面数据
++ (void)get_membersDataWithaccessToken:(NSString *)accessToken
+                             sccess:(void (^)(NSDictionary *responseObject))success
+                            failure:(void(^)(NSError *error))failure{
+    NSMutableDictionary *dic = [[NSMutableDictionary alloc]initWithCapacity:1];
+    dic[@"accessToken"] = accessToken;
+    [self asyncNetworkingUrl:@"/interfaceNew/member" andDict:dic success:success failure:failure];
+}
+//支付宝购买统一接口
++ (void)AliPayWithaccessToken:(NSString *)accessToken
+                                pay_type:(NSString *)pay_type//1.购买课堂 2.购买会员 3.打赏 4.充值
+                                  act_id:(NSString *)act_id
+                                   money:(NSString *)money
+                                mem_type:(NSString *)mem_type
+                                   month:(NSString *)month
+                                sccess:(void (^)(NSDictionary *responseObject))success
+                               failure:(void(^)(NSError *error))failure{
+    NSMutableDictionary *dic = [[NSMutableDictionary alloc]initWithCapacity:1];
+    dic[@"accessToken"] = accessToken;
+    dic[@"pay_type"] = pay_type;
+    if ([pay_type intValue] == 1) {
+        dic[@"act_id"] = act_id;
+    }else if ([pay_type intValue] == 2) {
+        dic[@"mem_type"] = mem_type;
+        dic[@"month"] = month;
+    }else if ([pay_type intValue] == 3) {
+        dic[@"act_id"] = act_id;
+        dic[@"money"] = money;
+    }else if ([pay_type intValue] == 4) {
+        dic[@"money"] = money;
+    }
+    [self asyncNetworkingUrl:@"/Alipay/alipay" andDict:dic success:success failure:failure];
+}
+//微信购买统一接口
++ (void)WXPayWithaccessToken:(NSString *)accessToken
+                               pay_type:(NSString *)pay_type//1.购买课堂 2.购买会员 3.打赏 4.充值
+                                 act_id:(NSString *)act_id
+                                  money:(NSString *)money
+                               mem_type:(NSString *)mem_type
+                                  month:(NSString *)month
+                                sccess:(void (^)(NSDictionary *responseObject))success
+                               failure:(void(^)(NSError *error))failure{
+    NSMutableDictionary *dic = [[NSMutableDictionary alloc]initWithCapacity:1];
+    dic[@"accessToken"] = accessToken;
+    dic[@"pay_type"] = pay_type;
+    if ([pay_type intValue] == 1) {
+        dic[@"act_id"] = act_id;
+    }else if ([pay_type intValue] == 2) {
+        dic[@"mem_type"] = mem_type;
+        dic[@"month"] = month;
+    }else if ([pay_type intValue] == 3) {
+        dic[@"act_id"] = act_id;
+        dic[@"money"] = money;
+    }else if ([pay_type intValue] == 4) {
+        dic[@"money"] = money;
+    }
+    [self asyncNetworkingUrl:@"/Wxpay/wxpay" andDict:dic success:success failure:failure];
+}
+//获取会员限制数据
++ (void)get_VipLimitDataWithSccess:(void (^)(NSDictionary *responseObject))success
+                               failure:(void(^)(NSError *error))failure{
+    NSMutableDictionary *dic = [[NSMutableDictionary alloc]initWithCapacity:1];
+    [self asyncNetworkingUrl:@"/interfaceNew/getDailyInfo" andDict:dic success:success failure:failure];
+}
+
 @end

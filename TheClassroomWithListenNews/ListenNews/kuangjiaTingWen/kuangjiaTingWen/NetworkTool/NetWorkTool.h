@@ -1572,5 +1572,67 @@
                                 job:(NSString *)job
                              sccess:(void (^)(NSDictionary *responseObject))success
                             failure:(void(^)(NSError *error))failure;
+
+/**
+ 会员界面数据
+
+ @param accessToken accessToken
+ @param success 成功
+ @param failure 失败
+ */
++ (void)get_membersDataWithaccessToken:(NSString *)accessToken
+                                sccess:(void (^)(NSDictionary *responseObject))success
+                               failure:(void(^)(NSError *error))failure;
+
+/**
+ 微信购买统一接口
+
+ @param accessToken accessToken
+ @param pay_type 支付类型
+ @param act_id act_id description
+ @param money 金额
+ @param mem_type vip
+ @param month VIP购买月数
+ @param success 成功
+ @param failure 失败
+ */
++ (void)AliPayWithaccessToken:(NSString *)accessToken
+                                pay_type:(NSString *)pay_type//1.购买课堂 2.购买会员 3.打赏 4.充值
+                                  act_id:(NSString *)act_id
+                                   money:(NSString *)money
+                                mem_type:(NSString *)mem_type
+                                   month:(NSString *)month
+                                  sccess:(void (^)(NSDictionary *responseObject))success
+                                 failure:(void(^)(NSError *error))failure;
+
+/**
+ 微信购买统一接口
+ 
+ @param accessToken accessToken
+ @param pay_type 支付类型
+ @param act_id act_id description
+ @param money 金额
+ @param mem_type vip
+ @param month VIP购买月数
+ @param success 成功
+ @param failure 失败
+ */
++ (void)WXPayWithaccessToken:(NSString *)accessToken
+                               pay_type:(NSString *)pay_type//1.购买课堂 2.购买会员 3.打赏 4.充值
+                                 act_id:(NSString *)act_id
+                                  money:(NSString *)money
+                               mem_type:(NSString *)mem_type
+                                  month:(NSString *)month
+                                 sccess:(void (^)(NSDictionary *responseObject))success
+                                failure:(void(^)(NSError *error))failure;
+
+/**
+ 获取会员限制数据
+ 
+ @param success 成功
+ @param failure 失败
+ */
++ (void)get_VipLimitDataWithSccess:(void (^)(NSDictionary *responseObject))success
+                          failure:(void(^)(NSError *error))failure;
 @end
 

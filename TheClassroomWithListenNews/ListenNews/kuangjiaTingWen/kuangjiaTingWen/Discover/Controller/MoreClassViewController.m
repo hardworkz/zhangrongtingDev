@@ -184,7 +184,8 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
     MyClassroomListFrameModel *frameModel = self.commentInfoArr[indexPath.row];
-    if ([frameModel.model.is_free isEqualToString:@"1"]) {
+    NSDictionary *userInfoDict = [CommonCode readFromUserD:@"dangqianUserInfo"];
+    if ([frameModel.model.is_free isEqualToString:@"1"]||[userInfoDict[results][@"member_type"] intValue] == 2) {
         zhuboXiangQingVCNewController *faxianzhuboVC = [[zhuboXiangQingVCNewController alloc]init];
         faxianzhuboVC.jiemuDescription = frameModel.model.Description;
         faxianzhuboVC.jiemuFan_num = frameModel.model.fan_num;
@@ -195,9 +196,9 @@
         faxianzhuboVC.jiemuName = frameModel.model.name;
         faxianzhuboVC.isfaxian = NO;
         faxianzhuboVC.isClass = YES;
-        self.hidesBottomBarWhenPushed=YES;
+//        self.hidesBottomBarWhenPushed=YES;
         [self.navigationController pushViewController:faxianzhuboVC animated:YES];
-        self.hidesBottomBarWhenPushed=NO;
+//        self.hidesBottomBarWhenPushed=NO;
     }
     else if ([frameModel.model.is_free isEqualToString:@"0"]){
         ClassViewController *vc = [ClassViewController shareInstance];

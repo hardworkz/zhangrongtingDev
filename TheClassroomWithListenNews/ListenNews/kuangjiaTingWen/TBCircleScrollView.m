@@ -335,7 +335,8 @@
         HomePageViewController *homePageVC = (HomePageViewController *)object;
         UINavigationController *nav = homePageVC.navigationController;
         if ([[CommonCode readFromUserD:@"isLogin"]boolValue] == YES) {
-            if ([newArr[_curPage][@"is_free"] isEqualToString:@"1"]) {
+            NSDictionary *userInfoDict = [CommonCode readFromUserD:@"dangqianUserInfo"];
+            if ([newArr[_curPage][@"is_free"] isEqualToString:@"1"]||[userInfoDict[results][@"member_type"] intValue] == 2) {
                 zhuboXiangQingVCNewController *faxianzhuboVC = [[zhuboXiangQingVCNewController alloc]init];
                 faxianzhuboVC.jiemuDescription = newArr[_curPage][@"description"];
                 faxianzhuboVC.jiemuFan_num = newArr[_curPage][@"fan_num"];
@@ -356,7 +357,6 @@
                 classVC.jiemuIs_fan = newArr[_curPage][@"is_fan"];
                 classVC.jiemuMessage_num = newArr[_curPage][@"message_num"];
                 classVC.jiemuName = newArr[_curPage][@"name"];
-                classVC.act_id = newArr[_curPage][@"url"];
                 classVC.act_id = newArr[_curPage][@"url"];
                 [nav.navigationBar setHidden:YES];
                 [nav pushViewController:classVC animated:YES];

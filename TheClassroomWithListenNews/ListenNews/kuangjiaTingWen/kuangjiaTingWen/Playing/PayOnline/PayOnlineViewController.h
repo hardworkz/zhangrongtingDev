@@ -15,6 +15,10 @@
 @property (strong, nonatomic) NSString *uid;
 
 @property (strong, nonatomic) NSString *post_id;
+/**
+ 主播ID
+ */
+@property (strong, nonatomic) NSString *act_id;
 
 @property (assign, nonatomic) double balanceCount;
 

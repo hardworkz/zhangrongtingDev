@@ -10,6 +10,7 @@
 
 @interface NewsModel : NSObject
 @property(nonatomic)NSString *jiemuID;/**<节目ID*/
+@property(nonatomic)NSString *act_id;/**<主播ID*/
 @property(nonatomic)NSString *Titlejiemu;/**<节目标题*/
 @property(nonatomic)NSString *RiQijiemu;/**<节目日期*/
 @property(nonatomic)NSString *post_lai;/**<*/

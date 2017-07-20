@@ -278,9 +278,9 @@ typedef void(^animateBlock)();
 }
 
 - (void)payButtonAction:(UIButton *)sender{
-    self.hidesBottomBarWhenPushed=YES;
+//    self.hidesBottomBarWhenPushed=YES;
     [self.navigationController pushViewController:[PayViewController new] animated:YES];
-    self.hidesBottomBarWhenPushed=NO;
+//    self.hidesBottomBarWhenPushed=NO;
 }
 
 - (void)loginFirst {
@@ -526,7 +526,6 @@ typedef void(^animateBlock)();
 }
 
 - (void)signInAction:(UITapGestureRecognizer *)tap{
-    
     if (self.isSigned) {
         self.isSigned = YES;
         [self.signInImageView setImage:[UIImage imageNamed:@"sign_ined"]];
@@ -534,6 +533,7 @@ typedef void(^animateBlock)();
         [[NSNotificationCenter defaultCenter] postNotificationName:@"updateUserInfo" object:nil];
     }
     else{
+        tap.view.userInteractionEnabled = NO;
         //签到
         NSDictionary *userInfo = [CommonCode readFromUserD:@"dangqianUserInfo"];
         NSString *accesstoken = nil;
@@ -545,6 +545,7 @@ typedef void(^animateBlock)();
             accesstoken = AvatarAccessToken;
         }
         [NetWorkTool signInWithaccessToken:AvatarAccessToken sccess:^(NSDictionary *responseObject) {
+            tap.view.userInteractionEnabled = YES;
             if ([responseObject[@"msg"] isEqualToString:@"签到成功!"]) {
                 self.isSigned = YES;
                 [self.signInImageView setImage:[UIImage imageNamed:@"sign_ined"]];
@@ -564,10 +565,9 @@ typedef void(^animateBlock)();
             else {
                 XWAlerLoginView *alert = [[XWAlerLoginView alloc] initWithTitle:responseObject[@"msg"]];
                 [alert show];
-//                [SVProgressHUD showErrorWithStatus:responseObject[@"msg"]];
             }
         } failure:^(NSError *error) {
-            //
+            tap.view.userInteractionEnabled = YES;
         }];
     }
 }
@@ -767,7 +767,7 @@ typedef void(^animateBlock)();
 #pragma mark --- UITableViewDataSource
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return 6;
+    return 7;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -967,30 +967,11 @@ typedef void(^animateBlock)();
             signtureLab.text = nil;
             lvView.hidden = YES;
         }
-//        用户简介
-//        NSString *signtureStr = [CommonCode readFromUserD:@"dangqianUserInfo"][@"results"][@"signature"];;
-//        if (signtureStr.length == 0){
-//            signtureLab.text = @"该用户没有什么想说的";
-//        }
-//        else if ([signtureStr isEqualToString:@"没有简介"]){
-//            signtureLab.text = @"该用户没有什么想说的";
-//        }
-//        else if ([signtureStr isEqualToString:@"暂无简介"]){
-//            signtureLab.text = @"该用户没有什么想说的";
-//        }
-//        else{
-//            signtureLab.text = signtureStr;
-//        }
         
         return cell;
     }
     else if (indexPath.row == 1){
         UITableViewCell *cell = [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"wotwoIdentify"];
-//        UIImageView *img = [[UIImageView alloc]initWithFrame:CGRectMake(15.0 / 375 * IPHONE_W, 15.0 / 667 * IPHONE_H, 20.0 / 375 * IPHONE_W, 20.0 / 667 * IPHONE_H)];
-//        img.image = [UIImage imageNamed:@"pengyouquan"];
-////        img.image = [UIImage imageNamed:@"attention"];
-//        [cell.contentView addSubview:img];
-//        img.contentMode = UIViewContentModeScaleAspectFit;
         UILabel *lab = [[UILabel alloc]initWithFrame:CGRectMake(40.0 / 375 * IPHONE_W, 14.0 / 667 * IPHONE_H, 100.0 / 375 * IPHONE_W, 30.0 / 667 * IPHONE_H)];
         lab.text = @"听友圈";
 //        lab.text = @"我的关注";
@@ -1007,7 +988,22 @@ typedef void(^animateBlock)();
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
         return cell;
     }
-    else if (indexPath.row == 2){
+    else  if (indexPath.row == 2){
+        UITableViewCell *cell = [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"wofourIdentify"];
+        UILabel *lab = [[UILabel alloc]initWithFrame:CGRectMake(40.0 / 375 * IPHONE_W, 14.0 / 667 * IPHONE_H, 100.0 / 375 * IPHONE_W, 30.0 / 667 * IPHONE_H)];
+        lab.text = @"我的会员";
+        lab.textAlignment = NSTextAlignmentLeft;
+        lab.textColor = nTextColorMain;
+        [cell.contentView addSubview:lab];
+        lab.font = gFontMajor17;
+        UIView *line = [[UIView alloc]initWithFrame:CGRectMake(20.0 / 375 * IPHONE_W, 57.0 / 667 * IPHONE_H, SCREEN_WIDTH - 20.0 / 375 * IPHONE_W, 1)];
+        [line setBackgroundColor:gThinLineColor];
+        [cell.contentView addSubview:line];
+        cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+        cell.selectionStyle = UITableViewCellSelectionStyleNone;
+        return cell;
+    }
+    else if (indexPath.row == 3){
         UITableViewCell *cell = [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"wothreeIdentify"];
 //        UIImageView *img = [[UIImageView alloc]initWithFrame:CGRectMake(15.0 / 375 * IPHONE_W, 15.0 / 667 * IPHONE_H, 20.0 / 375 * IPHONE_W, 20.0 / 667 * IPHONE_H)];
 //        img.image = [UIImage imageNamed:@"dowload"];
@@ -1026,7 +1022,7 @@ typedef void(^animateBlock)();
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
         return cell;
     }
-    else if (indexPath.row == 3){
+    else if (indexPath.row == 4){
         UITableViewCell *cell = [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"wofourIdentify"];
         //        UIImageView *img = [[UIImageView alloc]initWithFrame:CGRectMake(15.0 / 375 * IPHONE_W, 15.0 / 667 * IPHONE_H, 20.0 / 375 * IPHONE_W, 20.0 / 667 * IPHONE_H)];
         //        img.image = [UIImage imageNamed:@"yingyong"];
@@ -1045,12 +1041,8 @@ typedef void(^animateBlock)();
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
         return cell;
     }
-    else if (indexPath.row == 4){
+    else if (indexPath.row == 5){
         UITableViewCell *cell = [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"wofourIdentify"];
-//        UIImageView *img = [[UIImageView alloc]initWithFrame:CGRectMake(15.0 / 375 * IPHONE_W, 15.0 / 667 * IPHONE_H, 20.0 / 375 * IPHONE_W, 20.0 / 667 * IPHONE_H)];
-//        img.image = [UIImage imageNamed:@"yingyong"];
-//        [cell.contentView addSubview:img];
-//        img.contentMode = UIViewContentModeScaleAspectFit;
          UILabel *lab = [[UILabel alloc]initWithFrame:CGRectMake(40.0 / 375 * IPHONE_W, 14.0 / 667 * IPHONE_H, 100.0 / 375 * IPHONE_W, 30.0 / 667 * IPHONE_H)];
         lab.text = @"我的课堂";
         lab.textAlignment = NSTextAlignmentLeft;
@@ -1064,54 +1056,12 @@ typedef void(^animateBlock)();
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
         return cell;
     }
-//    else if (indexPath.row == 4){
-//        UITableViewCell *cell = [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"wofourIdentify"];
-//        //        UIImageView *img = [[UIImageView alloc]initWithFrame:CGRectMake(15.0 / 375 * IPHONE_W, 15.0 / 667 * IPHONE_H, 20.0 / 375 * IPHONE_W, 20.0 / 667 * IPHONE_H)];
-//        //        img.image = [UIImage imageNamed:@"yingyong"];
-//        //        [cell.contentView addSubview:img];
-//        //        img.contentMode = UIViewContentModeScaleAspectFit;
-//        UILabel *lab = [[UILabel alloc]initWithFrame:CGRectMake(40.0 / 375 * IPHONE_W, 14.0 / 667 * IPHONE_H, 100.0 / 375 * IPHONE_W, 30.0 / 667 * IPHONE_H)];
-//        lab.text = @"上传节目";
-//        lab.textAlignment = NSTextAlignmentLeft;
-//        lab.textColor = nTextColorMain;
-//        [cell.contentView addSubview:lab];
-//        lab.font = gFontMajor17;
-//        UIView *line = [[UIView alloc]initWithFrame:CGRectMake(20.0 / 375 * IPHONE_W, 57.0 / 667 * IPHONE_H, SCREEN_WIDTH - 20.0 / 375 * IPHONE_W, 1)];
-//        [line setBackgroundColor:gThinLineColor];
-//        [cell.contentView addSubview:line];
-//        cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
-//        cell.selectionStyle = UITableViewCellSelectionStyleNone;
-//        return cell;
-//    }
-//    else if (indexPath.row == 4){
-//        UITableViewCell *cell = [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"wofourIdentify"];
-//        //        UIImageView *img = [[UIImageView alloc]initWithFrame:CGRectMake(15.0 / 375 * IPHONE_W, 15.0 / 667 * IPHONE_H, 20.0 / 375 * IPHONE_W, 20.0 / 667 * IPHONE_H)];
-//        //        img.image = [UIImage imageNamed:@"yingyong"];
-//        //        [cell.contentView addSubview:img];
-//        //        img.contentMode = UIViewContentModeScaleAspectFit;
-//        UILabel *lab = [[UILabel alloc]initWithFrame:CGRectMake(40.0 / 375 * IPHONE_W, 14.0 / 667 * IPHONE_H, 150.0 / 375 * IPHONE_W, 30.0 / 667 * IPHONE_H)];
-//        lab.text = @"帮助与反馈";
-//        lab.textAlignment = NSTextAlignmentLeft;
-//        lab.textColor = nTextColorMain;
-//        [cell.contentView addSubview:lab];
-//        lab.font = gFontMajor17;
-//        UIView *line = [[UIView alloc]initWithFrame:CGRectMake(20.0 / 375 * IPHONE_W, 57.0 / 667 * IPHONE_H, SCREEN_WIDTH - 20.0 / 375 * IPHONE_W, 1)];
-//        [line setBackgroundColor:gThinLineColor];
-//        [cell.contentView addSubview:line];
-//        cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
-//        cell.selectionStyle = UITableViewCellSelectionStyleNone;
-//        return cell;
-//    }
     else {
         static NSString *wosixIdentify = @"wosixIdentify";
         UITableViewCell *cell = [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:wosixIdentify];
         if (!cell){
             cell = [tableView dequeueReusableCellWithIdentifier:wosixIdentify];
         }
-//        UIImageView *img = [[UIImageView alloc]initWithFrame:CGRectMake(15.0 / 375 * IPHONE_W, 15.0 / 667 * IPHONE_H, 20.0 / 375 * IPHONE_W, 20.0 / 667 * IPHONE_H)];
-//        img.image = [UIImage imageNamed:@"setting"];
-//        [cell.contentView addSubview:img];
-//        img.contentMode = UIViewContentModeScaleAspectFit;
          UILabel *lab = [[UILabel alloc]initWithFrame:CGRectMake(40.0 / 375 * IPHONE_W, 14.0 / 667 * IPHONE_H, 100.0 / 375 * IPHONE_W, 30.0 / 667 * IPHONE_H)];
         lab.text = @"设置";
         lab.textAlignment = NSTextAlignmentLeft;
@@ -1146,65 +1096,55 @@ typedef void(^animateBlock)();
     else if (indexPath.row == 1) {
         if ([[CommonCode readFromUserD:@"isLogin"]boolValue] == YES){
             
-//            wodeguanzhuVC *vc = [wodeguanzhuVC new];
-//            vc.user_login = ExdangqianUser;
 //            self.hidesBottomBarWhenPushed=YES;
-//            [self.navigationController pushViewController:vc animated:YES];
-//            self.hidesBottomBarWhenPushed=NO;
-//            //TODO:听友圈
-            self.hidesBottomBarWhenPushed=YES;
             BlogViewController *blogVC = [BlogViewController new];
             blogVC.view.backgroundColor = [UIColor whiteColor];
             blogVC.isFeedbackVC = NO;
             [self.navigationController pushViewController:blogVC animated:YES];
-            self.hidesBottomBarWhenPushed=NO;
+//            self.hidesBottomBarWhenPushed=NO;
         }
         else {
             [self loginFirst];
         }
-    }
-    else if (indexPath.row == 2) {
-            self.hidesBottomBarWhenPushed=YES;
-            [self.navigationController pushViewController:[DownloadViewController new] animated:NO];
-            self.hidesBottomBarWhenPushed=NO;
-    }
-    else if (indexPath.row == 3) {
+    }else if (indexPath.row == 2) {
         if ([[CommonCode readFromUserD:@"isLogin"]boolValue] == YES){
-            self.hidesBottomBarWhenPushed=YES;
-            [self.navigationController pushViewController:[MyCollectionViewController new] animated:YES];
-            self.hidesBottomBarWhenPushed=NO;
+//            self.hidesBottomBarWhenPushed=YES;
+            [self.navigationController pushViewController:[MyVipMenbersViewController new] animated:YES];
+//            self.hidesBottomBarWhenPushed=NO;
         }
         else {
             [self loginFirst];
         }
+    }
+    else  if (indexPath.row == 3) {
+//            self.hidesBottomBarWhenPushed=YES;
+            [self.navigationController pushViewController:[DownloadViewController new] animated:NO];
+//            self.hidesBottomBarWhenPushed=NO;
     }
     else if (indexPath.row == 4) {
         if ([[CommonCode readFromUserD:@"isLogin"]boolValue] == YES){
-            self.hidesBottomBarWhenPushed=YES;
-            [self.navigationController pushViewController:[MyClassroomController new] animated:YES];
-            self.hidesBottomBarWhenPushed=NO;
+//            self.hidesBottomBarWhenPushed=YES;
+            [self.navigationController pushViewController:[MyCollectionViewController new] animated:YES];
+//            self.hidesBottomBarWhenPushed=NO;
         }
         else {
             [self loginFirst];
         }
     }
-//    else if (indexPath.row == 4) {
-//        NSURL *url = [NSURL URLWithString:@"http://admin.tingwen.me/index.php/article/zhinan.html"];
-//        SingleWebViewController *singleWebVC = [[SingleWebViewController alloc] initWithTitle:@"上传攻略" url:url];
-//        self.hidesBottomBarWhenPushed=YES;
-//        [self.navigationController pushViewController:singleWebVC animated:YES];
-//        self.hidesBottomBarWhenPushed=NO;
-//    }
-//    else if (indexPath.row == 4) {
-//        self.hidesBottomBarWhenPushed=YES;
-//        [self.navigationController pushViewController:[HelpAndFeedbackViewController new] animated:YES];
-//        self.hidesBottomBarWhenPushed=NO;
-//        
-//    }
     else if (indexPath.row == 5) {
-        self.hidesBottomBarWhenPushed=YES;
+        if ([[CommonCode readFromUserD:@"isLogin"]boolValue] == YES){
+//            self.hidesBottomBarWhenPushed=YES;
+            [self.navigationController pushViewController:[MyClassroomController new] animated:YES];
+//            self.hidesBottomBarWhenPushed=NO;
+        }
+        else {
+            [self loginFirst];
+        }
+    }
+    else if (indexPath.row == 6) {
+//        self.hidesBottomBarWhenPushed=YES;
         [self.navigationController pushViewController:[SheZhiVC new] animated:YES];
-        self.hidesBottomBarWhenPushed=NO;
+//        self.hidesBottomBarWhenPushed=NO;
     }
 
 }

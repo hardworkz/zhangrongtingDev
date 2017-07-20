@@ -1151,9 +1151,10 @@
 
     }
     else if (tableView == self.classroomTableView){
-        //跳转已购买课堂界面
+        NSDictionary *userInfoDict = [CommonCode readFromUserD:@"dangqianUserInfo"];
+        //跳转已购买课堂界面，超级会员可直接跳转课堂已购买界面
         MyClassroomListFrameModel *frameModel = self.classroomInfoArr[indexPath.row];
-        if ([frameModel.model.is_free isEqualToString:@"1"]) {
+        if ([frameModel.model.is_free isEqualToString:@"1"]||[userInfoDict[results][@"member_type"] intValue] == 2) {
             zhuboXiangQingVCNewController *faxianzhuboVC = [[zhuboXiangQingVCNewController alloc]init];
             faxianzhuboVC.jiemuDescription = frameModel.model.Description;
             faxianzhuboVC.jiemuFan_num = frameModel.model.fan_num;
@@ -1165,7 +1166,6 @@
             faxianzhuboVC.isfaxian = YES;
             faxianzhuboVC.isClass = YES;
             [self.navigationController pushViewController:faxianzhuboVC animated:YES];
-
         }
         //跳转未购买课堂界面
         else if ([frameModel.model.is_free isEqualToString:@"0"]){
@@ -1184,7 +1184,6 @@
         }
     }
 }
-
 - (void)getAD{
     //获取轮播图数据
 //    [self.ztADResult removeAllObjects];
