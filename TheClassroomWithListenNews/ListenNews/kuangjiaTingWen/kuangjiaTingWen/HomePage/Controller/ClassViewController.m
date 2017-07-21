@@ -1023,15 +1023,19 @@ static AVPlayer *_instancePlay = nil;
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    if ([self.classModel.comments isKindOfClass:[NSArray class]]){
-        if ([self.classModel.comments count] >= 3) {
-            return 5 + self.classModel.imagesArray.count;
+    if (self.classModel != nil) {
+        if ([self.classModel.comments isKindOfClass:[NSArray class]]){
+            if ([self.classModel.comments count] >= 3) {
+                return 3 + 2 + self.classModel.imagesArray.count;
+            }
+            else{
+                return  [self.classModel.comments count] + self.classModel.imagesArray.count + 2;
+            }
         }
         else{
-            return  [self.classModel.comments count] + self.classModel.imagesArray.count + 2;
+            return self.classModel.imagesArray.count + 2;
         }
-    }
-    else{
+    }else{
         return 0;
     }
 }

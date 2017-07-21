@@ -317,7 +317,7 @@
         }else if (switchIndex == 4) {//点击下载跳转
             if ([[CommonCode readFromUserD:@"isLogin"]boolValue] == YES) {
                 NSDictionary *userInfoDict = [CommonCode readFromUserD:@"dangqianUserInfo"];
-                if ([userInfoDict[results][@"member_type"] intValue] == 0) {//非会员
+                if ([userInfoDict[results][member_type] intValue] == 0 && !_isClass) {//非会员
                     UIAlertController *qingshuruyonghuming = [UIAlertController alertControllerWithTitle:@"温馨提示" message:@"您还不是会员，无法使用批量下载功能，是否前往开通会员" preferredStyle:UIAlertControllerStyleAlert];
                     [qingshuruyonghuming addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
                     }]];
@@ -330,7 +330,7 @@
                     }]];
                     
                     [self presentViewController:qingshuruyonghuming animated:YES completion:nil];
-                }else{//会员
+                }else{//会员和课堂已购买详情不限制
                     [self.navigationController setNavigationBarHidden:NO animated:YES];
                     BatchDownloadTableTableViewController *vc = [BatchDownloadTableTableViewController new];
                     vc.downloadSource = @"1";
@@ -846,7 +846,7 @@
         fensiliuyan.frame = CGRectMake(name.frame.origin.x,CGRectGetMaxY(imgBorderView.frame) - 30.0 / 667 *SCREEN_HEIGHT, SCREEN_WIDTH - name.frame.origin.x - 80.0 / 375 * SCREEN_WIDTH, 40.0 / 667 * IPHONE_H);
         fensiliuyan.numberOfLines = 2;
     }else{//课堂
-        CGSize fensiliuyanSize = [self.jiemuDescription boundingRectWithSize:CGSizeMake(SCREEN_WIDTH - CGRectGetMaxX(imgBorderView.frame) - 12 - 20, MAXFLOAT) options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:[UIFont boldSystemFontOfSize:17.0]} context:nil].size;
+        CGSize fensiliuyanSize = [self.jiemuDescription boundingRectWithSize:CGSizeMake(MAXFLOAT, MAXFLOAT) options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:[UIFont boldSystemFontOfSize:17.0]} context:nil].size;
         fensiliuyan.frame = CGRectMake(name.frame.origin.x,CGRectGetMaxY(name.frame) + 15.0 / 667 *SCREEN_HEIGHT, SCREEN_WIDTH - name.frame.origin.x - 30.0 / 375 * SCREEN_WIDTH, fensiliuyanSize.height);
         fensiliuyan.numberOfLines = 3;
     }
@@ -1504,6 +1504,7 @@
     button.selected = YES;
     button.titleLab.textColor = gMainColor;
     _isTapPlayBtn = YES;
+    [bofangVC shareInstance].isClass = YES;
     if ([[CommonCode readFromUserD:@"dangqianbofangxinwenID"] isEqualToString:xinwenArr[indexPath.row][@"id"]]){
         
         if (self.isfaxian) {
@@ -1579,7 +1580,6 @@
         }
         [xinwenshuaxinTableView reloadData];
     }
-    [bofangVC shareInstance].isClass = YES;
 }
 
 /**
@@ -2007,6 +2007,7 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
     
     if ([tableView isEqual:xinwenshuaxinTableView]){
+        [bofangVC shareInstance].isClass = YES;
         if ([[CommonCode readFromUserD:@"dangqianbofangxinwenID"] isEqualToString:xinwenArr[indexPath.row][@"id"]]){
             
             if (self.isfaxian) {
@@ -2090,7 +2091,6 @@
             }
             [tableView reloadData];
         }
-        [bofangVC shareInstance].isClass = YES;
     }
     else if ([tableView isEqual:fansWallTableView]){
         NSMutableDictionary *components = self.rewardListArray[indexPath.row];

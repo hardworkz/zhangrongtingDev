@@ -15,6 +15,10 @@
 #define SUCCEED_CODE @"0"  //网络返回成功码
 @interface NetWorkTool : NSObject
 /**
+ 对比当前和服务器时间，判断是否是新的一天
+ */
++ (void)isNewDayWithServer_date:(NSString *)dateString;
+/**
  获取当前栈顶控制器
  
  @return 栈顶控制器
@@ -1634,5 +1638,15 @@
  */
 + (void)get_VipLimitDataWithSccess:(void (^)(NSDictionary *responseObject))success
                           failure:(void(^)(NSError *error))failure;
+
+/**
+ 上传用户达到听新闻限制状态
+ 
+ @param success 成功
+ @param failure 失败
+ */
++ (void)sendLimitDataWithaccessToken:(NSString *)accessToken
+                              sccess:(void (^)(NSDictionary *responseObject))success
+                             failure:(void(^)(NSError *error))failure;
 @end
 

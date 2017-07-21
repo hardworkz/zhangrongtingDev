@@ -74,6 +74,7 @@
         }
         if ([pushNewsID isEqualToString:@"NO"]) {
             //上一次听过的新闻
+            APPDELEGATE.isTabbarCenterClicked = YES;
             if (ExIsKaiShiBoFang) {
                 self.hidesBottomBarWhenPushed = YES;
                 [self.navigationController pushViewController:[bofangVC shareInstance] animated:YES];
@@ -668,7 +669,7 @@
                 //TODO:搜索结果，课堂判断跳转
 //                NSDictionary *dic = [[NSDictionary alloc]initWithDictionary:self.SearchActResultsArrM[indexPath.row]];
 //                NSDictionary *userInfoDict = [CommonCode readFromUserD:@"dangqianUserInfo"];
-//                if ([dic[@"is_free"] isEqualToString:@"1"]||[userInfoDict[results][@"member_type"] intValue] == 2) {
+//                if ([dic[@"is_free"] isEqualToString:@"1"]||[userInfoDict[results][member_type] intValue] == 2) {
 //                    zhuboXiangQingVCNewController *faxianzhuboVC = [[zhuboXiangQingVCNewController alloc]init];
 //                    faxianzhuboVC.jiemuDescription = dic[@"description"];
 //                    faxianzhuboVC.jiemuFan_num = dic[@"fan_num"];
@@ -858,7 +859,7 @@
         if (indexPath.row < [model.data count]) {
             faxianSubModel *dic = model.data[indexPath.row];
             NSDictionary *userInfoDict = [CommonCode readFromUserD:@"dangqianUserInfo"];
-            if ([dic.is_free isEqualToString:@"1"]||[userInfoDict[results][@"member_type"] intValue] == 2) {
+            if ([dic.is_free isEqualToString:@"1"]||[userInfoDict[results][member_type] intValue] == 2) {
                 zhuboXiangQingVCNewController *faxianzhuboVC = [[zhuboXiangQingVCNewController alloc]init];
                 faxianzhuboVC.jiemuDescription = dic.Description;
                 faxianzhuboVC.jiemuFan_num = dic.fan_num;

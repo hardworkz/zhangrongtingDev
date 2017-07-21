@@ -85,6 +85,7 @@ typedef void(^animateBlock)();
         
         if ([pushNewsID isEqualToString:@"NO"]) {
             //上一次听过的新闻
+            APPDELEGATE.isTabbarCenterClicked = YES;
             if (ExIsKaiShiBoFang) {
                 self.hidesBottomBarWhenPushed = YES;
                 [self.navigationController pushViewController:[bofangVC shareInstance] animated:YES];

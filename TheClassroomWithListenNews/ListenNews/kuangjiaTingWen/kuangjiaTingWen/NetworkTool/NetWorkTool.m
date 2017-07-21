@@ -13,6 +13,14 @@
 
 @implementation NetWorkTool
 
++ (void)isNewDayWithServer_date:(NSString *)dateString
+{
+    NSString *serverDate = [CommonCode readFromUserD:[NSString stringWithFormat:@"%@_%@",server_date,ExdangqianUserUid]];
+    if (![dateString isEqualToString:serverDate]) {//判断本地缓存时间和服务器返回时间是否一致，不一致则清空新闻播放限制次数
+        [CommonCode writeToUserD:[NSString stringWithFormat:@"0"] andKey:[NSString stringWithFormat:@"%@_%@",limit_time,ExdangqianUserUid]];
+        [CommonCode writeToUserD:dateString andKey:[NSString stringWithFormat:@"%@_%@",server_date,ExdangqianUserUid]];
+    }
+}
 /**
  获取当前栈顶控制器
 
@@ -2247,5 +2255,11 @@ NSMutableDictionary *dic = [[NSMutableDictionary alloc]initWithCapacity:1
     NSMutableDictionary *dic = [[NSMutableDictionary alloc]initWithCapacity:1];
     [self asyncNetworkingUrl:@"/interfaceNew/getDailyInfo" andDict:dic success:success failure:failure];
 }
-
+//上传用户达到听新闻限制状态
++ (void)sendLimitDataWithaccessToken:(NSString *)accessToken
+                              sccess:(void (^)(NSDictionary *responseObject))success
+                           failure:(void(^)(NSError *error))failure{
+    NSMutableDictionary *dic = [[NSMutableDictionary alloc]initWithCapacity:1];
+    [self asyncNetworkingUrl:@"/interfaceNew/quantitys" andDict:dic success:success failure:failure];
+}
 @end

@@ -11,6 +11,10 @@
 
 #import "zhuboxiangqingVCNew.h"
 #import "ClassViewController.h"
+#import "HomePageViewController.h"
+#import "dingyueVC.h"
+#import "faxianVC.h"
+#import "mineVC.h"
 
 #import "ClassContentTableViewCell.h"
 #import "ClassAuditionTableViewCell.h"

@@ -36,4 +36,11 @@
 #import "LoginVC.h"
 #import "LoginNavC.h"
 
+//会员常量
+static NSString *const member_type = @"member_type";
+//非会员限制常量
+static NSString *const is_stop = @"is_stop";
+static NSString *const server_date = @"server_date";
+static NSString *const limit_num = @"limit_num";
+static NSString *const limit_time = @"limit_time";
 #endif /* PlayingHeader_h */

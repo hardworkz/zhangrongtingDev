@@ -336,7 +336,7 @@
         UINavigationController *nav = homePageVC.navigationController;
         if ([[CommonCode readFromUserD:@"isLogin"]boolValue] == YES) {
             NSDictionary *userInfoDict = [CommonCode readFromUserD:@"dangqianUserInfo"];
-            if ([newArr[_curPage][@"is_free"] isEqualToString:@"1"]||[userInfoDict[results][@"member_type"] intValue] == 2) {
+            if ([newArr[_curPage][@"is_free"] isEqualToString:@"1"]||[userInfoDict[results][member_type] intValue] == 2) {
                 zhuboXiangQingVCNewController *faxianzhuboVC = [[zhuboXiangQingVCNewController alloc]init];
                 faxianzhuboVC.jiemuDescription = newArr[_curPage][@"description"];
                 faxianzhuboVC.jiemuFan_num = newArr[_curPage][@"fan_num"];

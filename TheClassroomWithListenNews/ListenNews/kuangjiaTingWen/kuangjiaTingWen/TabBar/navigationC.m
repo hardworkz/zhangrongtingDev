@@ -46,7 +46,27 @@
         viewController.view.userInteractionEnabled = YES;
         viewController.hidesBottomBarWhenPushed = YES;
     }
+    if ([viewController isKindOfClass:[bofangVC class]]) {//判断要push到的控制器是播放器
+        bofangVC *playVC = (bofangVC *)viewController;
+        UIViewController *VC = self.topViewController;
+        //不是点击底部导航栏中心按钮的跳转才做isClass赋值判断
+        if (!APPDELEGATE.isTabbarCenterClicked) {
+            
+            if ([VC isKindOfClass:[zhuboXiangQingVCNewController class]]) {
+                zhuboXiangQingVCNewController *zhuboXiangQingVC = (zhuboXiangQingVCNewController *)VC;
+                if (zhuboXiangQingVC.isClass) {//是否为课堂已购买详情的控制器
+                    playVC.isClass = YES;
+                }else{
+                    playVC.isClass = NO;
+                }
+            }else{
+                playVC.isClass = NO;
+            }
+        }
+        
+    }
     [super pushViewController:viewController animated:animated];
+    APPDELEGATE.isTabbarCenterClicked = NO;
 }
 
 @end

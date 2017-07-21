@@ -50,9 +50,10 @@ static CGFloat const MaxScale = 1.0;/** 选中文字放大  */
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    self.hidesBottomBarWhenPushed = YES;
+//    self.hidesBottomBarWhenPushed = YES;
     [self.navigationController setNavigationBarHidden:YES animated:YES];
     
+    [self click:self.buttons[1]];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -113,6 +114,10 @@ static CGFloat const MaxScale = 1.0;/** 选中文字放大  */
     self.contentScrollView.showsHorizontalScrollIndicator  = NO;
     self.contentScrollView.userInteractionEnabled = YES;
     self.contentScrollView.delegate = self;
+    NSDictionary *userInfoDict = [CommonCode readFromUserD:@"dangqianUserInfo"];
+    if ([userInfoDict[results][member_type] intValue] == 0) {
+        self.contentScrollView.scrollEnabled = NO;
+    }
     
     [self.view addSubview:self.downloadingCountButton];
     [self.downloadingCountButton setHidden:YES];
@@ -234,7 +239,8 @@ static CGFloat const MaxScale = 1.0;/** 选中文字放大  */
         if (i == 0){
             [self click:btn];
         }
-        else if ( i == 1 && [arr count] > 0){
+        else
+            if ( i == 1 && [arr count] > 0){
             [self click:btn];
         }
         
@@ -245,7 +251,13 @@ static CGFloat const MaxScale = 1.0;/** 选中文字放大  */
 }
 -(void)click:(UIButton *)sender{
     
+    NSDictionary *userInfoDict = [CommonCode readFromUserD:@"dangqianUserInfo"];
     NSInteger i = sender.tag;
+    if ([userInfoDict[results][member_type] intValue] == 0 && i == 0) {
+        XWAlerLoginView *alert = [[XWAlerLoginView alloc] initWithTitle:@"您还不是会员，开通会员才能使用批量下载功能"];
+        [alert show];
+        return;
+    }
     CGFloat x  = i *SCREEN_WIDTH;
     self.contentScrollView.contentOffset = CGPointMake(x, 0);
     [sender setTitleColor:gMainColor forState:UIControlStateSelected];
@@ -361,21 +373,4 @@ static CGFloat const MaxScale = 1.0;/** 选中文字放大  */
     [rightButton setTitleColor:rightColor forState:UIControlStateNormal];
     
 }
-
-
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
-}
-
-/*
-#pragma mark - Navigation
-
-// In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
-}
-*/
-
 @end

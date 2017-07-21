@@ -343,8 +343,9 @@
     [NetWorkTool get_VipLimitDataWithSccess:^(NSDictionary *responseObject) {
         RTLog(@"%@",responseObject);
         if ([responseObject[status] intValue] == 1) {
-            [CommonCode writeToUserD:responseObject[results][@"date"] andKey:@"server_date"];
-            [CommonCode writeToUserD:responseObject[results][@"num"] andKey:@"limit_num"];
+            [NetWorkTool isNewDayWithServer_date:responseObject[results][@"date"]];
+            [CommonCode writeToUserD:responseObject[results][@"num"] andKey:[NSString stringWithFormat:@"%@",limit_num]];
+//        [CommonCode writeToUserD:@"3" andKey:[NSString stringWithFormat:@"%@_%@",limit_num,ExdangqianUserUid]];
         }
     } failure:^(NSError *error) {
         
@@ -693,7 +694,7 @@
 
 - (void)remoteControlReceivedWithEvent:(UIEvent *)event {
     //后台播放控制事件， 在此处设置对应的控制器进行相应
-    [[bofangVC shareInstance ] remoteControlReceivedWithEvent:event];
+    [[bofangVC shareInstance] remoteControlReceivedWithEvent:event];
 }
 
 //

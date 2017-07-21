@@ -104,11 +104,12 @@
         
         if ([pushNewsID isEqualToString:@"NO"]) {
             //上一次听过的新闻
+            APPDELEGATE.isTabbarCenterClicked = YES;
             if (ExIsKaiShiBoFang) {
-                weakSelf.hidesBottomBarWhenPushed = YES;
+//                weakSelf.hidesBottomBarWhenPushed = YES;
                 [weakSelf.navigationController pushViewController:[bofangVC shareInstance] animated:YES];
                 [[bofangVC shareInstance].tableView reloadData];
-                weakSelf.hidesBottomBarWhenPushed = NO;
+//                weakSelf.hidesBottomBarWhenPushed = NO;
             }
             else{
                 //跳转上一次播放的新闻
@@ -763,6 +764,7 @@
 {
     self.classIndex = 1;
     [self loadClassData];
+    [self loadNewsDataWithBofangVCNotification:NO];
 }
 
 /**
@@ -1154,7 +1156,7 @@
         NSDictionary *userInfoDict = [CommonCode readFromUserD:@"dangqianUserInfo"];
         //跳转已购买课堂界面，超级会员可直接跳转课堂已购买界面
         MyClassroomListFrameModel *frameModel = self.classroomInfoArr[indexPath.row];
-        if ([frameModel.model.is_free isEqualToString:@"1"]||[userInfoDict[results][@"member_type"] intValue] == 2) {
+        if ([frameModel.model.is_free isEqualToString:@"1"]||[userInfoDict[results][member_type] intValue] == 2) {
             zhuboXiangQingVCNewController *faxianzhuboVC = [[zhuboXiangQingVCNewController alloc]init];
             faxianzhuboVC.jiemuDescription = frameModel.model.Description;
             faxianzhuboVC.jiemuFan_num = frameModel.model.fan_num;

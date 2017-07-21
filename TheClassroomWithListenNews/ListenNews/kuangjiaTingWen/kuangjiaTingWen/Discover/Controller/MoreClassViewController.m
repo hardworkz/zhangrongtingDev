@@ -185,7 +185,7 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
     MyClassroomListFrameModel *frameModel = self.commentInfoArr[indexPath.row];
     NSDictionary *userInfoDict = [CommonCode readFromUserD:@"dangqianUserInfo"];
-    if ([frameModel.model.is_free isEqualToString:@"1"]||[userInfoDict[results][@"member_type"] intValue] == 2) {
+    if ([frameModel.model.is_free isEqualToString:@"1"]||[userInfoDict[results][member_type] intValue] == 2) {
         zhuboXiangQingVCNewController *faxianzhuboVC = [[zhuboXiangQingVCNewController alloc]init];
         faxianzhuboVC.jiemuDescription = frameModel.model.Description;
         faxianzhuboVC.jiemuFan_num = frameModel.model.fan_num;

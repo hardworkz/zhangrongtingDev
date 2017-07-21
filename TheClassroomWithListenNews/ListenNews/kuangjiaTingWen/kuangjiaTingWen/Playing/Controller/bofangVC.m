@@ -71,6 +71,8 @@
     int currentPlayIndex;
     //播放状态
     BOOL isPlaying;
+    //限制播放器播放
+    BOOL isLimitPlaying;
     //观察者对象
     id timeObserver;
     
@@ -95,7 +97,6 @@
 @property (assign, nonatomic) float rewardCount;
 @property (assign, nonatomic) BOOL isReward;
 @property (assign, nonatomic) BOOL isPay;
-@property (assign, nonatomic) BOOL isClassPlay;
 @property (assign, nonatomic) BOOL isCustomRewardCount;
 @property (strong, nonatomic) UITextField *customRewardTextField;
 @property (strong, nonatomic) NSArray *rewardArray;
@@ -136,20 +137,11 @@ __weak AVPlayer *weakPlayer;
 static bofangVC *_instance = nil;
 static AVPlayer *_instancePlay = nil;
 @implementation bofangVC
-//重新set方法，不保存值
+//判断是否是进入播放器播放课堂，保存该值
 - (void)setIsClass:(BOOL)isClass
 {
+    _isClass = isClass;
     [CommonCode writeToUserD:@(isClass) andKey:@"isClass"];
-    if (isClass) {
-        _isClassPlay = YES;
-    }else{
-        _isClassPlay = NO;
-    }
-}
-- (void)setIsPlay:(BOOL)isPlay
-{
-    _isPlay = isPlay;
-    
 }
 - (AVPlayer *)bofangPlayer
 {
@@ -169,6 +161,26 @@ static AVPlayer *_instancePlay = nil;
 }
 - (void)viewDidLoad {
     [super viewDidLoad];
+    
+    //初始化播放器判断限制状态
+    NSDictionary *userInfoDict = [CommonCode readFromUserD:@"dangqianUserInfo"];
+    if ([userInfoDict[results][member_type] intValue] == 0) {
+        int limitTime = [[CommonCode readFromUserD:[NSString stringWithFormat:@"%@_%@",limit_time,ExdangqianUserUid]] intValue];
+        int limitNum = [[CommonCode readFromUserD:[NSString stringWithFormat:@"%@",limit_num]] intValue];
+        if (limitTime >= limitNum ||[userInfoDict[results][is_stop] intValue] == 1) {
+            isLimitPlaying = YES;
+            [NetWorkTool sendLimitDataWithaccessToken:AvatarAccessToken sccess:^(NSDictionary *responseObject) {
+                if ([responseObject[status] intValue] == 1) {
+                    [[NSNotificationCenter defaultCenter] postNotificationName:@"updateUserInfo" object:nil];
+                }
+            } failure:^(NSError *error) {
+                
+            }];
+            
+        }else{
+            isLimitPlaying = NO;
+        }
+    }
     
     self.view.backgroundColor = [UIColor whiteColor];
     isJiaZaiWan = NO;
@@ -270,6 +282,7 @@ static AVPlayer *_instancePlay = nil;
 }
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
+    
     
     ExIsClassVCPlay = NO;
     [CommonCode writeToUserD:@(NO) andKey:@"ExIsClassVCPlay"];
@@ -784,9 +797,16 @@ static AVPlayer *_instancePlay = nil;
                 [bofangCenterBtn setEnabled:YES];
                 RTLog(@"KVO：准备完毕，可以播放");
                 //自动播放
-                if (self.isFirst == YES){
+                if (self.isFirst == YES ){
                     if (self.isPushNews) {
-                        [Explayer play];
+                        
+                        if (_isClass) {//限制播放新闻
+                            [Explayer play];
+                        }else{
+                            if (!isLimitPlaying) {
+                                [Explayer play];
+                            }
+                        }
                         [ExclassPlayer pause];
                     }
                     else{
@@ -796,9 +816,12 @@ static AVPlayer *_instancePlay = nil;
                 }
                 
                 break;
-            case AVPlayerStatusFailed:
+            case AVPlayerStatusFailed:{
                 RTLog(@"KVO：加载失败，网络或者服务器出现问题");
                 [self performSelector:@selector(bofangRightAction:) withObject:nil afterDelay:0.5f];
+                XWAlerLoginView *alert = [[XWAlerLoginView alloc] initWithTitle:@"~加载失败，自动播放下一条~"];
+                [alert show];
+            }
                 break;
             default:
                 break;
@@ -814,6 +837,15 @@ static AVPlayer *_instancePlay = nil;
 }
 //播放音频
 - (void)doPlay:(UIButton *)sender {
+    [self configNowPlayingInfoCenter];
+    if (!_isClass) {//限制播放新闻
+        if (isLimitPlaying) {
+            XWAlerLoginView *alert = [[XWAlerLoginView alloc] initWithTitle:@"您的今日可播放新闻数已用完"];
+            [alert show];
+            isPlaying = NO;
+            return;
+        }
+    }
     if (isPlaying){
         [[UIDevice currentDevice] setProximityMonitoringEnabled:NO];
         [Explayer pause];
@@ -826,7 +858,13 @@ static AVPlayer *_instancePlay = nil;
         [[UIDevice currentDevice] setProximityMonitoringEnabled:[[NSUserDefaults standardUserDefaults] boolForKey:@"shoushi"]];
         isPlaying = YES;
         self.isPlay = isPlaying;
-        [Explayer play];
+        if (_isClass) {//限制播放新闻
+            [Explayer play];
+        }else{
+            if (!isLimitPlaying) {
+                [Explayer play];
+            }
+        }
         [ExclassPlayer pause];
         [bofangCenterBtn setImage:[UIImage imageNamed:@"home_news_ic_pause"] forState:UIControlStateNormal];
         bofangCenterBtn.accessibilityLabel = @"暂停、播放";
@@ -835,7 +873,6 @@ static AVPlayer *_instancePlay = nil;
 //         RTLog(@"总长度 = %f",self.sliderProgress.maximumValue);
 //
     }
-    [self configNowPlayingInfoCenter];
 }
 //拖拽播放进度
 - (void)doChangeProgress:(UISlider *)sender{
@@ -845,7 +882,13 @@ static AVPlayer *_instancePlay = nil;
     [Explayer seekToTime:CMTimeMake(self.sliderProgress.value, 1) completionHandler:^(BOOL finished) {
         RTLog(@"拖拽结果：%d",finished);
         if (finished == YES){
-            [Explayer play];
+            if (_isClass) {//限制播放新闻
+                [Explayer play];
+            }else{
+                if (!isLimitPlaying) {
+                    [Explayer play];
+                }
+            }
         }
     }];
     [[UIDevice currentDevice] setProximityMonitoringEnabled:[[NSUserDefaults standardUserDefaults] boolForKey:@"shoushi"]];
@@ -1155,8 +1198,25 @@ static AVPlayer *_instancePlay = nil;
         return;
     }
     //判断是否是播放新闻，记录次数限制
-    if (!_isClassPlay) {
-        
+    NSDictionary *userInfoDict = [CommonCode readFromUserD:@"dangqianUserInfo"];
+    if (!_isClass && [userInfoDict[results][member_type] intValue] == 0) {
+        int limitTime = [[CommonCode readFromUserD:[NSString stringWithFormat:@"%@_%@",limit_time,ExdangqianUserUid]] intValue];
+        RTLog(@"limit_time---%d",limitTime);
+        int limitNum = [[CommonCode readFromUserD:[NSString stringWithFormat:@"%@",limit_num]] intValue];
+        if (limitTime >= limitNum) {
+            isLimitPlaying = YES;
+            isPlaying = NO;
+            [NetWorkTool sendLimitDataWithaccessToken:AvatarAccessToken sccess:^(NSDictionary *responseObject) {
+                if ([responseObject[status] intValue] == 1) {
+                    [[NSNotificationCenter defaultCenter] postNotificationName:@"updateUserInfo" object:nil];
+                }
+            } failure:^(NSError *error) {
+                
+            }];
+        }else{
+            isLimitPlaying = NO;
+            [CommonCode writeToUserD:[NSString stringWithFormat:@"%d",limitTime + 1] andKey:[NSString stringWithFormat:@"%@_%@",limit_time,ExdangqianUserUid]];
+        }
     }
     
     RTLog(@"bofangwanbi--------");
@@ -1265,11 +1325,12 @@ static AVPlayer *_instancePlay = nil;
             [Explayer addObserver:self forKeyPath:@"loadedTimeRanges" options:NSKeyValueObservingOptionNew context:nil];
             ExisRigester = YES;
         }
+        
         [bofangRightBtn setEnabled:NO];
         [bofangLeftBtn setEnabled:NO];
         [bofangCenterBtn setEnabled:NO];
         [self doPlay:bofangCenterBtn];
-        [self performSelector:@selector(doplay2) withObject:nil afterDelay:0.5f];
+        [self performSelector:@selector(doplay2) withObject:nil afterDelay:0.2f];
     }
 }
 
