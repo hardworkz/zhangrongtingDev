@@ -9,6 +9,7 @@
 #import <UIKit/UIKit.h>
 
 @interface XWAlerLoginView : UIView
++ (instancetype)alertWithTitle:(NSString *)string;
 - (instancetype)initWithTitle:(NSString *)string;
 - (void)show;
 - (void)dissmiss;

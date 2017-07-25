@@ -9,7 +9,10 @@
 #import "XWAlerLoginView.h"
 
 @implementation XWAlerLoginView
-
++ (instancetype)alertWithTitle:(NSString *)string
+{
+    return [[self alloc] initWithTitle:string];
+}
 - (instancetype)initWithTitle:(NSString *)string {
     if (self = [super init]) {
         

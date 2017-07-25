@@ -80,6 +80,10 @@
     UIButton *bofangRightBtn;
     BOOL isGuanZhu;
     TencentOAuth *tencentOAuth;
+    //是否正在显示快进后退15秒按钮
+    BOOL isShowfastBackView;
+    //view的显示时间默认5s
+    NSInteger showTime;
 }
 @property(strong,nonatomic)NSDictionary *infoDic;
 @property(strong,nonatomic)NSMutableArray *pinglunArr;
@@ -114,15 +118,17 @@
 @property (strong, nonatomic) UIView *seperatorLine;
 @property (strong, nonatomic) UILabel *titleLab;
 @property (strong, nonatomic) UILabel *riqiLab;
-//@property (strong, nonatomic) UIView *rewardView;
-//@property (strong, nonatomic) UIView *rewardBorderView;
-//@property (strong, nonatomic) UILabel *tipLabel;
-//@property (strong, nonatomic) UIView *customRewardView;
+
+/**
+ 快进15秒，后退15秒的View
+ */
+@property (strong, nonatomic) UIView *forwardBackView;
+@property (strong, nonatomic) NSTimer *showForwardBackViewTimer;
 
 @property (strong, nonatomic) UILabel *appreciateNum;//投金币数
 @property (strong, nonatomic) UILabel *commentNum;//评论数
 
-@property (strong, nonatomic) NSTimer *timer;//刷新锁屏页面数据计时器
+//@property (strong, nonatomic) NSTimer *timer;//刷新锁屏页面数据计时器
 
 @property (assign, nonatomic) BOOL isRewardBack;
 
@@ -331,6 +337,7 @@ static AVPlayer *_instancePlay = nil;
     }
     [CommonCode writeToUserD:@"NO" andKey:@"isPlayingVC"];
     
+    [self.forwardBackView removeFromSuperview];
 }
 
 #pragma mark - NSNotification
@@ -840,9 +847,19 @@ static AVPlayer *_instancePlay = nil;
     [self configNowPlayingInfoCenter];
     if (!_isClass) {//限制播放新闻
         if (isLimitPlaying) {
-            XWAlerLoginView *alert = [[XWAlerLoginView alloc] initWithTitle:@"您的今日可播放新闻数已用完"];
-            [alert show];
-            isPlaying = NO;
+//            XWAlerLoginView *alert = [[XWAlerLoginView alloc] initWithTitle:@"您的今日可播放新闻数已用完"];
+//            [alert show];
+//            isPlaying = NO;
+            
+            UIAlertController *qingshuruyonghuming = [UIAlertController alertControllerWithTitle:@"温馨提示" message:@"您还不是会员，是否前往开通会员，收听更多资讯" preferredStyle:UIAlertControllerStyleAlert];
+            [qingshuruyonghuming addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+            }]];
+            [qingshuruyonghuming addAction:[UIAlertAction actionWithTitle:@"前往开通会员" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+                MyVipMenbersViewController *MyVip = [MyVipMenbersViewController new];
+                [self.navigationController pushViewController:MyVip animated:YES];
+            }]];
+            
+            [self presentViewController:qingshuruyonghuming animated:YES completion:nil];
             return;
         }
     }
@@ -877,6 +894,13 @@ static AVPlayer *_instancePlay = nil;
 //拖拽播放进度
 - (void)doChangeProgress:(UISlider *)sender{
     
+    if (!isShowfastBackView) {
+        [self showForwardBackView];
+        
+        isShowfastBackView = YES;
+        [self attAction];
+    }
+    
     [Explayer pause];
     //调到指定时间去播放
     [Explayer seekToTime:CMTimeMake(self.sliderProgress.value, 1) completionHandler:^(BOOL finished) {
@@ -892,6 +916,29 @@ static AVPlayer *_instancePlay = nil;
         }
     }];
     [[UIDevice currentDevice] setProximityMonitoringEnabled:[[NSUserDefaults standardUserDefaults] boolForKey:@"shoushi"]];
+}
+- (void)attAction
+{
+    showTime = 5;
+    [_showForwardBackViewTimer invalidate];
+    _showForwardBackViewTimer = nil;
+    //启动定时器
+    _showForwardBackViewTimer = [NSTimer scheduledTimerWithTimeInterval:1.0
+                                                          target:self
+                                                        selector:@selector(timeAction)
+                                                        userInfo:nil
+                                                         repeats:YES];
+    [_showForwardBackViewTimer fire];//
+    [[NSRunLoop currentRunLoop] addTimer:_showForwardBackViewTimer forMode:NSDefaultRunLoopMode];
+    
+}
+- (void)timeAction
+{
+    showTime --;
+    if (showTime == 0) {
+        //隐藏快进，后退view
+        [self hideForwardBackView];
+    }
 }
 //播放完毕时调用的方法
 - (void)PlayedidEnd:(NSNotification *)notice
@@ -1199,23 +1246,25 @@ static AVPlayer *_instancePlay = nil;
     }
     //判断是否是播放新闻，记录次数限制
     NSDictionary *userInfoDict = [CommonCode readFromUserD:@"dangqianUserInfo"];
-    if (!_isClass && [userInfoDict[results][member_type] intValue] == 0) {
-        int limitTime = [[CommonCode readFromUserD:[NSString stringWithFormat:@"%@_%@",limit_time,ExdangqianUserUid]] intValue];
-        RTLog(@"limit_time---%d",limitTime);
-        int limitNum = [[CommonCode readFromUserD:[NSString stringWithFormat:@"%@",limit_num]] intValue];
-        if (limitTime >= limitNum) {
-            isLimitPlaying = YES;
-            isPlaying = NO;
-            [NetWorkTool sendLimitDataWithaccessToken:AvatarAccessToken sccess:^(NSDictionary *responseObject) {
-                if ([responseObject[status] intValue] == 1) {
-                    [[NSNotificationCenter defaultCenter] postNotificationName:@"updateUserInfo" object:nil];
-                }
-            } failure:^(NSError *error) {
-                
-            }];
-        }else{
-            isLimitPlaying = NO;
-            [CommonCode writeToUserD:[NSString stringWithFormat:@"%d",limitTime + 1] andKey:[NSString stringWithFormat:@"%@_%@",limit_time,ExdangqianUserUid]];
+    if (!_isClass) {
+        if ([userInfoDict[results][member_type] intValue] == 0) {
+            int limitTime = [[CommonCode readFromUserD:[NSString stringWithFormat:@"%@_%@",limit_time,ExdangqianUserUid]] intValue];
+            RTLog(@"limit_time---%d",limitTime);
+            int limitNum = [[CommonCode readFromUserD:[NSString stringWithFormat:@"%@",limit_num]] intValue];
+            if (limitTime >= limitNum) {
+                isLimitPlaying = YES;
+                isPlaying = NO;
+                [NetWorkTool sendLimitDataWithaccessToken:AvatarAccessToken sccess:^(NSDictionary *responseObject) {
+                    if ([responseObject[status] intValue] == 1) {
+                        [[NSNotificationCenter defaultCenter] postNotificationName:@"updateUserInfo" object:nil];
+                    }
+                } failure:^(NSError *error) {
+                    
+                }];
+            }else{
+                isLimitPlaying = NO;
+                [CommonCode writeToUserD:[NSString stringWithFormat:@"%d",limitTime + 1] andKey:[NSString stringWithFormat:@"%@_%@",limit_time,ExdangqianUserUid]];
+            }
         }
     }
     
@@ -3184,6 +3233,84 @@ static AVPlayer *_instancePlay = nil;
         //        [self doPlay:bofangCenterBtn];
         RTLog(@"no network");
     }
+}
+#pragma mark - 快进 后退 15秒控件
+- (UIView *)forwardBackView
+{
+    if (_forwardBackView == nil) {
+        CGFloat height = 70;
+        _forwardBackView = [[UIView alloc] init];
+        _forwardBackView.frame = CGRectMake(0, IPHONE_H - 109.0 / 667 * IPHONE_H - height, SCREEN_WIDTH, height);
+        _forwardBackView.backgroundColor = ColorWithRGBA(0, 0, 0, 0.5);
+        
+        UIButton *back = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH * 0.5, height)];
+        [back setImage:[UIImage imageNamed:@"fast_back"] forState:UIControlStateNormal];
+        [back setImage:[UIImage imageNamed:@"fast_back_blue"] forState:UIControlStateHighlighted];
+        [back addTarget:self action:@selector(back15)];
+        [_forwardBackView addSubview:back];
+        
+        UIButton *go = [[UIButton alloc] initWithFrame:CGRectMake(SCREEN_WIDTH * 0.5, 0, SCREEN_WIDTH * 0.5, height)];
+        [go setImage:[UIImage imageNamed:@"fast_go"] forState:UIControlStateNormal];
+        [go setImage:[UIImage imageNamed:@"fast_go_blue"] forState:UIControlStateHighlighted];
+        [go addTarget:self action:@selector(go15)];
+        [_forwardBackView addSubview:go];
+    }
+    return _forwardBackView;
+}
+- (void)back15
+{
+    [self attAction];
+    [Explayer pause];
+    //调到指定时间去播放
+    [Explayer seekToTime:CMTimeMake(self.sliderProgress.value > 15?self.sliderProgress.value - 15:0, 1) completionHandler:^(BOOL finished) {
+        RTLog(@"拖拽结果：%d",finished);
+        if (finished == YES){
+            if (_isClass) {//限制播放新闻
+                [Explayer play];
+            }else{
+                if (!isLimitPlaying) {
+                    [Explayer play];
+                }
+            }
+        }
+    }];
+    [[UIDevice currentDevice] setProximityMonitoringEnabled:[[NSUserDefaults standardUserDefaults] boolForKey:@"shoushi"]];
+}
+- (void)go15
+{
+    [self attAction];
+    [Explayer pause];
+    //调到指定时间去播放
+    [Explayer seekToTime:CMTimeMake(self.sliderProgress.value + 15, 1) completionHandler:^(BOOL finished) {
+        RTLog(@"拖拽结果：%d",finished);
+        if (finished == YES){
+            if (_isClass) {//限制播放新闻
+                [Explayer play];
+            }else{
+                if (!isLimitPlaying) {
+                    [Explayer play];
+                }
+            }
+        }
+    }];
+    [[UIDevice currentDevice] setProximityMonitoringEnabled:[[NSUserDefaults standardUserDefaults] boolForKey:@"shoushi"]];
+}
+- (void)showForwardBackView
+{
+    self.forwardBackView.alpha = 0.;
+    [self.view addSubview:self.forwardBackView];
+    [UIView animateWithDuration:1.0 animations:^{
+        _forwardBackView.alpha = 1.;
+    }];
+}
+- (void)hideForwardBackView
+{
+    [UIView animateWithDuration:1.0 animations:^{
+        _forwardBackView.alpha = 0.;
+    } completion:^(BOOL finished) {
+        [_forwardBackView removeFromSuperview];
+        isShowfastBackView = NO;
+    }];
 }
 #pragma mark - 懒加载新闻详情控件
 

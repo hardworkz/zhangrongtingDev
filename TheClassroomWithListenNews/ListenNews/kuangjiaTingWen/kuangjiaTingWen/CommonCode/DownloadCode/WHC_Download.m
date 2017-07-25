@@ -128,6 +128,26 @@ typedef enum : NSUInteger {
         self.downloadStatue = downloadStop;
         [ProManager insertSevaDownLoadArray:obj];
         
+        
+        //判断是否是单次下载新闻，记录次数限制
+        NSDictionary *userInfoDict = [CommonCode readFromUserD:@"dangqianUserInfo"];
+        RTLog(@"%@",userInfoDict);
+        if ([userInfoDict[results][member_type] intValue] == 0) {
+            int limitTime = [[CommonCode readFromUserD:[NSString stringWithFormat:@"%@_%@",limit_time,ExdangqianUserUid]] intValue];
+            RTLog(@"limit_time---%d",limitTime);
+            int limitNum = [[CommonCode readFromUserD:[NSString stringWithFormat:@"%@",limit_num]] intValue];
+            if (limitTime >= limitNum) {
+                [NetWorkTool sendLimitDataWithaccessToken:AvatarAccessToken sccess:^(NSDictionary *responseObject) {
+                    if ([responseObject[status] intValue] == 1) {
+                        [[NSNotificationCenter defaultCenter] postNotificationName:@"updateUserInfo" object:nil];
+                    }
+                } failure:^(NSError *error) {
+                    
+                }];
+            }else{
+                [CommonCode writeToUserD:[NSString stringWithFormat:@"%d",limitTime + 1] andKey:[NSString stringWithFormat:@"%@_%@",limit_time,ExdangqianUserUid]];
+            }
+        }
     }
     return self;
 }

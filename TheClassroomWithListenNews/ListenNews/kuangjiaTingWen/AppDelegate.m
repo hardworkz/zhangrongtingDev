@@ -107,9 +107,6 @@
     
     [MobClick startWithConfigure:UMConfigInstance];
     
-    UIView *view = [bofangVC shareInstance].view;
-    view.frame = CGRectMake(0, IPHONE_H, IPHONE_W, IPHONE_H);
-    //    [self.window addSubview:view];
     
     [[UIApplication sharedApplication] beginReceivingRemoteControlEvents];
     
@@ -149,6 +146,10 @@
     }
     ExTouXiangPath = [[NSHomeDirectory() stringByAppendingPathComponent:@"Documents"] stringByAppendingPathComponent:@"userAvatar.png"];
     ExdangqianUserUid = [CommonCode readFromUserD:@"dangqianUserUid"];
+    
+    UIView *view = [bofangVC shareInstance].view;
+    view.frame = CGRectMake(0, IPHONE_H, IPHONE_W, IPHONE_H);
+    //    [self.window addSubview:view];
     
     //获取缓存的课堂ID，判断当前ID是否有值，没有值则不跳转课堂试听页面
     Exact_id = [CommonCode readFromUserD:@"Exact_id"];
@@ -331,10 +332,34 @@
     
     NSError* error;
     [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:&error];
-
+    
+//    AudioSessionInitialize(NULL, NULL, interruptionListenner, (__bridge void*)self);
     return YES;
 }
 
+/**
+ 监听来电打断
+ */
+//void interruptionListenner(void* inClientData, UInt32 inInterruptionState)
+//{
+//    AppDelegate* pTHIS = (__bridge AppDelegate*)inClientData;
+//    if (pTHIS) {
+//        NSLog(@"interruptionListenner %u", (unsigned int)inInterruptionState);
+//        if (kAudioSessionBeginInterruption == inInterruptionState) {
+//            NSLog(@"Begin interruption");
+//            if ([bofangVC shareInstance].isPlay) {
+//                [[bofangVC shareInstance] doPlay:[bofangVC shareInstance].centerBtn];
+//            }
+//        }
+//        else
+//        {
+//            NSLog(@"Begin end interruption");
+//            NSLog(@"End end interruption");
+//            [[bofangVC shareInstance] doPlay:[bofangVC shareInstance].centerBtn];
+//        }
+//        
+//    }
+//}
 /**
  获取每日免费收听数以及当前系统时间
  */
