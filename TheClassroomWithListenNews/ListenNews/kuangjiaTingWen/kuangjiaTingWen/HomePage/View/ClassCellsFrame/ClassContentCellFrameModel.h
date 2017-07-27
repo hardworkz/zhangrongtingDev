@@ -13,7 +13,7 @@
  正文字体大小
  */
 @property(assign,nonatomic)CGFloat titleFontSize;
-@property (strong, nonatomic) NSString *excerpt;/**< */
+@property (strong, nonatomic) NSString *excerpt;/**<正文内容 */
 @property (assign, nonatomic) CGRect contentLabelF;
 @property (assign, nonatomic) CGFloat cellHeight;
 @end

@@ -124,14 +124,17 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
  */
 - (void)playNext
 {
-    //如果是最后一首，加载更多歌曲
-    if (self.currentSongIndex == self.songList.count - 1)
-    if (self.loadMoreList) {
-        self.loadMoreList(self.currentSongIndex);
-    }
+    
     [self endPlay];
     [self loadSongInfoFromFirst:NO];
     [self startPlay];
+    
+    //如果是最后一首，加载更多歌曲
+    if (self.currentSongIndex == self.songList.count - 1)
+        
+        if (self.loadMoreList) {
+            self.loadMoreList(self.currentSongIndex);
+        }
 }
 
 /**
@@ -316,6 +319,11 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
     //当前播放的是单个音频文件，不是列表
     if (self.currentSongIndex < 0) return;
     
+    //播放完毕，回调block,方便外面做处理
+    if (self.playDidEnd) {
+        self.playDidEnd(self.currentSongIndex);
+    }
+    //播放列表中的下一条
     [self playNext];
 }
 /**

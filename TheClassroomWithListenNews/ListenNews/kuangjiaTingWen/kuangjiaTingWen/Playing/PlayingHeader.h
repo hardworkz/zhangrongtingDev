@@ -10,9 +10,16 @@
 #define PlayingHeader_h
 
 #import "zhuboXiangQingVCNewController.h"
+#import "PayOnlineViewController.h"
+#import "TimerViewController.h"
+#import "NewPlayVC.h"
+#import "pinglunyeVC.h"
 
 #import "AppDelegate.h"
 #import "YJImageBrowserView.h"
+#import "ZRT_PlayerManager.h"
+#import "ProjiectDownLoadManager.h"
+#import "WHC_Download.h"
 
 #import "NewsModel.h"
 #import "NewObj.h"
@@ -24,7 +31,11 @@
 #import "PlayVCCommentModel.h"
 #import "PlayVCCommentFrameModel.h"
 #import "AutoImageViewHeightFrameModel.h"
+#import "PlayVCTextContentCellFramesModel.h"
 
+#import "PlayVCThreeBtnTableViewCell.h"
+#import "PlayCustomRewardTableViewCell.h"
+#import "PlayVCTextContentTableViewCell.h"
 #import "PlayVCCommentTableViewCell.h"
 #import "AutoImageTableViewCell.h"
 #import "zhuboxiangqingNewVCPlayBtn.h"

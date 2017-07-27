@@ -66,6 +66,9 @@ typedef void (^WechatdidReceiveCode)(NSString *);
  * 获取app代理
  */
 + (AppDelegate *)delegate;
-
+/**
+ 锁屏界面播放数据设置
+ */
+- (void)configNowPlayingCenter;
 @end
 

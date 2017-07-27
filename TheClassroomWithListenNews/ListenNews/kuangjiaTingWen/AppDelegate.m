@@ -716,7 +716,19 @@
         
     });
 }
-
+#pragma mark - NowPlayingCenter & Remote Control
+- (void)configNowPlayingCenter
+{
+//    NSMutableDictionary * info = [NSMutableDictionary dictionary];
+//    [info setObject:_player.currentSong.title forKey:MPMediaItemPropertyTitle];
+//    [info setObject:_player.currentSong.artist forKey:MPMediaItemPropertyArtist];
+//    [info setObject:@(self.player.playTime.intValue) forKey:MPNowPlayingInfoPropertyElapsedPlaybackTime];
+//    [info setObject:@(1) forKey:MPNowPlayingInfoPropertyPlaybackRate];
+//    [info setObject:@(self.player.playDuration.intValue) forKey:MPMediaItemPropertyPlaybackDuration];
+//    MPMediaItemArtwork * artwork = [[MPMediaItemArtwork alloc] initWithImage:_player.coverImg];
+//    [info setObject:artwork forKey:MPMediaItemPropertyArtwork];
+//    [[MPNowPlayingInfoCenter defaultCenter]setNowPlayingInfo:info];
+}
 - (void)remoteControlReceivedWithEvent:(UIEvent *)event {
     //后台播放控制事件， 在此处设置对应的控制器进行相应
     [[bofangVC shareInstance] remoteControlReceivedWithEvent:event];

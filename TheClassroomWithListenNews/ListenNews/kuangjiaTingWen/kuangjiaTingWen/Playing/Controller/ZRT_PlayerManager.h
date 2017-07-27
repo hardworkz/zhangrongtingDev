@@ -21,7 +21,14 @@ typedef NS_ENUM(NSInteger, ZRTPlayStatus) {
     id _timeObserve; //监控进度
 }
 
+/**
+ 加载更多列表数据
+ */
 @property (copy, nonatomic) void (^loadMoreList)(NSInteger currentSongIndex);
+/**
+ 播放完成回调
+ */
+@property (copy, nonatomic) void (^playDidEnd)(NSInteger currentSongIndex);
 #pragma mark - 状态
 /*
  * 播放状态
@@ -47,7 +54,7 @@ typedef NS_ENUM(NSInteger, ZRTPlayStatus) {
 /*
  * 播放器
  */
-@property (nonatomic, strong, readonly) AVPlayer * player;
+@property (nonatomic, strong) AVPlayer * player;
 
 /*
  * 播放器播放状态
@@ -100,11 +107,11 @@ typedef NS_ENUM(NSInteger, ZRTPlayStatus) {
  */
 - (void)pausePlay;
 /*
- * 切歌
+ * 下一条
  */
 - (void)nextSong;
 /*
- * ban歌
+ * 上一条
  */
 - (void)previousSong;
 /**

@@ -1,47 +1,73 @@
 //
-//  ClassContentTableViewCell.m
+//  PlayVCTextContentTableViewCell.m
 //  kuangjiaTingWen
 //
-//  Created by 泡果 on 2017/6/2.
+//  Created by 泡果 on 2017/7/26.
 //  Copyright © 2017年 zhimi. All rights reserved.
 //
 
-#import "ClassContentTableViewCell.h"
+#import "PlayVCTextContentTableViewCell.h"
+#import "NSDate+TimeFormat.h"
 
-@interface ClassContentTableViewCell()
+@interface PlayVCTextContentTableViewCell()
 {
+    UILabel *titleLab;
+    UILabel *riqiLab;
     UITextView *zhengwenTextView;
 }
 @end
-@implementation ClassContentTableViewCell
+@implementation PlayVCTextContentTableViewCell
 + (NSString *)ID
 {
     return @"ClassContentTableViewCell";
 }
-+(ClassContentTableViewCell *)cellWithTableView:(UITableView *)tableView
++(PlayVCTextContentTableViewCell *)cellWithTableView:(UITableView *)tableView
 {
-    ClassContentTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:[ClassContentTableViewCell ID]];
+    PlayVCTextContentTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:[PlayVCTextContentTableViewCell ID]];
     if (cell == nil) {
-        cell = [[ClassContentTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:[ClassContentTableViewCell ID]];
+        cell = [[PlayVCTextContentTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:[PlayVCTextContentTableViewCell ID]];
     }
     return cell;
 }
 - (instancetype)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier
 {
     if (self = [super initWithStyle:style reuseIdentifier:reuseIdentifier]) {
+        //标题
+        titleLab = [[UILabel alloc] init];
+        titleLab.textAlignment = NSTextAlignmentLeft;
+        titleLab.textColor = nTextColorMain;
+        titleLab.lineBreakMode = NSLineBreakByWordWrapping;
+        titleLab.numberOfLines = 0;
+        titleLab.frame = CGRectMake(20.0 / 375 * IPHONE_W, 20.0 / 667 * SCREEN_HEIGHT, IPHONE_W - 40.0 / 375 * IPHONE_W, 40.0 / 667 * IPHONE_H);
+        [self.contentView addSubview:titleLab];
+        
+        //日期
+        riqiLab = [[UILabel alloc] init];
+        riqiLab.textAlignment = NSTextAlignmentCenter;
+        riqiLab.textColor = nTextColorSub;
+        [self.contentView addSubview:riqiLab];
+
         //新闻内容
         zhengwenTextView = [[UITextView alloc]initWithFrame:CGRectMake(20.0 / 375 * IPHONE_W, 0 + 24.0 / 667 * IPHONE_H, IPHONE_W - 40.0 / 375 * IPHONE_W, 50.0 / 667 * IPHONE_H)];
         zhengwenTextView.scrollEnabled = NO;
         zhengwenTextView.editable = NO;
         zhengwenTextView.scrollsToTop = NO;
         [self.contentView addSubview:zhengwenTextView];
-
     }
     return self;
 }
-- (void)setFrameModel:(ClassContentCellFrameModel *)frameModel
+- (void)setFrameModel:(PlayVCTextContentCellFramesModel *)frameModel
 {
     _frameModel = frameModel;
+    titleLab.frame = frameModel.titleLabelF;
+    riqiLab.frame = frameModel.timeLabelF;
+    
+    titleLab.font = [UIFont boldSystemFontOfSize:self.titleFontSize];
+    titleLab.text = frameModel.title;
+    riqiLab.font = [UIFont systemFontOfSize:self.dateFont];
+    NSDate *date = [NSDate dateFromString:self.time];
+    riqiLab.text = [NSString stringWithFormat:@"#来自:%@   %@ ",self.post_lai,[date showTimeByTypeA]];
+    
     //设置文本内容和frame
     NSString *str1 = [frameModel.excerpt stringByReplacingOccurrencesOfString:@"\r" withString:@""];
     zhengwenTextView.text = str1;

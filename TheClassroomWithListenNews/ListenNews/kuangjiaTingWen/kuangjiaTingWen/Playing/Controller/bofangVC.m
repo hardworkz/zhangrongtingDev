@@ -957,31 +957,6 @@ static AVPlayer *_instancePlay = nil;
 - (void)reloadPlayAllTime
 {
     self.yinpinzongTime.text = [self convertStringWithTime:[self.newsModel.post_time intValue] / 1000];
-//    if ([self.newsModel.post_time intValue] / 1000 / 60)
-//    {
-//        if ([self.newsModel.post_time intValue] / 1000 / 60 > 9)
-//        {
-//            self.yinpinzongTime.text = [NSString stringWithFormat:@"%d:%d",[self.newsModel.post_time intValue] / 1000 / 60,[self.newsModel.post_time intValue] / 1000 % 60];
-//        }else
-//        {
-//            if ([self.newsModel.post_time intValue] / 1000 % 60 < 10)
-//            {
-//                self.yinpinzongTime.text = [NSString stringWithFormat:@"0%d:0%d",[self.newsModel.post_time intValue] / 1000 / 60,[self.newsModel.post_time intValue] / 1000 % 60];
-//            }else
-//            {
-//                self.yinpinzongTime.text = [NSString stringWithFormat:@"0%d:%d",[self.newsModel.post_time intValue] / 1000 / 60,[self.newsModel.post_time intValue] / 1000 % 60];
-//            }
-//        }
-//    }else
-//    {
-//        if ([self.newsModel.post_time intValue] / 1000 > 10)
-//        {
-//            self.yinpinzongTime.text = [NSString stringWithFormat:@"00:%d",[self.newsModel.post_time intValue] / 1000 % 60];
-//        }else
-//        {
-//            self.yinpinzongTime.text = [NSString stringWithFormat:@"00:0%d",[self.newsModel.post_time intValue] / 1000 % 60];
-//        }
-//    }
 }
 #pragma mark - 私有方法转换时间为时分秒
 - (NSString *)convertStringWithTime:(float)time {
@@ -1435,48 +1410,48 @@ static AVPlayer *_instancePlay = nil;
     }
 }
 
-- (void)dianzanAction:(UIButton *)sender{
-    jiaDianZanShuJv = [NSMutableArray arrayWithArray:[CommonCode readFromUserD:@"jiaDianZanShuJv"]];
-    UIImageView *image = (UIImageView *)[sender viewWithTag:1];
-    UILabel *lab = (UILabel *)[sender viewWithTag:2];
-    if (isDianZan == NO){
-        
-        RTLog(@"点赞");
-        for (int i = 0; i < jiaDianZanShuJv.count; i ++){
-            NSString *str = jiaDianZanShuJv[i][@"jiemuID"];
-            if ([str isEqualToString:self.newsModel.jiemuID])
-            {
-                [jiaDianZanShuJv removeObjectAtIndex:i];
-                break;
-            }
-        }
-        image.image = [UIImage imageNamed:@"pinglun-yizan"];
-        lab.text = [NSString stringWithFormat:@"%d",[lab.text intValue] + 1];
-        lab.textColor = ColorWithRGBA(0, 159, 240, 1);
-        isDianZan = YES;
-        NSDictionary *dic = @{@"jiemuID":self.newsModel.jiemuID,@"praisenum":lab.text,@"isdianzan":@"YES"};
-        [jiaDianZanShuJv addObject:dic];
-        [CommonCode writeToUserD:jiaDianZanShuJv andKey:@"jiaDianZanShuJv"];
-    }
-    else{
-        RTLog(@"取消点赞");
-        
-        for (int i = 0; i < jiaDianZanShuJv.count; i ++){
-            NSString *str = jiaDianZanShuJv[i][@"jiemuID"];
-            if ([str isEqualToString:self.newsModel.jiemuID]) {
-                [jiaDianZanShuJv removeObjectAtIndex:i];
-                break;
-            }
-        }
-        image.image = [UIImage imageNamed:@"pinglun-7"];
-        lab.text = [NSString stringWithFormat:@"%d",[lab.text intValue] - 1];
-        lab.textColor = [UIColor blackColor];
-        isDianZan = NO;
-        NSDictionary *dic = @{@"jiemuID":self.newsModel.jiemuID,@"praisenum":lab.text,@"isdianzan":@"NO"};
-        [jiaDianZanShuJv addObject:dic];
-        [CommonCode writeToUserD:jiaDianZanShuJv andKey:@"jiaDianZanShuJv"];
-    }
-}
+//- (void)dianzanAction:(UIButton *)sender{
+//    jiaDianZanShuJv = [NSMutableArray arrayWithArray:[CommonCode readFromUserD:@"jiaDianZanShuJv"]];
+//    UIImageView *image = (UIImageView *)[sender viewWithTag:1];
+//    UILabel *lab = (UILabel *)[sender viewWithTag:2];
+//    if (isDianZan == NO){
+//        
+//        RTLog(@"点赞");
+//        for (int i = 0; i < jiaDianZanShuJv.count; i ++){
+//            NSString *str = jiaDianZanShuJv[i][@"jiemuID"];
+//            if ([str isEqualToString:self.newsModel.jiemuID])
+//            {
+//                [jiaDianZanShuJv removeObjectAtIndex:i];
+//                break;
+//            }
+//        }
+//        image.image = [UIImage imageNamed:@"pinglun-yizan"];
+//        lab.text = [NSString stringWithFormat:@"%d",[lab.text intValue] + 1];
+//        lab.textColor = ColorWithRGBA(0, 159, 240, 1);
+//        isDianZan = YES;
+//        NSDictionary *dic = @{@"jiemuID":self.newsModel.jiemuID,@"praisenum":lab.text,@"isdianzan":@"YES"};
+//        [jiaDianZanShuJv addObject:dic];
+//        [CommonCode writeToUserD:jiaDianZanShuJv andKey:@"jiaDianZanShuJv"];
+//    }
+//    else{
+//        RTLog(@"取消点赞");
+//        
+//        for (int i = 0; i < jiaDianZanShuJv.count; i ++){
+//            NSString *str = jiaDianZanShuJv[i][@"jiemuID"];
+//            if ([str isEqualToString:self.newsModel.jiemuID]) {
+//                [jiaDianZanShuJv removeObjectAtIndex:i];
+//                break;
+//            }
+//        }
+//        image.image = [UIImage imageNamed:@"pinglun-7"];
+//        lab.text = [NSString stringWithFormat:@"%d",[lab.text intValue] - 1];
+//        lab.textColor = [UIColor blackColor];
+//        isDianZan = NO;
+//        NSDictionary *dic = @{@"jiemuID":self.newsModel.jiemuID,@"praisenum":lab.text,@"isdianzan":@"NO"};
+//        [jiaDianZanShuJv addObject:dic];
+//        [CommonCode writeToUserD:jiaDianZanShuJv andKey:@"jiaDianZanShuJv"];
+//    }
+//}
 
 - (void)pinglunAction{
     
@@ -1539,10 +1514,6 @@ static AVPlayer *_instancePlay = nil;
     layer.transform = transfrom;
 }
 
-- (void)shangAction {
-    RTLog(@"打赏");
-}
-
 - (void)zhuboBtnVAction:(UITapGestureRecognizer *)tap {
     zhuboXiangQingVCNewController *zhubo = [zhuboXiangQingVCNewController new];
     zhubo.jiemuDescription = self.newsModel.jiemuDescription;
@@ -1563,11 +1534,11 @@ static AVPlayer *_instancePlay = nil;
     [self.navigationController pushViewController:[TimerViewController defaultTimerViewController] animated:YES];
 }
 
-- (void)dingshiTapAction:(UITapGestureRecognizer *)tap {
-    self.hidesBottomBarWhenPushed = YES;
-    [self.navigationController.navigationBar setHidden:YES];
-    [self.navigationController pushViewController:[TimerViewController defaultTimerViewController] animated:YES];
-}
+//- (void)dingshiTapAction:(UITapGestureRecognizer *)tap {
+//    self.hidesBottomBarWhenPushed = YES;
+//    [self.navigationController.navigationBar setHidden:YES];
+//    [self.navigationController pushViewController:[TimerViewController defaultTimerViewController] animated:YES];
+//}
 //TODO:分享
 - (void)shareNewsBtnAction{
     
