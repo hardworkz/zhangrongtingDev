@@ -61,7 +61,7 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
     if (![_playDuration isEqualToString:playDuration] &&
         ![playDuration isEqualToString:@"0"]) {
         _playDuration = playDuration;
-//        [[AppDelegate delegate] configNowPlayingCenter];
+        [[AppDelegate delegate] configNowPlayingCenter];
     }else {
         _playDuration = playDuration;
     }
@@ -124,17 +124,9 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
  */
 - (void)playNext
 {
-    
     [self endPlay];
     [self loadSongInfoFromFirst:NO];
     [self startPlay];
-    
-    //如果是最后一首，加载更多歌曲
-    if (self.currentSongIndex == self.songList.count - 1)
-        
-        if (self.loadMoreList) {
-            self.loadMoreList(self.currentSongIndex);
-        }
 }
 
 /**
@@ -142,6 +134,12 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
  */
 - (void)previousSong
 {
+    if (self.currentSongIndex == 0){
+        XWAlerLoginView *alert = [XWAlerLoginView alertWithTitle:@"这已经是第一条了"];
+        [alert show];
+        return;
+    }
+
     [self endPlay];
     //因为loadsong会将index加1，这里要减2，才是上一首
     self.currentSongIndex -= 2;
@@ -154,6 +152,18 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
  */
 - (void)nextSong
 {
+    //如果是最后一首，先暂停播放下一首
+    if (self.currentSongIndex == self.songList.count - 1){
+        if (self.loadMoreList) {
+            
+            self.loadMoreList(self.currentSongIndex);
+        }else{
+            XWAlerLoginView *alert = [XWAlerLoginView alertWithTitle:@"这已经是最后一条了"];
+            [alert show];
+        }
+        return;
+    }
+    
     [self playNext];
 }
 #pragma mark - 加载歌曲
@@ -176,6 +186,9 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
     }
     //更新当前歌曲信息
     self.currentSong = self.songList[self.currentSongIndex];
+    
+    //刷新封面图片
+    self.currentCoverImage = NEWSSEMTPHOTOURL(self.currentSong[@"smeta"]);
     
     //加载URL
     NSURL * url = [NSURL URLWithString:self.currentSong[@"post_mp"]];
@@ -208,6 +221,9 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
     
     //刷新index
     self.currentSongIndex = index;
+    
+    //刷新封面图片
+    self.currentCoverImage = NEWSSEMTPHOTOURL(self.currentSong[@"smeta"]);
     
     //加载URL
     NSURL * url = [NSURL URLWithString:self.currentSong[@"post_mp"]];
@@ -319,10 +335,26 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
     //当前播放的是单个音频文件，不是列表
     if (self.currentSongIndex < 0) return;
     
+    
     //播放完毕，回调block,方便外面做处理
     if (self.playDidEnd) {
         self.playDidEnd(self.currentSongIndex);
     }
+    
+    //如果是最后一首，先暂停播放下一首
+    if (self.currentSongIndex == self.songList.count - 1){
+        
+        [self endPlay];
+        
+        if (self.loadMoreList) {
+            self.loadMoreList(self.currentSongIndex);
+        }else{
+            XWAlerLoginView *alert = [XWAlerLoginView alertWithTitle:@"这已经是最后一条了"];
+            [alert show];
+        }
+        return;
+    }
+    
     //播放列表中的下一条
     [self playNext];
 }
@@ -402,7 +434,8 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
 /**
  转换秒数为时间格式字符串
  */
-- (NSString *)convertStringWithTime:(float)time {
+- (NSString *)convertStringWithTime:(float)time
+{
     if (isnan(time)) time = 0.f;
     int min = time / 60.0;
     int sec = time - min * 60;

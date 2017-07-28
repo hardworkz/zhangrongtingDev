@@ -14,6 +14,7 @@
 #import "TimerViewController.h"
 #import "NewPlayVC.h"
 #import "pinglunyeVC.h"
+#import "RewardListViewController.h"
 
 #import "AppDelegate.h"
 #import "YJImageBrowserView.h"
@@ -46,6 +47,11 @@
 
 #import "LoginVC.h"
 #import "LoginNavC.h"
+
+
+#import <MediaPlayer/MediaPlayer.h>
+#import "NSDate+TimeFormat.h"
+#import "UIActionSheet+MKBlockAdditions.h"
 
 //会员常量
 static NSString *const member_type = @"member_type";

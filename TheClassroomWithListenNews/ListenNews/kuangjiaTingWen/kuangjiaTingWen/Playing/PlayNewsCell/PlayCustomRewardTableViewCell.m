@@ -43,7 +43,6 @@
     UILabel *noPayLabel;
 }
 @property (strong, nonatomic) UITextField *customRewardTextField;
-@property (strong, nonatomic) OJLAnimationButton *finalRewardButton;
 
 @end
 @implementation PlayCustomRewardTableViewCell
@@ -88,7 +87,7 @@
         [rewardBorderView.layer setCornerRadius:5.0];
         [rewardView addSubview:rewardBorderView];
         
-        tipLabel = [[UILabel alloc]initWithFrame:CGRectMake( 80, 5, 220, 32)];
+        tipLabel = [[UILabel alloc]initWithFrame:CGRectMake(80, 5, 220, 32)];
         [tipLabel setText:self.rewardType == RewardViewTypeCustomReward ? @"请输入自定义金额" : @"您的支持是我们最大的动力~"];
         [tipLabel setTextColor:gTextDownload];
         [tipLabel setFont:gFontMain14];
@@ -256,7 +255,6 @@
     }
     return self;
 }
-
 /**
  设置类型
  */

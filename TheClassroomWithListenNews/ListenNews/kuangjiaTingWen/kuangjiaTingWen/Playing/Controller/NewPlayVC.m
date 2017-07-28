@@ -12,7 +12,7 @@
 #include <TencentOpenAPI/QQApiInterface.h>
 #import "GestureControlAlertView.h"
 
-@interface NewPlayVC ()<UITableViewDelegate,UITableViewDataSource>
+@interface NewPlayVC ()<UITableViewDelegate,UITableViewDataSource,TencentSessionDelegate>
 {
     //底部播放模块控件容器
     UIView *dibuView;
@@ -36,15 +36,21 @@
     BOOL isGuanZhu;
     //新闻头部详情View
     UIView *xiangqingView;
+    //打赏动画按钮
+    OJLAnimationButton *rewardAnimationBtn;
 }
 /**
  主页面tableView
  */
 @property(strong,nonatomic)UITableView *tableView;
 /**
- 新闻详情数据
+ 新闻详情模型数据
  */
 @property (strong, nonatomic) newsDetailModel *postDetailModel;
+/**
+ 新闻内容模型数据
+ */
+@property (strong, nonatomic) PlayVCTextContentCellFramesModel *textFrameModel;
 /**
  评论数据数组
  */
@@ -100,11 +106,11 @@
 /**
  投金币数
  */
-@property (strong, nonatomic) UILabel *appreciateNum;
+//@property (strong, nonatomic) UILabel *appreciateNum;
 /**
  评论数
  */
-@property (strong, nonatomic) UILabel *commentNum;
+//@property (strong, nonatomic) UILabel *commentNum;
 //新闻详情控件------------------------------------
 /**
  新闻图片
@@ -183,7 +189,7 @@ static NewPlayVC *_instance = nil;
     
     //通知
     //监听外面列表加载成功通知
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(jiazaichenggong:) name:@"jiazaichenggong" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(loadSuccess:) name:@"jiazaichenggong" object:nil];
     //后台系统中断音频控制通知
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleInterruption:) name:AVAudioSessionInterruptionNotification object:[AVAudioSession sharedInstance]];
     //添加通知，拔出耳机后暂停播放
@@ -205,66 +211,49 @@ static NewPlayVC *_instance = nil;
     [NetWorkTool getPostDetailWithaccessToken:AvatarAccessToken post_id:self.post_id sccess:^(NSDictionary *responseObject) {
         if ([responseObject[@"status"] intValue] == 1){
             _postDetailModel = [newsDetailModel mj_objectWithKeyValues:responseObject[@"results"]];
-            if (_postDetailModel.reward.count != 0) {
-//                self.isPay = YES;
-//                self.rewardArray = detailModel.reward;
-                //修复广告点击进入的主播详情粉丝数错误
-//                self.newsModel.act_id = detailModel.act.act_id;
-//                self.newsModel.jiemuFan_num = detailModel.act.fan_num;
-//                self.newsModel.jiemuMessage_num = detailModel.act.message_num;
-            }
-            else{
-//                self.isPay = NO;
-//                self.rewardArray = nil;
-            }
-            [self.appreciateNum setText:_postDetailModel.gold];
-            if ([_postDetailModel.is_collection integerValue] == 1) {
-                _isCollected = YES;
-                UIButton *collectBtn = (UIButton *)[dibuView viewWithTag:99];
-                [collectBtn setImage:[UIImage imageNamed:@"home_news_collectioned"] forState:UIControlStateNormal];
-            }
-            else{
-                _isCollected = NO;
-                UIButton *collectBtn = (UIButton *)[dibuView viewWithTag:99];
-                [collectBtn setImage:[UIImage imageNamed:@"home_news_collection"] forState:UIControlStateNormal];
-            }
+            //记录当前新闻详情
+            [self recordTheLastNews];
+            //设置新闻内容详情的frame数据
+            [self setFrameModel];
+            //设置详情头部数据
+            [self setupTableViewHeaderData];
         }
         else{
-//            self.isPay = NO;
-//            self.rewardArray = nil;
-            [self.appreciateNum setText:@"0"];
             [SVProgressHUD showErrorWithStatus:responseObject[@"msg"]];
         }
-        
-//        if (self.isRewardBack) {
-//            self.isReward = YES;
-//            self.isRewardBack = NO;
-//        }
-//        else{
-//            self.isReward = NO;
-//            self.isCustomRewardCount = NO;
-//        }
+        //设置打赏模块状态
+        self.rewardType = RewardViewTypeNone;
         
         [self.tableView reloadData];
     } failure:^(NSError *error) {
         RTLog(@"%@",error);
     }];
-    
+}
+
+/**
+ 设置frame模型数据
+ */
+- (void)setFrameModel{
+    PlayVCTextContentCellFramesModel *frameModel = [[PlayVCTextContentCellFramesModel alloc] init];
+    frameModel.titleFontSize = self.titleFontSize;
+    frameModel.dateFont = self.dateFont;
+    frameModel.title = self.postDetailModel.post_title;
+    NSDate *date = [NSDate dateFromString:self.postDetailModel.post_modified];
+    frameModel.timeString = [NSString stringWithFormat:@"#来自:%@   %@ ",self.postDetailModel.post_lai,[date showTimeByTypeA]];
+    frameModel.excerpt = self.postDetailModel.post_excerpt;
+    self.textFrameModel = frameModel;
 }
 #pragma mark - 获取评论列表
 - (void)getCommentList{
     //获取评论列表
     [NetWorkTool getPaoGuoJieMuPingLunLieBiaoWithJieMuID:self.post_id anduid:ExdangqianUserUid andPage:@"1" andLimit:@"10" sccess:^(NSDictionary *responseObject) {
-        RTLog(@"%@",responseObject[@"results"]);
         if ([responseObject[@"results"] isKindOfClass:[NSArray class]])
         {
             NSArray *array = [PlayVCCommentModel mj_objectArrayWithKeyValuesArray:responseObject[@"results"]];
             self.pinglunArr = [self pinglunFrameModelArrayWithModelArray:array];
-            [self.commentNum setText:[NSString stringWithFormat:@"%lu",(unsigned long)self.pinglunArr.count]];
         }
         else{
             self.pinglunArr = [NSMutableArray array];
-            [self.commentNum setText:@"0"];
         }
         [self.tableView reloadData];
     } failure:^(NSError *error) {
@@ -304,36 +293,39 @@ static NewPlayVC *_instance = nil;
     [_rightBtn addTarget:self action:@selector(shareNewsBtnAction) forControlEvents:UIControlEventTouchUpInside];
     [_topView addSubview:_rightBtn];
 }
-#pragma mark - 设置新闻头部控件
+#pragma mark - 设置新闻头部控件数据
 - (void)setupTableViewHeaderData
 {
     //设置新闻图片
-//    NSString *imgUrl4 = self.newsModel.ImgStrjiemu;
-//    if ([imgUrl4 rangeOfString:@"userDownLoadPathImage"].location != NSNotFound) {
-//        [_zhengwenImg sd_setImageWithURL:[NSURL fileURLWithPath:imgUrl4] placeholderImage:[UIImage imageNamed:@"thumbnailsdefault"]];
-//    }
-//    else if ([imgUrl4  rangeOfString:@"http"].location != NSNotFound)
-//    {
-//        [_zhengwenImg sd_setImageWithURL:[NSURL URLWithString:imgUrl4] placeholderImage:[UIImage imageNamed:@"thumbnailsdefault"]];
-//    }else
-//    {
-//        NSString *str = USERPHOTOHTTPSTRINGZhuBo(imgUrl4);
-//        [_zhengwenImg sd_setImageWithURL:[NSURL URLWithString:str] placeholderImage:[UIImage imageNamed:@"thumbnailsdefault"]];
-//    }
+    NSString *imgUrl4 = self.postDetailModel.smeta;
+    if ([imgUrl4 rangeOfString:@"userDownLoadPathImage"].location != NSNotFound) {
+        [_zhengwenImg sd_setImageWithURL:[NSURL fileURLWithPath:imgUrl4] placeholderImage:[UIImage imageNamed:@"thumbnailsdefault"]];
+    }
+    else if ([imgUrl4  rangeOfString:@"http"].location != NSNotFound)
+    {
+        [_zhengwenImg sd_setImageWithURL:[NSURL URLWithString:imgUrl4] placeholderImage:[UIImage imageNamed:@"thumbnailsdefault"]];
+    }else
+    {
+        NSString *str = USERPHOTOHTTPSTRINGZhuBo(imgUrl4);
+        [_zhengwenImg sd_setImageWithURL:[NSURL URLWithString:str] placeholderImage:[UIImage imageNamed:@"thumbnailsdefault"]];
+    }
     //设置主播头像
-//    if([self.newsModel.jiemuImages rangeOfString:@"/data/upload/"].location !=NSNotFound)//_roaldSearchText
-//    {
-//        IMAGEVIEWHTTP(_zhuboImg, self.newsModel.jiemuImages);
-//    }
-//    else
-//    {
-//        IMAGEVIEWHTTP2(_zhuboImg, self.newsModel.jiemuImages);
-//    }
+    if([self.postDetailModel.act.images rangeOfString:@"/data/upload/"].location !=NSNotFound)//_roaldSearchText
+    {
+        IMAGEVIEWHTTP(_zhuboImg, self.postDetailModel.act.images);
+    }
+    else
+    {
+        IMAGEVIEWHTTP2(_zhuboImg, self.postDetailModel.act.images);
+    }
     //设置主播昵称
-//    _zhuboTitleLab.text = self.newsModel.jiemuName;
+    _zhuboTitleLab.text = self.postDetailModel.act.name;
     //设置标题名称
-//    _titleLab.text = self.newsModel.Titlejiemu;
+    _titleLab.text = self.postDetailModel.post_title;
+    //是否关注
+    _guanzhuBtn.selected = [self.postDetailModel.is_collection intValue] == 1?YES:NO;
 }
+#pragma mark - 设置新闻头部控件
 - (UIView *)setupTableViewHeader
 {
     xiangqingView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, IPHONE_W, IPHONE_H)];
@@ -646,15 +638,6 @@ static NewPlayVC *_instance = nil;
     }
     return _sliderProgress;
 }
-- (UILabel *)commentNum{
-    if (!_commentNum) {
-        _commentNum = [[UILabel alloc]init];
-        [_commentNum setTextAlignment:NSTextAlignmentLeft];
-        [_commentNum setFont:gFontSub11];
-        [_commentNum setTextColor:[UIColor colorWithHue:0.01 saturation:0.57 brightness:0.93 alpha:1.00]];
-    }
-    return _commentNum;
-}
 #pragma mark --- 懒加载数组容器
 - (NSMutableArray *)pinglunArr
 {
@@ -667,22 +650,130 @@ static NewPlayVC *_instance = nil;
 #pragma mark - table datasource
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    return 0;
+    if (self.postDetailModel) {
+        return 3 + self.pinglunArr.count;
+    }else{
+        return 0;
+    }
 }
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    return nil;
+    if (indexPath.row == 0) {
+        PlayVCTextContentTableViewCell *cell = [PlayVCTextContentTableViewCell cellWithTableView:tableView];
+        cell.frameModel = self.textFrameModel;
+        DefineWeakSelf
+        cell.readOriginalEssay = ^(UIButton *item) {
+            [weakSelf readOriginalEssay:item];
+        };
+        return cell;
+    }else if (indexPath.row == 1) {
+        PlayVCThreeBtnTableViewCell *cell = [PlayVCThreeBtnTableViewCell cellWithTableView:tableView];
+        cell.appreciateNum.text = self.postDetailModel.gold;
+        cell.commentNum.text = self.postDetailModel.comment_count;
+        DefineWeakSelf
+        cell.selectedItem = ^(UIButton *item) {
+            [weakSelf selecteItemAction:item];
+        };
+        return cell;
+    }else if (indexPath.row == 2) {
+        PlayCustomRewardTableViewCell *cell = [PlayCustomRewardTableViewCell cellWithTableView:tableView];
+        rewardAnimationBtn = cell.finalRewardButton;
+        cell.rewardArray = self.postDetailModel.reward;
+        DefineWeakSelf
+        cell.selecteRewardCountAction = ^(UIButton *item, NSArray *buttons) {
+            [weakSelf selecteRewardCountAction:item buttons:buttons];
+        };
+        cell.rewardButtonAciton = ^(UIButton *item) {
+            [weakSelf rewardButtonAciton:item];
+        };
+        cell.finalRewardButtonAciton = ^(OJLAnimationButton *item) {
+            [weakSelf finalRewardButtonAciton:item];
+        };
+        cell.lookupRewardListButton = ^(UIButton *item) {
+            [weakSelf lookupRewardListButton:item];
+        };
+        cell.backButtonAction = ^(UIButton *item) {
+            [weakSelf backButtonAction:item];
+        };
+        return cell;
+    }else{
+        PlayVCCommentTableViewCell *cell = [PlayVCCommentTableViewCell cellWithTableView:tableView];
+        cell.hideZanBtn = YES;
+        PlayVCCommentFrameModel *frameModel = self.pinglunArr[indexPath.row - 3];
+        cell.selectionStyle = UITableViewCellSelectionStyleNone;
+        cell.frameModel = frameModel;
+        return cell;
+    }
 }
 #pragma mark - table delegate
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    
+    if (indexPath.row >= 3) {
+        //TODO:删除自己的评论 或者回复、复制
+        PlayVCCommentFrameModel *frameModel = self.pinglunArr[indexPath.row - 3];
+        PlayVCCommentModel *model = frameModel.model;
+        NSDictionary *userInfo = [CommonCode readFromUserD:@"dangqianUserInfo"];
+        NSString *currentUserID = userInfo[@"results"][@"id"];
+        if ([currentUserID isEqualToString:model.uid]) {
+            [UIActionSheet actionSheetWithTitle:nil message:nil buttons:@[@"删除", @"复制"] showInView:self.view onDismiss:^(int buttonIndex) {
+                if (buttonIndex == 0) {
+                    [NetWorkTool delCommentWithaccessToken:[DSE encryptUseDES:ExdangqianUser] comment_id:model.playCommentID sccess:^(NSDictionary *responseObject)
+                    {
+                        [self getCommentList];
+                        
+                    } failure:^(NSError *error) {
+                        //
+                        RTLog(@"delete error");
+                    }];
+                }
+                else{
+                    UIPasteboard *gr                             = [UIPasteboard generalPasteboard];
+                    gr.string                                    = [NSString stringWithFormat:@"%@",model.content];
+                    XWAlerLoginView *xw = [[XWAlerLoginView alloc]initWithTitle:@"分享链接已复制到您的剪切板~~"];
+                    [xw show];
+                }
+            } onCancel:^{
+                
+            }];
+            
+        }
+        else{
+            
+            [UIActionSheet actionSheetWithTitle:nil message:nil buttons:@[@"回复", @"复制"] showInView:self.view onDismiss:^(int buttonIndex) {
+                if (buttonIndex == 0) {
+                    if ([[CommonCode readFromUserD:@"isLogin"] boolValue] == YES)
+                    {
+                        pinglunyeVC *pinglunye = [pinglunyeVC new];
+                        pinglunye.isNewsCommentPage = YES;
+                        pinglunye.post_id = model.post_id;
+                        pinglunye.to_uid = model.uid;
+                        pinglunye.comment_id = model.playCommentID;
+                        pinglunye.post_table = model.post_table;
+                        self.hidesBottomBarWhenPushed = YES;
+                        [self.navigationController pushViewController:pinglunye animated:YES];
+                        self.hidesBottomBarWhenPushed = YES;
+                    }
+                    else{
+                        [self loginFirst];
+                    }
+                }
+                else{
+                    UIPasteboard *gr                             = [UIPasteboard generalPasteboard];
+                    gr.string                                    = [NSString stringWithFormat:@"%@",model.content];
+                    XWAlerLoginView *xw = [[XWAlerLoginView alloc]initWithTitle:@"分享链接已复制到您的剪切板~~"];
+                    [xw show];
+                }
+            } onCancel:^{
+                
+            }];
+        }
+    }
 }
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     return 0;
 }
-#pragma mark OJLAnimationButtonDelegate
+#pragma mark --- 打赏按钮：OJLAnimationButtonDelegate
 -(void)OJLAnimationButtonDidStartAnimation:(OJLAnimationButton *)OJLAnimationButton{
     RTLog(@"start");
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.8 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
@@ -697,7 +788,171 @@ static NewPlayVC *_instance = nil;
 -(void)OJLAnimationButtonWillFinishAnimation:(OJLAnimationButton *)OJLAnimationButton{
         [self rewarding];
 }
+#pragma mark - UIButtonAction
 
+/**
+ 下载，打赏金币，评论按钮
+ */
+- (void)selecteItemAction:(UIButton *)sender {
+    switch (sender.tag - 10) {
+        case 0:
+        {
+            //下载
+            [self downloadAction:sender];
+        }
+            break;
+        case 1:
+        {
+            //投金币
+            [self appreciateGold];
+            
+        }
+            break;
+        case 2:
+        {
+            //评论
+            [self pinglunAction];
+        }
+            break;
+            
+        default:
+            break;
+    }
+}
+
+/**
+ 下载
+ */
+- (void)downloadAction:(UIButton *)sender {
+    [SVProgressHUD showInfoWithStatus:@"开始下载"];
+    [self performSelector:@selector(SVPDismiss) withObject:nil afterDelay:1.0];
+    //TODO:下载单条新闻
+    NSArray *nowarr = [CommonCode readFromUserD:@"zhuyeliebiao"];
+    NSMutableDictionary *dic = [NSMutableDictionary dictionary];
+    for ( int i = 0 ; i < [nowarr count]; i ++) {
+        if ([nowarr[i][@"id"] isEqualToString:[CommonCode readFromUserD:@"dangqianbofangxinwenID"]]) {
+            dic = nowarr[i];
+            break;
+        }
+    }
+    if (dic != nil && [dic allKeys].count != 0) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            ProjiectDownLoadManager *manager = [ProjiectDownLoadManager defaultProjiectDownLoadManager];
+            [manager insertSevaDownLoadArray:dic];
+            
+            WHC_Download *op = [[WHC_Download alloc]initStartDownloadWithURL:[NSURL URLWithString:dic[@"post_mp"]] savePath:manager.userDownLoadPath savefileName:[dic[@"post_mp"] stringByReplacingOccurrencesOfString:@"/" withString:@""] withObj:dic delegate:nil];
+            [manager.downLoadQueue addOperation:op];
+        });
+    }else{
+        XWAlerLoginView *xw = [[XWAlerLoginView alloc]initWithTitle:@"下载路径为空"];
+        [xw show];
+    }
+    
+}
+/**
+ 投金币
+ */
+- (void)appreciateGold
+{
+    if ([[CommonCode readFromUserD:@"isLogin"]boolValue] == YES){
+        NSDictionary *userInfo = [CommonCode readFromUserD:@"dangqianUserInfo"];
+        if ([userInfo[@"results"][@"gold"] floatValue] > 0) {
+            [NetWorkTool goldUseWithaccessToken:AvatarAccessToken act_id:(self.postDetailModel.post_news != nil) ? self.postDetailModel.post_news : self.post_id post_id:self.post_id sccess:^(NSDictionary *responseObject) {
+                [self loadData];
+                XWAlerLoginView *xw = [[XWAlerLoginView alloc]initWithTitle:responseObject[@"msg"]];
+                [xw show];
+                //投完金币 --》 获取用户信息
+                [[NSNotificationCenter defaultCenter] postNotificationName:@"updateUserInfo" object:nil];
+                
+            } failure:^(NSError *error) {
+                //
+            }];
+        }
+        else{
+            XWAlerLoginView *xw = [[XWAlerLoginView alloc]initWithTitle:@"金币不足"];
+            [xw show];
+        }
+    }
+    else{
+        XWAlerLoginView *xw = [[XWAlerLoginView alloc]initWithTitle:@"登录后才可以投金币哦~"];
+        [xw show];
+    }
+}
+/**
+ 点击跳转评论页面
+ */
+- (void)pinglunAction
+{
+    if ([[CommonCode readFromUserD:@"isLogin"] boolValue] == YES){
+        pinglunyeVC *pinglunye = [pinglunyeVC new];
+        pinglunye.isNewsCommentPage = YES;
+        pinglunye.post_id = self.post_id;
+        
+        pinglunye.to_uid = @"0";
+        [self.navigationController pushViewController:pinglunye animated:YES];
+    }
+    else{
+        if ([[CommonCode readFromUserD:@"isIAP"] boolValue] == YES) {
+            XWAlerLoginView *xw = [[XWAlerLoginView alloc]initWithTitle:@"登录后才可以评论哦~"];
+            [xw show];
+        }else{
+            UIAlertController *qingshuruyonghuming = [UIAlertController alertControllerWithTitle:@"请先登录" message:nil preferredStyle:UIAlertControllerStyleAlert];
+            [qingshuruyonghuming addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+            }]];
+            [qingshuruyonghuming addAction:[UIAlertAction actionWithTitle:@"去登录" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+                LoginVC *loginFriVC = [LoginVC new];
+                LoginNavC *loginNavC = [[LoginNavC alloc]initWithRootViewController:loginFriVC];
+                [loginNavC.navigationBar setBackgroundColor:[UIColor whiteColor]];
+                loginNavC.navigationBar.tintColor = [UIColor blackColor];
+                [self presentViewController:loginNavC animated:YES completion:nil];
+            }]];
+            
+            [self presentViewController:qingshuruyonghuming animated:YES completion:nil];
+        }
+    }
+}
+
+- (void)rewardButtonAciton:(UIButton *)sender
+{
+    self.rewardType = RewardViewTypeReward;
+    [self.tableView reloadData];
+}
+
+- (void)lookupRewardListButton:(UIButton *)sender
+{
+    RewardListViewController *vc = [RewardListViewController new];
+    vc.post_id = self.post_id;
+    vc.act_id = self.postDetailModel.post_news;
+    self.hidesBottomBarWhenPushed = YES;
+    [self.navigationController pushViewController:vc animated:YES];
+    
+}
+
+- (void)finalRewardButtonAciton:(OJLAnimationButton *)sender {
+    [self.view endEditing:YES];
+    if ([[CommonCode readFromUserD:@"isLogin"]boolValue] == YES){
+        [sender startAnimation];
+    }
+    else{
+        [self rewardOrLoginfirst];
+    }
+}
+- (void)rewardOrLoginfirst{
+    
+    UIAlertController *alertC = [UIAlertController alertControllerWithTitle:@"温馨提示" message:@"您还没有登录，登录后赞赏才有排名哦~是否去登录" preferredStyle:UIAlertControllerStyleAlert];
+    [alertC addAction:[UIAlertAction actionWithTitle:@"赞赏" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action)
+    {
+        [rewardAnimationBtn startAnimation];
+    }]];
+    [alertC addAction:[UIAlertAction actionWithTitle:@"登录" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        LoginVC *loginFriVC = [LoginVC new];
+        LoginNavC *loginNavC = [[LoginNavC alloc]initWithRootViewController:loginFriVC];
+        [loginNavC.navigationBar setBackgroundColor:[UIColor whiteColor]];
+        loginNavC.navigationBar.tintColor = [UIColor blackColor];
+        [self presentViewController:loginNavC animated:YES completion:nil];
+    }]];
+    [self presentViewController:alertC animated:YES completion:nil];
+}
 
 /**
  打赏操作，跳转支付界面
@@ -746,34 +1001,39 @@ static NewPlayVC *_instance = nil;
     self.rewardCount = [textField.text floatValue];
     return YES;
 }
+#pragma mark - 跳转阅读原文
+- (void)readOriginalEssay:(UIButton *)sender
+{
+    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:self.postDetailModel.url]];
+}
 #pragma mark - 打赏调用action
-- (void)selecteRewardCountAction:(UIButton *)sender {
+- (void)selecteRewardCountAction:(UIButton *)sender buttons:(NSArray *)buttons{
     
     //TODO:打赏按钮数据
-//    for ( int i = 0 ; i < self.buttons.count; i ++ ) {
-//        if (i == sender.tag - 100 ) {
-//            UIButton *allDoneButton = self.buttons[i];
-//            [allDoneButton setBackgroundColor:gButtonRewardColor];
-//            [allDoneButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-//            continue;
-//        }
-//        else{
-//            UIButton *anotherButton = self.buttons[i];
-//            [anotherButton setBackgroundColor:[UIColor whiteColor]];
-//            [anotherButton setTitleColor:gTextRewardColor forState:UIControlStateNormal];
-//            continue;
-//        }
-//    }
-//    DefineWeakSelf;
-//    switch (sender.tag - 100) {
-//        case 0:self.rewardCount = 1;break;
-//        case 1:self.rewardCount = 5;break;
-//        case 2:self.rewardCount = 10;break;
-//        case 3:self.rewardCount = 50;break;
-//        case 4:self.rewardCount = 100;break;
-//        case 5:[weakSelf customRewardCount];break;
-//        default:break;
-//    }
+    for ( int i = 0 ; i < buttons.count; i ++ ) {
+        if (i == sender.tag - 100 ) {
+            UIButton *allDoneButton = buttons[i];
+            [allDoneButton setBackgroundColor:gButtonRewardColor];
+            [allDoneButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+            continue;
+        }
+        else{
+            UIButton *anotherButton = buttons[i];
+            [anotherButton setBackgroundColor:[UIColor whiteColor]];
+            [anotherButton setTitleColor:gTextRewardColor forState:UIControlStateNormal];
+            continue;
+        }
+    }
+    DefineWeakSelf;
+    switch (sender.tag - 100) {
+        case 0:self.rewardCount = 1;break;
+        case 1:self.rewardCount = 5;break;
+        case 2:self.rewardCount = 10;break;
+        case 3:self.rewardCount = 50;break;
+        case 4:self.rewardCount = 100;break;
+        case 5:[weakSelf customRewardCount];break;
+        default:break;
+    }
 }
 
 - (void)backButtonAction:(UIButton *)sender {
@@ -784,6 +1044,31 @@ static NewPlayVC *_instance = nil;
 - (void)customRewardCount {
     self.rewardType = RewardViewTypeCustomReward;
     [self.tableView reloadData];
+}
+#pragma mark - 记录当前播放新闻详情数据
+- (void)recordTheLastNews{
+    
+    NSMutableDictionary *dic = [NSMutableDictionary new];
+//    [dic setObject:self.newsModel.jiemuID forKey:@"jiemuID"];
+//    [dic setObject:self.newsModel.Titlejiemu forKey:@"Titlejiemu"];
+//    [dic setObject:self.newsModel.RiQijiemu forKey:@"RiQijiemu"];
+//    [dic setObject:self.newsModel.ImgStrjiemu forKey:@"ImgStrjiemu"];
+//    [dic setObject:self.newsModel.post_lai forKey:@"post_lai"];
+//    [dic setObject:self.newsModel.post_news forKey:@"post_news"];
+//    [dic setObject:self.newsModel.jiemuName forKey:@"jiemuName"];
+//    [dic setObject:self.newsModel.jiemuDescription forKey:@"jiemuDescription"];
+//    [dic setObject:self.newsModel.jiemuImages forKey:@"jiemuImages"];
+//    [dic setObject:self.newsModel.jiemuFan_num forKey:@"jiemuFan_num"];
+//    [dic setObject:self.newsModel.jiemuMessage_num forKey:@"jiemuMessage_num"];
+//    [dic setObject:self.newsModel.jiemuIs_fan forKey:@"jiemuIs_fan"];
+//    [dic setObject:self.newsModel.post_mp forKey:@"post_mp"];
+//    [dic setObject:self.newsModel.post_time forKey:@"post_time"];
+//    [dic setObject:self.newsModel.post_keywords forKey:@"post_keywords"];
+//    [dic setObject:self.newsModel.url forKey:@"url"];
+//    [dic setObject:self.newsModel.ImgStrjiemu forKey:@"ImgStrjiemu"];
+//    [dic setObject:self.newsModel.ZhengWenjiemu forKey:@"ZhengWenjiemu"];
+//    [dic setObject:self.newsModel.praisenum forKey:@"praisenum"];
+    [CommonCode writeToUserD:dic andKey:THELASTNEWSDATA];
 }
 #pragma mark - 快进 后退 15秒控件
 - (UIView *)forwardBackView
@@ -975,6 +1260,21 @@ static NewPlayVC *_instance = nil;
         }
     }
 }
+#pragma mark - 网络状态改变通知
+/**
+ 监听网络改变方法
+ */
+- (void)networkChange
+{
+    if ([[SuNetworkMonitor monitor] isWiFiEnable]) {//网络切换为WiFi
+        RTLog(@"wifi");
+    }else if([[SuNetworkMonitor monitor] isNetworkEnable]){//网络切换为手机网络
+        RTLog(@"iphone network");
+    }else{
+        RTLog(@"no network");
+    }
+}
+
 #pragma mark - 控件事件action
 /**
  上一首
@@ -988,15 +1288,26 @@ static NewPlayVC *_instance = nil;
  */
 - (void)playPauseClicked:(UIButton *)sender
 {
-    //添加手势控制
-    [self setGestureControl];
 }
 /**
  下一首
  */
 - (void)bofangRightAction:(UIButton *)sender
 {
+    //添加手势控制
+    [self setGestureControl];
+}
+/**
+ 选中播放对应index的音频
+ 
+ @param index 对应index
+ */
+- (void)playFromIndex:(NSInteger)index
+{
+    //设置播放器数据
     
+    //设置界面数据
+    [self loadData];
 }
 /**
  点击定时跳转定时设置控制器
@@ -1206,42 +1517,7 @@ static NewPlayVC *_instance = nil;
     }
 }
 
-/**
- 点击跳转评论页面
- */
-- (void)pinglunAction
-{
-    
-    if ([[CommonCode readFromUserD:@"isLogin"] boolValue] == YES){
-        pinglunyeVC *pinglunye = [pinglunyeVC new];
-        pinglunye.isNewsCommentPage = YES;
-        pinglunye.post_id = self.post_id;
-        
-        pinglunye.to_uid = @"0";
-        self.hidesBottomBarWhenPushed = YES;
-        [self.navigationController pushViewController:pinglunye animated:YES];
-        self.hidesBottomBarWhenPushed = YES;
-    }
-    else{
-        if ([[CommonCode readFromUserD:@"isIAP"] boolValue] == YES) {
-            XWAlerLoginView *xw = [[XWAlerLoginView alloc]initWithTitle:@"登录后才可以评论哦~"];
-            [xw show];
-        }else{
-            UIAlertController *qingshuruyonghuming = [UIAlertController alertControllerWithTitle:@"请先登录" message:nil preferredStyle:UIAlertControllerStyleAlert];
-            [qingshuruyonghuming addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-            }]];
-            [qingshuruyonghuming addAction:[UIAlertAction actionWithTitle:@"去登录" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-                LoginVC *loginFriVC = [LoginVC new];
-                LoginNavC *loginNavC = [[LoginNavC alloc]initWithRootViewController:loginFriVC];
-                [loginNavC.navigationBar setBackgroundColor:[UIColor whiteColor]];
-                loginNavC.navigationBar.tintColor = [UIColor blackColor];
-                [self presentViewController:loginNavC animated:YES completion:nil];
-            }]];
-            
-            [self presentViewController:qingshuruyonghuming animated:YES completion:nil];
-        }
-    }
-}
+
 //TODO:分享内容设置
 - (void)shareNewsBtnAction{
     
@@ -1557,7 +1833,6 @@ static NewPlayVC *_instance = nil;
         }
     }];
 }
-
 /**
  获取分享图片
  */
@@ -1732,9 +2007,25 @@ static NewPlayVC *_instance = nil;
         dispatch_sync(dispatch_get_main_queue(), ^{
             [self shareNewsBtnAction];
         });
-        
     }
 }
+#pragma mark - 登录弹窗
+- (void)loginFirst {
+    
+    UIAlertController *qingshuruyonghuming = [UIAlertController alertControllerWithTitle:@"温馨提示" message:@"您还没登录，请先登录后操作" preferredStyle:UIAlertControllerStyleAlert];
+    [qingshuruyonghuming addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+    }]];
+    [qingshuruyonghuming addAction:[UIAlertAction actionWithTitle:@"登录" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        LoginVC *loginFriVC = [LoginVC new];
+        LoginNavC *loginNavC = [[LoginNavC alloc]initWithRootViewController:loginFriVC];
+        [loginNavC.navigationBar setBackgroundColor:[UIColor whiteColor]];
+        loginNavC.navigationBar.tintColor = [UIColor blackColor];
+        [self presentViewController:loginNavC animated:YES completion:nil];
+    }]];
+    
+    [self presentViewController:qingshuruyonghuming animated:YES completion:nil];
+}
+
 #pragma mark - 工具方法
 /**
  *  计算文本高度

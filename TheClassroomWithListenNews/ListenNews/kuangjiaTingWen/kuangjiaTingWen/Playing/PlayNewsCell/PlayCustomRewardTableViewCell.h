@@ -24,13 +24,17 @@
 @property (nonatomic, strong) NSMutableArray *buttons;
 
 /**
+ 打赏动画按钮
+ */
+@property (strong, nonatomic) OJLAnimationButton *finalRewardButton;
+/**
  选中打赏金币值按钮回调
  */
 @property (copy, nonatomic) void (^selecteRewardCountAction)(UIButton *item,NSArray *buttons);
 /**
  自定义赞赏
  */
-@property (copy, nonatomic) void (^finalRewardButtonAciton)(UIButton *item);
+@property (copy, nonatomic) void (^finalRewardButtonAciton)(OJLAnimationButton *item);
 /**
  查看榜单block
  */
@@ -43,10 +47,6 @@
  返回赞赏
  */
 @property (copy, nonatomic) void (^backButtonAction)(UIButton *item);
-/**
- 赞赏按钮动画完成调用
- */
-@property (copy, nonatomic) void (^animationFinish)(OJLAnimationButton *item);
 
 +(PlayCustomRewardTableViewCell *)cellWithTableView:(UITableView *)tableView;
 @end

@@ -719,19 +719,43 @@
 #pragma mark - NowPlayingCenter & Remote Control
 - (void)configNowPlayingCenter
 {
-//    NSMutableDictionary * info = [NSMutableDictionary dictionary];
-//    [info setObject:_player.currentSong.title forKey:MPMediaItemPropertyTitle];
-//    [info setObject:_player.currentSong.artist forKey:MPMediaItemPropertyArtist];
-//    [info setObject:@(self.player.playTime.intValue) forKey:MPNowPlayingInfoPropertyElapsedPlaybackTime];
-//    [info setObject:@(1) forKey:MPNowPlayingInfoPropertyPlaybackRate];
-//    [info setObject:@(self.player.playDuration.intValue) forKey:MPMediaItemPropertyPlaybackDuration];
-//    MPMediaItemArtwork * artwork = [[MPMediaItemArtwork alloc] initWithImage:_player.coverImg];
-//    [info setObject:artwork forKey:MPMediaItemPropertyArtwork];
-//    [[MPNowPlayingInfoCenter defaultCenter]setNowPlayingInfo:info];
+    if([[SDWebImageManager sharedManager] cachedImageExistsForURL:[NSURL URLWithString:[ZRT_PlayerManager manager].currentCoverImage]]){
+        UIImage* img = [[SDWebImageManager sharedManager].imageCache imageFromMemoryCacheForKey:[[SDWebImageManager sharedManager] cacheKeyForURL:[NSURL URLWithString:[ZRT_PlayerManager manager].currentCoverImage]]];
+        
+        if(!img)
+            img = [[SDWebImageManager sharedManager].imageCache imageFromDiskCacheForKey:[[SDWebImageManager sharedManager] cacheKeyForURL:[NSURL URLWithString:[ZRT_PlayerManager manager].currentCoverImage]]];
+        NSMutableDictionary * playingCenterInfo = [NSMutableDictionary dictionary];
+        [playingCenterInfo setObject:[ZRT_PlayerManager manager].currentSong[@"post_title"] forKey:MPMediaItemPropertyTitle];
+        [playingCenterInfo setObject:[ZRT_PlayerManager manager].currentSong[@"act"][@"name"] forKey:MPMediaItemPropertyArtist];
+        [playingCenterInfo setObject:@([[ZRT_PlayerManager manager].playDuration intValue]) forKey:MPNowPlayingInfoPropertyElapsedPlaybackTime];
+        [playingCenterInfo setObject:@(1) forKey:MPNowPlayingInfoPropertyPlaybackRate];
+        [playingCenterInfo setObject:@([[ZRT_PlayerManager manager].duration intValue]) forKey:MPMediaItemPropertyPlaybackDuration];
+        MPMediaItemArtwork * artwork = [[MPMediaItemArtwork alloc] initWithImage:img];
+        [playingCenterInfo setObject:artwork forKey:MPMediaItemPropertyArtwork];
+        [[MPNowPlayingInfoCenter defaultCenter] setNowPlayingInfo:playingCenterInfo];
+        
+    }else{
+        [[SDWebImageManager sharedManager] downloadImageWithURL:[NSURL URLWithString:[ZRT_PlayerManager manager].currentCoverImage] options:SDWebImageRetryFailed|SDWebImageLowPriority progress:nil completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, BOOL finished, NSURL *imageURL) {
+            if (image) {
+                NSMutableDictionary * playingCenterInfo = [NSMutableDictionary dictionary];
+                [playingCenterInfo setObject:[ZRT_PlayerManager manager].currentSong[@"post_title"] forKey:MPMediaItemPropertyTitle];
+                [playingCenterInfo setObject:[ZRT_PlayerManager manager].currentSong[@"act"][@"name"] forKey:MPMediaItemPropertyArtist];
+                [playingCenterInfo setObject:@([[ZRT_PlayerManager manager].playDuration intValue]) forKey:MPNowPlayingInfoPropertyElapsedPlaybackTime];
+                [playingCenterInfo setObject:@(1) forKey:MPNowPlayingInfoPropertyPlaybackRate];
+                [playingCenterInfo setObject:@([[ZRT_PlayerManager manager].duration intValue]) forKey:MPMediaItemPropertyPlaybackDuration];
+                MPMediaItemArtwork * artwork = [[MPMediaItemArtwork alloc] initWithImage:image];
+                [playingCenterInfo setObject:artwork forKey:MPMediaItemPropertyArtwork];
+                [[MPNowPlayingInfoCenter defaultCenter] setNowPlayingInfo:playingCenterInfo];
+            }
+        }];
+    }
+    
 }
 - (void)remoteControlReceivedWithEvent:(UIEvent *)event {
     //后台播放控制事件， 在此处设置对应的控制器进行相应
     [[bofangVC shareInstance] remoteControlReceivedWithEvent:event];
+    //新的播放器控制
+    [[NewPlayVC shareInstance] remoteControlReceivedWithEvent:event];
 }
 
 //

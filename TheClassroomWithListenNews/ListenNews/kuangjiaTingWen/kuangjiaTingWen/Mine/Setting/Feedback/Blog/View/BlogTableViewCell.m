@@ -200,17 +200,11 @@ static NSString *const kUserNameKey = @"UserName";
             _newsBackgroundView.fd_collapsed = NO;
             
             
-            NSString *aimgUrl = [NSString stringWithFormat:@"%@",[self.blog[@"post"][@"smeta"] stringByReplacingOccurrencesOfString:@"\\" withString:@""]];
-            NSString *bimgUrl1 = [aimgUrl stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-            NSString *cimgUrl2 = [bimgUrl1 stringByReplacingOccurrencesOfString:@"thumb:" withString:@""];
-            NSString *dimgUrl3 = [cimgUrl2 stringByReplacingOccurrencesOfString:@"{" withString:@""];
-            NSString *eimgUrl4 = [dimgUrl3 stringByReplacingOccurrencesOfString:@"}" withString:@""];
-            
-            if ([eimgUrl4  rangeOfString:@"http"].location != NSNotFound){
-                [_newsImage sd_setImageWithURL:[NSURL URLWithString:eimgUrl4] placeholderImage:NewsPlaceHolderImage];
+            if ([NEWSSEMTPHOTOURL(self.blog[@"post"][@"smeta"])  rangeOfString:@"http"].location != NSNotFound){
+                [_newsImage sd_setImageWithURL:[NSURL URLWithString:NEWSSEMTPHOTOURL(self.blog[@"post"][@"smeta"])] placeholderImage:NewsPlaceHolderImage];
             }
             else{
-                NSString *str = USERPHOTOHTTPSTRINGZhuBo(eimgUrl4);
+                NSString *str = USERPHOTOHTTPSTRINGZhuBo(NEWSSEMTPHOTOURL(self.blog[@"post"][@"smeta"]));
                 [_newsImage sd_setImageWithURL:[NSURL URLWithString:str] placeholderImage:NewsPlaceHolderImage];
             }
             

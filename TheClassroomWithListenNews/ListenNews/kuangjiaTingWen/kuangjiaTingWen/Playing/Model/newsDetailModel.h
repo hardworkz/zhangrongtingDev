@@ -25,20 +25,21 @@
  */
 @class newsActModel;
 @interface newsDetailModel : NSObject
-@property (nonatomic, strong) NSString *post_id;
-@property (nonatomic, strong) NSString *post_news;
-@property (nonatomic, strong) NSString *post_title;
-@property (nonatomic, strong) NSString *post_lai;
-@property (nonatomic, strong) NSString *post_mp;
-@property (nonatomic, strong) NSString *post_time;
-@property (nonatomic, strong) NSString *post_size;
-@property (nonatomic, strong) NSString *post_excerpt;
-@property (nonatomic, strong) NSString *post_modified;
-@property (nonatomic, strong) NSString *comment_count;
-@property (nonatomic, strong) NSString *smeta;
-@property (nonatomic, strong) NSString *gold;
-@property (nonatomic, strong) NSString *is_collection;
-@property (nonatomic, strong) NSString *reward_num;
-@property (nonatomic, strong) newsActModel *act;
-@property (nonatomic, strong) NSArray *reward;
+@property (nonatomic, strong) NSString *post_id;/**<新闻ID*/
+@property (nonatomic, strong) NSString *post_news;/**<新闻节目ID */
+@property (nonatomic, strong) NSString *post_title;/**<新闻标题 */
+@property (nonatomic, strong) NSString *post_lai;/**<新闻来源 */
+@property (nonatomic, strong) NSString *post_mp;/**<新闻音频url */
+@property (nonatomic, strong) NSString *post_time;/**<新闻音频总时间（ps:秒数，要除1000） */
+@property (nonatomic, strong) NSString *post_size;/**<音频大小 */
+@property (nonatomic, strong) NSString *post_excerpt;/**<新闻内容摘要 */
+@property (nonatomic, strong) NSString *post_modified;/**<新闻发布日期 */
+@property (nonatomic, strong) NSString *comment_count;/**<新闻评论数 */
+@property (nonatomic, strong) NSString *smeta;/**<新闻封面图片 */
+@property (nonatomic, strong) NSString *gold;/**<被打赏的金币总额 */
+@property (nonatomic, strong) NSString *is_collection;/**<是否收藏 */
+@property (nonatomic, strong) NSString *reward_num;/**<打赏数 */
+@property (nonatomic, strong) NSString *url;/**<原文url */
+@property (nonatomic, strong) newsActModel *act;/**<主播数据模型 */
+@property (nonatomic, strong) NSArray *reward;/**<打赏数据 */
 @end

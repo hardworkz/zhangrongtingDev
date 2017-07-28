@@ -41,9 +41,13 @@ typedef NS_ENUM(NSInteger, ZRTPlayStatus) {
 @property (nonatomic, strong) NSMutableArray * songList;
 
 /*
- * 当前播放歌曲
+ * 当前播放音频数据
  */
 @property (nonatomic, strong) NSDictionary * currentSong;
+/*
+ * 当前播放音频封面图
+ */
+@property (nonatomic, strong) NSString * currentCoverImage;
 
 /*
  * 当前播放歌曲索引

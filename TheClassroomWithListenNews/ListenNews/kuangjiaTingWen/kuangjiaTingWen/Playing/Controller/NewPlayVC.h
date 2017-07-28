@@ -34,4 +34,10 @@ typedef NS_ENUM(NSInteger, RewardViewType) {
 @property (nonatomic, assign) PlayType playType;
 
 @property(nonatomic)NSString *post_id;/**<新闻ID*/
+/**
+ 选中播放对应index的音频
+ 
+ @param index 对应index
+ */
+- (void)playFromIndex:(NSInteger)index;
 @end

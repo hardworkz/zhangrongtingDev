@@ -2165,7 +2165,7 @@ static AVPlayer *_instancePlay = nil;
     }
 }
 
- - (void)loginFirst {
+- (void)loginFirst {
     
     UIAlertController *qingshuruyonghuming = [UIAlertController alertControllerWithTitle:@"温馨提示" message:@"您还没登录，请先登录后操作" preferredStyle:UIAlertControllerStyleAlert];
     [qingshuruyonghuming addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
@@ -2484,6 +2484,7 @@ static AVPlayer *_instancePlay = nil;
         if (image == nil) {
             image = [UIImage imageNamed:@"tingwen_bg_square"];
         }
+        
         MPMediaItemArtwork *artWork = [[MPMediaItemArtwork alloc] initWithImage:image];
         //歌曲名称、演唱者、专辑缩列图、音乐剩余时长、音乐当前播放时间
         //MPMediaItemPropertyAlbumTitle:专辑名
