@@ -43,7 +43,7 @@
         payBtn.titleLabel.font = [UIFont systemFontOfSize:15];
         [payBtn setTitleColor:[UIColor redColor]];
         payBtn.layer.cornerRadius = (44 - 20)*0.5;
-        payBtn.layer.borderWidth = 1.;
+        payBtn.layer.borderWidth = 0.5;
         payBtn.layer.borderColor = [UIColor redColor].CGColor;
         [payBtn addTarget:self action:@selector(payClicked)];
         [self.contentView addSubview:payBtn];

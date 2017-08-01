@@ -147,9 +147,13 @@
     ExTouXiangPath = [[NSHomeDirectory() stringByAppendingPathComponent:@"Documents"] stringByAppendingPathComponent:@"userAvatar.png"];
     ExdangqianUserUid = [CommonCode readFromUserD:@"dangqianUserUid"];
     
-    UIView *view = [bofangVC shareInstance].view;
-    view.frame = CGRectMake(0, IPHONE_H, IPHONE_W, IPHONE_H);
+//    UIView *view = [bofangVC shareInstance].view;
+//    view.frame = CGRectMake(0, IPHONE_H, IPHONE_W, IPHONE_H);
     //    [self.window addSubview:view];
+    
+    //初始化播放器和播放控制器
+    [ZRT_PlayerManager manager];
+    [NewPlayVC shareInstance];
     
     //获取缓存的课堂ID，判断当前ID是否有值，没有值则不跳转课堂试听页面
     Exact_id = [CommonCode readFromUserD:@"Exact_id"];
@@ -719,6 +723,7 @@
 #pragma mark - NowPlayingCenter & Remote Control
 - (void)configNowPlayingCenter
 {
+//    RTLog(@"%@",[ZRT_PlayerManager manager].currentSong);
     if([[SDWebImageManager sharedManager] cachedImageExistsForURL:[NSURL URLWithString:[ZRT_PlayerManager manager].currentCoverImage]]){
         UIImage* img = [[SDWebImageManager sharedManager].imageCache imageFromMemoryCacheForKey:[[SDWebImageManager sharedManager] cacheKeyForURL:[NSURL URLWithString:[ZRT_PlayerManager manager].currentCoverImage]]];
         
@@ -726,10 +731,10 @@
             img = [[SDWebImageManager sharedManager].imageCache imageFromDiskCacheForKey:[[SDWebImageManager sharedManager] cacheKeyForURL:[NSURL URLWithString:[ZRT_PlayerManager manager].currentCoverImage]]];
         NSMutableDictionary * playingCenterInfo = [NSMutableDictionary dictionary];
         [playingCenterInfo setObject:[ZRT_PlayerManager manager].currentSong[@"post_title"] forKey:MPMediaItemPropertyTitle];
-        [playingCenterInfo setObject:[ZRT_PlayerManager manager].currentSong[@"act"][@"name"] forKey:MPMediaItemPropertyArtist];
-        [playingCenterInfo setObject:@([[ZRT_PlayerManager manager].playDuration intValue]) forKey:MPNowPlayingInfoPropertyElapsedPlaybackTime];
+        [playingCenterInfo setObject:[ZRT_PlayerManager manager].currentSong[@"post_act"][@"name"] forKey:MPMediaItemPropertyArtist];
+        [playingCenterInfo setObject:@([ZRT_PlayerManager manager].playDuration) forKey:MPNowPlayingInfoPropertyElapsedPlaybackTime];
         [playingCenterInfo setObject:@(1) forKey:MPNowPlayingInfoPropertyPlaybackRate];
-        [playingCenterInfo setObject:@([[ZRT_PlayerManager manager].duration intValue]) forKey:MPMediaItemPropertyPlaybackDuration];
+        [playingCenterInfo setObject:@([ZRT_PlayerManager manager].duration) forKey:MPMediaItemPropertyPlaybackDuration];
         MPMediaItemArtwork * artwork = [[MPMediaItemArtwork alloc] initWithImage:img];
         [playingCenterInfo setObject:artwork forKey:MPMediaItemPropertyArtwork];
         [[MPNowPlayingInfoCenter defaultCenter] setNowPlayingInfo:playingCenterInfo];
@@ -739,10 +744,10 @@
             if (image) {
                 NSMutableDictionary * playingCenterInfo = [NSMutableDictionary dictionary];
                 [playingCenterInfo setObject:[ZRT_PlayerManager manager].currentSong[@"post_title"] forKey:MPMediaItemPropertyTitle];
-                [playingCenterInfo setObject:[ZRT_PlayerManager manager].currentSong[@"act"][@"name"] forKey:MPMediaItemPropertyArtist];
-                [playingCenterInfo setObject:@([[ZRT_PlayerManager manager].playDuration intValue]) forKey:MPNowPlayingInfoPropertyElapsedPlaybackTime];
+                [playingCenterInfo setObject:[ZRT_PlayerManager manager].currentSong[@"post_act"][@"name"] forKey:MPMediaItemPropertyArtist];
+                [playingCenterInfo setObject:@([ZRT_PlayerManager manager].playDuration) forKey:MPNowPlayingInfoPropertyElapsedPlaybackTime];
                 [playingCenterInfo setObject:@(1) forKey:MPNowPlayingInfoPropertyPlaybackRate];
-                [playingCenterInfo setObject:@([[ZRT_PlayerManager manager].duration intValue]) forKey:MPMediaItemPropertyPlaybackDuration];
+                [playingCenterInfo setObject:@([ZRT_PlayerManager manager].duration) forKey:MPMediaItemPropertyPlaybackDuration];
                 MPMediaItemArtwork * artwork = [[MPMediaItemArtwork alloc] initWithImage:image];
                 [playingCenterInfo setObject:artwork forKey:MPMediaItemPropertyArtwork];
                 [[MPNowPlayingInfoCenter defaultCenter] setNowPlayingInfo:playingCenterInfo];

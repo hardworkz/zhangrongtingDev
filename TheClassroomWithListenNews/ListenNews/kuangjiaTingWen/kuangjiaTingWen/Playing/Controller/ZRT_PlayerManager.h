@@ -8,8 +8,26 @@
 
 #import <Foundation/Foundation.h>
 
+#define SONGPLAYSTATUSCHANGE @"SongPlayStatusChange"
+
+typedef NS_ENUM(NSInteger, ChannelType) {
+    ChannelTypeChannelNone = 0,//不是列表播放
+    ChannelTypeHomeChannelOne,//播放首页频道1(快讯)
+    ChannelTypeHomeChannelTwo,//播放首页频道2（专栏）
+    ChannelTypeHomeChannelClassify,//播放首页6大分类模块
+    ChannelTypeSubscriptionChannel,//播放订阅列表
+    ChannelTypeDiscoverAnchor,//播放发现模块主播详情新闻列表(课堂详情课程播放列表)
+    ChannelTypeMineDownload,//播放我的模块下载列表
+    ChannelTypeMineCollection,//播放我的模块收藏列表
+    ChannelTypeMineCircleListen,//播放我的模块听友圈点击新闻单条播放
+};
+typedef NS_ENUM(NSInteger, ZRTPlayType) {
+    ZRTPlayTypeNews = 0,//播放新闻
+    ZRTPlayTypeClassroomTry,//播放课堂试听
+    ZRTPlayTypeClassroom,//播放课堂
+};
 typedef NS_ENUM(NSInteger, ZRTPlayStatus) {
-    ZRTPlayStatusNone,//播放界面：未知状态
+    ZRTPlayStatusNone = 0,//播放界面：未知状态
     ZRTPlayStatusLoadSongInfo,//播放界面：加载信息
     ZRTPlayStatusReadyToPlay,//播放界面：准备播放
     ZRTPlayStatusPlay,//播放界面：继续播放
@@ -26,19 +44,41 @@ typedef NS_ENUM(NSInteger, ZRTPlayStatus) {
  */
 @property (copy, nonatomic) void (^loadMoreList)(NSInteger currentSongIndex);
 /**
+ 加载更多列表数据成功调用block
+ */
+@property (copy, nonatomic) void (^loadMoreListSuccess)(NSArray *playList);
+/**
  播放完成回调
  */
 @property (copy, nonatomic) void (^playDidEnd)(NSInteger currentSongIndex);
-#pragma mark - 状态
+/**
+ 播放，刷新列表
+ */
+@property (copy, nonatomic) void (^playReloadList)(NSInteger currentSongIndex);
+/**
+ 播放监控进度回调
+ */
+@property (copy, nonatomic) void (^playTimeObserve)(float progress,float bufferProgress,float currentTime,float totalDuration);
+#pragma mark - 播放状态
 /*
  * 播放状态
  */
 @property (nonatomic, assign, readonly) ZRTPlayStatus status;
+#pragma mark - 播放类型
+/*
+ * 播放类型
+ */
+@property (nonatomic, assign) ZRTPlayType playType;
+#pragma mark - 播放频道列表
+/**
+ 播放频道列表
+ */
+@property (assign, nonatomic) ChannelType channelType;
 #pragma mark - 列表
 /*
  * 歌曲列表
  */
-@property (nonatomic, strong) NSMutableArray * songList;
+@property (nonatomic, strong) NSArray * songList;
 
 /*
  * 当前播放音频数据
@@ -69,6 +109,7 @@ typedef NS_ENUM(NSInteger, ZRTPlayStatus) {
  * 播放进度
  */
 @property (nonatomic, assign, readonly) float progress;
+
 /*
  * 播放速率
  */
@@ -82,12 +123,12 @@ typedef NS_ENUM(NSInteger, ZRTPlayStatus) {
 /*
  * 当前播放时间(秒)
  */
-@property (nonatomic, copy, readonly) NSString * playDuration;
+@property (nonatomic, assign) float playDuration;
 
 /*
  * 总时长(秒)
  */
-@property (nonatomic, copy, readonly) NSString * duration;
+@property (nonatomic, assign) float duration;
 
 /*
  * 当前播放时间(00:00)
@@ -125,7 +166,7 @@ typedef NS_ENUM(NSInteger, ZRTPlayStatus) {
  */
 - (void)loadSongInfoFromIndex:(NSInteger)index;
 /**
- 播放url的音频
+ 播放单独url的音频
  
  @param urlString 音频url字符串
  */

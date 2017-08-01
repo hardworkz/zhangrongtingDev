@@ -8,7 +8,6 @@
 
 #import "PlayCustomRewardTableViewCell.h"
 #import "OJLAnimationButton.h"
-#import "MenuItemV.h"
 
 @interface PlayCustomRewardTableViewCell ()<UITextFieldDelegate>
 {
@@ -16,8 +15,6 @@
     UIView *rewardView;
     //打赏状态容器控件
     UIView *rewardBorderView;
-    //初始状态容器控件
-    UIView *rewardBorderViewNormal;
     //提示文本1
     UILabel *tipLabel;
     //选择打赏金额按钮view
@@ -26,21 +23,6 @@
     UIView *customRewardView;
     //返回退出打赏
     UIButton *backButton;
-    
-    //提示文本2
-    UILabel *tipsLabel;
-    //赞赏按钮
-    UIButton *rewardButton;
-    //分割线
-    UIView *midleLine;
-    //打赏人头像容器
-    MenuItemV *paidView;
-    //超过5人显示提示
-    UILabel *paidLabel;
-    //跳转打赏列表按钮
-    UIButton *rewardListButton;
-    //无人打赏时的提示
-    UILabel *noPayLabel;
 }
 @property (strong, nonatomic) UITextField *customRewardTextField;
 
@@ -176,82 +158,13 @@
         [rewardBorderView addSubview:backButton];
         
         [rewardBorderView setFrame:CGRectMake(rewardBorderView.frame.origin.x, rewardBorderView.frame.origin.y, rewardBorderView.frame.size.width, CGRectGetMaxY(_finalRewardButton.frame) + 35)];
-        
+        //设置view的高度
         [rewardView setFrame:CGRectMake(rewardView.frame.origin.x, rewardView.frame.origin.y, rewardView.frame.size.width, CGRectGetMaxY(rewardBorderView.frame) + 15)];
         
-        //初始状态控件容器
-        rewardBorderViewNormal = [[UIView alloc]initWithFrame:CGRectMake(15, 55, SCREEN_WIDTH - 30, 100)];
-        [rewardBorderViewNormal setUserInteractionEnabled:YES];
-        [rewardBorderViewNormal.layer setBorderWidth:1.0];
-        [rewardBorderViewNormal.layer setBorderColor:gTextRewardColor.CGColor];
-        [rewardBorderViewNormal.layer setMasksToBounds:YES];
-        [rewardBorderViewNormal.layer setCornerRadius:5.0];
-        [rewardView addSubview:rewardBorderViewNormal];
-        
-        tipsLabel = [[UILabel alloc]initWithFrame:CGRectMake( 80, 5, 170, 32)];
-        [tipsLabel setText:@"千山万水总是情，\n支持一下行不行~"];
-        [tipsLabel setNumberOfLines:0];
-        [tipsLabel setTextColor:gTextDownload];
-        [tipsLabel setFont:gFontSub11];
-        [rewardBorderViewNormal addSubview:tipsLabel];
-        
-        rewardButton = [UIButton buttonWithType:UIButtonTypeCustom];
-        [rewardButton setFrame:CGRectMake(CGRectGetMaxX(rewardBorderView.frame) - 90, 10, 60, 30)];
-        [rewardButton.layer setMasksToBounds:YES];
-        [rewardButton.layer setCornerRadius:5.0];
-        [rewardButton setBackgroundColor:gButtonRewardColor];
-        [rewardButton.titleLabel setFont:gFontMain12];
-        [rewardButton setTitle:@"赞赏" forState:UIControlStateNormal];
-        [rewardButton addTarget:self action:@selector(rewardButtonAciton:) forControlEvents:UIControlEventTouchUpInside];
-        [rewardBorderViewNormal addSubview:rewardButton];
-    
-        //分割线
-        midleLine = [[UIView alloc]initWithFrame:CGRectMake(0, rewardBorderView.frame.size.height / 2, rewardBorderView.frame.size.width, 0.5)];
-        midleLine.backgroundColor = [UIColor lightGrayColor];
-        midleLine.alpha = 0.5f;
-        [rewardBorderViewNormal addSubview:midleLine];
-    
-        NSMutableArray *titleArr = [NSMutableArray new];
-        NSMutableArray *imageArr = [NSMutableArray new];
-        NSInteger num = (self.rewardArray.count > 5) ? 5 : self.rewardArray.count;
-        for (int i = 0 ; i < num; i ++) {
-            rewardModel *reward = self.rewardArray[i];
-            [titleArr addObject:reward.money];
-            [imageArr addObject:reward.avatar];
-        }
-        
-        paidView = [[MenuItemV alloc]initWithFrame:CGRectMake(15, CGRectGetMaxY(midleLine.frame),32 * AdaptiveScale_W * [titleArr count] + 20,36) andTitleArr:titleArr andImgArr:imageArr andLineNum:[titleArr count]];
-        
-        [rewardBorderViewNormal addSubview:paidView];
-
-        paidLabel = [[UILabel alloc]initWithFrame:CGRectMake(CGRectGetMaxX(paidView.frame) - 20,CGRectGetMaxY(midleLine.frame) + 10, 60, 32)];
-        [paidLabel setText:[NSString stringWithFormat:@"等%lu人赞过",(unsigned long)[self.rewardArray count]]];
-        [paidLabel setTextAlignment:NSTextAlignmentCenter];
-        [paidLabel setTextColor:UIColorFromHex(666666)];
-        [paidLabel setFont:gFontSub11];
-        [rewardBorderViewNormal addSubview:paidLabel];
-        
-        rewardListButton = [UIButton buttonWithType:UIButtonTypeCustom];
-        [rewardListButton setFrame:CGRectMake(CGRectGetMaxX(rewardBorderView.frame) - 90, CGRectGetMaxY(midleLine.frame) + 10, 60, 30)];
-        [rewardListButton.layer setMasksToBounds:YES];
-        [rewardListButton.layer setCornerRadius:5.0];
-        [rewardListButton.layer setBorderColor:gTextRewardColor.CGColor];
-        [rewardListButton.layer setBorderWidth:0.5];
-        [rewardListButton.titleLabel setFont:gFontMain12];
-        [rewardListButton setTitleColor:gButtonRewardColor forState:UIControlStateNormal];
-        [rewardListButton setTitle:@"查看榜单" forState:UIControlStateNormal];
-        [rewardListButton addTarget:self action:@selector(lookupRewardListButton:) forControlEvents:UIControlEventTouchUpInside];
-        [rewardBorderViewNormal addSubview:rewardListButton];
-    
-        noPayLabel = [[UILabel alloc]initWithFrame:CGRectMake( 0,rewardBorderView.frame.size.height / 2 + 10, rewardBorderView.frame.size.width, 32)];
-        [noPayLabel setText:@"还没有人赞过呢，快来当第一~"];
-        [noPayLabel setTextAlignment:NSTextAlignmentCenter];
-        [noPayLabel setTextColor:UIColorFromHex(666666)];
-        [noPayLabel setFont:gFontSub11];
-        [rewardBorderViewNormal addSubview:noPayLabel];
-        
         [self.contentView addSubview:rewardView];
-
+        
+        RTLog(@"%f----%f",CGRectGetMaxY(rewardBorderView.frame),rewardView.height);
+        
     }
     return self;
 }
@@ -264,48 +177,9 @@
     if (rewardType == RewardViewTypeReward) {//打赏状态，显示选择打赏的值按钮
         selectedView.hidden = NO;
         customRewardView.hidden = YES;
-        
-        rewardBorderView.hidden = NO;
-        rewardBorderViewNormal.hidden = YES;
-        
-        [rewardView setFrame:CGRectMake(rewardView.frame.origin.x, rewardView.frame.origin.y, rewardView.frame.size.width, CGRectGetMaxY(_finalRewardButton.frame) + 50)];
     }else if(rewardType == RewardViewTypeCustomReward){//打赏状态，自定义输入打赏金额
         selectedView.hidden = YES;
         customRewardView.hidden = NO;
-        
-        rewardBorderView.hidden = NO;
-        rewardBorderViewNormal.hidden = YES;
-        
-        [rewardView setFrame:CGRectMake(rewardView.frame.origin.x, rewardView.frame.origin.y, rewardView.frame.size.width, CGRectGetMaxY(_finalRewardButton.frame) + 50)];
-    }else{//初始状态
-        rewardView.frame = CGRectMake(-5, 5 ,  SCREEN_WIDTH + 10, 170);
-        
-        if (self.rewardArray.count == 0) {//无人打赏
-            rewardBorderView.hidden = YES;
-            rewardBorderViewNormal.hidden = NO;
-            
-            noPayLabel.hidden = NO;
-            paidView.hidden = YES;
-            paidLabel.hidden = YES;
-            rewardListButton.hidden = YES;
-            
-        }else if(self.rewardArray.count != 0 && self.rewardArray.count < 5){//打赏人数小于等于4
-            rewardBorderView.hidden = YES;
-            rewardBorderViewNormal.hidden = NO;
-            
-            noPayLabel.hidden = YES;
-            paidView.hidden = NO;
-            paidLabel.hidden = YES;
-            rewardListButton.hidden = NO;
-        }else{//打赏人数大于等于5
-            rewardBorderView.hidden = YES;
-            rewardBorderViewNormal.hidden = NO;
-            
-            noPayLabel.hidden = YES;
-            paidView.hidden = NO;
-            paidLabel.hidden = NO;
-            rewardListButton.hidden = NO;
-        }
     }
 }
 - (void)selecteRewardCountAction:(UIButton *)item
@@ -314,19 +188,6 @@
         self.selecteRewardCountAction(item,self.buttons);
     }
 }
-- (void)rewardButtonAciton:(UIButton *)sender {
-    if (self.rewardButtonAciton) {
-        self.rewardButtonAciton(sender);
-    }
-}
-
-- (void)lookupRewardListButton:(UIButton *)sender {
-    
-    if (self.lookupRewardListButton) {
-        self.lookupRewardListButton(sender);
-    }
-}
-
 - (void)finalRewardButtonAciton:(OJLAnimationButton *)sender {
     if (self.finalRewardButtonAciton) {
         self.finalRewardButtonAciton(sender);

@@ -9,6 +9,10 @@
 #import <UIKit/UIKit.h>
 #import "OJLAnimationButton.h"
 
+//上一次播放的新闻详情
+#define NewPlayVC_THELASTNEWSDATA @"NewPlayVC_TheLastNewsData"
+#define NewPlayVC_PLAYLIST @"NewPlayVC_PlayList"
+
 typedef NS_ENUM(NSInteger, PlayType) {
     PlayTypeNone = 0,//未知播放
     PlayTypeNews,//播放新闻
@@ -22,7 +26,6 @@ typedef NS_ENUM(NSInteger, RewardViewType) {
 @interface NewPlayVC : UIViewController<OJLAnimationButtonDelegate>
 
 + (instancetype)shareInstance;
-
 /*
  * 赞赏View状态
  */
@@ -40,4 +43,9 @@ typedef NS_ENUM(NSInteger, RewardViewType) {
  @param index 对应index
  */
 - (void)playFromIndex:(NSInteger)index;
+/**
+ 刷新视图界面
+ */
+- (void)reloadInterface;
+
 @end

@@ -73,7 +73,7 @@ static NSString *const VIPContent = @"普通会员:\n1.每日可收听新闻数�
     UIButton *call = [UIButton buttonWithType:UIButtonTypeCustom];
     [call setTitle:@"客服:0592-5962072"];
     call.titleLabel.font = [UIFont systemFontOfSize:12];
-    [call setTitleColor:[UIColor blueColor]];
+    [call setTitleColor:[UIColor lightGrayColor]];
     call.frame = CGRectMake(0, SCREEN_HEIGHT - 30, SCREEN_WIDTH, 30);
     [call addTarget:self action:@selector(call)];
     [self.view addSubview:call];
@@ -81,7 +81,7 @@ static NSString *const VIPContent = @"普通会员:\n1.每日可收听新闻数�
     CGSize size = [call.titleLabel.text boundingRectWithSize:CGSizeMake(MAXFLOAT, MAXFLOAT) options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:call.titleLabel.font} context:nil].size;
     
     UIView *lineBottom = [[UIView alloc] init];
-    lineBottom.backgroundColor = [UIColor blueColor];
+    lineBottom.backgroundColor = [UIColor lightGrayColor];
     lineBottom.frame = CGRectMake((SCREEN_WIDTH - size.width)*0.5, 20, size.width, 1);
     [call addSubview:lineBottom];
 }

@@ -10,10 +10,6 @@
 
 @class OJLAnimationButton;
 @interface PlayCustomRewardTableViewCell : UITableViewCell
-/**
- 赞赏人数据数组
- */
-@property (strong, nonatomic) NSArray *rewardArray;
 /*
  * 赞赏View状态
  */
@@ -35,14 +31,6 @@
  自定义赞赏
  */
 @property (copy, nonatomic) void (^finalRewardButtonAciton)(OJLAnimationButton *item);
-/**
- 查看榜单block
- */
-@property (copy, nonatomic) void (^lookupRewardListButton)(UIButton *item);
-/**
- 点击打赏按钮block
- */
-@property (copy, nonatomic) void (^rewardButtonAciton)(UIButton *item);
 /**
  返回赞赏
  */

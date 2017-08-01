@@ -36,6 +36,7 @@ static CGFloat const MaxScale = 1.0;/** 选中文字放大  */
 
 @property (strong, nonatomic) UIButton *downloadingCountButton;
 
+@property (assign, nonatomic) BOOL isShowVipTips;
 @end
 
 @implementation DownloadViewController
@@ -254,8 +255,18 @@ static CGFloat const MaxScale = 1.0;/** 选中文字放大  */
     NSDictionary *userInfoDict = [CommonCode readFromUserD:@"dangqianUserInfo"];
     NSInteger i = sender.tag;
     if ([userInfoDict[results][member_type] intValue] == 0 && i == 0) {
-        XWAlerLoginView *alert = [[XWAlerLoginView alloc] initWithTitle:@"您还不是会员，开通会员才能使用批量下载功能"];
-        [alert show];
+        if (_isShowVipTips) {
+            UIAlertController *qingshuruyonghuming = [UIAlertController alertControllerWithTitle:@"温馨提示" message:@"您还不是会员，无法使用批量下载功能，是否前往开通会员" preferredStyle:UIAlertControllerStyleAlert];
+            [qingshuruyonghuming addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+            }]];
+            [qingshuruyonghuming addAction:[UIAlertAction actionWithTitle:@"前往开通会员" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+                MyVipMenbersViewController *MyVip = [MyVipMenbersViewController new];
+                [self.navigationController pushViewController:MyVip animated:YES];
+            }]];
+            
+            [self presentViewController:qingshuruyonghuming animated:YES completion:nil];
+        }
+        _isShowVipTips = YES;
         return;
     }
     CGFloat x  = i *SCREEN_WIDTH;

@@ -16,6 +16,8 @@
 {
     //底部播放模块控件容器
     UIView *dibuView;
+    //底部收藏按钮
+    UIButton *bofangfenxiangBtn;
     //播放上一首
     UIButton *bofangLeftBtn;
     //播放开始/暂停
@@ -162,6 +164,32 @@ static NewPlayVC *_instance = nil;
     }) ;
     return _instance ;
 }
+- (void)viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
+    
+    [self.navigationController setNavigationBarHidden:YES animated:YES];
+    
+    if (![ZRT_PlayerManager manager].isPlaying) {
+        [[UIDevice currentDevice] setProximityMonitoringEnabled:NO];
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"stopAnimate" object:nil];
+    }else {
+        [[UIDevice currentDevice] setProximityMonitoringEnabled:[[NSUserDefaults standardUserDefaults] boolForKey:@"shoushi"]];
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"startAnimate" object:nil];
+    }
+}
+- (void)viewWillDisappear:(BOOL)animated
+{
+    [super viewWillDisappear:animated];
+    [self.navigationController setNavigationBarHidden:NO animated:YES];
+    
+    if (![ZRT_PlayerManager manager].isPlaying) {
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"stopAnimate" object:nil];
+    }else {
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"startAnimate" object:nil];
+    }
+
+}
 - (void)viewDidLoad {
     [super viewDidLoad];
     
@@ -178,6 +206,9 @@ static NewPlayVC *_instance = nil;
     //设置自定义导航栏
     [self setupNavigation];
     
+    //设置底部播放控件
+    [self xinwenxiangqingbujv];
+    
     //设置新闻头部详情控件
     self.tableView.tableHeaderView = [self setupTableViewHeader];
     
@@ -186,10 +217,14 @@ static NewPlayVC *_instance = nil;
     [rightSwipe setDirection:UISwipeGestureRecognizerDirectionRight];
     [self.view addGestureRecognizer:rightSwipe];
 
+    //播放器加载更多数据回调block
+    DefineWeakSelf
+    [ZRT_PlayerManager manager].loadMoreListSuccess = ^(NSArray *playList) {
+        [CommonCode writeToUserD:playList andKey:@"zhuyeliebiao"];
+        [weakSelf bofangRightAction:bofangRightBtn];
+    };
     
     //通知
-    //监听外面列表加载成功通知
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(loadSuccess:) name:@"jiazaichenggong" object:nil];
     //后台系统中断音频控制通知
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleInterruption:) name:AVAudioSessionInterruptionNotification object:[AVAudioSession sharedInstance]];
     //添加通知，拔出耳机后暂停播放
@@ -200,38 +235,40 @@ static NewPlayVC *_instance = nil;
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(WechatPayResultsBack:) name:@"WechatPayResultsBack" object:nil];
     //听币支付回调
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(TcoinPayResultsBack:) name:@"TcoinPayResultsBack" object:nil];
+    //播放器状态改变
+    RegisterNotify(SONGPLAYSTATUSCHANGE, @selector(playStatusChange:))
     //网络连接状态改变通知
     RegisterNotify(NETWORKSTATUSCHANGE, @selector(networkChange))
     //跳转打赏支付页面后返回的通知
 //    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(RewardBack:) name:@"RewardBack" object:nil];
 }
 #pragma mark - 加载新闻详情数据
-- (void)loadData{
-    //postDetail
+- (void)loadData
+{
     [NetWorkTool getPostDetailWithaccessToken:AvatarAccessToken post_id:self.post_id sccess:^(NSDictionary *responseObject) {
-        if ([responseObject[@"status"] intValue] == 1){
-            _postDetailModel = [newsDetailModel mj_objectWithKeyValues:responseObject[@"results"]];
-            //记录当前新闻详情
-            [self recordTheLastNews];
+        [self.tableView.mj_header endRefreshing];
+        if ([responseObject[status] intValue] == 1){
+            //刷新新闻详情模型数据
+            _postDetailModel = [newsDetailModel mj_objectWithKeyValues:responseObject[results]];
             //设置新闻内容详情的frame数据
             [self setFrameModel];
-            //设置详情头部数据
-            [self setupTableViewHeaderData];
+            //设置详情头部状态控件数据
+            [self setHeaderStateControl];
         }
         else{
-            [SVProgressHUD showErrorWithStatus:responseObject[@"msg"]];
+            [SVProgressHUD showErrorWithStatus:responseObject[msg]];
         }
         //设置打赏模块状态
         self.rewardType = RewardViewTypeNone;
         
         [self.tableView reloadData];
     } failure:^(NSError *error) {
+        [self.tableView.mj_header endRefreshing];
         RTLog(@"%@",error);
     }];
 }
-
 /**
- 设置frame模型数据
+ 设置新闻内容详情frame模型数据
  */
 - (void)setFrameModel{
     PlayVCTextContentCellFramesModel *frameModel = [[PlayVCTextContentCellFramesModel alloc] init];
@@ -247,15 +284,20 @@ static NewPlayVC *_instance = nil;
 - (void)getCommentList{
     //获取评论列表
     [NetWorkTool getPaoGuoJieMuPingLunLieBiaoWithJieMuID:self.post_id anduid:ExdangqianUserUid andPage:@"1" andLimit:@"10" sccess:^(NSDictionary *responseObject) {
-        if ([responseObject[@"results"] isKindOfClass:[NSArray class]])
-        {
-            NSArray *array = [PlayVCCommentModel mj_objectArrayWithKeyValuesArray:responseObject[@"results"]];
-            self.pinglunArr = [self pinglunFrameModelArrayWithModelArray:array];
+        if ([responseObject[status] intValue] == 1) {
+            if ([responseObject[@"results"] isKindOfClass:[NSArray class]])
+            {
+                NSArray *array = [PlayVCCommentModel mj_objectArrayWithKeyValuesArray:responseObject[@"results"]];
+                self.pinglunArr = [self pinglunFrameModelArrayWithModelArray:array];
+            }
+            else{
+                self.pinglunArr = [NSMutableArray array];
+            }
+            [self.tableView reloadData];
+        }else{
+            XWAlerLoginView *alert = [XWAlerLoginView alertWithTitle:responseObject[msg]];
+            [alert show];
         }
-        else{
-            self.pinglunArr = [NSMutableArray array];
-        }
-        [self.tableView reloadData];
     } failure:^(NSError *error) {
         RTLog(@"error = %@",error);
     }];
@@ -293,37 +335,54 @@ static NewPlayVC *_instance = nil;
     [_rightBtn addTarget:self action:@selector(shareNewsBtnAction) forControlEvents:UIControlEventTouchUpInside];
     [_topView addSubview:_rightBtn];
 }
-#pragma mark - 设置新闻头部控件数据
+#pragma mark - 设置详情控件数据
 - (void)setupTableViewHeaderData
 {
     //设置新闻图片
-    NSString *imgUrl4 = self.postDetailModel.smeta;
+    NSString *imgUrl4 = NEWSSEMTPHOTOURL(self.postDetailModel.smeta);
     if ([imgUrl4 rangeOfString:@"userDownLoadPathImage"].location != NSNotFound) {
-        [_zhengwenImg sd_setImageWithURL:[NSURL fileURLWithPath:imgUrl4] placeholderImage:[UIImage imageNamed:@"thumbnailsdefault"]];
+        [self.zhengwenImg sd_setImageWithURL:[NSURL fileURLWithPath:imgUrl4] placeholderImage:[UIImage imageNamed:@"thumbnailsdefault"]];
     }
     else if ([imgUrl4  rangeOfString:@"http"].location != NSNotFound)
     {
-        [_zhengwenImg sd_setImageWithURL:[NSURL URLWithString:imgUrl4] placeholderImage:[UIImage imageNamed:@"thumbnailsdefault"]];
+        [self.zhengwenImg sd_setImageWithURL:[NSURL URLWithString:imgUrl4] placeholderImage:[UIImage imageNamed:@"thumbnailsdefault"]];
     }else
     {
         NSString *str = USERPHOTOHTTPSTRINGZhuBo(imgUrl4);
-        [_zhengwenImg sd_setImageWithURL:[NSURL URLWithString:str] placeholderImage:[UIImage imageNamed:@"thumbnailsdefault"]];
+        [self.zhengwenImg sd_setImageWithURL:[NSURL URLWithString:str] placeholderImage:[UIImage imageNamed:@"thumbnailsdefault"]];
     }
     //设置主播头像
     if([self.postDetailModel.act.images rangeOfString:@"/data/upload/"].location !=NSNotFound)//_roaldSearchText
     {
-        IMAGEVIEWHTTP(_zhuboImg, self.postDetailModel.act.images);
+        IMAGEVIEWHTTP(self.zhuboImg, self.postDetailModel.act.images);
     }
     else
     {
-        IMAGEVIEWHTTP2(_zhuboImg, self.postDetailModel.act.images);
+        IMAGEVIEWHTTP2(self.zhuboImg, self.postDetailModel.act.images);
     }
     //设置主播昵称
-    _zhuboTitleLab.text = self.postDetailModel.act.name;
+    self.zhuboTitleLab.text = self.postDetailModel.act.name;
+    
     //设置标题名称
-    _titleLab.text = self.postDetailModel.post_title;
+    self.titleLab.text = self.postDetailModel.post_title;
     //是否关注
-    _guanzhuBtn.selected = [self.postDetailModel.is_collection intValue] == 1?YES:NO;
+    self.guanzhuBtn.selected = [self.postDetailModel.act.is_fan intValue] == 1;
+    //是否收藏
+    bofangfenxiangBtn.selected = [self.postDetailModel.is_collection intValue] == 1;
+    [self reloadPlayAllTime];/**<刷新音频总时长*/
+}
+- (void)setHeaderStateControl
+{
+    //设置主播昵称
+    self.zhuboTitleLab.text = self.postDetailModel.act.name;
+    
+    //设置标题名称
+    self.titleLab.text = self.postDetailModel.post_title;
+    //是否关注
+    self.guanzhuBtn.selected = [self.postDetailModel.act.is_fan intValue] == 1;
+    //是否收藏
+    bofangfenxiangBtn.selected = [self.postDetailModel.is_collection intValue] == 1;
+    [self reloadPlayAllTime];/**<刷新音频总时长*/
 }
 #pragma mark - 设置新闻头部控件
 - (UIView *)setupTableViewHeader
@@ -366,12 +425,14 @@ static NewPlayVC *_instance = nil;
     [xiangqingView addSubview:_achorTouch];
     
     //关注、取消
-    _guanzhuBtn.frame = CGRectMake(SCREEN_WIDTH - 80.0 / 375 * IPHONE_W, CGRectGetMaxY(_zhengwenImg.frame) + 9.0 / 375 * IPHONE_W, 60.0 / 375 * IPHONE_W, 30.0 / 667 * IPHONE_H);
+    self.guanzhuBtn.frame = CGRectMake(SCREEN_WIDTH - 80.0 / 375 * IPHONE_W, CGRectGetMaxY(_zhengwenImg.frame) + 9.0 / 375 * IPHONE_W, 60.0 / 375 * IPHONE_W, 30.0 / 667 * IPHONE_H);
     [xiangqingView addSubview:_guanzhuBtn];
     
     
     self.seperatorLine.frame = CGRectMake(20.0 / 375 * SCREEN_WIDTH, CGRectGetMaxY(_zhuboImg.frame) +  12.0 / 667 * SCREEN_HEIGHT, SCREEN_WIDTH - 40.0 / 375 * SCREEN_WIDTH, 1.0);
     [xiangqingView addSubview:_seperatorLine];
+    
+    xiangqingView.height = CGRectGetMaxY(self.seperatorLine.frame);
 
     return xiangqingView;
 }
@@ -383,11 +444,13 @@ static NewPlayVC *_instance = nil;
     dibuView.backgroundColor = [UIColor whiteColor];
     [self.view addSubview:dibuView];
     //底部收藏按钮
-    UIButton *bofangfenxiangBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+    bofangfenxiangBtn = [UIButton buttonWithType:UIButtonTypeCustom];
     bofangfenxiangBtn.frame = CGRectMake(IPHONE_W - 52.0 / 375 * IPHONE_W, 54.0 / 667 * IPHONE_H, 32.0 / 667 * IPHONE_H, 32.0 / 667 * IPHONE_H);
     [bofangfenxiangBtn setImageEdgeInsets:UIEdgeInsetsMake(5, 5, 7, 7)];
     [bofangfenxiangBtn setImage:[UIImage imageNamed:@"home_news_collection"] forState:UIControlStateNormal];
+    [bofangfenxiangBtn setImage:[UIImage imageNamed:@"home_news_collectioned"] forState:UIControlStateSelected];
     [bofangfenxiangBtn setTag:99];
+    bofangfenxiangBtn.selected = NO;
     bofangfenxiangBtn.accessibilityLabel = @"收藏";
     [bofangfenxiangBtn addTarget:self action:@selector(collect) forControlEvents:UIControlEventTouchUpInside];
     bofangfenxiangBtn.contentMode = UIViewContentModeScaleToFill;
@@ -435,12 +498,11 @@ static NewPlayVC *_instance = nil;
     bofangCenterBtn = [UIButton buttonWithType:UIButtonTypeCustom];
     bofangCenterBtn.frame = CGRectMake((IPHONE_W  - bofangLeftBtn.frame.size.width)/ 2, bofangLeftBtn.frame.origin.y, bofangLeftBtn.frame.size.width ,bofangLeftBtn.frame.size.height);
     [bofangCenterBtn setImage:[UIImage imageNamed:@"home_news_ic_play"] forState:UIControlStateNormal];
+    [bofangCenterBtn setImage:[UIImage imageNamed:@"home_news_ic_pause"] forState:UIControlStateSelected];
     bofangCenterBtn.accessibilityLabel = @"播放";
     [bofangCenterBtn addTarget:self action:@selector(playPauseClicked:) forControlEvents:UIControlEventTouchUpInside];
     bofangCenterBtn.contentMode = UIViewContentModeScaleToFill;
-    
-    //初始时，禁用播放按钮
-    [bofangCenterBtn setEnabled:NO];
+    bofangCenterBtn.selected = YES;
     
     //新闻时长
     if (IS_IPAD) {
@@ -471,6 +533,7 @@ static NewPlayVC *_instance = nil;
     dangqianTime.text = @"00:00";
     [dibuView addSubview:dangqianTime];
     
+    //播放进度条
     self.sliderProgress.continuous = YES;
     [self.sliderProgress setThumbImage:[UIImage imageNamed:@"slider"] forState:UIControlStateNormal];
     self.sliderProgress.minimumTrackTintColor = gMainColor;
@@ -497,6 +560,27 @@ static NewPlayVC *_instance = nil;
     self.sliderProgress.maximumTrackTintColor = [UIColor clearColor];
     
     [dibuView addSubview:bofangCenterBtn];
+    
+    DefineWeakSelf
+    [ZRT_PlayerManager manager].playTimeObserve = ^(float progress,float bufferProgress,float currentTime,float totalDuration) {
+        
+        dangqianTime.text = [self convertStringWithTime:currentTime];
+        weakSelf.sliderProgress.value = currentTime;
+        weakSelf.sliderProgress.maximumValue = totalDuration;
+        [weakSelf.prgBufferProgress setProgress:bufferProgress animated:YES];
+    };
+    [ZRT_PlayerManager manager].playDidEnd = ^(NSInteger currentSongIndex) {
+        //初始化详情模型
+        self.postDetailModel = [newsDetailModel new];
+        //保存当前播放新闻的ID
+        [self saveCurrentPlayNewsID];
+        //设置模型数据，从播放器中获取对应正在播放的数据赋值新闻模型
+        [self setPostDetailModelDataFormPlayManager];
+        //获取详情数据
+        [weakSelf loadData];
+        //获取评论数据
+        [weakSelf getCommentList];
+    };
 }
 #pragma mark - 懒加载新闻详情控件
 
@@ -551,9 +635,8 @@ static NewPlayVC *_instance = nil;
 {
     if (_guanzhuBtn == nil) {
         _guanzhuBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-        [_guanzhuBtn setTitle:@"取消" forState:UIControlStateNormal];
-        [_guanzhuBtn setTitle:@"+ 关注" forState:UIControlStateSelected];
-        _guanzhuBtn.selected = NO;
+        [_guanzhuBtn setTitle:@"+ 关注" forState:UIControlStateNormal];
+        [_guanzhuBtn setTitle:@"取消" forState:UIControlStateSelected];
         [_guanzhuBtn setTitleColor:gMainColor forState:UIControlStateNormal];
         _guanzhuBtn.titleLabel.font  = [UIFont systemFontOfSize:13.0];
         _guanzhuBtn.layer.cornerRadius = 4;
@@ -650,10 +733,10 @@ static NewPlayVC *_instance = nil;
 #pragma mark - table datasource
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    if (self.postDetailModel) {
+    if (self.pinglunArr.count != 0) {
         return 3 + self.pinglunArr.count;
     }else{
-        return 0;
+        return 3;
     }
 }
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -661,10 +744,7 @@ static NewPlayVC *_instance = nil;
     if (indexPath.row == 0) {
         PlayVCTextContentTableViewCell *cell = [PlayVCTextContentTableViewCell cellWithTableView:tableView];
         cell.frameModel = self.textFrameModel;
-        DefineWeakSelf
-        cell.readOriginalEssay = ^(UIButton *item) {
-            [weakSelf readOriginalEssay:item];
-        };
+        cell.selectionStyle = UITableViewCellSelectionStyleNone;
         return cell;
     }else if (indexPath.row == 1) {
         PlayVCThreeBtnTableViewCell *cell = [PlayVCThreeBtnTableViewCell cellWithTableView:tableView];
@@ -674,28 +754,38 @@ static NewPlayVC *_instance = nil;
         cell.selectedItem = ^(UIButton *item) {
             [weakSelf selecteItemAction:item];
         };
+        cell.selectionStyle = UITableViewCellSelectionStyleNone;
         return cell;
     }else if (indexPath.row == 2) {
-        PlayCustomRewardTableViewCell *cell = [PlayCustomRewardTableViewCell cellWithTableView:tableView];
-        rewardAnimationBtn = cell.finalRewardButton;
-        cell.rewardArray = self.postDetailModel.reward;
-        DefineWeakSelf
-        cell.selecteRewardCountAction = ^(UIButton *item, NSArray *buttons) {
-            [weakSelf selecteRewardCountAction:item buttons:buttons];
-        };
-        cell.rewardButtonAciton = ^(UIButton *item) {
-            [weakSelf rewardButtonAciton:item];
-        };
-        cell.finalRewardButtonAciton = ^(OJLAnimationButton *item) {
-            [weakSelf finalRewardButtonAciton:item];
-        };
-        cell.lookupRewardListButton = ^(UIButton *item) {
-            [weakSelf lookupRewardListButton:item];
-        };
-        cell.backButtonAction = ^(UIButton *item) {
-            [weakSelf backButtonAction:item];
-        };
-        return cell;
+        if (_rewardType == RewardViewTypeNone) {
+            PlayDefaultRewardTableViewCell *cell = [PlayDefaultRewardTableViewCell cellWithTableView:tableView];
+            cell.rewardArray = self.postDetailModel.reward;
+            DefineWeakSelf
+            cell.rewardButtonAciton = ^(UIButton *item) {
+                [weakSelf rewardButtonAciton:item];
+            };
+            cell.lookupRewardListButton = ^(UIButton *item) {
+                [weakSelf lookupRewardListButton:item];
+            };
+            cell.selectionStyle = UITableViewCellSelectionStyleNone;
+            return cell;
+        }else{
+            PlayCustomRewardTableViewCell *cell = [PlayCustomRewardTableViewCell cellWithTableView:tableView];
+            cell.rewardType = _rewardType;
+            rewardAnimationBtn = cell.finalRewardButton;
+            DefineWeakSelf
+            cell.selecteRewardCountAction = ^(UIButton *item, NSArray *buttons) {
+                [weakSelf selecteRewardCountAction:item buttons:buttons];
+            };
+            cell.finalRewardButtonAciton = ^(OJLAnimationButton *item) {
+                [weakSelf finalRewardButtonAciton:item];
+            };
+            cell.backButtonAction = ^(UIButton *item) {
+                [weakSelf backButtonAction:item];
+            };
+            cell.selectionStyle = UITableViewCellSelectionStyleNone;
+            return cell;
+        }
     }else{
         PlayVCCommentTableViewCell *cell = [PlayVCCommentTableViewCell cellWithTableView:tableView];
         cell.hideZanBtn = YES;
@@ -771,7 +861,21 @@ static NewPlayVC *_instance = nil;
 }
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    return 0;
+    if (indexPath.row == 0) {
+        PlayVCTextContentCellFramesModel *frameModel = self.textFrameModel;
+        return frameModel.cellHeight;
+    }else if (indexPath.row == 1) {
+        return 72.0;
+    }else if (indexPath.row == 2) {
+        if (self.rewardType == RewardViewTypeNone) {
+            return 172;
+        }else{
+            return 266;
+        }
+    }else{
+        PlayVCCommentFrameModel *frameModel = self.pinglunArr[indexPath.row - 3];
+        return frameModel.cellHeight;
+    }
 }
 #pragma mark --- 打赏按钮：OJLAnimationButtonDelegate
 -(void)OJLAnimationButtonDidStartAnimation:(OJLAnimationButton *)OJLAnimationButton{
@@ -911,11 +1015,17 @@ static NewPlayVC *_instance = nil;
         }
     }
 }
-
+#pragma mark - 打赏Viewaction
 - (void)rewardButtonAciton:(UIButton *)sender
 {
     self.rewardType = RewardViewTypeReward;
     [self.tableView reloadData];
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.25 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        //获取当前cell的frame
+        CGRect cellRect = [_tableView rectForRowAtIndexPath:[NSIndexPath indexPathForRow:2 inSection:0]];
+        
+        [self.tableView setContentOffset:CGPointMake(0, cellRect.origin.y - self.tableView.height + cellRect.size.height) animated:YES];
+    });
 }
 
 - (void)lookupRewardListButton:(UIButton *)sender
@@ -963,7 +1073,6 @@ static NewPlayVC *_instance = nil;
         [alert show];
         return;
     }
-    //TODO:打赏跳转支付界面
     PayOnlineViewController *vc = [PayOnlineViewController new];
     NSString *accesstoken = nil;
     if ([[CommonCode readFromUserD:@"isLogin"]boolValue] == YES){
@@ -972,12 +1081,12 @@ static NewPlayVC *_instance = nil;
             RTLog(@"%@",responseObject);
             if ([responseObject[@"status"] integerValue] == 1) {
                 vc.balanceCount = [responseObject[@"results"][@"listen_money"] doubleValue];
-//                vc.rewardCount = self.rewardCount;
-//                vc.uid = (self.newsModel.post_news != nil) ? self.newsModel.post_news : self.newsModel.jiemuID;
-//                vc.post_id = self.newsModel.jiemuID;
-//                vc.act_id = self.newsModel.act_id;
-//                vc.isPayClass = NO;
-//                [self.navigationController pushViewController:vc animated:YES];
+                vc.rewardCount = self.rewardCount;
+                vc.uid = (self.postDetailModel.post_news != nil) ? self.postDetailModel.post_news : self.postDetailModel.act.act_id;
+                vc.post_id = self.post_id;
+                vc.act_id = self.postDetailModel.act.act_id;
+                vc.isPayClass = NO;
+                [self.navigationController pushViewController:vc animated:YES];
             }
             
         } failure:^(NSError *error) {
@@ -1035,40 +1144,20 @@ static NewPlayVC *_instance = nil;
         default:break;
     }
 }
-
-- (void)backButtonAction:(UIButton *)sender {
+/**
+ 返回初始打赏控件状态
+ */
+- (void)backButtonAction:(UIButton *)sender
+{
     self.rewardType = RewardViewTypeNone;
     [self.tableView reloadData];
 }
-
+/**
+ 点击自定义打赏金额按钮，刷新页面
+ */
 - (void)customRewardCount {
     self.rewardType = RewardViewTypeCustomReward;
     [self.tableView reloadData];
-}
-#pragma mark - 记录当前播放新闻详情数据
-- (void)recordTheLastNews{
-    
-    NSMutableDictionary *dic = [NSMutableDictionary new];
-//    [dic setObject:self.newsModel.jiemuID forKey:@"jiemuID"];
-//    [dic setObject:self.newsModel.Titlejiemu forKey:@"Titlejiemu"];
-//    [dic setObject:self.newsModel.RiQijiemu forKey:@"RiQijiemu"];
-//    [dic setObject:self.newsModel.ImgStrjiemu forKey:@"ImgStrjiemu"];
-//    [dic setObject:self.newsModel.post_lai forKey:@"post_lai"];
-//    [dic setObject:self.newsModel.post_news forKey:@"post_news"];
-//    [dic setObject:self.newsModel.jiemuName forKey:@"jiemuName"];
-//    [dic setObject:self.newsModel.jiemuDescription forKey:@"jiemuDescription"];
-//    [dic setObject:self.newsModel.jiemuImages forKey:@"jiemuImages"];
-//    [dic setObject:self.newsModel.jiemuFan_num forKey:@"jiemuFan_num"];
-//    [dic setObject:self.newsModel.jiemuMessage_num forKey:@"jiemuMessage_num"];
-//    [dic setObject:self.newsModel.jiemuIs_fan forKey:@"jiemuIs_fan"];
-//    [dic setObject:self.newsModel.post_mp forKey:@"post_mp"];
-//    [dic setObject:self.newsModel.post_time forKey:@"post_time"];
-//    [dic setObject:self.newsModel.post_keywords forKey:@"post_keywords"];
-//    [dic setObject:self.newsModel.url forKey:@"url"];
-//    [dic setObject:self.newsModel.ImgStrjiemu forKey:@"ImgStrjiemu"];
-//    [dic setObject:self.newsModel.ZhengWenjiemu forKey:@"ZhengWenjiemu"];
-//    [dic setObject:self.newsModel.praisenum forKey:@"praisenum"];
-    [CommonCode writeToUserD:dic andKey:THELASTNEWSDATA];
 }
 #pragma mark - 快进 后退 15秒控件
 - (UIView *)forwardBackView
@@ -1105,14 +1194,7 @@ static NewPlayVC *_instance = nil;
     [Explayer seekToTime:CMTimeMake(self.sliderProgress.value > 15?self.sliderProgress.value - 15:0, 1) completionHandler:^(BOOL finished) {
         RTLog(@"拖拽结果：%d",finished);
         if (finished == YES){
-            //TODO:设置数据
-//            if (_isClass) {//限制播放新闻
-//                [Explayer play];
-//            }else{
-//                if (!isLimitPlaying) {
-//                    [Explayer play];
-//                }
-//            }
+            [[ZRT_PlayerManager manager] startPlay];
         }
     }];
     [[UIDevice currentDevice] setProximityMonitoringEnabled:[[NSUserDefaults standardUserDefaults] boolForKey:@"shoushi"]];
@@ -1128,14 +1210,7 @@ static NewPlayVC *_instance = nil;
     [Explayer seekToTime:CMTimeMake(self.sliderProgress.value + 15, 1) completionHandler:^(BOOL finished) {
         RTLog(@"拖拽结果：%d",finished);
         if (finished == YES){
-            //TODO:设置数据
-//            if (_isClass) {//限制播放新闻
-//                [Explayer play];
-//            }else{
-//                if (!isLimitPlaying) {
-//                    [Explayer play];
-//                }
-//            }
+            [[ZRT_PlayerManager manager] startPlay];
         }
     }];
     [[UIDevice currentDevice] setProximityMonitoringEnabled:[[NSUserDefaults standardUserDefaults] boolForKey:@"shoushi"]];
@@ -1204,7 +1279,7 @@ static NewPlayVC *_instance = nil;
     if (type == AVAudioSessionInterruptionTypeBegan) {//进入别的应用
         //Handle InterruptionBegan
         //系统暂停音频，则设置暂停播放器
-//        [self doPlay:bofangCenterBtn];
+        [self playPauseClicked:bofangCenterBtn];
         RTLog(@"interruptionTypeBegan");
     }else{
         RTLog(@"interruptionTypeEnd");
@@ -1222,7 +1297,7 @@ static NewPlayVC *_instance = nil;
         switch (event.subtype) {
             case UIEventSubtypeRemoteControlTogglePlayPause:
                 //暂停或播放
-//                [self doPlay:bofangCenterBtn];
+                [self playPauseClicked:bofangCenterBtn];
                 break;
                 
             case UIEventSubtypeRemoteControlPreviousTrack:
@@ -1235,7 +1310,6 @@ static NewPlayVC *_instance = nil;
                 break;
                 
             default:
-//                [self doPlay:bofangCenterBtn];
                 break;
         }
     }
@@ -1256,10 +1330,29 @@ static NewPlayVC *_instance = nil;
         //原设备为耳机则暂停
         RTLog(@"%@",portDescription.portType);
         if ([portDescription.portType isEqualToString:@"Headphones"]) {
-//            [self doPlay:bofangCenterBtn];
+            [self playPauseClicked:bofangCenterBtn];
         }
     }
 }
+#pragma mark - 播放状态改变
+- (void)playStatusChange:(NSNotification *)note
+{
+    switch ([ZRT_PlayerManager manager].status) {
+        case ZRTPlayStatusPlay:
+            bofangCenterBtn.selected = YES;
+            break;
+            
+        case ZRTPlayStatusPause:
+            bofangCenterBtn.selected = NO;
+            break;
+        case ZRTPlayStatusStop:
+//            bofangCenterBtn.selected = NO;
+            break;
+        default:
+            break;
+    }
+}
+
 #pragma mark - 网络状态改变通知
 /**
  监听网络改变方法
@@ -1277,17 +1370,35 @@ static NewPlayVC *_instance = nil;
 
 #pragma mark - 控件事件action
 /**
- 上一首
- */
-- (void)bofangLeftAction:(UIButton *)sender
-{
-    
-}
-/**
  播放/暂停
  */
 - (void)playPauseClicked:(UIButton *)sender
 {
+    if ([ZRT_PlayerManager manager].isPlaying) {//点击暂停
+        [[ZRT_PlayerManager manager] pausePlay];
+        sender.selected = NO;
+    }else{//点击播放
+        [[ZRT_PlayerManager manager] startPlay];
+        sender.selected = YES;
+    }
+}
+/**
+ 上一首
+ */
+- (void)bofangLeftAction:(UIButton *)sender
+{
+    //播放上一首
+    [[ZRT_PlayerManager manager] previousSong];
+    //保存当前播放新闻的ID
+    [self saveCurrentPlayNewsID];
+    //设置详情模型
+    self.postDetailModel = [newsDetailModel new];
+    //设置模型数据，从播放器中获取对应正在播放的数据赋值新闻模型
+    [self setPostDetailModelDataFormPlayManager];
+    //获取详情数据
+    [self loadData];
+    //获取评论数据
+    [self getCommentList];
 }
 /**
  下一首
@@ -1296,6 +1407,18 @@ static NewPlayVC *_instance = nil;
 {
     //添加手势控制
     [self setGestureControl];
+    //播放下一首
+    [[ZRT_PlayerManager manager] nextSong];
+    //设置详情模型
+    self.postDetailModel = [newsDetailModel new];
+    //保存当前播放新闻的ID
+    [self saveCurrentPlayNewsID];
+    //设置模型数据，从播放器中获取对应正在播放的数据赋值新闻模型
+    [self setPostDetailModelDataFormPlayManager];
+    //获取详情数据
+    [self loadData];
+    //获取评论数据
+    [self getCommentList];
 }
 /**
  选中播放对应index的音频
@@ -1305,9 +1428,79 @@ static NewPlayVC *_instance = nil;
 - (void)playFromIndex:(NSInteger)index
 {
     //设置播放器数据
-    
+    [[ZRT_PlayerManager manager] loadSongInfoFromIndex:index];
+    //设置详情模型
+    self.postDetailModel = [newsDetailModel new];
+    //保存当前播放新闻的ID
+    [self saveCurrentPlayNewsID];
+    //设置模型数据，从播放器中获取对应正在播放的数据赋值新闻模型
+    [self setPostDetailModelDataFormPlayManager];
     //设置界面数据
     [self loadData];
+    //获取评论列表
+    [self getCommentList];
+}
+/**
+ 设置模型数据，从播放器中获取对应正在播放的数据赋值新闻模型
+ */
+- (void)setPostDetailModelDataFormPlayManager
+{
+    _postDetailModel = [newsDetailModel mj_objectWithKeyValues:[ZRT_PlayerManager manager].currentSong];
+    _postDetailModel.post_id = [ZRT_PlayerManager manager].currentSong[@"id"];
+    newsActModel *act = [newsActModel mj_objectWithKeyValues:[ZRT_PlayerManager manager].currentSong[@"post_act"]];
+    _postDetailModel.act = act;
+    
+    //设置新闻内容详情的frame数据
+    [self setFrameModel];
+    //设置详情头部数据
+    [self setupTableViewHeaderData];
+    
+    //设置进度条最大值
+    self.sliderProgress.maximumValue = [_postDetailModel.post_time intValue] / 1000;
+    //设置进度条初始值
+    self.sliderProgress.value = 0.;
+    //缓冲进度条清空
+    [self.prgBufferProgress setProgress:0. animated:NO];
+    
+    [self.tableView reloadData];
+    //滚动到顶部
+    [self.tableView setContentOffset:CGPointZero animated:YES];
+}
+
+/**
+ 记录当前播放新闻的ID
+ */
+- (void)saveCurrentPlayNewsID
+{
+    //切换新闻ID
+    self.post_id = [ZRT_PlayerManager manager].songList[[ZRT_PlayerManager manager].currentSongIndex][@"id"];
+    //当前播放新闻ID
+    [CommonCode writeToUserD:self.post_id andKey:@"dangqianbofangxinwenID"];
+    //保存已听过新闻的ID数据
+    if ([[CommonCode readFromUserD:@"yitingguoxinwenID"] isKindOfClass:[NSArray class]])
+    {
+        NSMutableArray *yitingguoArr = [NSMutableArray arrayWithArray:[CommonCode readFromUserD:@"yitingguoxinwenID"]];
+        [yitingguoArr addObject:self.post_id];
+        NSSet *set = [NSSet setWithArray:yitingguoArr];
+        [CommonCode writeToUserD:[set allObjects] andKey:@"yitingguoxinwenID"];
+    }else
+    {
+        NSMutableArray *yitingguoArr = [NSMutableArray array];
+        [yitingguoArr addObject:self.post_id];
+        NSSet *set = [NSSet setWithArray:yitingguoArr];
+        [CommonCode writeToUserD:[set allObjects] andKey:@"yitingguoxinwenID"];
+    }
+}
+
+/**
+ 刷新视图界面
+ */
+- (void)reloadInterface
+{
+    //滚动到顶部
+    [self.tableView setContentOffset:CGPointZero animated:YES];
+    //重新刷新界面
+    [self.tableView reloadData];
 }
 /**
  点击定时跳转定时设置控制器
@@ -1322,8 +1515,8 @@ static NewPlayVC *_instance = nil;
  */
 - (void)reloadPlayAllTime
 {
-    //TODO:设置数据
-//    self.yinpinzongTime.text = [self convertStringWithTime:[self.newsModel.post_time intValue] / 1000];
+    dangqianTime.text = @"00:00";
+    self.yinpinzongTime.text = [self convertStringWithTime:[self.postDetailModel.post_time intValue] / 1000];
 }
 - (void)back{
     [self.navigationController popViewControllerAnimated:YES];
@@ -1332,7 +1525,8 @@ static NewPlayVC *_instance = nil;
     
     [self.navigationController popViewControllerAnimated:YES];
 }
-- (void)SVPDismiss {
+- (void)SVPDismiss
+{
     [SVProgressHUD dismiss];
 }
 
@@ -1359,17 +1553,10 @@ static NewPlayVC *_instance = nil;
     
     [Explayer pause];
     //调到指定时间去播放
-    [Explayer seekToTime:CMTimeMake(self.sliderProgress.value, 1) completionHandler:^(BOOL finished) {
+    [[ZRT_PlayerManager manager].player seekToTime:CMTimeMake(self.sliderProgress.value, [ZRT_PlayerManager manager].playRate) completionHandler:^(BOOL finished) {
         RTLog(@"拖拽结果：%d",finished);
         if (finished == YES){
-            //TODO:设置数据
-//            if (_isClass) {//限制播放新闻
-//                [Explayer play];
-//            }else{
-//                if (!isLimitPlaying) {
-//                    [Explayer play];
-//                }
-//            }
+            [[ZRT_PlayerManager manager] startPlay];
         }
     }];
     [[UIDevice currentDevice] setProximityMonitoringEnabled:[[NSUserDefaults standardUserDefaults] boolForKey:@"shoushi"]];
@@ -1457,14 +1644,13 @@ static NewPlayVC *_instance = nil;
  */
 - (void)zhuboBtnVAction:(UITapGestureRecognizer *)tap {
     zhuboXiangQingVCNewController *zhubo = [zhuboXiangQingVCNewController new];
-    //TODO:设置数据
-//    zhubo.jiemuDescription = self.newsModel.jiemuDescription;
-//    zhubo.jiemuFan_num = self.newsModel.jiemuFan_num;
-//    zhubo.jiemuID = (self.newsModel.post_news != nil) ? self.newsModel.post_news : self.newsModel.jiemuID;
-//    zhubo.jiemuImages = self.newsModel.jiemuImages;
-//    zhubo.jiemuIs_fan = self.newsModel.jiemuIs_fan;
-//    zhubo.jiemuMessage_num = self.newsModel.jiemuMessage_num;
-//    zhubo.jiemuName = self.newsModel.jiemuName;
+    zhubo.jiemuDescription = self.postDetailModel.act.Description;
+    zhubo.jiemuFan_num = self.postDetailModel.act.fan_num;
+    zhubo.jiemuID = (self.postDetailModel.post_news != nil) ? self.postDetailModel.post_news : self.postDetailModel.act.act_id;
+    zhubo.jiemuImages = self.postDetailModel.act.images;
+    zhubo.jiemuIs_fan = self.postDetailModel.act.is_fan;
+    zhubo.jiemuMessage_num = self.postDetailModel.act.message_num;
+    zhubo.jiemuName = self.postDetailModel.act.name;
     zhubo.isbofangye = YES;
     [self.navigationController pushViewController:zhubo animated:YES];
 }
@@ -2043,5 +2229,18 @@ static NewPlayVC *_instance = nil;
                                      attributes:@{NSFontAttributeName:fontSize}
                                         context:nil];
     return ceil(rect.size.height);
+}
+/**
+ 转换秒数为时间格式字符串
+ */
+- (NSString *)convertStringWithTime:(float)time
+{
+    if (isnan(time)) time = 0.f;
+    int min = time / 60.0;
+    int sec = time - min * 60;
+    NSString * minStr = min > 9 ? [NSString stringWithFormat:@"%d",min] : [NSString stringWithFormat:@"0%d",min];
+    NSString * secStr = sec > 9 ? [NSString stringWithFormat:@"%d",sec] : [NSString stringWithFormat:@"0%d",sec];
+    NSString * timeStr = [NSString stringWithFormat:@"%@:%@",minStr, secStr];
+    return timeStr;
 }
 @end

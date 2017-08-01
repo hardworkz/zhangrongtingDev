@@ -34,6 +34,7 @@
 #import "AutoImageViewHeightFrameModel.h"
 #import "PlayVCTextContentCellFramesModel.h"
 
+#import "PlayDefaultRewardTableViewCell.h"
 #import "PlayVCThreeBtnTableViewCell.h"
 #import "PlayCustomRewardTableViewCell.h"
 #import "PlayVCTextContentTableViewCell.h"

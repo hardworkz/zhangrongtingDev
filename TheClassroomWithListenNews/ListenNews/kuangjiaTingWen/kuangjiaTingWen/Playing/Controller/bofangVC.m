@@ -169,24 +169,24 @@ static AVPlayer *_instancePlay = nil;
     [super viewDidLoad];
     
     //初始化播放器判断限制状态
-    NSDictionary *userInfoDict = [CommonCode readFromUserD:@"dangqianUserInfo"];
-    if ([userInfoDict[results][member_type] intValue] == 0) {
-        int limitTime = [[CommonCode readFromUserD:[NSString stringWithFormat:@"%@_%@",limit_time,ExdangqianUserUid]] intValue];
-        int limitNum = [[CommonCode readFromUserD:[NSString stringWithFormat:@"%@",limit_num]] intValue];
-        if (limitTime >= limitNum ||[userInfoDict[results][is_stop] intValue] == 1) {
-            isLimitPlaying = YES;
-            [NetWorkTool sendLimitDataWithaccessToken:AvatarAccessToken sccess:^(NSDictionary *responseObject) {
-                if ([responseObject[status] intValue] == 1) {
-                    [[NSNotificationCenter defaultCenter] postNotificationName:@"updateUserInfo" object:nil];
-                }
-            } failure:^(NSError *error) {
-                
-            }];
-            
-        }else{
-            isLimitPlaying = NO;
-        }
-    }
+//    NSDictionary *userInfoDict = [CommonCode readFromUserD:@"dangqianUserInfo"];
+//    if ([userInfoDict[results][member_type] intValue] == 0) {
+//        int limitTime = [[CommonCode readFromUserD:[NSString stringWithFormat:@"%@_%@",limit_time,ExdangqianUserUid]] intValue];
+//        int limitNum = [[CommonCode readFromUserD:[NSString stringWithFormat:@"%@",limit_num]] intValue];
+//        if (limitTime >= limitNum ||[userInfoDict[results][is_stop] intValue] == 1) {
+//            isLimitPlaying = YES;
+//            [NetWorkTool sendLimitDataWithaccessToken:AvatarAccessToken sccess:^(NSDictionary *responseObject) {
+//                if ([responseObject[status] intValue] == 1) {
+//                    [[NSNotificationCenter defaultCenter] postNotificationName:@"updateUserInfo" object:nil];
+//                }
+//            } failure:^(NSError *error) {
+//                
+//            }];
+//            
+//        }else{
+//            isLimitPlaying = NO;
+//        }
+//    }
     
     self.view.backgroundColor = [UIColor whiteColor];
     isJiaZaiWan = NO;
@@ -765,6 +765,7 @@ static AVPlayer *_instancePlay = nil;
     timeObserver = [Explayer addPeriodicTimeObserverForInterval:CMTimeMake(1, 1) queue:dispatch_get_main_queue() usingBlock:^(CMTime time) {
         //获取当前播放时间
         float currentTime = (float)weakPlayer.currentItem.currentTime.value / (float)weakPlayer.currentItem.currentTime.timescale;
+        RTLog(@"%f",currentTime);
         int testTime = (int)currentTime;
         weakVC.sliderProgress.value = currentTime;
         //更新缓冲进度
@@ -2944,7 +2945,7 @@ static AVPlayer *_instancePlay = nil;
             [rewardBorderView addSubview:backButton];
             
             [rewardBorderView setFrame:CGRectMake(rewardBorderView.frame.origin.x, rewardBorderView.frame.origin.y, rewardBorderView.frame.size.width, CGRectGetMaxY(_finalRewardButton.frame) + 35)];
-             [rewardView setFrame:CGRectMake(rewardView.frame.origin.x, rewardView.frame.origin.y, rewardView.frame.size.width, CGRectGetMaxY(rewardBorderView.frame) + 15)];
+            [rewardView setFrame:CGRectMake(rewardView.frame.origin.x, rewardView.frame.origin.y, rewardView.frame.size.width, CGRectGetMaxY(rewardBorderView.frame) + 15)];
         }
         else{
             UILabel *tipLabel = [[UILabel alloc]initWithFrame:CGRectMake( 80, 5, 170, 32)];
@@ -3181,7 +3182,8 @@ static AVPlayer *_instancePlay = nil;
     RTLog(@"stop");
 }
 
--(void)OJLAnimationButtonWillFinishAnimation:(OJLAnimationButton *)OJLAnimationButton{
+-(void)OJLAnimationButtonWillFinishAnimation:(OJLAnimationButton *)OJLAnimationButton
+{
      [self rewarding];
 }
 #pragma mark - UITextFieldDelegate

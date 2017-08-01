@@ -51,13 +51,13 @@
     
     _contentLabelF = CGRectMake(zhengwenTextView.x, zhengwenTextView.y, zhengwenTextView.width, size.height);
     
-    if (self.isHideReadOriginalEssay) {
-        _readOriginalEssayF = CGRectMake(20, CGRectGetMaxY(_contentLabelF) + 10, SCREEN_WIDTH - 40, 35.0 / 667 * IPHONE_H);
-    }else{
-        _readOriginalEssayF = CGRectMake(0, CGRectGetMaxY(_contentLabelF), SCREEN_WIDTH, 0);
-    }
+//    if (self.isHideReadOriginalEssay) {
+//        _readOriginalEssayF = CGRectMake(20, CGRectGetMaxY(_contentLabelF) + 10, SCREEN_WIDTH - 40, 35.0 / 667 * IPHONE_H);
+//    }else{
+//        _readOriginalEssayF = CGRectMake(0, CGRectGetMaxY(_contentLabelF), SCREEN_WIDTH, 0);
+//    }
     
-    _cellHeight = CGRectGetMaxY(_readOriginalEssayF) + 5;
+    _cellHeight = CGRectGetMaxY(_contentLabelF) + 5;
 }
 #pragma mark - 工具方法
 /**

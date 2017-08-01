@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
-@interface jiemuLieBiaoVC : UIViewController
+@interface jiemuLieBiaoVC : RootViewController
 
 /* 上个界面获取到得自己已关注的节目列表 */
 @property(strong,nonatomic)NSMutableArray *lastInfoArr;

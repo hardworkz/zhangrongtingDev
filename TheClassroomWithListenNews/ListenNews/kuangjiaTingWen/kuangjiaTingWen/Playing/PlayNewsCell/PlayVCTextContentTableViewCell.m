@@ -14,7 +14,7 @@
     UILabel *titleLab;
     UILabel *riqiLab;
     UITextView *zhengwenTextView;
-    UIButton *readOriginalEssay;
+//    UIButton *readOriginalEssay;
 }
 @end
 @implementation PlayVCTextContentTableViewCell
@@ -56,14 +56,14 @@
         [self.contentView addSubview:zhengwenTextView];
         
         //阅读原文
-        readOriginalEssay = [UIButton buttonWithType:UIButtonTypeCustom];
-        readOriginalEssay.backgroundColor = gMainColor;
-        [readOriginalEssay setTitle:@"阅读原文" forState:UIControlStateNormal];
-        [readOriginalEssay.layer setMasksToBounds:YES];
-        [readOriginalEssay.layer setCornerRadius:5.0f];
-        readOriginalEssay.userInteractionEnabled = YES;
-        [readOriginalEssay addTarget:self action:@selector(readOriginalEssay:) forControlEvents:UIControlEventTouchUpInside];
-        [self.contentView addSubview:readOriginalEssay];
+//        readOriginalEssay = [UIButton buttonWithType:UIButtonTypeCustom];
+//        readOriginalEssay.backgroundColor = gMainColor;
+//        [readOriginalEssay setTitle:@"阅读原文" forState:UIControlStateNormal];
+//        [readOriginalEssay.layer setMasksToBounds:YES];
+//        [readOriginalEssay.layer setCornerRadius:5.0f];
+//        readOriginalEssay.userInteractionEnabled = YES;
+//        [readOriginalEssay addTarget:self action:@selector(readOriginalEssay:) forControlEvents:UIControlEventTouchUpInside];
+//        [self.contentView addSubview:readOriginalEssay];
 
     }
     return self;
@@ -97,10 +97,10 @@
     }
     zhengwenTextView.frame = frameModel.contentLabelF;
 }
-- (void)readOriginalEssay:(UIButton *)item
-{
-    if (self.readOriginalEssay) {
-        self.readOriginalEssay(item);
-    }
-}
+//- (void)readOriginalEssay:(UIButton *)item
+//{
+//    if (self.readOriginalEssay) {
+//        self.readOriginalEssay(item);
+//    }
+//}
 @end

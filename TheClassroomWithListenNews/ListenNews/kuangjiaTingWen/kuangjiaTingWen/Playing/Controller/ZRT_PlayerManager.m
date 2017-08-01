@@ -8,7 +8,6 @@
 
 #import "ZRT_PlayerManager.h"
 
-#define SONGPLAYSTATUSCHANGE @"SongPlayStatusChange"
 #if DEBUG
 #define BASE_INFO_FUN(info)    BASE_INFO_LOG([self class],_cmd,info)
 #else
@@ -49,6 +48,29 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
         return self.player.rate==self.playRate;
     }
 }
+
+/**
+ 拦截set方法保存当前播放新闻列表数据
+
+ @param songList 当前新闻播放列表
+ */
+- (void)setSongList:(NSArray *)songList
+{
+    _songList = songList;
+    
+    [CommonCode writeToUserD:songList andKey:NewPlayVC_PLAYLIST];
+}
+/**
+ 拦截set方法保存当前播放新闻数据
+
+ @param currentSong 当前播放新闻
+ */
+- (void)setCurrentSong:(NSDictionary *)currentSong
+{
+    _currentSong = currentSong;
+    
+    [CommonCode writeToUserD:currentSong andKey:NewPlayVC_THELASTNEWSDATA];
+}
 - (void)setPlayRate:(float)playRate
 {
     _playRate = playRate;
@@ -57,14 +79,9 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
 /*
  * 总时长(秒)
  */
-- (void)setPlayDuration:(NSString *)playDuration {
-    if (![_playDuration isEqualToString:playDuration] &&
-        ![playDuration isEqualToString:@"0"]) {
-        _playDuration = playDuration;
-        [[AppDelegate delegate] configNowPlayingCenter];
-    }else {
-        _playDuration = playDuration;
-    }
+- (void)setPlayDuration:(float)playDuration {
+    _playDuration = playDuration;
+    [[AppDelegate delegate] configNowPlayingCenter];
 }
 /*
  * 当前播放时间(00:00)
@@ -114,8 +131,8 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
     
     //重置进度
     _progress = 0.f;
-    _playDuration = @"0";
-    _duration = @"0";
+    _playDuration = 0.f;
+    _duration = 0.f;
     
     SendNotify(SONGPLAYSTATUSCHANGE, nil)
 }
@@ -155,7 +172,6 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
     //如果是最后一首，先暂停播放下一首
     if (self.currentSongIndex == self.songList.count - 1){
         if (self.loadMoreList) {
-            
             self.loadMoreList(self.currentSongIndex);
         }else{
             XWAlerLoginView *alert = [XWAlerLoginView alertWithTitle:@"这已经是最后一条了"];
@@ -175,26 +191,29 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
     
     //更新当前歌曲位置
     self.currentSongIndex = isFirst ? 0 : self.currentSongIndex + 1;
+    
+    //回调列表，刷新界面
+    if (self.playReloadList) {
+        self.playReloadList(self.currentSongIndex);
+    }
     //播放index设置
     //上一首<0则回到最后一首
-    if (self.currentSongIndex < 0) {
-        self.currentSongIndex = self.songList.count - 1;
-    }
-    //播放到最后一首则回到第一首
-    if (self.currentSongIndex >= self.songList.count) {
-        self.currentSongIndex = 0;
-    }
+//    if (self.currentSongIndex < 0) {
+//        self.currentSongIndex = self.songList.count - 1;
+//    }
+//    //播放到最后一首则回到第一首
+//    if (self.currentSongIndex >= self.songList.count) {
+//        self.currentSongIndex = 0;
+//    }
     //更新当前歌曲信息
     self.currentSong = self.songList[self.currentSongIndex];
     
     //刷新封面图片
     self.currentCoverImage = NEWSSEMTPHOTOURL(self.currentSong[@"smeta"]);
     
-    //加载URL
-    NSURL * url = [NSURL URLWithString:self.currentSong[@"post_mp"]];
-    
-    //重置播放器
-    AVPlayerItem * songItem = [[AVPlayerItem alloc]initWithURL:url];
+    //获取播放器播放对象
+    AVPlayerItem * songItem  = [[AVPlayerItem alloc] initWithURL:[NSURL URLWithString:self.currentSong[@"post_mp"]]];
+    //设置播放器，替换播放对象
     if (_player == nil) {
         _player = [[AVPlayer alloc]initWithPlayerItem:songItem];
     }else {
@@ -222,14 +241,41 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
     //刷新index
     self.currentSongIndex = index;
     
-    //刷新封面图片
-    self.currentCoverImage = NEWSSEMTPHOTOURL(self.currentSong[@"smeta"]);
+    //回调列表，刷新界面
+    if (self.playReloadList) {
+        self.playReloadList(self.currentSongIndex);
+    }
     
-    //加载URL
-    NSURL * url = [NSURL URLWithString:self.currentSong[@"post_mp"]];
+    //获取播放器播放对象
+    AVPlayerItem * songItem;
     
-    //重置播放器
-    AVPlayerItem * songItem = [[AVPlayerItem alloc]initWithURL:url];
+    switch (self.playType) {
+        case ZRTPlayTypeNews:
+            //刷新封面图片
+            self.currentCoverImage = NEWSSEMTPHOTOURL(self.currentSong[@"smeta"]);
+            
+            songItem = [[AVPlayerItem alloc] initWithURL:[NSURL URLWithString:self.currentSong[@"post_mp"]]];
+            break;
+        case ZRTPlayTypeClassroom:
+            //刷新封面图片
+            self.currentCoverImage = NEWSSEMTPHOTOURL(self.currentSong[@"smeta"]);
+            
+            songItem = [[AVPlayerItem alloc] initWithURL:[NSURL URLWithString:self.currentSong[@"post_mp"]]];
+            break;
+        case ZRTPlayTypeClassroomTry:{
+            //刷新封面图片
+            self.currentCoverImage = NEWSSEMTPHOTOURL(self.currentSong[@"smeta"]);
+            
+            ClassAuditionListModel *auditionModel = (ClassAuditionListModel *)self.currentSong;
+            
+            songItem = [[AVPlayerItem alloc] initWithURL:[NSURL URLWithString:auditionModel.s_mpurl]];
+        }
+            break;
+        default:
+            break;
+    }
+    
+    //设置播放器，替换播放对象
     if (_player == nil) {
         _player = [[AVPlayer alloc]initWithPlayerItem:songItem];
     }else {
@@ -287,16 +333,20 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
     
     //更新播放器进度
     MJWeakSelf
-    _timeObserve = [self.player addPeriodicTimeObserverForInterval:CMTimeMake(1.0, 1.0) queue:dispatch_get_main_queue() usingBlock:^(CMTime time) {
-        float current = CMTimeGetSeconds(time);
+    _timeObserve = [self.player addPeriodicTimeObserverForInterval:CMTimeMake(1.0, self.playRate) queue:dispatch_get_main_queue() usingBlock:^(CMTime time)
+    {
+        float currentTime = CMTimeGetSeconds(time);
         float total = CMTimeGetSeconds(songItem.duration);
-        if (current) {
-            _progress = current / total;
-            weakSelf.playDuration = [NSString stringWithFormat:@"%.f",current];
-            _duration = [NSString stringWithFormat:@"%.2f",total];
+        if (currentTime) {
+            _progress = currentTime / total;
+            _playDuration = currentTime;
+            _duration = total;
         }
         NSTimeInterval timeInterval = [weakSelf availableDuration];//计算缓冲进度
         _bufferProgress = timeInterval/total;//获取缓冲进度值
+        if (weakSelf.playTimeObserve) {
+            weakSelf.playTimeObserve(weakSelf.progress,weakSelf.bufferProgress,currentTime,total);
+        }
     }];
     
     //监控状态属性，注意AVPlayer也有一个status属性，通过监控它的status也可以获得播放状态
@@ -335,12 +385,6 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
     //当前播放的是单个音频文件，不是列表
     if (self.currentSongIndex < 0) return;
     
-    
-    //播放完毕，回调block,方便外面做处理
-    if (self.playDidEnd) {
-        self.playDidEnd(self.currentSongIndex);
-    }
-    
     //如果是最后一首，先暂停播放下一首
     if (self.currentSongIndex == self.songList.count - 1){
         
@@ -357,6 +401,11 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
     
     //播放列表中的下一条
     [self playNext];
+    
+    //播放完毕，回调block,方便外面做处理
+    if (self.playDidEnd) {
+        self.playDidEnd(self.currentSongIndex);
+    }
 }
 /**
  *  通过KVO监控播放器状态
@@ -380,6 +429,7 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
                 break;
             case AVPlayerStatusReadyToPlay:
                 _status = ZRTPlayStatusReadyToPlay;
+                [self startPlay];
                 RTLog(@"KVO：准备完毕");
                 break;
             case AVPlayerStatusFailed:
@@ -395,7 +445,7 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
         NSArray * array = songItem.loadedTimeRanges;
         CMTimeRange timeRange = [array.firstObject CMTimeRangeValue]; //本次缓冲的时间范围
         NSTimeInterval totalBuffer = CMTimeGetSeconds(timeRange.start) + CMTimeGetSeconds(timeRange.duration); //缓冲总长度
-        RTLog(@"共缓冲%.2f",totalBuffer);
+//        RTLog(@"共缓冲%.2f",totalBuffer);
         
     }else if ([keyPath isEqualToString:kvo_playbackBufferEmpty])
     {

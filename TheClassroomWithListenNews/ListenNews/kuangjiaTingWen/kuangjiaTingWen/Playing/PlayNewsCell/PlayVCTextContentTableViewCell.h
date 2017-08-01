@@ -10,7 +10,7 @@
 
 @interface PlayVCTextContentTableViewCell : UITableViewCell
 
-@property (copy, nonatomic) void (^readOriginalEssay)(UIButton *item);
+//@property (copy, nonatomic) void (^readOriginalEssay)(UIButton *item);
 
 @property (strong, nonatomic) PlayVCTextContentCellFramesModel *frameModel;
 

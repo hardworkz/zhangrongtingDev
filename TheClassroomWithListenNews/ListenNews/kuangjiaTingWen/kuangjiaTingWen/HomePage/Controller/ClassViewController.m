@@ -960,6 +960,7 @@ static AVPlayer *_instancePlay = nil;
         NSArray *shitingArray = [CommonCode readFromUserD:playList];
         NSDictionary *auditionModel = shitingArray[sender.tag];
         [ExclassPlayer replaceCurrentItemWithPlayerItem:[[AVPlayerItem alloc]initWithURL:[NSURL URLWithString:auditionModel[@"s_mpurl"]]]];
+        RTLog(@"%@",auditionModel[@"s_mpurl"]);
         [ExclassPlayer play];
         [Explayer pause];
         _isPlaying = YES;

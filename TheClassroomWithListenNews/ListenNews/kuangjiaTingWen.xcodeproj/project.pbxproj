@@ -190,6 +190,7 @@
 		699CA1F91EFA23B300670704 /* newsDetailModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 699CA1F81EFA23B300670704 /* newsDetailModel.m */; };
 		699CA1FC1EFA23CA00670704 /* newsActModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 699CA1FB1EFA23CA00670704 /* newsActModel.m */; };
 		699CA1FF1EFA23DF00670704 /* rewardModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 699CA1FE1EFA23DF00670704 /* rewardModel.m */; };
+		69A0B5031F30610B0028D5A0 /* PlayDefaultRewardTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 69A0B5021F30610B0028D5A0 /* PlayDefaultRewardTableViewCell.m */; };
 		69A477EB1F09D038001D8856 /* RootViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 69A477EA1F09D038001D8856 /* RootViewController.m */; };
 		69A7BABA1ED4177C0094E0BA /* SuNetworkMonitor.m in Sources */ = {isa = PBXBuildFile; fileRef = 69A7BAB91ED4177C0094E0BA /* SuNetworkMonitor.m */; };
 		69AA54AC1EF75F3E003053DB /* AutoImageTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 69AA54A71EF75F3E003053DB /* AutoImageTableViewCell.m */; };
@@ -870,6 +871,8 @@
 		699CA1FB1EFA23CA00670704 /* newsActModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = newsActModel.m; sourceTree = "<group>"; };
 		699CA1FD1EFA23DF00670704 /* rewardModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = rewardModel.h; sourceTree = "<group>"; };
 		699CA1FE1EFA23DF00670704 /* rewardModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = rewardModel.m; sourceTree = "<group>"; };
+		69A0B5011F30610B0028D5A0 /* PlayDefaultRewardTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PlayDefaultRewardTableViewCell.h; sourceTree = "<group>"; };
+		69A0B5021F30610B0028D5A0 /* PlayDefaultRewardTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PlayDefaultRewardTableViewCell.m; sourceTree = "<group>"; };
 		69A477E91F09D038001D8856 /* RootViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RootViewController.h; sourceTree = "<group>"; };
 		69A477EA1F09D038001D8856 /* RootViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RootViewController.m; sourceTree = "<group>"; };
 		69A7BAB81ED4177C0094E0BA /* SuNetworkMonitor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SuNetworkMonitor.h; sourceTree = "<group>"; };
@@ -1995,6 +1998,8 @@
 				698B67F91F28813B00E1FFE0 /* PlayVCThreeBtnTableViewCell.m */,
 				698B67FB1F288AD100E1FFE0 /* PlayCustomRewardTableViewCell.h */,
 				698B67FC1F288AD100E1FFE0 /* PlayCustomRewardTableViewCell.m */,
+				69A0B5011F30610B0028D5A0 /* PlayDefaultRewardTableViewCell.h */,
+				69A0B5021F30610B0028D5A0 /* PlayDefaultRewardTableViewCell.m */,
 			);
 			path = PlayNewsCell;
 			sourceTree = "<group>";
@@ -3703,6 +3708,7 @@
 				697CA29F1EF384BE00F853AF /* UINavigationController+Cloudox.m in Sources */,
 				69AF4FD71F1378C30097893F /* CustomPageScrollView.m in Sources */,
 				69C713701EC0740F00F2729E /* DownloadTableViewCell.m in Sources */,
+				69A0B5031F30610B0028D5A0 /* PlayDefaultRewardTableViewCell.m in Sources */,
 				69C713C41EC0754200F2729E /* BlogTableViewCell.m in Sources */,
 				6353EB1F1D1BCC73003A1B2A /* TBCircleScrollView.m in Sources */,
 				695745A91D5C7384001022AD /* UISwitch+Night.m in Sources */,
