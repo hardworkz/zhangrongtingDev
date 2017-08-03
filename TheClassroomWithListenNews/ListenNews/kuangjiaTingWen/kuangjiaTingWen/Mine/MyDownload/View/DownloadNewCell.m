@@ -48,6 +48,7 @@
 }
 
 - (void)awakeFromNib {
+    [super awakeFromNib];
     // Initialization code
 }
 
@@ -58,38 +59,7 @@
     }
     self.obj = newobj;
     _titleLabel.text = newobj.post_title;
-    
-    if ([[CommonCode readFromUserD:@"yitingguoxinwenID"] isKindOfClass:[NSArray class]]){
-        NSArray *yitingguoArr = [NSArray arrayWithArray:[CommonCode readFromUserD:@"yitingguoxinwenID"]];
-        for (int i = 0; i < yitingguoArr.count - 1; i ++ ){
-            if ([self.obj.i_id isEqualToString:yitingguoArr[i]]){
-                if ([[CommonCode readFromUserD:@"dangqianbofangxinwenID"] isEqualToString:self.obj.i_id]){
-                    _titleLabel.textColor = gMainColor;
-                    break;
-                }
-                else{
-                    _titleLabel.textColor = [[UIColor grayColor]colorWithAlphaComponent:0.7f];
-                    break;
-                }
-            }
-            else{
-                _titleLabel.textColor = [UIColor blackColor];
-            }
-        }
-    }
-    if ([[CommonCode readFromUserD:@"dangqianbofangxinwenID"] isEqualToString:self.obj.i_id]){
-        _titleLabel.textColor = gMainColor;
-    }
-    
-    
-//    [SQLClass getClickWithString:newobj.i_id withExistenceBlock:^(bool isClick) {
-//        if (isClick) {
-//            _titleLabel.textColor = [UIColor lightGrayColor];
-//        }else {
-//            _titleLabel.textColor = [UIColor blackColor];
-//        }
-//    }];
-    
+    _titleLabel.textColor = [[ZRT_PlayerManager manager] textColorFormID:self.obj.i_id];
     @autoreleasepool {
         UIImage *ima = [UIImage imageWithContentsOfFile:newobj.smeta];
         if (ima) {

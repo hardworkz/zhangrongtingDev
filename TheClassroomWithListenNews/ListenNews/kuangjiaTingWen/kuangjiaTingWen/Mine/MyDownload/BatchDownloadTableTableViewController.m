@@ -215,8 +215,6 @@
             
         });
         
-//        [[NSNotificationCenter defaultCenter] postNotificationName:@"addDownload" object:nil];
-        
     }
     else{
         [SVProgressHUD showErrorWithStatus:@"请选择要下载的新闻"];

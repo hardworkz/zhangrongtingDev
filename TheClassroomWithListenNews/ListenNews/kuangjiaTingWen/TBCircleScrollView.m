@@ -272,55 +272,42 @@
         }
         HomePageViewController *homePageVC = (HomePageViewController *)object;
         UINavigationController *nav = homePageVC.navigationController;
-        if ([[CommonCode readFromUserD:@"dangqianbofangxinwenID"] isEqualToString:newArr[_curPage][@"post_list"][@"id"]]){
-            [bofangVC shareInstance].hidesBottomBarWhenPushed = YES;
+        //设置播放器播放内容类型
+        [ZRT_PlayerManager manager].playType = ZRTPlayTypeNews;
+        //设置播放界面打赏view的状态
+        //遍历新闻数据列表，获取真正的index
+        int index = 0;
+        for (int i = 0 ; i<newsArr.count; i++) {
+            if ([newsArr[_curPage][@"post_list"][@"id"] isEqualToString:newsArr[i][@"post_list"][@"id"]]){
+                index = i;
+                break;
+            }
+        }
+        //设置打赏控件状态
+        [NewPlayVC shareInstance].rewardType = RewardViewTypeNone;
+        if ([[CommonCode readFromUserD:@"dangqianbofangxinwenID"] isEqualToString:newsArr[_curPage][@"post_list"][@"id"]])
+        {
+            //设置播放器播放数组
+            [ZRT_PlayerManager manager].songList = newsArr;
+            [[NewPlayVC shareInstance] reloadInterface];
             [nav.navigationBar setHidden:YES];
-            [nav pushViewController:[bofangVC shareInstance] animated:YES];
-            [bofangVC shareInstance].hidesBottomBarWhenPushed = NO;
+            [nav pushViewController:[NewPlayVC shareInstance] animated:YES];
         }
         else{
-            [bofangVC shareInstance].newsModel.jiemuID = newArr[_curPage][@"post_list"][@"id"];
-            [bofangVC shareInstance].newsModel.Titlejiemu = newArr[_curPage][@"post_list"][@"post_title"];
-            [bofangVC shareInstance].newsModel.RiQijiemu = newArr[_curPage][@"post_list"][@"post_date"];
-            [bofangVC shareInstance].newsModel.ImgStrjiemu = newArr[_curPage][@"post_list"][@"smeta"];
-            [bofangVC shareInstance].newsModel.post_lai = newArr[_curPage][@"post_list"][@"post_lai"];
-            [bofangVC shareInstance].newsModel.post_news = newArr[_curPage][@"post_list"][@"post_act"][@"id"];
-            [bofangVC shareInstance].newsModel.jiemuName = newArr[_curPage][@"post_list"][@"post_act"][@"name"];
-            [bofangVC shareInstance].newsModel.jiemuDescription = newArr[_curPage][@"post_list"][@"post_act"][@"description"];
-            [bofangVC shareInstance].newsModel.jiemuImages = newArr[_curPage][@"post_list"][@"post_act"][@"images"];
-            [bofangVC shareInstance].newsModel.jiemuFan_num = newArr[_curPage][@"post_list"][@"post_act"][@"fan_num"];
-            [bofangVC shareInstance].newsModel.jiemuMessage_num = newArr[_curPage][@"post_list"][@"post_act"][@"message_num"];
-            [bofangVC shareInstance].newsModel.jiemuIs_fan = newArr[_curPage][@"post_list"][@"post_act"][@"is_fan"];
-            [bofangVC shareInstance].newsModel.post_mp = newArr[_curPage][@"post_list"][@"post_mp"];
-            
-            [bofangVC shareInstance].newsModel.post_time = newArr[_curPage][@"post_list"][@"post_time"];
-            [bofangVC shareInstance].yinpinzongTime.text = [[bofangVC shareInstance] convertStringWithTime:[newArr[_curPage][@"post_list"][@"post_time"] intValue] / 1000];
-            
-            ExcurrentNumber = 0;
-            
-            [bofangVC shareInstance].newsModel.ImgStrjiemu = newArr[_curPage][@"post_list"][@"smeta"];
-            [bofangVC shareInstance].newsModel.ZhengWenjiemu = newArr[_curPage][@"post_list"][@"post_excerpt"];
-            [bofangVC shareInstance].newsModel.praisenum = newArr[_curPage][@"post_list"][@"praisenum"];
-            [bofangVC shareInstance].newsModel.url = newArr[_curPage][@"post_list"][@"url"];
-            [bofangVC shareInstance].newsModel.post_keywords = newArr[_curPage][@"post_list"][@"post_keywords"];
-            [bofangVC shareInstance].newsModel.url = newArr[_curPage][@"post_list"][@"url"];
-            [bofangVC shareInstance].iszhuboxiangqing = NO;
-            [[bofangVC shareInstance].tableView reloadData];
-            
-            [Explayer replaceCurrentItemWithPlayerItem:[[AVPlayerItem alloc]initWithURL:[NSURL URLWithString:newArr[_curPage][@"post_list"][@"post_mp"]]]];
-            ExisRigester = YES;
-            ExIsKaiShiBoFang = YES;
-            ExwhichBoFangYeMianStr = @"shouyebofang";
-            [bofangVC shareInstance].hidesBottomBarWhenPushed = YES;
+            //设置播放器播放数组
+            [ZRT_PlayerManager manager].songList = newsArr;
+            //设置新闻ID
+            [NewPlayVC shareInstance].post_id = newsArr[_curPage][@"post_list"][@"id"];
+            //保存当前播放新闻Index
+            ExcurrentNumber = index;
+            //播放频道
+            [ZRT_PlayerManager manager].channelType = ChannelTypeHomeChannelClassify;
+            //调用播放对应Index方法
+            [[NewPlayVC shareInstance] playFromIndex:ExcurrentNumber];
+            //跳转播放界面
             [nav.navigationBar setHidden:YES];
-            [nav pushViewController:[bofangVC shareInstance ] animated:YES];
-            [bofangVC shareInstance].hidesBottomBarWhenPushed = NO;
-            [[NSNotificationCenter defaultCenter] postNotificationName:@"yuanpanzhuan" object:nil];
-            [[NSNotificationCenter defaultCenter] postNotificationName:@"qiehuanxinwen" object:nil];
-            [CommonCode writeToUserD:newsArr andKey:@"zhuyeliebiao"];
-            [CommonCode writeToUserD:newArr[_curPage][@"post_list"][@"id"] andKey:@"dangqianbofangxinwenID"];
+            [nav pushViewController:[NewPlayVC shareInstance] animated:YES];
         }
-        
     }else if ([newArr[_curPage][@"cate"] intValue] == 2) {//当前为URL，打开手机系统浏览器
         NSString *URLString = newArr[_curPage][@"url"];
         //调用系统浏览器

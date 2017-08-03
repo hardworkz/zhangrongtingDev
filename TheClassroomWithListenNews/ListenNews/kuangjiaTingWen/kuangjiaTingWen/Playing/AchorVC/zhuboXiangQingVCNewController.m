@@ -372,8 +372,8 @@
         [self pinglunkuang];
     }
     
-    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(gaibianyanse:) name:@"gaibianyanse" object:nil];
-    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(zhuboxiangqingbofangJiaZai:) name:@"zhuboxiangqingbofang" object:nil];
+//    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(gaibianyanse:) name:@"gaibianyanse" object:nil];
+//    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(zhuboxiangqingbofangJiaZai:) name:@"zhuboxiangqingbofang" object:nil];
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(back) name:@"isBackfromPersonalPage" object:nil];
     
     UISwipeGestureRecognizer *rightSwipe = [[UISwipeGestureRecognizer alloc]initWithTarget:self action:@selector(back)];
@@ -422,11 +422,14 @@
     manager.enable = YES;
     manager.shouldToolbarUsesTextFieldTintColor = YES;
     [manager setKeyboardDistanceFromTextField:0];
+    
     //在登录状态下,课堂购买完成界面，判断用户是否提交学员信息，如果未提交则进行弹窗
-    if ([[CommonCode readFromUserD:@"isLogin"]boolValue] == YES &&_isClass) {
+    if ([[CommonCode readFromUserD:@"isLogin"]boolValue] == YES) {
         NSDictionary *userInfoDict = [CommonCode readFromUserD:@"dangqianUserInfo"];
-        if ([userInfoDict[results][@"is_record"] intValue] == 0) {
-            [self show];
+        if (_isClass) {
+            if ([userInfoDict[results][@"is_record"] intValue] == 0) {
+                [self show];
+            }
         }
     }
 }
@@ -525,6 +528,9 @@
         {
             xinwenArr = [[NSMutableArray alloc]initWithArray:responseObject[@"results"]];
             [tableView reloadData];
+            if ([ZRT_PlayerManager manager].channelType == ChannelTypeDiscoverAnchor) {
+                [ZRT_PlayerManager manager].songList = xinwenArr;
+            }
         }
         [tableView.mj_header endRefreshing];
     } failure:^(NSError *error) {
@@ -547,6 +553,9 @@
             [xinwenArr addObjectsFromArray:responseObject[@"results"]];
             [tableView reloadData];
             [tableView.mj_footer endRefreshing];
+            if ([ZRT_PlayerManager manager].channelType == ChannelTypeDiscoverAnchor) {
+                [ZRT_PlayerManager manager].songList = xinwenArr;
+            }
         }else{
             [tableView reloadData];
             [tableView.mj_footer endRefreshingWithNoMoreData];
@@ -1489,11 +1498,9 @@
     ExIsClassVCPlay = NO;
     [CommonCode writeToUserD:@(NO) andKey:@"ExIsClassVCPlay"];
     [CommonCode writeToUserD:nil andKey:@"Exact_id"];
-//    ExIsFree = YES;
-//    [CommonCode writeToUserD:@(YES) andKey:@"ExIsFree"];
     //当前选中按钮为播放状态，设置为未播放状态并停止播放
     if (button.selected == YES) {
-        [[bofangVC shareInstance] doPlay:[bofangVC shareInstance].centerBtn];
+        [[ZRT_PlayerManager manager] pausePlay];
         button.selected = NO;
         return;
     }
@@ -1502,79 +1509,51 @@
     button.titleLab.textColor = gMainColor;
     _isTapPlayBtn = YES;
     [bofangVC shareInstance].isClass = YES;
+    
+    //设置频道类型
+    [ZRT_PlayerManager manager].channelType = ChannelTypeDiscoverAnchor;
+    //设置播放界面内容类型
+    if (self.isClass) {
+        [NewPlayVC shareInstance].playType = PlayTypeClass;
+        //设置播放器播放内容类型
+        [ZRT_PlayerManager manager].playType = ZRTPlayTypeClassroom;
+    }else{
+        [NewPlayVC shareInstance].playType = PlayTypeNews;
+        //设置播放器播放内容类型
+        [ZRT_PlayerManager manager].playType = ZRTPlayTypeNews;
+    }
+    //设置播放器播放完成自动加载更多block
+    DefineWeakSelf;
+    [ZRT_PlayerManager manager].loadMoreList = ^(NSInteger currentSongIndex) {
+        [weakSelf xinwenshanglajiazai:xinwenshuaxinTableView];
+    };
+    //播放内容切换后刷新对应的播放列表
+    [ZRT_PlayerManager manager].playReloadList = ^(NSInteger currentSongIndex) {
+        [xinwenshuaxinTableView reloadData];
+    };
+    //设置播放界面打赏view的状态
+    [NewPlayVC shareInstance].rewardType = RewardViewTypeNone;
+    //判断是否是点击当前正在播放的新闻，如果是则直接跳转
     if ([[CommonCode readFromUserD:@"dangqianbofangxinwenID"] isEqualToString:xinwenArr[indexPath.row][@"id"]]){
         
-        if (self.isfaxian) {
-//            self.hidesBottomBarWhenPushed = YES;
-            [self.navigationController.navigationBar setHidden:NO];
-            [[NSNotificationCenter defaultCenter]postNotificationName:@"getAhocComment" object:xinwenArr[indexPath.row][@"id"]];
+        //设置播放器播放数组
+        [ZRT_PlayerManager manager].songList = xinwenArr;
+        //判断是否正在播放，如果正在播放则暂停，如果暂停，则开始播放
+        if ([ZRT_PlayerManager manager].isPlaying) {
+            [[ZRT_PlayerManager manager] pausePlay];
+        }else{
+            [[ZRT_PlayerManager manager] startPlay];
         }
-        else{
-            [self.navigationController popViewControllerAnimated:YES];
-            [[NSNotificationCenter defaultCenter]postNotificationName:@"getAhocComment" object:xinwenArr[indexPath.row][@"id"]];
-        }
-        if ([bofangVC shareInstance].isPlay) {
-        }
-        else{
-            [[bofangVC shareInstance] doplay2];
-        }
-    }
-    else{
+    }else{
         
-        [bofangVC shareInstance].newsModel.jiemuID = xinwenArr[indexPath.row][@"id"];
-        [bofangVC shareInstance].newsModel.Titlejiemu = xinwenArr[indexPath.row][@"post_title"];
-        [bofangVC shareInstance].newsModel.RiQijiemu = xinwenArr[indexPath.row][@"post_date"];
-        [bofangVC shareInstance].newsModel.ImgStrjiemu = xinwenArr[indexPath.row][@"smeta"];
-        [bofangVC shareInstance].newsModel.post_lai = xinwenArr[indexPath.row][@"post_lai"];
-        [bofangVC shareInstance].newsModel.post_news = self.jiemuID;
-        [bofangVC shareInstance].newsModel.jiemuName = self.jiemuName;
-        [bofangVC shareInstance].newsModel.jiemuDescription = self.jiemuDescription;
-        [bofangVC shareInstance].newsModel.jiemuImages = self.jiemuImages;
-        [bofangVC shareInstance].newsModel.jiemuFan_num = self.jiemuFan_num;
-        [bofangVC shareInstance].newsModel.jiemuMessage_num = self.jiemuMessage_num;
-        [bofangVC shareInstance].newsModel.jiemuIs_fan = self.jiemuIs_fan;
-        [bofangVC shareInstance].newsModel.post_mp = xinwenArr[indexPath.row][@"post_mp"];
-        [bofangVC shareInstance].newsModel.post_time = xinwenArr[indexPath.row][@"post_time"];
-        [bofangVC shareInstance].newsModel.post_keywords = xinwenArr[indexPath.row][@"post_keywords"];
-        [bofangVC shareInstance].newsModel.url = xinwenArr[indexPath.row][@"url"];
-        [bofangVC shareInstance].yinpinzongTime.text = [[bofangVC shareInstance] convertStringWithTime:[xinwenArr[indexPath.row][@"post_time"] intValue] / 1000];
+        //设置播放器播放数组
+        [ZRT_PlayerManager manager].songList = xinwenArr;
+        //设置新闻ID
+        [NewPlayVC shareInstance].post_id = xinwenArr[indexPath.row][@"id"];
+        //保存当前播放新闻Index
         ExcurrentNumber = (int)indexPath.row;
-        [bofangVC shareInstance].newsModel.ImgStrjiemu = xinwenArr[indexPath.row][@"smeta"];
-        [bofangVC shareInstance].newsModel.ZhengWenjiemu = xinwenArr[indexPath.row][@"post_excerpt"];
-        [bofangVC shareInstance].newsModel.praisenum = xinwenArr[indexPath.row][@"praisenum"];
-        [bofangVC shareInstance].iszhuboxiangqing = YES;
-        [[bofangVC shareInstance].tableView reloadData];
-        [Explayer replaceCurrentItemWithPlayerItem:[[AVPlayerItem alloc]initWithURL:[NSURL URLWithString:xinwenArr[indexPath.row][@"post_mp"]]]];
-        if ([bofangVC shareInstance].isPlay || ExIsKaiShiBoFang == NO) {
-        }
-        else{
-            [[bofangVC shareInstance] doplay2];
-        }
-        ExisRigester = YES;
-        ExIsKaiShiBoFang = YES;
-        ExwhichBoFangYeMianStr = @"zhuboxiangqingbofang";
-        if (self.isfaxian) {
-            [[NSNotificationCenter defaultCenter]postNotificationName:@"getAhocComment" object:xinwenArr[indexPath.row][@"id"]];
-        }
-        else{
-            [self.navigationController popViewControllerAnimated:YES];
-            [[NSNotificationCenter defaultCenter]postNotificationName:@"getAhocComment" object:xinwenArr[indexPath.row][@"id"]];
-        }
-        [[NSNotificationCenter defaultCenter] postNotificationName:@"yuanpanzhuan" object:nil];
-        [[NSNotificationCenter defaultCenter] postNotificationName:@"qiehuanxinwen" object:nil];
-        [CommonCode writeToUserD:xinwenArr andKey:@"zhuyeliebiao"];
-        [CommonCode writeToUserD:xinwenArr[indexPath.row][@"id"] andKey:@"dangqianbofangxinwenID"];
-        if ([[CommonCode readFromUserD:@"yitingguoxinwenID"] isKindOfClass:[NSArray class]])
-        {
-            NSMutableArray *yitingguoArr = [NSMutableArray arrayWithArray:[CommonCode readFromUserD:@"yitingguoxinwenID"]];
-            [yitingguoArr addObject:xinwenArr[indexPath.row][@"id"]];
-            [CommonCode writeToUserD:yitingguoArr andKey:@"yitingguoxinwenID"];
-        }else
-        {
-            NSMutableArray *yitingguoArr = [NSMutableArray array];
-            [yitingguoArr addObject:xinwenArr[indexPath.row][@"id"]];
-            [CommonCode writeToUserD:yitingguoArr andKey:@"yitingguoxinwenID"];
-        }
+        //调用播放对应Index方法
+        [[NewPlayVC shareInstance] playFromIndex:ExcurrentNumber];
         [xinwenshuaxinTableView reloadData];
     }
 }
@@ -1699,35 +1678,14 @@
             titleLab.frame = CGRectMake(72.0 / 375 * IPHONE_W, 12.0 / 667 * IPHONE_H, SCREEN_WIDTH - 87.0 / 375 * IPHONE_W, 21 * 3);
         }
         titleLab.text = xinwenArr[indexPath.row][@"post_title"];
-        if ([[CommonCode readFromUserD:@"yitingguoxinwenID"] isKindOfClass:[NSArray class]]){
-            NSArray *yitingguoArr = [NSArray arrayWithArray:[CommonCode readFromUserD:@"yitingguoxinwenID"]];
-            for (int i = 0; i < yitingguoArr.count - 1; i ++ )
-            {
-                if ([xinwenArr[indexPath.row][@"id"] isEqualToString:yitingguoArr[i]])
-                {
-                    if ([[CommonCode readFromUserD:@"dangqianbofangxinwenID"] isEqualToString:xinwenArr[indexPath.row][@"id"]])
-                    {
-                        titleLab.textColor = gMainColor;
-                        break;
-                    }
-                    else{
-                        titleLab.textColor = [[UIColor grayColor] colorWithAlphaComponent:0.7f];
-                        break;
-                    }
-                }else
-                {
-                    titleLab.textColor = nTextColorMain;
-                }
-            }
-        }
+        
+        titleLab.textColor = [[ZRT_PlayerManager manager] textColorFormID:xinwenArr[indexPath.row][@"id"]];
         if ([[CommonCode readFromUserD:@"dangqianbofangxinwenID"] isEqualToString:xinwenArr[indexPath.row][@"id"]])
         {
-            if (![bofangVC shareInstance].isPlay && !_isTapPlayBtn){
+            if ([ZRT_PlayerManager manager].isPlaying){
                 playBtn.selected = NO;
-                titleLab.textColor = [[UIColor grayColor] colorWithAlphaComponent:0.7f];
             }else{
                 playBtn.selected = YES;
-                titleLab.textColor = gMainColor;
             }
         }
         titleLab.numberOfLines = 0;
@@ -2004,88 +1962,51 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
     
     if ([tableView isEqual:xinwenshuaxinTableView]){
-        [bofangVC shareInstance].isClass = YES;
+        //设置频道类型
+        [ZRT_PlayerManager manager].channelType = ChannelTypeDiscoverAnchor;
+        //设置播放界面内容类型
+        if (self.isClass) {
+            [NewPlayVC shareInstance].playType = PlayTypeClass;
+            //设置播放器播放内容类型
+            [ZRT_PlayerManager manager].playType = ZRTPlayTypeClassroom;
+        }else{
+            [NewPlayVC shareInstance].playType = PlayTypeNews;
+            //设置播放器播放内容类型
+            [ZRT_PlayerManager manager].playType = ZRTPlayTypeNews;
+        }
+        //设置播放器播放完成自动加载更多block
+        DefineWeakSelf;
+        [ZRT_PlayerManager manager].loadMoreList = ^(NSInteger currentSongIndex) {
+            [weakSelf xinwenshanglajiazai:tableView];
+        };
+        //播放内容切换后刷新对应的播放列表
+        [ZRT_PlayerManager manager].playReloadList = ^(NSInteger currentSongIndex) {
+            [xinwenshuaxinTableView reloadData];
+        };
+        //设置播放界面打赏view的状态
+        [NewPlayVC shareInstance].rewardType = RewardViewTypeNone;
+        //判断是否是点击当前正在播放的新闻，如果是则直接跳转
         if ([[CommonCode readFromUserD:@"dangqianbofangxinwenID"] isEqualToString:xinwenArr[indexPath.row][@"id"]]){
             
-            if (self.isfaxian) {
-//                self.hidesBottomBarWhenPushed = YES;
-                [self.navigationController.navigationBar setHidden:NO];
-                [self.navigationController pushViewController:[bofangVC shareInstance ] animated:YES];
-                [[bofangVC shareInstance] scrollToTop];
-                [[NSNotificationCenter defaultCenter]postNotificationName:@"getAhocComment" object:xinwenArr[indexPath.row][@"id"]];
-            }
-            else{
-                [self.navigationController popViewControllerAnimated:YES];
-                [[NSNotificationCenter defaultCenter]postNotificationName:@"getAhocComment" object:xinwenArr[indexPath.row][@"id"]];
-            }
-            if ([bofangVC shareInstance].isPlay) {
-                
-            }
-            else{
-                [[bofangVC shareInstance] doplay2];
-            }
+            //设置播放器播放数组
+            [ZRT_PlayerManager manager].songList = xinwenArr;
+            [[NewPlayVC shareInstance] reloadInterface];
+            [self.navigationController.navigationBar setHidden:YES];
+            [self.navigationController pushViewController:[NewPlayVC shareInstance] animated:YES];
         }
         else{
             
-            [bofangVC shareInstance].newsModel.jiemuID = xinwenArr[indexPath.row][@"id"];
-            [bofangVC shareInstance].newsModel.Titlejiemu = xinwenArr[indexPath.row][@"post_title"];
-            [bofangVC shareInstance].newsModel.RiQijiemu = xinwenArr[indexPath.row][@"post_date"];
-            [bofangVC shareInstance].newsModel.ImgStrjiemu = xinwenArr[indexPath.row][@"smeta"];
-            [bofangVC shareInstance].newsModel.post_lai = xinwenArr[indexPath.row][@"post_lai"];
-            [bofangVC shareInstance].newsModel.post_news = self.jiemuID;
-            [bofangVC shareInstance].newsModel.jiemuName = self.jiemuName;
-            [bofangVC shareInstance].newsModel.jiemuDescription = self.jiemuDescription;
-            [bofangVC shareInstance].newsModel.jiemuImages = self.jiemuImages;
-            [bofangVC shareInstance].newsModel.jiemuFan_num = self.jiemuFan_num;
-            [bofangVC shareInstance].newsModel.jiemuMessage_num = self.jiemuMessage_num;
-            [bofangVC shareInstance].newsModel.jiemuIs_fan = self.jiemuIs_fan;
-            [bofangVC shareInstance].newsModel.post_mp = xinwenArr[indexPath.row][@"post_mp"];
-            [bofangVC shareInstance].newsModel.post_time = xinwenArr[indexPath.row][@"post_time"];
-            [bofangVC shareInstance].newsModel.post_keywords = xinwenArr[indexPath.row][@"post_keywords"];
-            [bofangVC shareInstance].newsModel.url = xinwenArr[indexPath.row][@"url"];
-            [bofangVC shareInstance].yinpinzongTime.text = [[bofangVC shareInstance] convertStringWithTime:[xinwenArr[indexPath.row][@"post_time"] intValue] / 1000];
+            //设置播放器播放数组
+            [ZRT_PlayerManager manager].songList = xinwenArr;
+            //设置新闻ID
+            [NewPlayVC shareInstance].post_id = xinwenArr[indexPath.row][@"id"];
+            //保存当前播放新闻Index
             ExcurrentNumber = (int)indexPath.row;
-            [bofangVC shareInstance].newsModel.ImgStrjiemu = xinwenArr[indexPath.row][@"smeta"];
-            [bofangVC shareInstance].newsModel.ZhengWenjiemu = xinwenArr[indexPath.row][@"post_excerpt"];
-            [bofangVC shareInstance].newsModel.praisenum = xinwenArr[indexPath.row][@"praisenum"];
-            [bofangVC shareInstance].iszhuboxiangqing = YES;
-            [[bofangVC shareInstance].tableView reloadData];
-            [Explayer replaceCurrentItemWithPlayerItem:[[AVPlayerItem alloc]initWithURL:[NSURL URLWithString:xinwenArr[indexPath.row][@"post_mp"]]]];
-            if ([bofangVC shareInstance].isPlay || ExIsKaiShiBoFang == NO) {
-                
-            }
-            else{
-                [[bofangVC shareInstance] doplay2];
-            }
-            ExisRigester = YES;
-            ExIsKaiShiBoFang = YES;
-            ExwhichBoFangYeMianStr = @"zhuboxiangqingbofang";
-            if (self.isfaxian) {
-//                self.hidesBottomBarWhenPushed = YES;
-                [self.navigationController.navigationBar setHidden:NO];
-                [self.navigationController pushViewController:[bofangVC shareInstance ] animated:YES];
-                [[bofangVC shareInstance] scrollToTop];
-                [[NSNotificationCenter defaultCenter]postNotificationName:@"getAhocComment" object:xinwenArr[indexPath.row][@"id"]];
-            }
-            else{
-                [self.navigationController popViewControllerAnimated:YES];
-                [[NSNotificationCenter defaultCenter]postNotificationName:@"getAhocComment" object:xinwenArr[indexPath.row][@"id"]];
-            }
-            [[NSNotificationCenter defaultCenter] postNotificationName:@"yuanpanzhuan" object:nil];
-            [[NSNotificationCenter defaultCenter] postNotificationName:@"qiehuanxinwen" object:nil];
-            [CommonCode writeToUserD:xinwenArr andKey:@"zhuyeliebiao"];
-            [CommonCode writeToUserD:xinwenArr[indexPath.row][@"id"] andKey:@"dangqianbofangxinwenID"];
-            if ([[CommonCode readFromUserD:@"yitingguoxinwenID"] isKindOfClass:[NSArray class]])
-            {
-                NSMutableArray *yitingguoArr = [NSMutableArray arrayWithArray:[CommonCode readFromUserD:@"yitingguoxinwenID"]];
-                [yitingguoArr addObject:xinwenArr[indexPath.row][@"id"]];
-                [CommonCode writeToUserD:yitingguoArr andKey:@"yitingguoxinwenID"];
-            }else
-            {
-                NSMutableArray *yitingguoArr = [NSMutableArray array];
-                [yitingguoArr addObject:xinwenArr[indexPath.row][@"id"]];
-                [CommonCode writeToUserD:yitingguoArr andKey:@"yitingguoxinwenID"];
-            }
+            //调用播放对应Index方法
+            [[NewPlayVC shareInstance] playFromIndex:ExcurrentNumber];
+            //跳转播放界面
+            [self.navigationController.navigationBar setHidden:YES];
+            [self.navigationController pushViewController:[NewPlayVC shareInstance] animated:YES];
             [tableView reloadData];
         }
     }
@@ -2103,9 +2024,7 @@
         gerenzhuye.user_nicename = components[@"user_nicename"];
         gerenzhuye.avatar = components[@"user_avatar"];
         gerenzhuye.user_id = components[@"user_id"];
-//        self.hidesBottomBarWhenPushed=YES;
         [self.navigationController pushViewController:gerenzhuye animated:YES];
-//        self.hidesBottomBarWhenPushed=YES;
         
     }
     else if ([tableView isEqual:pinglunhoushuaxinTableView]){
@@ -2449,9 +2368,12 @@ didSelectLinkWithTransitInformation:(NSDictionary *)components {
             XWAlerLoginView *alert = [[XWAlerLoginView alloc] initWithTitle:@"恭喜您，信息提交成功"];
             [alert show];
             
-            NSDictionary *userInfoDict = [CommonCode readFromUserD:@"dangqianUserInfo"];
+            NSMutableDictionary *userInfoDict = [[CommonCode readFromUserD:@"dangqianUserInfo"] mutableCopy];
+            RTLog(@"%@",userInfoDict);
             [userInfoDict setValue:@"1" forKey:@"is_record"];
             [CommonCode writeToUserD:userInfoDict andKey:@"dangqianUserInfo"];
+            //提交成功 --》 获取用户信息
+            [[NSNotificationCenter defaultCenter] postNotificationName:@"updateUserInfo" object:nil];
             //退出提交
             [self cancelBtnClick:nil];
         }else{

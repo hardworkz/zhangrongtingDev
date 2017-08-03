@@ -51,6 +51,7 @@ static NSInteger selectIndex2 = -1;
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(selectCell1:) name:@"selectCellD" object:nil];
     [self.tableView registerNib:[UINib nibWithNibName:@"DownloadNewCell" bundle:nil] forCellReuseIdentifier:@"downloadNewCell"];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(addDownload:) name:@"addDownload" object:nil];
+    
     [self initData];
     
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(removeAllDeleteButton:) name:@"removeAllDeleteButton" object:nil];
@@ -59,35 +60,8 @@ static NSInteger selectIndex2 = -1;
 
 - (void)setEditing:(BOOL)editing animated:(BOOL)animated {
     [super setEditing:editing animated:animated];
-    [[NSNotificationCenter defaultCenter]postNotificationName:@"bianji" object:nil];
-//    UIViewController *v;
-    if ([self isKindOfClass:[UINavigationController class]]) {
-//        UINavigationController * nav = (UINavigationController *)self;
-//        v =  nav.topViewController;
-    };
-    ////    UIViewController *v = [self.view getVisalViewController];
-    //    UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
-    //    button.layer.cornerRadius = 5;
-    //    button.clipsToBounds= YES;
-    //    button.titleLabel.font = [UIFont systemFontOfSize:15];
-    //    [button setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-    //    [button setTitle:@"删除全部" forState:UIControlStateNormal];
-    //    button.backgroundColor = [UIColor redColor];
-    //    button.frame = CGRectMake(10, SCREEN_WIDTH - 50, SCREEN_WIDTH - 20, 44);
-    //    [button addTarget:self action:@selector(remove:) forControlEvents:UIControlEventTouchUpInside];
-    //    if (editing) {
-    ////        UIBarButtonItem *bar = self.navigationItem.rightBarButtonItem;
-    ////        [bar setTitle:@"取消"];
-    //        [self.view.window addSubview:button];
-    //    }else {
-    ////        UIBarButtonItem *bar = self.navigationItem.rightBarButtonItem;
-    ////        [bar setTitle:@"编辑"];
-    //        [self.view.window.subviews enumerateObjectsUsingBlock:^(__kindof UIView * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-    //            if ([obj isKindOfClass:[UIButton class]]) {
-    //                [obj removeFromSuperview];
-    //            }
-    //        }];
-    //    }
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"bianji" object:nil];
 }
 
 - (void)remove:(UIButton *)sender{
@@ -112,7 +86,6 @@ static NSInteger selectIndex2 = -1;
         [_allPlayButton setFrame:CGRectMake(15, 10, 20, 20)];
         [_allPlayButton setBackgroundImage:[UIImage imageNamed:@"downloaded_play"] forState:UIControlStateNormal];
         [_allPlayButton setAccessibilityLabel:@"播放全部"];
-        //        [_allPlayButton setBackgroundImage:[UIImage imageNamed:@"downloaded_play"] forState:UIControlStateSelected];
         [_allPlayButton addTarget:self action:@selector(allPlayButtonAction:) forControlEvents:UIControlEventTouchUpInside];
         
     }
@@ -132,29 +105,6 @@ static NSInteger selectIndex2 = -1;
     return _manageButton;
 }
 
-//- (UIView *)manageToolBarView {
-//    if (!_manageToolBarView) {
-//        _manageToolBarView = [[UIView alloc]initWithFrame:CGRectMake(0, SCREEN_HEIGHT - 64- 50 - 40, SCREEN_WIDTH, 40)];
-//        [_manageToolBarView setBackgroundColor:[UIColor whiteColor]];
-//        self.allSelectButton = [UIButton buttonWithType:UIButtonTypeCustom];
-//        [self.allSelectButton setFrame:CGRectMake(0, 0, SCREEN_WIDTH / 2, 40)];
-//        [self.allSelectButton setTitle:@"全选" forState:UIControlStateNormal];
-//        [self.allSelectButton setTitleColor:gTextColorSub forState:UIControlStateNormal];
-//        [self.allSelectButton addTarget:self action:@selector(allselectDownloadNews:) forControlEvents:UIControlEventTouchUpInside];
-//        [_manageToolBarView addSubview:self.allSelectButton];
-//        UIButton *deleteButton = [UIButton buttonWithType:UIButtonTypeCustom];
-//        [deleteButton setFrame:CGRectMake(SCREEN_WIDTH / 2, 0, SCREEN_WIDTH / 2, 40)];
-//        [deleteButton setTitle:@"删除" forState:UIControlStateNormal];
-//        [deleteButton setTitleColor:gTextColorSub forState:UIControlStateNormal];
-//        [deleteButton addTarget:self action:@selector(deleteDownloadNews:) forControlEvents:UIControlEventTouchUpInside];
-//        [_manageToolBarView addSubview:deleteButton];
-//        UIView *line = [[UIView alloc]initWithFrame:CGRectMake(SCREEN_WIDTH / 2, 0, 1, 40)];
-//        [line setBackgroundColor:gThinLineColor];
-//        [_manageToolBarView addSubview:line];
-//    }
-//    return _manageToolBarView;
-//}
-
 - (UIButton *)allDeletebutton {
     if (!_allDeletebutton) {
         _allDeletebutton = [UIButton buttonWithType:UIButtonTypeCustom];
@@ -173,99 +123,53 @@ static NSInteger selectIndex2 = -1;
 #pragma mark - Utilities
 
 - (void)allPlayButtonAction:(UIButton *)sender {
-    [CommonCode writeToUserD:@"NO" andKey:TINGYOUQUANBOFANGWANBI];
+//    [CommonCode writeToUserD:@"NO" andKey:TINGYOUQUANBOFANGWANBI];
     NSArray *arr = _downloadArray;
     if ([arr count]) {
-        NewObj *obj = [_downloadArray firstObject];
-        if ([[CommonCode readFromUserD:@"dangqianbofangxinwenID"] isEqualToString:obj.i_id]){
-            if ([bofangVC shareInstance].isPlay) {
-                
-            }
-            else{
-                if ([bofangVC shareInstance].isFirst) {
-                    //
-                }
-                else{
-                   [[bofangVC shareInstance] doplay2];
-                }
-            }
-            self.hidesBottomBarWhenPushed = YES;
+        
+        //把obj 转成字典放入数组
+        NSMutableArray *downloadArr = [NSMutableArray array];
+        for (int i = 0; i < [_downloadArray count]; i ++) {
+            NSMutableDictionary *dic = [[_downloadArray[i] getAllPropertiesAndVaules] mutableCopy];
+            [dic setObject:dic[@"i_id"] forKey:@"id"];
+            [downloadArr addObject:dic];
+        }
+        NSDictionary *obj = downloadArr[0];
+        
+        //设置频道类型
+        [ZRT_PlayerManager manager].channelType = ChannelTypeMineDownload;
+        //设置播放器播放内容类型
+        [ZRT_PlayerManager manager].playType = ZRTPlayTypeNews;
+        DefineWeakSelf;
+        //播放内容切换后刷新对应的播放列表
+        [ZRT_PlayerManager manager].playReloadList = ^(NSInteger currentSongIndex) {
+            [weakSelf.tableView reloadData];
+        };
+        //设置播放界面打赏view的状态
+        [NewPlayVC shareInstance].rewardType = RewardViewTypeNone;
+        //判断是否是点击当前正在播放的新闻，如果是则直接跳转
+        if ([[CommonCode readFromUserD:@"dangqianbofangxinwenID"] isEqualToString:obj[@"id"]]){
+            
+            //设置播放器播放数组
+            [ZRT_PlayerManager manager].songList = downloadArr;
+            [[NewPlayVC shareInstance] reloadInterface];
             [self.navigationController.navigationBar setHidden:YES];
-            [self.navigationController pushViewController:[bofangVC shareInstance ] animated:YES];
-            self.hidesBottomBarWhenPushed = NO;
+            [self.navigationController pushViewController:[NewPlayVC shareInstance] animated:YES];
         }
         else{
-            [bofangVC shareInstance].newsModel.jiemuID = obj.i_id;
-            [bofangVC shareInstance].newsModel.Titlejiemu = obj.post_title;
-            [bofangVC shareInstance].newsModel.RiQijiemu = obj.post_date;
-            [bofangVC shareInstance].newsModel.ImgStrjiemu = obj.smeta;
-            [bofangVC shareInstance].newsModel.post_lai = obj.post_lai;
-            [bofangVC shareInstance].newsModel.post_news = obj.post_act[@"id"];
-            [bofangVC shareInstance].newsModel.jiemuName = obj.post_act[@"name"];
-            [bofangVC shareInstance].newsModel.jiemuDescription = obj.post_act[@"description"];
-            [bofangVC shareInstance].newsModel.jiemuImages = obj.post_act[@"images"];
-            [bofangVC shareInstance].newsModel.jiemuFan_num = obj.post_act[@"fan_num"];
-            [bofangVC shareInstance].newsModel.jiemuMessage_num = obj.post_act[@"message_num"];
-            [bofangVC shareInstance].newsModel.jiemuIs_fan = obj.post_act[@"is_fan"];
-            [bofangVC shareInstance].newsModel.post_mp = obj.post_mp;
-            [bofangVC shareInstance].newsModel.post_time = obj.post_time;
-            [bofangVC shareInstance].newsModel.post_keywords = obj.post_keywords;
-            [bofangVC shareInstance].newsModel.url = obj.url;
-            [bofangVC shareInstance].iszhuboxiangqing = NO;
-            [bofangVC shareInstance].yinpinzongTime.text = [[bofangVC shareInstance] convertStringWithTime:[obj.post_time intValue] / 1000];
             
+            //设置播放器播放数组
+            [ZRT_PlayerManager manager].songList = downloadArr;
+            //设置新闻ID
+            [NewPlayVC shareInstance].post_id = downloadArr[0][@"id"];
+            //保存当前播放新闻Index
             ExcurrentNumber = 0;
-            
-            [bofangVC shareInstance].newsModel.ImgStrjiemu = obj.smeta;
-            [bofangVC shareInstance].newsModel.ZhengWenjiemu = obj.post_excerpt;
-            [bofangVC shareInstance].newsModel.praisenum = obj.praisenum;
-            [bofangVC shareInstance].newsModel.post_keywords = obj.post_keywords;
-            [bofangVC shareInstance].newsModel.url = obj.url;
-            [[bofangVC shareInstance].tableView reloadData];
-            [Explayer replaceCurrentItemWithPlayerItem:[[AVPlayerItem alloc]initWithURL:[NSURL fileURLWithPath:obj.post_mp]]];
-            ExisRigester = YES;
-            ExIsKaiShiBoFang = YES;
-            ExwhichBoFangYeMianStr = @"Downloadbofang";
-            self.hidesBottomBarWhenPushed = YES;
+            //调用播放对应Index方法
+            [[NewPlayVC shareInstance] playFromIndex:ExcurrentNumber];
+            //跳转播放界面
             [self.navigationController.navigationBar setHidden:YES];
-            [self.navigationController pushViewController:[bofangVC shareInstance ] animated:YES];
-            self.hidesBottomBarWhenPushed = NO;
-            
-            if ([bofangVC shareInstance].isPlay || ExIsKaiShiBoFang == NO) {
-                
-            }
-            else{
-                if ([bofangVC shareInstance].isFirst) {
-                    //
-                }
-                else{
-                    [[bofangVC shareInstance] doplay2];
-                }
-            }
-            
-            [[NSNotificationCenter defaultCenter] postNotificationName:@"yuanpanzhuan" object:nil];
-            [[NSNotificationCenter defaultCenter] postNotificationName:@"qiehuanxinwen" object:nil];
-            [CommonCode writeToUserD:obj.i_id andKey:@"dangqianbofangxinwenID"];
-            //TODO:把obj 转成字典放入数组
-            NSMutableArray *downloadArr = [NSMutableArray array];
-            for (int i = 0; i < [_downloadArray count]; i ++) {
-                NSMutableDictionary *dic = [[_downloadArray[i] getAllPropertiesAndVaules] mutableCopy];
-                [dic setObject:dic[@"i_id"] forKey:@"id"];
-                [downloadArr addObject:dic];
-            }
-            [CommonCode writeToUserD:downloadArr andKey:@"zhuyeliebiao"];
-            if ([[CommonCode readFromUserD:@"yitingguoxinwenID"] isKindOfClass:[NSArray class]])
-            {
-                NSMutableArray *yitingguoArr = [NSMutableArray arrayWithArray:[CommonCode readFromUserD:@"yitingguoxinwenID"]];
-                [yitingguoArr addObject:obj.i_id];
-                [CommonCode writeToUserD:yitingguoArr andKey:@"yitingguoxinwenID"];
-            }else
-            {
-                NSMutableArray *yitingguoArr = [NSMutableArray array];
-                [yitingguoArr addObject:obj.i_id];
-                [CommonCode writeToUserD:yitingguoArr andKey:@"yitingguoxinwenID"];
-            }
-            [[NSNotificationCenter defaultCenter] postNotificationName:@"dianjihougaibiangezhongyanse" object:nil];
+            [self.navigationController pushViewController:[NewPlayVC shareInstance] animated:YES];
+            [self.tableView reloadData];
         }
     }
     else{
@@ -287,11 +191,6 @@ static NSInteger selectIndex2 = -1;
         [self.manageButton setSelected:NO];
         [self.tableView setEditing:NO];
         [self.allDeletebutton removeFromSuperview];
-//        [self.view.window.subviews enumerateObjectsUsingBlock:^(__kindof UIView * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-//            if ([obj isKindOfClass:[UIButton class]]) {
-//                [obj removeFromSuperview];
-//            }
-//        }];
     }
     else{
         [self.manageButton setSelected:YES];
@@ -406,83 +305,127 @@ static NSInteger selectIndex2 = -1;
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     
     [[NSNotificationCenter defaultCenter] postNotificationName:@"selectCellD" object:[_downloadArray[indexPath.row] i_id]];
-     NewObj *obj = _downloadArray[indexPath.row];
-    [CommonCode writeToUserD:@"NO" andKey:TINGYOUQUANBOFANGWANBI];
-    if ([[CommonCode readFromUserD:@"dangqianbofangxinwenID"] isEqualToString:obj.i_id]){
-        self.hidesBottomBarWhenPushed = YES;
+    
+    //把当前数据转为字典
+    NSMutableArray *downloadArr = [NSMutableArray array];
+    for (int i = 0; i < [_downloadArray count]; i ++) {
+        NSMutableDictionary *dic = [[_downloadArray[i] getAllPropertiesAndVaules] mutableCopy];
+        [dic setObject:dic[@"i_id"] forKey:@"id"];
+        [downloadArr addObject:dic];
+    }
+    NSDictionary *obj = downloadArr[indexPath.row];
+    
+    //设置频道类型
+    [ZRT_PlayerManager manager].channelType = ChannelTypeMineDownload;
+    //设置播放器播放内容类型
+    [ZRT_PlayerManager manager].playType = ZRTPlayTypeNews;
+    DefineWeakSelf;
+    //播放内容切换后刷新对应的播放列表
+    [ZRT_PlayerManager manager].playReloadList = ^(NSInteger currentSongIndex) {
+        [weakSelf.tableView reloadData];
+    };
+    //设置播放界面打赏view的状态
+    [NewPlayVC shareInstance].rewardType = RewardViewTypeNone;
+    //判断是否是点击当前正在播放的新闻，如果是则直接跳转
+    if ([[CommonCode readFromUserD:@"dangqianbofangxinwenID"] isEqualToString:obj[@"id"]]){
+        
+        //设置播放器播放数组
+        [ZRT_PlayerManager manager].songList = downloadArr;
+        [[NewPlayVC shareInstance] reloadInterface];
         [self.navigationController.navigationBar setHidden:YES];
-        [self.navigationController pushViewController:[bofangVC shareInstance ] animated:YES];
-        self.hidesBottomBarWhenPushed = NO;
+        [self.navigationController pushViewController:[NewPlayVC shareInstance] animated:YES];
     }
     else{
-        [bofangVC shareInstance].newsModel.jiemuID = obj.i_id;
-        [bofangVC shareInstance].newsModel.Titlejiemu = obj.post_title;
-        [bofangVC shareInstance].newsModel.RiQijiemu = obj.post_date;
-        [bofangVC shareInstance].newsModel.ImgStrjiemu = obj.smeta;
-        [bofangVC shareInstance].newsModel.post_lai = obj.post_lai;
-        [bofangVC shareInstance].newsModel.post_news = obj.post_news;
-        [bofangVC shareInstance].newsModel.jiemuName = obj.post_act[@"name"];
-        [bofangVC shareInstance].newsModel.jiemuDescription = obj.post_act[@"description"];
-        [bofangVC shareInstance].newsModel.jiemuImages = obj.post_act[@"images"];
-        [bofangVC shareInstance].newsModel.jiemuFan_num = obj.post_act[@"fan_num"];
-        [bofangVC shareInstance].newsModel.jiemuMessage_num = obj.post_act[@"message_num"];
-        [bofangVC shareInstance].newsModel.jiemuIs_fan = obj.post_act[@"is_fan"];
-        [bofangVC shareInstance].newsModel.post_mp = obj.post_mp;
-        [bofangVC shareInstance].newsModel.post_time = obj.post_time;
-        [bofangVC shareInstance].newsModel.post_keywords = obj.post_keywords;
-        [bofangVC shareInstance].newsModel.url = obj.url;
-        [bofangVC shareInstance].iszhuboxiangqing = NO;
-        [bofangVC shareInstance].yinpinzongTime.text = [[bofangVC shareInstance] convertStringWithTime:[obj.post_time intValue] / 1000];
         
+        //设置播放器播放数组
+        [ZRT_PlayerManager manager].songList = downloadArr;
+        //设置新闻ID
+        [NewPlayVC shareInstance].post_id = downloadArr[indexPath.row][@"id"];
+        //保存当前播放新闻Index
         ExcurrentNumber = (int)indexPath.row;
-        
-        [bofangVC shareInstance].newsModel.ImgStrjiemu = obj.smeta;
-        [bofangVC shareInstance].newsModel.ZhengWenjiemu = obj.post_excerpt;
-        [bofangVC shareInstance].newsModel.praisenum = obj.praisenum;
-        [bofangVC shareInstance].newsModel.post_keywords = obj.post_keywords;
-        [bofangVC shareInstance].newsModel.url = obj.url;
-        [[bofangVC shareInstance].tableView reloadData];
-        [Explayer replaceCurrentItemWithPlayerItem:[[AVPlayerItem alloc]initWithURL:[NSURL fileURLWithPath:obj.post_mp]]];
-        if ([bofangVC shareInstance].isPlay || ExIsKaiShiBoFang == NO) {
-            
-        }
-        else{
-            [[bofangVC shareInstance] doplay2];
-        }
-        ExisRigester = YES;
-        ExIsKaiShiBoFang = YES;
-        ExwhichBoFangYeMianStr = @"Downloadbofang";
-        self.hidesBottomBarWhenPushed = YES;
+        //调用播放对应Index方法
+        [[NewPlayVC shareInstance] playFromIndex:ExcurrentNumber];
+        //跳转播放界面
         [self.navigationController.navigationBar setHidden:YES];
-        [self.navigationController pushViewController:[bofangVC shareInstance ] animated:YES];
-        self.hidesBottomBarWhenPushed = NO;
-        
-        [[NSNotificationCenter defaultCenter] postNotificationName:@"yuanpanzhuan" object:nil];
-        [[NSNotificationCenter defaultCenter] postNotificationName:@"qiehuanxinwen" object:nil];
-        [CommonCode writeToUserD:obj.i_id andKey:@"dangqianbofangxinwenID"];
-        //TODO:把obj 转成字典放入数组
-        NSMutableArray *downloadArr = [NSMutableArray array];
-        for (int i = 0; i < [_downloadArray count]; i ++) {
-            NSMutableDictionary *dic = [[_downloadArray[i] getAllPropertiesAndVaules] mutableCopy];
-            [dic setObject:dic[@"i_id"] forKey:@"id"];
-            [downloadArr addObject:dic];
-        }
-        [CommonCode writeToUserD:downloadArr andKey:@"zhuyeliebiao"];
-        if ([[CommonCode readFromUserD:@"yitingguoxinwenID"] isKindOfClass:[NSArray class]])
-        {
-            NSMutableArray *yitingguoArr = [NSMutableArray arrayWithArray:[CommonCode readFromUserD:@"yitingguoxinwenID"]];
-            [yitingguoArr addObject:obj.i_id];
-            [CommonCode writeToUserD:yitingguoArr andKey:@"yitingguoxinwenID"];
-        }else
-        {
-            NSMutableArray *yitingguoArr = [NSMutableArray array];
-            [yitingguoArr addObject:obj.i_id];
-            [CommonCode writeToUserD:yitingguoArr andKey:@"yitingguoxinwenID"];
-        }
-        [[bofangVC shareInstance].tableView reloadData];
+        [self.navigationController pushViewController:[NewPlayVC shareInstance] animated:YES];
         [tableView reloadData];
-        [[NSNotificationCenter defaultCenter] postNotificationName:@"dianjihougaibiangezhongyanse" object:nil];
     }
+//    [CommonCode writeToUserD:@"NO" andKey:TINGYOUQUANBOFANGWANBI];
+//    if ([[CommonCode readFromUserD:@"dangqianbofangxinwenID"] isEqualToString:obj.i_id]){
+//        self.hidesBottomBarWhenPushed = YES;
+//        [self.navigationController.navigationBar setHidden:YES];
+//        [self.navigationController pushViewController:[bofangVC shareInstance ] animated:YES];
+//        self.hidesBottomBarWhenPushed = NO;
+//    }
+//    else{
+//        [bofangVC shareInstance].newsModel.jiemuID = obj.i_id;
+//        [bofangVC shareInstance].newsModel.Titlejiemu = obj.post_title;
+//        [bofangVC shareInstance].newsModel.RiQijiemu = obj.post_date;
+//        [bofangVC shareInstance].newsModel.ImgStrjiemu = obj.smeta;
+//        [bofangVC shareInstance].newsModel.post_lai = obj.post_lai;
+//        [bofangVC shareInstance].newsModel.post_news = obj.post_news;
+//        [bofangVC shareInstance].newsModel.jiemuName = obj.post_act[@"name"];
+//        [bofangVC shareInstance].newsModel.jiemuDescription = obj.post_act[@"description"];
+//        [bofangVC shareInstance].newsModel.jiemuImages = obj.post_act[@"images"];
+//        [bofangVC shareInstance].newsModel.jiemuFan_num = obj.post_act[@"fan_num"];
+//        [bofangVC shareInstance].newsModel.jiemuMessage_num = obj.post_act[@"message_num"];
+//        [bofangVC shareInstance].newsModel.jiemuIs_fan = obj.post_act[@"is_fan"];
+//        [bofangVC shareInstance].newsModel.post_mp = obj.post_mp;
+//        [bofangVC shareInstance].newsModel.post_time = obj.post_time;
+//        [bofangVC shareInstance].newsModel.post_keywords = obj.post_keywords;
+//        [bofangVC shareInstance].newsModel.url = obj.url;
+//        [bofangVC shareInstance].iszhuboxiangqing = NO;
+//        [bofangVC shareInstance].yinpinzongTime.text = [[bofangVC shareInstance] convertStringWithTime:[obj.post_time intValue] / 1000];
+//        
+//        ExcurrentNumber = (int)indexPath.row;
+//        
+//        [bofangVC shareInstance].newsModel.ImgStrjiemu = obj.smeta;
+//        [bofangVC shareInstance].newsModel.ZhengWenjiemu = obj.post_excerpt;
+//        [bofangVC shareInstance].newsModel.praisenum = obj.praisenum;
+//        [bofangVC shareInstance].newsModel.post_keywords = obj.post_keywords;
+//        [bofangVC shareInstance].newsModel.url = obj.url;
+//        [[bofangVC shareInstance].tableView reloadData];
+//        [Explayer replaceCurrentItemWithPlayerItem:[[AVPlayerItem alloc]initWithURL:[NSURL fileURLWithPath:obj.post_mp]]];
+//        if ([bofangVC shareInstance].isPlay || ExIsKaiShiBoFang == NO) {
+//            
+//        }
+//        else{
+//            [[bofangVC shareInstance] doplay2];
+//        }
+//        ExisRigester = YES;
+//        ExIsKaiShiBoFang = YES;
+//        ExwhichBoFangYeMianStr = @"Downloadbofang";
+//        self.hidesBottomBarWhenPushed = YES;
+//        [self.navigationController.navigationBar setHidden:YES];
+//        [self.navigationController pushViewController:[bofangVC shareInstance ] animated:YES];
+//        self.hidesBottomBarWhenPushed = NO;
+//        
+//        [[NSNotificationCenter defaultCenter] postNotificationName:@"yuanpanzhuan" object:nil];
+//        [[NSNotificationCenter defaultCenter] postNotificationName:@"qiehuanxinwen" object:nil];
+//        [CommonCode writeToUserD:obj.i_id andKey:@"dangqianbofangxinwenID"];
+//        //TODO:把obj 转成字典放入数组
+//        NSMutableArray *downloadArr = [NSMutableArray array];
+//        for (int i = 0; i < [_downloadArray count]; i ++) {
+//            NSMutableDictionary *dic = [[_downloadArray[i] getAllPropertiesAndVaules] mutableCopy];
+//            [dic setObject:dic[@"i_id"] forKey:@"id"];
+//            [downloadArr addObject:dic];
+//        }
+//        [CommonCode writeToUserD:downloadArr andKey:NewPlayVC_PLAYLIST];
+//        if ([[CommonCode readFromUserD:@"yitingguoxinwenID"] isKindOfClass:[NSArray class]])
+//        {
+//            NSMutableArray *yitingguoArr = [NSMutableArray arrayWithArray:[CommonCode readFromUserD:@"yitingguoxinwenID"]];
+//            [yitingguoArr addObject:obj.i_id];
+//            [CommonCode writeToUserD:yitingguoArr andKey:@"yitingguoxinwenID"];
+//        }else
+//        {
+//            NSMutableArray *yitingguoArr = [NSMutableArray array];
+//            [yitingguoArr addObject:obj.i_id];
+//            [CommonCode writeToUserD:yitingguoArr andKey:@"yitingguoxinwenID"];
+//        }
+//        [[bofangVC shareInstance].tableView reloadData];
+//        [tableView reloadData];
+//        [[NSNotificationCenter defaultCenter] postNotificationName:@"dianjihougaibiangezhongyanse" object:nil];
+//    }
 }
 
 
@@ -490,6 +433,9 @@ static NSInteger selectIndex2 = -1;
     [[NSNotificationCenter defaultCenter]removeObserver:self];
 }
 
+/**
+ 初始化已经下载的数据
+ */
 - (void)initData {
     ProjiectDownLoadManager *manager = [ProjiectDownLoadManager defaultProjiectDownLoadManager];
     NSArray *arr = [manager downloadAllNewObjArrar];
@@ -519,18 +465,8 @@ static NSInteger selectIndex2 = -1;
         if (_downloadArray.count > conut) {
             @synchronized(self) {
                 NSIndexPath *indexP = [NSIndexPath indexPathForRow:0 inSection:0];
-                //                NSIndexPath *indexP1 = [NSIndexPath indexPathForRow:selectIndex2 inSection:0];
                 [selfBlock.tableView insertRowsAtIndexPaths:@[indexP] withRowAnimation:UITableViewRowAnimationRight];
-                //                NSPredicate *p = [NSPredicate predicateWithFormat:@"i_id == %@", [NewContentViewController defaultNewContentController].obj.i_id];
-                //                if ([[_downloadArray filteredArrayUsingPredicate:p]count]) {
-                //                    NewObj* obj = [_downloadArray filteredArrayUsingPredicate:p][0];
-                //                    selectIndex2 = [_downloadArray indexOfObject:obj];
-                //                }else {
-                //                    selectIndex2 = -1;
-                //                }
                 [selfBlock.tableView selectRowAtIndexPath:[NSIndexPath indexPathForRow:selectIndex2 inSection:0] animated:YES scrollPosition:UITableViewScrollPositionNone];
-                //                [self.tableView selectRowAtIndexPath:indexP1 animated:YES scrollPosition:UITableViewScrollPositionNone];
-                
             }
         }
     });
@@ -548,10 +484,7 @@ static NSInteger selectIndex2 = -1;
         }else {
             selectIndex2 = -1;
         }
-        //        [self.tableView selectRowAtIndexPath:[NSIndexPath indexPathForRow:selectIndex2 inSection:0] animated:YES scrollPosition:UITableViewScrollPositionNone];
         if (selectIndex2 >= 0) {
-            //            [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:selectIndex2 inSection:0]
-            //                                  atScrollPosition:UITableViewScrollPositionMiddle animated:YES] ;
         }
     });
 }
@@ -560,27 +493,6 @@ static NSInteger selectIndex2 = -1;
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
     // Return NO if you do not want the specified item to be editable.
     return YES;
-}
-
-- (void)viewWillAppear:(BOOL)animated {
-    [super viewWillAppear:animated];
-    //   selectIndex2 = [[[NSUserDefaults standardUserDefaults]objectForKey:@"selectC2"] integerValue];
-    //    [self.tableView selectRowAtIndexPath:[NSIndexPath indexPathForRow:selectIndex2 inSection:0] animated:YES scrollPosition:UITableViewScrollPositionNone];
-    
-    //    NSPredicate *p = [NSPredicate predicateWithFormat:@"i_id == %@", [NewContentViewController defaultNewContentController].obj.i_id];
-    //    if ([[_downloadArray filteredArrayUsingPredicate:p]count]) {
-    //        NewObj* obj = [_downloadArray filteredArrayUsingPredicate:p][0];
-    //        selectIndex2 = [_downloadArray indexOfObject:obj];
-    //    }else {
-    //        selectIndex2 = -1;
-    //    }
-    //    [self.tableView selectRowAtIndexPath:[NSIndexPath indexPathForRow:selectIndex2 inSection:0] animated:YES scrollPosition:UITableViewScrollPositionNone];
-    //    if (selectIndex2 >= 0) {
-    //        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-    ////            [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:selectIndex2 inSection:0] atScrollPosition:UITableViewScrollPositionMiddle animated:YES] ;
-    //        });
-    //    }
-    
 }
 
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -603,29 +515,4 @@ static NSInteger selectIndex2 = -1;
 - (NSString *)tableView:(UITableView *)tableView titleForDeleteConfirmationButtonForRowAtIndexPath:(NSIndexPath *)indexPath{
     return @"删除";
 }
-
-/*
- // Override to support rearranging the table view.
- - (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)fromIndexPath toIndexPath:(NSIndexPath *)toIndexPath {
- }
- */
-
-/*
- // Override to support conditional rearranging of the table view.
- - (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
- // Return NO if you do not want the item to be re-orderable.
- return YES;
- }
- */
-
-/*
- #pragma mark - Navigation
- 
- // In a storyboard-based application, you will often want to do a little preparation before navigation
- - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
- // Get the new view controller using [segue destinationViewController].
- // Pass the selected object to the new view controller.
- }
- */
-
 @end

@@ -44,6 +44,11 @@
     [NetWorkTool get_collectionWithaccessToken:AvatarAccessToken sccess:^(NSDictionary *responseObject) {
         if ([responseObject[@"results"] isKindOfClass:[NSArray class]]) {
             self.dataSourceArr = [responseObject[@"results"] mutableCopy];
+            //替换id为当前新闻ID
+            for (int i = 0; i<self.dataSourceArr.count; i++) {
+                NSDictionary *dict = self.dataSourceArr[i];
+                [dict setValue:dict[@"post_id"] forKey:@"id"];
+            }
             [self.helpTableView reloadData];
         }else{
             if (self.dataSourceArr.count == 0) {
@@ -60,7 +65,6 @@
     } failure:^(NSError *error) {
         //
     }];
-    
 }
 
 - (void)setUpView{
@@ -138,80 +142,41 @@
 #pragma mark - UITableViewDelegate
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
+    //设置频道类型
+    [ZRT_PlayerManager manager].channelType = ChannelTypeMineCollection;
+    //设置播放器播放内容类型
+    [ZRT_PlayerManager manager].playType = ZRTPlayTypeNews;
+    DefineWeakSelf;
+    //播放内容切换后刷新对应的播放列表
+    [ZRT_PlayerManager manager].playReloadList = ^(NSInteger currentSongIndex) {
+        [weakSelf.helpTableView reloadData];
+    };
+    //设置播放界面打赏view的状态
+    [NewPlayVC shareInstance].rewardType = RewardViewTypeNone;
+    //判断是否是点击当前正在播放的新闻，如果是则直接跳转
     if ([[CommonCode readFromUserD:@"dangqianbofangxinwenID"] isEqualToString:self.dataSourceArr[indexPath.row][@"post_id"]]){
-        self.hidesBottomBarWhenPushed = YES;
+        
+        //设置播放器播放数组
+        [ZRT_PlayerManager manager].songList = self.dataSourceArr;
+        [[NewPlayVC shareInstance] reloadInterface];
         [self.navigationController.navigationBar setHidden:YES];
-        [bofangVC shareInstance].isMyCollectionVC = YES;
-        [self.navigationController pushViewController:[bofangVC shareInstance] animated:YES];
-        [[bofangVC shareInstance].tableView reloadData];
-        self.hidesBottomBarWhenPushed = YES;
-        if ([bofangVC shareInstance].isPlay) {
-            
-        }
-        else{
-            [[bofangVC shareInstance] doplay2];
-        }
+        [self.navigationController pushViewController:[NewPlayVC shareInstance] animated:YES];
     }
     else{
-        [bofangVC shareInstance].newsModel.jiemuID = self.dataSourceArr[indexPath.row][@"post_id"];
-        [bofangVC shareInstance].newsModel.Titlejiemu = self.dataSourceArr[indexPath.row][@"post_title"];
-        [bofangVC shareInstance].newsModel.RiQijiemu = self.dataSourceArr[indexPath.row][@"post_date"];
-        [bofangVC shareInstance].newsModel.ImgStrjiemu = self.dataSourceArr[indexPath.row][@"smeta"];
-        [bofangVC shareInstance].newsModel.post_lai = self.dataSourceArr[indexPath.row][@"post_lai"];
-        [bofangVC shareInstance].newsModel.post_news = self.dataSourceArr[indexPath.row][@"post_act"][@"id"];
-        [bofangVC shareInstance].newsModel.jiemuName = self.dataSourceArr[indexPath.row][@"post_act"][@"name"];
-        [bofangVC shareInstance].newsModel.jiemuDescription = self.dataSourceArr[indexPath.row][@"post_act"][@"description"];
-        [bofangVC shareInstance].newsModel.jiemuImages = self.dataSourceArr[indexPath.row][@"post_act"][@"images"];
-        [bofangVC shareInstance].newsModel.jiemuFan_num = self.dataSourceArr[indexPath.row][@"post_act"][@"fan_num"];
-        [bofangVC shareInstance].newsModel.jiemuMessage_num = self.dataSourceArr[indexPath.row][@"post_act"][@"message_num"];
-        [bofangVC shareInstance].newsModel.jiemuIs_fan = self.dataSourceArr[indexPath.row][@"post_act"][@"is_fan"];
-        [bofangVC shareInstance].newsModel.post_mp = self.dataSourceArr[indexPath.row][@"post_mp"];
-        [bofangVC shareInstance].newsModel.post_time = self.dataSourceArr[indexPath.row][@"post_time"];
-        [bofangVC shareInstance].iszhuboxiangqing = NO;
-        [bofangVC shareInstance].newsModel.post_keywords = self.dataSourceArr[indexPath.row][@"post_keywords"];
-        [bofangVC shareInstance].newsModel.url = self.dataSourceArr[indexPath.row][@"url"];
-        [bofangVC shareInstance].yinpinzongTime.text = [[bofangVC shareInstance] convertStringWithTime:[self.dataSourceArr[indexPath.row][@"post_time"] intValue] / 1000];
         
+        //设置播放器播放数组
+        [ZRT_PlayerManager manager].songList = self.dataSourceArr;
+        //设置新闻ID
+        [NewPlayVC shareInstance].post_id = self.dataSourceArr[indexPath.row][@"post_id"];
+        //保存当前播放新闻Index
         ExcurrentNumber = (int)indexPath.row;
-        [bofangVC shareInstance].newsModel.ImgStrjiemu = self.dataSourceArr[indexPath.row][@"smeta"];
-        [bofangVC shareInstance].newsModel.ZhengWenjiemu = self.dataSourceArr[indexPath.row][@"post_excerpt"];
-        [bofangVC shareInstance].newsModel.praisenum = self.dataSourceArr[indexPath.row][@"praisenum"];
-        [[bofangVC shareInstance].tableView reloadData];
-        [Explayer replaceCurrentItemWithPlayerItem:[[AVPlayerItem alloc]initWithURL:[NSURL URLWithString:self.dataSourceArr[indexPath.row][@"post_mp"]]]];
-        if ([bofangVC shareInstance].isPlay || ExIsKaiShiBoFang == NO) {
-            
-        }
-        else{
-            [[bofangVC shareInstance] doplay2];
-        }
-        ExisRigester = YES;
-        ExIsKaiShiBoFang = YES;
-        ExwhichBoFangYeMianStr = @"shouyebofang";
-        self.hidesBottomBarWhenPushed = YES;
+        //调用播放对应Index方法
+        [[NewPlayVC shareInstance] playFromIndex:ExcurrentNumber];
+        //跳转播放界面
         [self.navigationController.navigationBar setHidden:YES];
-        [bofangVC shareInstance].isMyCollectionVC = YES;
-        [self.navigationController pushViewController:[bofangVC shareInstance] animated:YES];
-        [[bofangVC shareInstance].tableView reloadData];
-        //        [self.navigationController.navigationBar setHidden:NO];
-        self.hidesBottomBarWhenPushed = YES;
-        [[NSNotificationCenter defaultCenter] postNotificationName:@"yuanpanzhuan" object:nil];
-        [[NSNotificationCenter defaultCenter] postNotificationName:@"qiehuanxinwen" object:nil];
-        [CommonCode writeToUserD:self.dataSourceArr andKey:@"zhuyeliebiao"];
-        [CommonCode writeToUserD:self.dataSourceArr[indexPath.row][@"post_id"] andKey:@"dangqianbofangxinwenID"];
-        RTLog(@"saveID:%@",self.dataSourceArr[indexPath.row][@"post_id"]);
-        if ([[CommonCode readFromUserD:@"yitingguoxinwenID"] isKindOfClass:[NSArray class]]){
-            NSMutableArray *yitingguoArr = [NSMutableArray arrayWithArray:[CommonCode readFromUserD:@"yitingguoxinwenID"]];
-            [yitingguoArr addObject:self.dataSourceArr[indexPath.row][@"post_id"]];
-            [CommonCode writeToUserD:yitingguoArr andKey:@"yitingguoxinwenID"];
-        }
-        else{
-            NSMutableArray *yitingguoArr = [NSMutableArray array];
-            [yitingguoArr addObject:self.dataSourceArr[indexPath.row][@"post_id"]];
-            [CommonCode writeToUserD:yitingguoArr andKey:@"yitingguoxinwenID"];
-        }
+        [self.navigationController pushViewController:[NewPlayVC shareInstance] animated:YES];
         [tableView reloadData];
     }
-
 }
 
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath{
@@ -263,29 +228,7 @@
     //标题
     UILabel *titleLab = [[UILabel alloc]initWithFrame:CGRectMake(20.0 / 375 * IPHONE_W, 16.0 / 667 * IPHONE_H,  SCREEN_WIDTH - 155.0 / 375 * IPHONE_W, 21.0 / 667 *IPHONE_H)];
     titleLab.text = self.dataSourceArr[indexPath.row][@"post_title"];
-    titleLab.textColor = [UIColor blackColor];
-    RTLog(@"dangqianbofangxinwenID:%@-----列表中的ID:%@",[CommonCode readFromUserD:@"dangqianbofangxinwenID"],self.dataSourceArr[indexPath.row][@"post_id"]);
-    if ([[CommonCode readFromUserD:@"yitingguoxinwenID"] isKindOfClass:[NSArray class]]){
-        NSArray *yitingguoArr = [NSArray arrayWithArray:[CommonCode readFromUserD:@"yitingguoxinwenID"]];
-        for (int i = 0; i < yitingguoArr.count - 1; i ++ ){
-            if ([self.dataSourceArr[indexPath.row][@"post_id"] isEqualToString:yitingguoArr[i]]){
-                if ([[CommonCode readFromUserD:@"dangqianbofangxinwenID"] isEqualToString:self.dataSourceArr[indexPath.row][@"post_id"]]){
-                    titleLab.textColor = gMainColor;
-                    break;
-                }
-                else{
-                    titleLab.textColor = [[UIColor grayColor]colorWithAlphaComponent:0.7f];
-                    break;
-                }
-            }
-            else{
-                titleLab.textColor = nTextColorMain;
-            }
-        }
-    }
-    if ([[CommonCode readFromUserD:@"dangqianbofangxinwenID"] isEqualToString:self.dataSourceArr[indexPath.row][@"post_id"]]){
-        titleLab.textColor = gMainColor;
-    }
+    titleLab.textColor = [[ZRT_PlayerManager manager] textColorFormID:self.dataSourceArr[indexPath.row][@"post_id"]];
     titleLab.textAlignment = NSTextAlignmentLeft;
     titleLab.font = [UIFont boldSystemFontOfSize:17.0f ];
     [cell.contentView addSubview:titleLab];

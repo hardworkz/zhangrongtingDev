@@ -134,7 +134,6 @@
         [rewardView setFrame:CGRectMake(rewardView.frame.origin.x, rewardView.frame.origin.y, rewardView.frame.size.width, CGRectGetMaxY(rewardBorderViewNormal.frame) + 20)];
         
         [self.contentView addSubview:rewardView];
-
     }
     return self;
 }

@@ -162,9 +162,6 @@
         [rewardView setFrame:CGRectMake(rewardView.frame.origin.x, rewardView.frame.origin.y, rewardView.frame.size.width, CGRectGetMaxY(rewardBorderView.frame) + 15)];
         
         [self.contentView addSubview:rewardView];
-        
-        RTLog(@"%f----%f",CGRectGetMaxY(rewardBorderView.frame),rewardView.height);
-        
     }
     return self;
 }

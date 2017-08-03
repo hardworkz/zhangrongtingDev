@@ -20,6 +20,7 @@ typedef NS_ENUM(NSInteger, ChannelType) {
     ChannelTypeMineDownload,//播放我的模块下载列表
     ChannelTypeMineCollection,//播放我的模块收藏列表
     ChannelTypeMineCircleListen,//播放我的模块听友圈点击新闻单条播放
+    ChannelTypeMinePersonCenter,//播放我的模块听友圈点击新闻单条播放
 };
 typedef NS_ENUM(NSInteger, ZRTPlayType) {
     ZRTPlayTypeNews = 0,//播放新闻
@@ -44,10 +45,6 @@ typedef NS_ENUM(NSInteger, ZRTPlayStatus) {
  */
 @property (copy, nonatomic) void (^loadMoreList)(NSInteger currentSongIndex);
 /**
- 加载更多列表数据成功调用block
- */
-@property (copy, nonatomic) void (^loadMoreListSuccess)(NSArray *playList);
-/**
  播放完成回调
  */
 @property (copy, nonatomic) void (^playDidEnd)(NSInteger currentSongIndex);
@@ -56,9 +53,13 @@ typedef NS_ENUM(NSInteger, ZRTPlayStatus) {
  */
 @property (copy, nonatomic) void (^playReloadList)(NSInteger currentSongIndex);
 /**
+ 刷新缓冲进度
+ */
+@property (copy, nonatomic) void (^reloadBufferProgress)(float bufferProgress);
+/**
  播放监控进度回调
  */
-@property (copy, nonatomic) void (^playTimeObserve)(float progress,float bufferProgress,float currentTime,float totalDuration);
+@property (copy, nonatomic) void (^playTimeObserve)(float progress,float currentTime,float totalDuration);
 #pragma mark - 播放状态
 /*
  * 播放状态
@@ -154,11 +155,11 @@ typedef NS_ENUM(NSInteger, ZRTPlayStatus) {
 /*
  * 下一条
  */
-- (void)nextSong;
+- (BOOL)nextSong;
 /*
  * 上一条
  */
-- (void)previousSong;
+- (BOOL)previousSong;
 /**
  选中播放对应index的音频
  
@@ -171,4 +172,11 @@ typedef NS_ENUM(NSInteger, ZRTPlayStatus) {
  @param urlString 音频url字符串
  */
 - (void)loadSongInfoWithUrl:(NSString *)urlString;
+/**
+ 判断当前的列表标题的颜色（正在播放为主题色，已经播放过为灰色，没有播放过为黑色）
+
+ @param post_id 新闻ID
+ @return 返回颜色
+ */
+- (UIColor *)textColorFormID:(NSString *)post_id;
 @end

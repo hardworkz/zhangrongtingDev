@@ -295,7 +295,6 @@
                 }
                 _voiceTimeLabel.text = [NSString stringWithFormat:@"%@''",model.play_time];
             }
-
         }
     }
     

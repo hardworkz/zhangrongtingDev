@@ -61,6 +61,7 @@
     self.tableView.mj_footer = [MJRefreshAutoNormalFooter footerWithRefreshingBlock:^{
         [self setUpData];
     }];
+    self.tableView.mj_footer.hidden = YES;
     
     UISwipeGestureRecognizer *rightSwipe = [[UISwipeGestureRecognizer alloc]initWithTarget:self action:@selector(back)];
     [rightSwipe setDirection:UISwipeGestureRecognizerDirectionRight];
@@ -89,13 +90,12 @@
             }
             [self.tableView reloadData];
             if (dataArray.count != 0) {
-                self.tableView.mj_footer = [MJRefreshAutoNormalFooter footerWithRefreshingBlock:^{
-                    [self setUpData];
-                }];
+                self.tableView.mj_footer.hidden = NO;
             }
             if (dataArray.count < 10) {
                 [self.tableView.mj_footer endRefreshingWithNoMoreData];
             }
+            
         }else{
             if (self.dataSourceArr.count == 0) {
 //                [self.tableView.mj_footer endRefreshingWithNoMoreData];

@@ -32,7 +32,11 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
 
 - (id)init {
     if (self = [super init]) {
-        self.songList = [NSMutableArray array];
+        if ([[CommonCode readFromUserD:NewPlayVC_PLAYLIST] isKindOfClass:[NSArray class]]) {
+            self.songList = [CommonCode readFromUserD:NewPlayVC_PLAYLIST];
+        }else{
+            self.songList = [NSMutableArray array];
+        }
         self.playRate = 1.0;
     }
     return self;
@@ -71,6 +75,25 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
     
     [CommonCode writeToUserD:currentSong andKey:NewPlayVC_THELASTNEWSDATA];
 }
+
+/**
+ 当前播放index
+ */
+- (void)setCurrentSongIndex:(NSInteger)currentSongIndex
+{
+    _currentSongIndex = currentSongIndex;
+    
+    [CommonCode writeToUserD:@(currentSongIndex) andKey:NewPlayVC_PLAY_INDEX];
+}
+- (void)setChannelType:(ChannelType)channelType
+{
+    _channelType = channelType;
+    
+    [CommonCode writeToUserD:@(channelType) andKey:NewPlayVC_PLAY_CHANNEL];
+}
+/**
+ 播放速率
+ */
 - (void)setPlayRate:(float)playRate
 {
     _playRate = playRate;
@@ -103,10 +126,8 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
  */
 - (void)startPlay
 {
-    if (self.status == ZRTPlayStatusPause) {
-        _status = ZRTPlayStatusPlay;
-        SendNotify(SONGPLAYSTATUSCHANGE, nil)
-    }
+    _status = ZRTPlayStatusPlay;
+    SendNotify(SONGPLAYSTATUSCHANGE, nil)
     [self.player play];
 }
 /*
@@ -149,12 +170,12 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
 /**
  切换到上一首
  */
-- (void)previousSong
+- (BOOL)previousSong
 {
     if (self.currentSongIndex == 0){
         XWAlerLoginView *alert = [XWAlerLoginView alertWithTitle:@"这已经是第一条了"];
         [alert show];
-        return;
+        return YES;
     }
 
     [self endPlay];
@@ -162,12 +183,13 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
     self.currentSongIndex -= 2;
     [self loadSongInfoFromFirst:NO];
     [self startPlay];
+    return NO;
 }
 
 /**
  切换到下一首
  */
-- (void)nextSong
+- (BOOL)nextSong
 {
     //如果是最后一首，先暂停播放下一首
     if (self.currentSongIndex == self.songList.count - 1){
@@ -177,10 +199,11 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
             XWAlerLoginView *alert = [XWAlerLoginView alertWithTitle:@"这已经是最后一条了"];
             [alert show];
         }
-        return;
+        return YES;
     }
     
     [self playNext];
+    return NO;
 }
 #pragma mark - 加载歌曲
 /*
@@ -254,17 +277,23 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
             //刷新封面图片
             self.currentCoverImage = NEWSSEMTPHOTOURL(self.currentSong[@"smeta"]);
             
-            songItem = [[AVPlayerItem alloc] initWithURL:[NSURL URLWithString:self.currentSong[@"post_mp"]]];
+            if (self.channelType == ChannelTypeMineDownload) {
+                songItem = [[AVPlayerItem alloc] initWithURL:[NSURL fileURLWithPath:self.currentSong[@"post_mp"]]];
+            }else{
+                songItem = [[AVPlayerItem alloc] initWithURL:[NSURL URLWithString:self.currentSong[@"post_mp"]]];
+            }
             break;
         case ZRTPlayTypeClassroom:
             //刷新封面图片
             self.currentCoverImage = NEWSSEMTPHOTOURL(self.currentSong[@"smeta"]);
             
-            songItem = [[AVPlayerItem alloc] initWithURL:[NSURL URLWithString:self.currentSong[@"post_mp"]]];
+            if (self.channelType == ChannelTypeMineDownload) {
+                songItem = [[AVPlayerItem alloc] initWithURL:[NSURL fileURLWithPath:self.currentSong[@"post_mp"]]];
+            }else{
+                songItem = [[AVPlayerItem alloc] initWithURL:[NSURL URLWithString:self.currentSong[@"post_mp"]]];
+            }
             break;
         case ZRTPlayTypeClassroomTry:{
-            //刷新封面图片
-            self.currentCoverImage = NEWSSEMTPHOTOURL(self.currentSong[@"smeta"]);
             
             ClassAuditionListModel *auditionModel = (ClassAuditionListModel *)self.currentSong;
             
@@ -342,10 +371,8 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
             _playDuration = currentTime;
             _duration = total;
         }
-        NSTimeInterval timeInterval = [weakSelf availableDuration];//计算缓冲进度
-        _bufferProgress = timeInterval/total;//获取缓冲进度值
         if (weakSelf.playTimeObserve) {
-            weakSelf.playTimeObserve(weakSelf.progress,weakSelf.bufferProgress,currentTime,total);
+            weakSelf.playTimeObserve(weakSelf.progress,currentTime,total);
         }
     }];
     
@@ -445,7 +472,10 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
         NSArray * array = songItem.loadedTimeRanges;
         CMTimeRange timeRange = [array.firstObject CMTimeRangeValue]; //本次缓冲的时间范围
         NSTimeInterval totalBuffer = CMTimeGetSeconds(timeRange.start) + CMTimeGetSeconds(timeRange.duration); //缓冲总长度
-//        RTLog(@"共缓冲%.2f",totalBuffer);
+        RTLog(@"共缓冲%.2f",totalBuffer);
+        if (self.reloadBufferProgress) {
+            self.reloadBufferProgress(totalBuffer/self.duration);
+        }
         
     }else if ([keyPath isEqualToString:kvo_playbackBufferEmpty])
     {
@@ -494,5 +524,33 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
     NSString * timeStr = [NSString stringWithFormat:@"%@:%@",minStr, secStr];
     return timeStr;
 }
-
+/**
+ 判断当前的列表标题的颜色（正在播放为主题色，已经播放过为灰色，没有播放过为黑色）
+ 
+ @param post_id 新闻ID
+ @return 返回颜色
+ */
+- (UIColor *)textColorFormID:(NSString *)post_id
+{
+    UIColor *returnColor = [UIColor blackColor];
+    if ([[CommonCode readFromUserD:@"yitingguoxinwenID"] isKindOfClass:[NSArray class]]){
+        NSArray *yitingguoArr = [NSArray arrayWithArray:[CommonCode readFromUserD:@"yitingguoxinwenID"]];
+        for (int i = 0; i < yitingguoArr.count; i ++){
+            if ([post_id isEqualToString:yitingguoArr[i]]){
+                if ([[CommonCode readFromUserD:@"dangqianbofangxinwenID"] isEqualToString:post_id]){
+                    returnColor = gMainColor;
+                    break;
+                }
+                else{
+                    returnColor = [[UIColor grayColor]colorWithAlphaComponent:0.7f];
+                    break;
+                }
+            }
+            else{
+                returnColor = nTextColorMain;
+            }
+        }
+    }
+    return returnColor;
+}
 @end

@@ -153,7 +153,7 @@
     
     //初始化播放器和播放控制器
     [ZRT_PlayerManager manager];
-    [NewPlayVC shareInstance];
+    [NewPlayVC shareInstance].view.backgroundColor = [UIColor whiteColor];
     
     //获取缓存的课堂ID，判断当前ID是否有值，没有值则不跳转课堂试听页面
     Exact_id = [CommonCode readFromUserD:@"Exact_id"];

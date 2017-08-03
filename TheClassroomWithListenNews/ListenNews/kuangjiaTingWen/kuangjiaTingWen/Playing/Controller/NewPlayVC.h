@@ -9,9 +9,11 @@
 #import <UIKit/UIKit.h>
 #import "OJLAnimationButton.h"
 
-//上一次播放的新闻详情
+//上一次播放的记录
 #define NewPlayVC_THELASTNEWSDATA @"NewPlayVC_TheLastNewsData"
 #define NewPlayVC_PLAYLIST @"NewPlayVC_PlayList"
+#define NewPlayVC_PLAY_INDEX @"NewPlayVC_CurrentPlayIndex"
+#define NewPlayVC_PLAY_CHANNEL @"NewPlayVC_PlayChannel"
 
 typedef NS_ENUM(NSInteger, PlayType) {
     PlayTypeNone = 0,//未知播放

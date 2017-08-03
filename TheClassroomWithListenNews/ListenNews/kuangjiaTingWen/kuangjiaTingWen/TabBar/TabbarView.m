@@ -43,15 +43,17 @@
         UIButton *btn222 = [UIButton buttonWithType:UIButtonTypeCustom];
         [self addSubview:btn222];
         _currentIdx = 0;
-        [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(startAnimate:) name:@"startAnimate" object:nil];
-        [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(stopAnimate:) name:@"stopAnimate" object:nil];
+        //选中首页
         [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(dingyueSkipToshouyeVC:) name:@"dingyueSkipToshouyeVC" object:nil];
+        //选中发现
         [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(dingyueSkipTofaxianVC:) name:@"dingyueSkipTofaxianVC" object:nil];
         //推送跳转播放新闻
         [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(pushNewsDetail:) name:@"pushNewsDetail" object:nil];
         [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(backgroundToPushNews:) name:@"backgroundToPushNews" object:nil];
         [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(setMyunreadMessageTips:) name:@"setMyunreadMessageTips" object:nil];
         
+        //播放器状态改变
+        RegisterNotify(SONGPLAYSTATUSCHANGE, @selector(playStatusChange:))
     }
     return self;
 }
@@ -61,12 +63,6 @@
     _items = items;
     // 进行遍历items -->> items里面是一个个的tabBar，
     [items enumerateObjectsUsingBlock:^(UITabBarItem * _Nonnull tabBarItem, NSUInteger idx, BOOL * _Nonnull stop) {
-        //        // (自适应布局*********已取消***********)
-        //        _btnImgView = [[UIImageView alloc] initWithImage:tabBarItem.image highlightedImage:tabBarItem.selectedImage];
-        //        _btnImgView.center = CGPointMake(btnWidth/2, btnHeight/2-5);
-        //        CGRect rect  = _btnImgView.frame;
-        //        rect.size = CGSizeMake(21, 21);
-        //        _btnImgView.frame = rect;
         
         // 透明Btn
         UIButton *tabBarBtn = [UIButton buttonWithType:UIButtonTypeCustom];
@@ -109,8 +105,6 @@
     _rotationBarBtn.frame = CGRectMake(ScreenWidth/(items.count + 1) * 2 + btnWidth/2 -21, 2.5, 42, 42);
     [_rotationBarBtn setSelected:NO];
     [_rotationBarBtn setTag:110];
-//    [_rotationBarBtn setBackgroundImage:[UIImage imageNamed:@"animate_r"] forState:UIControlStateNormal];
-//    [_rotationBarBtn setBackgroundImage:[UIImage imageNamed:@"animate"] forState:UIControlStateSelected];
     [_rotationBarBtn setBackgroundImage:[UIImage imageNamed:@"home_tab_play"] forState:UIControlStateNormal];
     [_rotationBarBtn setBackgroundImage:[UIImage imageNamed:@"home_tab_play"] forState:UIControlStateSelected];
     
@@ -119,36 +113,19 @@
     _rotationBarBtn.accessibilityLabel = @"新闻详情";
     [self addSubview:_rotationBarBtn];
     
-//    UIView *line = [[UIView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, 0.3)];
-//    [line setBackgroundColor:[UIColor lightGrayColor]];
-//    [self addSubview:line];
-    
     [self addSubview:self.newMessageButton];
     [self.newMessageButton setHidden:YES];
 }
 
-// 布局按钮(自适应布局*********已取消***********)
-//- (void)layoutSubviews{
-//    [super layoutSubviews];
-//    CGFloat btnX = 0;
-//    CGFloat btnY = 0;
-//    for (int i = 2; i < self.subviews.count; i++) {
-//        UIButton *btn = self.subviews[i];
-//        btnX = (i - 2) * btnWidth;
-//        btn.frame = CGRectMake(btnX, btnY, btnWidth, btnHeight);
-//    }
-//}
-
 - (void)tabBarBtnClick:(UIButton *)btn{
     // 二次点击当前的tabBar，释放注释可(return)不再执行动画
 //    if (btn == self.seletBtn) return;
-        ((UIImageView *)self.seletBtn.subviews[0]).highlighted = NO;
-        ((UIImageView *)btn.subviews[0]).highlighted = YES;
-        ((UILabel *)self.seletBtn.subviews[1]).textColor = [UIColor grayColor];
-//        ((UILabel *)btn.subviews[1]).textColor = gMainColor;
-        ((UILabel *)btn.subviews[1]).textColor = nMainColor;
-        self.seletBtn = btn;
-        _currentIdx = btn.tag - 2000;
+    ((UIImageView *)self.seletBtn.subviews[0]).highlighted = NO;
+    ((UIImageView *)btn.subviews[0]).highlighted = YES;
+    ((UILabel *)self.seletBtn.subviews[1]).textColor = [UIColor grayColor];
+    ((UILabel *)btn.subviews[1]).textColor = nMainColor;
+    self.seletBtn = btn;
+    _currentIdx = btn.tag - 2000;
     
     // 获取点击的索引 --> 对应tabBar的索引
     if ([self.delegate respondsToSelector:@selector(LC_tabBar:didSelectItem:)]) {
@@ -161,7 +138,7 @@
     
     NSString *pushNewsID = @"";
     if (_isPushSkip) {
-        pushNewsID = [[NSUserDefaults standardUserDefaults]valueForKey:@"pushNews"];
+        pushNewsID = [[NSUserDefaults standardUserDefaults] valueForKey:@"pushNews"];
         [[NSUserDefaults standardUserDefaults] synchronize];
     }
     else{
@@ -274,25 +251,6 @@
 }
 
 - (void)imgAnimate:(UIButton*)btn{
-    //    UIView *view=btn.subviews[0];
-    //    // 动画执行顺序
-    //    [UIView animateWithDuration:0.1 animations:^(void){
-    //         view.transform = CGAffineTransformScale(CGAffineTransformIdentity,0.5, 0.5);
-    //
-    //    } completion:^(BOOL finished){
-    //         [UIView animateWithDuration:0.2 animations:
-    //          ^(void){
-    //              view.transform = CGAffineTransformScale(CGAffineTransformIdentity,1.2, 1.2);
-    //
-    //          } completion:^(BOOL finished){
-    //              [UIView animateWithDuration:0.1 animations:
-    //               ^(void){
-    //                   view.transform = CGAffineTransformScale(CGAffineTransformIdentity,1,1);
-    //
-    //               } completion:^(BOOL finished){
-    //               }];
-    //          }];
-    //     }];
     
     _rotationAnimation = [CABasicAnimation animationWithKeyPath:@"transform.rotation.z"];
     _rotationAnimation.toValue = [NSNumber numberWithFloat: M_PI * 2.0 ];
@@ -312,20 +270,35 @@
 - (void)SVPDismiss {
     [SVProgressHUD dismiss];
 }
-
-- (void)startAnimate:(NSNotification *)notification{
-    [_rotationBarBtn setSelected:YES];
-    [self imgAnimate:_rotationBarBtn];
+#pragma mark -通知- 播放状态改变
+- (void)playStatusChange:(NSNotification *)note
+{
+    switch ([ZRT_PlayerManager manager].status) {
+        case ZRTPlayStatusPlay:
+            [_rotationBarBtn setSelected:YES];
+            [self imgAnimate:_rotationBarBtn];
+            break;
+            
+        case ZRTPlayStatusPause:
+            [self stopAnimate];
+            break;
+        case ZRTPlayStatusStop:
+            [self stopAnimate];
+            break;
+        default:
+            break;
+    }
 }
-
-- (void)stopAnimate:(NSNotification *)notification{
-    [self stopAnimate];
-}
-
+/**
+ 设置选中首页
+ */
 - (void)dingyueSkipToshouyeVC:(NSNotification *)notification {
     UIButton *shouyeTabBarBtn = (UIButton *)[self viewWithTag:2000];
     [self tabBarBtnClick:shouyeTabBarBtn];
 }
+/**
+ 设置选中发现
+ */
 - (void)dingyueSkipTofaxianVC:(NSNotification *)notification {
     UIButton *faxianTabBarBtn = (UIButton *)[self viewWithTag:2002];
     [self tabBarBtnClick:faxianTabBarBtn];
@@ -335,6 +308,9 @@
     [[NSNotificationCenter defaultCenter] postNotificationName:@"backgroundToPushNews" object:nil];
 }
 
+/**
+ 接收到推送通知点击打开播放器
+ */
 - (void)pushNewsDetail:(NSNotification *)notification {
     
     UIButton *playBtn = (UIButton *)[self viewWithTag:110];
@@ -370,9 +346,5 @@
         [_newMessageButton.titleLabel setFont:[UIFont systemFontOfSize:11.0]];
     }
     return _newMessageButton;
-}
-- (void)dealloc
-{
-    RTLog(@"TabbarView---dealloc");
 }
 @end
