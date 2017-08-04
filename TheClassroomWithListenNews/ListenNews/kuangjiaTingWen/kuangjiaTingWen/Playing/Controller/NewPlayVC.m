@@ -526,12 +526,13 @@ static NewPlayVC *_instance = nil;
     [dibuView addSubview:dangqianTime];
     
     //播放进度条
-    self.sliderProgress.continuous = YES;
     [self.sliderProgress setThumbImage:[UIImage imageNamed:@"slider"] forState:UIControlStateNormal];
     self.sliderProgress.minimumTrackTintColor = gMainColor;
     self.sliderProgress.maximumTrackTintColor = [UIColor clearColor];
     [self.sliderProgress addTarget:self action:@selector(doChangeProgress:) forControlEvents:UIControlEventValueChanged];
+    [self.sliderProgress addTarget:self action:@selector(sliderTouchDown:) forControlEvents:UIControlEventTouchDown];
     
+//    self.prgBufferProgress.frame = self.sliderProgress.frame;
     if (IS_IPAD) {
         self.prgBufferProgress.frame = CGRectMake(20.0 / 375 * IPHONE_W, 22.0 / 667 * IPHONE_H, SCREEN_WIDTH - 40.0 / 375 * SCREEN_WIDTH, 2.0);
     }
@@ -563,8 +564,18 @@ static NewPlayVC *_instance = nil;
     [ZRT_PlayerManager manager].reloadBufferProgress = ^(float bufferProgress) {
         [weakSelf.prgBufferProgress setProgress:bufferProgress animated:YES];
     };
+    
     [ZRT_PlayerManager manager].playDidEnd = ^(NSInteger currentSongIndex) {
-        [weakSelf bofangRightAction:bofangRightBtn];
+        //设置详情模型
+        self.postDetailModel = [newsDetailModel new];
+        //保存当前播放新闻的ID
+        [self saveCurrentPlayNewsID];
+        //设置模型数据，从播放器中获取对应正在播放的数据赋值新闻模型
+        [self setPostDetailModelDataFormPlayManager];
+        //获取详情数据
+        [self loadData];
+        //获取评论数据
+        [self getCommentList];
     };
 }
 #pragma mark - 懒加载新闻详情控件
@@ -704,6 +715,7 @@ static NewPlayVC *_instance = nil;
     {
         _sliderProgress = [[UISlider alloc]initWithFrame:CGRectMake(20.0 / 375 * IPHONE_W, 22.0 / 667 * SCREEN_HEIGHT - 6, IPHONE_W - 40.0 / 375 * IPHONE_W, 14.0)];
         _sliderProgress.value = 0.0f;
+        _sliderProgress.continuous = NO;
     }
     return _sliderProgress;
 }
@@ -1168,9 +1180,11 @@ static NewPlayVC *_instance = nil;
 - (void)back15
 {
     [self attAction];
-    [Explayer pause];
+    if ([ZRT_PlayerManager manager].isPlaying) {
+        [[ZRT_PlayerManager manager] pausePlay];
+    }
     //调到指定时间去播放
-    [Explayer seekToTime:CMTimeMake(self.sliderProgress.value > 15?self.sliderProgress.value - 15:0, 1) completionHandler:^(BOOL finished) {
+    [[ZRT_PlayerManager manager].player seekToTime:CMTimeMake(self.sliderProgress.value > 15?self.sliderProgress.value - 15:0, 1) completionHandler:^(BOOL finished) {
         RTLog(@"拖拽结果：%d",finished);
         if (finished == YES){
             [[ZRT_PlayerManager manager] startPlay];
@@ -1184,9 +1198,11 @@ static NewPlayVC *_instance = nil;
 - (void)go15
 {
     [self attAction];
-    [Explayer pause];
+    if ([ZRT_PlayerManager manager].isPlaying) {
+        [[ZRT_PlayerManager manager] pausePlay];
+    }
     //调到指定时间去播放
-    [Explayer seekToTime:CMTimeMake(self.sliderProgress.value + 15, 1) completionHandler:^(BOOL finished) {
+    [[ZRT_PlayerManager manager].player seekToTime:CMTimeMake(self.sliderProgress.value + 15, 1) completionHandler:^(BOOL finished) {
         RTLog(@"拖拽结果：%d",finished);
         if (finished == YES){
             [[ZRT_PlayerManager manager] startPlay];
@@ -1300,17 +1316,28 @@ static NewPlayVC *_instance = nil;
  *  @param notification 输出改变通知对象
  */
 -(void)routeChange:(NSNotification *)notification{
-    NSDictionary *dic=notification.userInfo;
-    int changeReason= [dic[AVAudioSessionRouteChangeReasonKey] intValue];
-    //等于AVAudioSessionRouteChangeReasonOldDeviceUnavailable表示旧输出不可用
-    if (changeReason==AVAudioSessionRouteChangeReasonOldDeviceUnavailable) {
-        AVAudioSessionRouteDescription *routeDescription=dic[AVAudioSessionRouteChangePreviousRouteKey];
-        AVAudioSessionPortDescription *portDescription= [routeDescription.outputs firstObject];
-        //原设备为耳机则暂停
-        RTLog(@"%@",portDescription.portType);
-        if ([portDescription.portType isEqualToString:@"Headphones"]) {
-            [self playPauseClicked:bofangCenterBtn];
+    NSDictionary *interuptionDict = notification.userInfo;
+    
+    NSInteger routeChangeReason = [[interuptionDict valueForKey:AVAudioSessionRouteChangeReasonKey] integerValue];
+    
+    switch (routeChangeReason) {
+            
+        case AVAudioSessionRouteChangeReasonNewDeviceAvailable:
+            // 耳机插入
+            break;
+            
+        case AVAudioSessionRouteChangeReasonOldDeviceUnavailable:
+        {
+            // 耳机拔掉
+            // 拔掉耳机继续播放
+            [[ZRT_PlayerManager manager] startPlay];
         }
+            break;
+            
+        case AVAudioSessionRouteChangeReasonCategoryChange:
+            // called at start - also when other audio wants to play
+            NSLog(@"AVAudioSessionRouteChangeReasonCategoryChange");
+            break;
     }
 }
 #pragma mark -通知- 播放状态改变
@@ -1466,6 +1493,9 @@ static NSInteger touchCount = 0;
  */
 - (void)setPostDetailModelDataFormPlayManager
 {
+    Exact_id = nil;
+    [CommonCode writeToUserD:nil andKey:@"Exact_id"];
+    
     _postDetailModel = [newsDetailModel mj_objectWithKeyValues:[ZRT_PlayerManager manager].currentSong];
     if ([ZRT_PlayerManager manager].channelType == ChannelTypeMineCollection) {
         _post_id = [ZRT_PlayerManager manager].currentSong[@"post_id"];
@@ -1501,6 +1531,9 @@ static NSInteger touchCount = 0;
 {
     //切换新闻ID
     self.post_id = [ZRT_PlayerManager manager].songList[[ZRT_PlayerManager manager].currentSongIndex][@"id"];
+    if (self.post_id == nil) {
+        return;
+    }
     //当前播放新闻ID
     [CommonCode writeToUserD:self.post_id andKey:@"dangqianbofangxinwenID"];
     //保存已听过新闻的ID数据
@@ -1571,6 +1604,7 @@ static NSInteger touchCount = 0;
  */
 - (void)doChangeProgress:(UISlider *)sender{
     
+    //显示快进后退按钮
     if (!isShowfastBackView) {
         [self showForwardBackView];
         
@@ -1578,7 +1612,6 @@ static NSInteger touchCount = 0;
         [self attAction];
     }
     
-    [Explayer pause];
     //调到指定时间去播放
     [[ZRT_PlayerManager manager].player seekToTime:CMTimeMake(self.sliderProgress.value, [ZRT_PlayerManager manager].playRate) completionHandler:^(BOOL finished) {
         RTLog(@"拖拽结果：%d",finished);
@@ -1588,7 +1621,23 @@ static NSInteger touchCount = 0;
     }];
     [[UIDevice currentDevice] setProximityMonitoringEnabled:[[NSUserDefaults standardUserDefaults] boolForKey:@"shoushi"]];
 }
-
+/**
+ 开始拖拽进度条调用
+ */
+- (void)sliderTouchDown:(UISlider *)sender
+{
+    //显示快进后退按钮
+    if (!isShowfastBackView) {
+        [self showForwardBackView];
+        
+        isShowfastBackView = YES;
+        [self attAction];
+    }
+    //暂停播放
+    if ([ZRT_PlayerManager manager].isPlaying) {
+        [[ZRT_PlayerManager manager] pausePlay];
+    }
+}
 /**
  快进，后退15sView隐藏定时器
  */

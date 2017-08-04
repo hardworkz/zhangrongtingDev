@@ -56,7 +56,7 @@
     DefineWeakSelf;
     APPDELEGATE.faxianSkipToPlayingVC = ^(NSString *pushNewsID){
         
-        if (ExIsClassVCPlay && Exact_id != nil) {
+        if ([ZRT_PlayerManager manager].playType == ZRTPlayTypeClassroomTry && Exact_id != nil) {
             NSMutableDictionary *dict = [CommonCode readFromUserD:@"is_free_data"];
             ClassViewController *vc = [ClassViewController shareInstance];
             vc.jiemuDescription = dict[@"jiemuDescription"];
@@ -74,7 +74,6 @@
         }
         if ([pushNewsID isEqualToString:@"NO"]) {
             //上一次听过的新闻
-//            APPDELEGATE.isTabbarCenterClicked = YES;
             if ([ZRT_PlayerManager manager].currentSong) {
                 [self.navigationController pushViewController:[NewPlayVC shareInstance] animated:YES];
             }

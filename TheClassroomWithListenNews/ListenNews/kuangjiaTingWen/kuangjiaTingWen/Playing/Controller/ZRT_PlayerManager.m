@@ -19,6 +19,10 @@ static NSString *const kvo_loadedTimeRanges = @"loadedTimeRanges";
 static NSString *const kvo_playbackBufferEmpty = @"playbackBufferEmpty";
 static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
 
+@interface ZRT_PlayerManager ()
+//播放属性
+@property (nonatomic, strong) AVPlayerItem           *playerItem;
+@end
 @implementation ZRT_PlayerManager
 + (instancetype)manager {
     
@@ -41,6 +45,21 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
     }
     return self;
 }
+- (NSMutableArray *)downloadPostIDArray
+{
+    NSMutableArray *downloadArray = [NSMutableArray array];
+    ProjiectDownLoadManager *manager = [ProjiectDownLoadManager defaultProjiectDownLoadManager];
+    NSArray *arr = [manager downloadAllNewObjArrar];
+    __weak __typeof(downloadArray) weakDownloadArray = downloadArray;
+    [arr enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        @autoreleasepool {
+            NewObj *nObj = [NewObj newObjWithDictionary:obj];
+            [weakDownloadArray addObject:nObj.i_id];
+        }
+    }];
+    return downloadArray;
+}
+
 #pragma mark - 播放器
 /*
  * 播放器播放状态
@@ -104,7 +123,9 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
  */
 - (void)setPlayDuration:(float)playDuration {
     _playDuration = playDuration;
-    [[AppDelegate delegate] configNowPlayingCenter];
+    if (self.playType != ZRTPlayTypeClassroomTry) {
+        [[AppDelegate delegate] configNowPlayingCenter];
+    }
 }
 /*
  * 当前播放时间(00:00)
@@ -120,7 +141,33 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
     
     return [self convertStringWithTime:self.totalTime.floatValue];
 }
-
+/**
+ *  根据playerItem，来添加移除观察者
+ *
+ *  @param playerItem playerItem
+ */
+- (void)setPlayerItem:(AVPlayerItem *)playerItem
+{
+    if (_playerItem == playerItem) {return;}
+    
+    if (_playerItem) {
+        [[NSNotificationCenter defaultCenter] removeObserver:self name:AVPlayerItemDidPlayToEndTimeNotification object:_playerItem];
+        [_playerItem removeObserver:self forKeyPath:kvo_status];
+        [_playerItem removeObserver:self forKeyPath:kvo_loadedTimeRanges];
+        [_playerItem removeObserver:self forKeyPath:kvo_playbackBufferEmpty];
+        [_playerItem removeObserver:self forKeyPath:kvo_playbackLikelyToKeepUp];
+    }
+    _playerItem = playerItem;
+    if (playerItem) {
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(playbackFinished:) name:AVPlayerItemDidPlayToEndTimeNotification object:playerItem];
+        [playerItem addObserver:self forKeyPath:kvo_status options:NSKeyValueObservingOptionNew context:nil];
+        [playerItem addObserver:self forKeyPath:kvo_loadedTimeRanges options:NSKeyValueObservingOptionNew context:nil];
+        // 缓冲区空了，需要等待数据
+        [playerItem addObserver:self forKeyPath:kvo_playbackBufferEmpty options:NSKeyValueObservingOptionNew context:nil];
+        // 缓冲区有足够数据可以播放了
+        [playerItem addObserver:self forKeyPath:kvo_playbackLikelyToKeepUp options:NSKeyValueObservingOptionNew context:nil];
+    }
+}
 /**
  开始播放
  */
@@ -216,7 +263,7 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
     self.currentSongIndex = isFirst ? 0 : self.currentSongIndex + 1;
     
     //回调列表，刷新界面
-    if (self.playReloadList) {
+    if (self.playReloadList && self.playType == ZRTPlayTypeNews) {
         self.playReloadList(self.currentSongIndex);
     }
     //播放index设置
@@ -234,14 +281,24 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
     //刷新封面图片
     self.currentCoverImage = NEWSSEMTPHOTOURL(self.currentSong[@"smeta"]);
     
-    //获取播放器播放对象
-    AVPlayerItem * songItem  = [[AVPlayerItem alloc] initWithURL:[NSURL URLWithString:self.currentSong[@"post_mp"]]];
-    //设置播放器，替换播放对象
-    if (_player == nil) {
-        _player = [[AVPlayer alloc]initWithPlayerItem:songItem];
-    }else {
-        [_player replaceCurrentItemWithPlayerItem:songItem];
+    //判断该新闻ID是否已经离线下载了
+    BOOL isDownLoad = NO;
+    NSMutableArray *postIDArray = [self downloadPostIDArray];
+    for (NSString *post_id in postIDArray) {
+        if ([post_id isEqualToString:self.currentSong[@"id"]]) {
+            isDownLoad = YES;
+            break;
+        }
     }
+    //获取播放器播放对象
+    if (isDownLoad) {
+        self.playerItem = [[AVPlayerItem alloc] initWithURL:[NSURL fileURLWithPath:self.currentSong[@"post_mp"]]];
+    }else{
+        self.playerItem = [[AVPlayerItem alloc] initWithURL:[NSURL URLWithString:self.currentSong[@"post_mp"]]];
+    }
+    
+    // 每次都重新创建Player，替换replaceCurrentItemWithPlayerItem:，该方法阻塞线程
+    self.player = [AVPlayer playerWithPlayerItem:self.playerItem];
     
     //给当前歌曲添加监控
     [self addObserver];
@@ -265,12 +322,9 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
     self.currentSongIndex = index;
     
     //回调列表，刷新界面
-    if (self.playReloadList) {
+    if (self.playReloadList && self.playType == ZRTPlayTypeNews) {
         self.playReloadList(self.currentSongIndex);
     }
-    
-    //获取播放器播放对象
-    AVPlayerItem * songItem;
     
     switch (self.playType) {
         case ZRTPlayTypeNews:
@@ -278,9 +332,22 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
             self.currentCoverImage = NEWSSEMTPHOTOURL(self.currentSong[@"smeta"]);
             
             if (self.channelType == ChannelTypeMineDownload) {
-                songItem = [[AVPlayerItem alloc] initWithURL:[NSURL fileURLWithPath:self.currentSong[@"post_mp"]]];
-            }else{
-                songItem = [[AVPlayerItem alloc] initWithURL:[NSURL URLWithString:self.currentSong[@"post_mp"]]];
+                self.playerItem = [[AVPlayerItem alloc] initWithURL:[NSURL fileURLWithPath:self.currentSong[@"post_mp"]]];
+            }else{//判断该新闻ID是否已经离线下载了
+                BOOL isDownLoad = NO;
+                NSMutableArray *postIDArray = [self downloadPostIDArray];
+                for (NSString *post_id in postIDArray) {
+                    if ([post_id isEqualToString:self.currentSong[@"id"]]) {
+                        isDownLoad = YES;
+                        break;
+                    }
+                }
+                //获取播放器播放对象
+                if (isDownLoad) {
+                    self.playerItem = [[AVPlayerItem alloc] initWithURL:[NSURL fileURLWithPath:self.currentSong[@"post_mp"]]];
+                }else{
+                    self.playerItem = [[AVPlayerItem alloc] initWithURL:[NSURL URLWithString:self.currentSong[@"post_mp"]]];
+                }
             }
             break;
         case ZRTPlayTypeClassroom:
@@ -288,28 +355,33 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
             self.currentCoverImage = NEWSSEMTPHOTOURL(self.currentSong[@"smeta"]);
             
             if (self.channelType == ChannelTypeMineDownload) {
-                songItem = [[AVPlayerItem alloc] initWithURL:[NSURL fileURLWithPath:self.currentSong[@"post_mp"]]];
-            }else{
-                songItem = [[AVPlayerItem alloc] initWithURL:[NSURL URLWithString:self.currentSong[@"post_mp"]]];
+                self.playerItem = [[AVPlayerItem alloc] initWithURL:[NSURL fileURLWithPath:self.currentSong[@"post_mp"]]];
+            }else{//判断该新闻ID是否已经离线下载了
+                BOOL isDownLoad = NO;
+                NSMutableArray *postIDArray = [self downloadPostIDArray];
+                for (NSString *post_id in postIDArray) {
+                    if ([post_id isEqualToString:self.currentSong[@"id"]]) {
+                        isDownLoad = YES;
+                        break;
+                    }
+                }
+                //获取播放器播放对象
+                if (isDownLoad) {
+                    self.playerItem = [[AVPlayerItem alloc] initWithURL:[NSURL fileURLWithPath:self.currentSong[@"post_mp"]]];
+                }else{
+                    self.playerItem = [[AVPlayerItem alloc] initWithURL:[NSURL URLWithString:self.currentSong[@"post_mp"]]];
+                }
             }
             break;
-        case ZRTPlayTypeClassroomTry:{
-            
-            ClassAuditionListModel *auditionModel = (ClassAuditionListModel *)self.currentSong;
-            
-            songItem = [[AVPlayerItem alloc] initWithURL:[NSURL URLWithString:auditionModel.s_mpurl]];
-        }
+        case ZRTPlayTypeClassroomTry:
+            self.playerItem = [[AVPlayerItem alloc] initWithURL:[NSURL URLWithString:self.currentSong[@"s_mpurl"]]];
             break;
         default:
             break;
     }
     
-    //设置播放器，替换播放对象
-    if (_player == nil) {
-        _player = [[AVPlayer alloc]initWithPlayerItem:songItem];
-    }else {
-        [_player replaceCurrentItemWithPlayerItem:songItem];
-    }
+    // 每次都重新创建Player，替换replaceCurrentItemWithPlayerItem:，该方法阻塞线程
+    self.player = [AVPlayer playerWithPlayerItem:self.playerItem];
     
     //给当前歌曲添加监控
     [self addObserver];
@@ -332,16 +404,13 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
     //刷新index
     self.currentSongIndex = -1;
     
-    //加载URL
+    //加载playerItem
     NSURL * url = [NSURL URLWithString:urlString];
+    self.playerItem = [[AVPlayerItem alloc]initWithURL:url];
     
     //重置播放器
-    AVPlayerItem * songItem = [[AVPlayerItem alloc]initWithURL:url];
-    if (_player == nil) {
-        _player = [[AVPlayer alloc]initWithPlayerItem:songItem];
-    }else {
-        [_player replaceCurrentItemWithPlayerItem:songItem];
-    }
+    // 每次都重新创建Player，替换replaceCurrentItemWithPlayerItem:该方法阻塞线程
+    self.player = [AVPlayer playerWithPlayerItem:self.playerItem];
     
     //给当前歌曲添加监控
     [self addObserver];
@@ -355,17 +424,18 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
 #pragma mark - KVO
 - (void)addObserver
 {
-    AVPlayerItem * songItem = self.player.currentItem;
-    
-    //给AVPlayerItem添加播放完成通知
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(playbackFinished:) name:AVPlayerItemDidPlayToEndTimeNotification object:songItem];
-    
+    AVPlayerItem *songItem = self.player.currentItem;
     //更新播放器进度
     MJWeakSelf
     _timeObserve = [self.player addPeriodicTimeObserverForInterval:CMTimeMake(1.0, self.playRate) queue:dispatch_get_main_queue() usingBlock:^(CMTime time)
     {
         float currentTime = CMTimeGetSeconds(time);
         float total = CMTimeGetSeconds(songItem.duration);
+        
+        //判断是否是NaN如果是则返回
+        if (isnan(total)) {
+            return;
+        }
         if (currentTime) {
             _progress = currentTime / total;
             _playDuration = currentTime;
@@ -375,31 +445,13 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
             weakSelf.playTimeObserve(weakSelf.progress,currentTime,total);
         }
     }];
-    
-    //监控状态属性，注意AVPlayer也有一个status属性，通过监控它的status也可以获得播放状态
-    [songItem addObserver:self forKeyPath:kvo_status options:NSKeyValueObservingOptionNew context:nil];
-    //监控网络加载情况属性
-    [songItem addObserver:self forKeyPath:kvo_loadedTimeRanges options:NSKeyValueObservingOptionNew context:nil];
-    // seekToTime后，缓冲数据为空，而且有效时间内数据无法补充，播放失败
-    [songItem addObserver:self forKeyPath:kvo_playbackBufferEmpty options:NSKeyValueObservingOptionNew context:nil];
-    // seekToTime后，可以正常播放，相当于readyToPlay，一般拖动滑竿菊花转，到了这个这个状态菊花隐藏
-    [songItem addObserver:self forKeyPath:kvo_playbackLikelyToKeepUp options:NSKeyValueObservingOptionNew context:nil];
 }
 - (void)removeObserver
 {
-    AVPlayerItem * songItem = self.player.currentItem;
-    
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
-    
     if (_timeObserve) {
         [self.player removeTimeObserver:_timeObserve];
         _timeObserve = nil;
     }
-    
-    [songItem removeObserver:self forKeyPath:kvo_status];
-    [songItem removeObserver:self forKeyPath:kvo_loadedTimeRanges];
-    [songItem removeObserver:self forKeyPath:kvo_playbackBufferEmpty];
-    [songItem removeObserver:self forKeyPath:kvo_playbackLikelyToKeepUp];
     
     [self.player replaceCurrentItemWithPlayerItem:nil];
 }
@@ -409,6 +461,9 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
 - (void)playbackFinished:(NSNotification *)notice
 {
     RTLog(@"播放完成");
+    if (self.playDidEndReload) {
+        self.playDidEndReload(self.currentSongIndex);
+    }
     //当前播放的是单个音频文件，不是列表
     if (self.currentSongIndex < 0) return;
     
@@ -425,7 +480,6 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
         }
         return;
     }
-    
     //播放列表中的下一条
     [self playNext];
     
@@ -479,23 +533,23 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
         
     }else if ([keyPath isEqualToString:kvo_playbackBufferEmpty])
     {
-        if (songItem.playbackBufferEmpty) {
-            //缓冲区域为空，暂停播放
-            [self pausePlay];
-            if (self.playRate < 0) {
-                XWAlerLoginView *alert = [[XWAlerLoginView alloc] initWithTitle:@"播放异常"];
-                [alert show];
-            }
-        }
+//        if (songItem.playbackBufferEmpty) {
+//            //缓冲区域为空，暂停播放
+//            [self pausePlay];
+//            if (self.playRate < 0) {
+//                XWAlerLoginView *alert = [[XWAlerLoginView alloc] initWithTitle:@"播放异常"];
+//                [alert show];
+//            }
+//        }
     }
     
     else if ([keyPath isEqualToString:kvo_playbackLikelyToKeepUp])
     {
-        if (songItem.playbackLikelyToKeepUp)
-        {
-            //缓存可用，继续播放
-            [self startPlay];
-        }
+//        if (songItem.playbackLikelyToKeepUp)
+//        {
+//            //缓存可用，继续播放
+//            [self startPlay];
+//        }
     }
 }
 
@@ -537,7 +591,7 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
         NSArray *yitingguoArr = [NSArray arrayWithArray:[CommonCode readFromUserD:@"yitingguoxinwenID"]];
         for (int i = 0; i < yitingguoArr.count; i ++){
             if ([post_id isEqualToString:yitingguoArr[i]]){
-                if ([[CommonCode readFromUserD:@"dangqianbofangxinwenID"] isEqualToString:post_id]){
+                if ([[CommonCode readFromUserD:@"dangqianbofangxinwenID"] isEqualToString:post_id] && self.playType == ZRTPlayTypeNews){
                     returnColor = gMainColor;
                     break;
                 }

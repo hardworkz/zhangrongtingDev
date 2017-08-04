@@ -289,9 +289,6 @@ static AVPlayer *_instancePlay = nil;
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     
-    
-    ExIsClassVCPlay = NO;
-    [CommonCode writeToUserD:@(NO) andKey:@"ExIsClassVCPlay"];
     [CommonCode writeToUserD:nil andKey:@"Exact_id"];
     
     IQKeyboardManager *manager = [IQKeyboardManager sharedManager];

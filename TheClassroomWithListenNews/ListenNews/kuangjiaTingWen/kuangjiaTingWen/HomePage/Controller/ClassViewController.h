@@ -35,10 +35,6 @@
  当前页面tableview
  */
 @property (nonatomic, strong) UITableView *helpTableView;
-/**
- 试听课堂是否播放
- */
-@property (assign, nonatomic) BOOL isPlaying;
 
 @property (strong, nonatomic) UIViewController *listVC;/**<外层列表页面控制器*/
 /**

@@ -55,6 +55,7 @@
 @property (strong, nonatomic) AVPlayer *voicePlayer;
 //非mp3格式的语音播放器
 @property (strong, nonatomic) AVAudioPlayer *player;
+
 @property (strong, nonatomic) AVAudioSession *session;
 @property (strong, nonatomic) UIImageView *voiceImgV;
 
@@ -1018,11 +1019,8 @@
     else{
         NSIndexPath *indexPath = [self.blogTableview indexPathForCell:cell];
         FeedBackAndListenFriendFrameModel *frameModel = self.blogArray[indexPath.row];
-        if ([bofangVC shareInstance].isPlay) {
-            [[bofangVC shareInstance] doplay2];
-        }
-        else{
-            
+        if ([ZRT_PlayerManager manager].isPlaying) {
+            [[ZRT_PlayerManager manager] pausePlay];
         }
         //用一个uiimageview 盖住原来的再添加动画效果
         CGRect  frame  = [cell.voiceButton convertRect:self.voiceImgV.bounds toView:self.blogTableview];
@@ -1070,8 +1068,6 @@
                 self.voicePlayer = [[AVPlayer alloc]init];
                 //添加观察者，用来监视播放器的状态变化
                 [self.voicePlayer addObserver:self forKeyPath:@"statu" options:NSKeyValueObservingOptionNew context:nil];
-                //添加观察者，用来监听播放器的缓冲进度loadedTimeRanges属性
-                //            [Explayer addObserver:self forKeyPath:@"loadedTimeRanges" options:NSKeyValueObservingOptionNew context:nil];
             }
             [self.voicePlayer replaceCurrentItemWithPlayerItem:[[AVPlayerItem alloc]initWithURL:[NSURL URLWithString:frameModel.model.mp3_url]]];
             //播放完毕后发出通知
@@ -1084,8 +1080,6 @@
             if (ExisRigester == NO){
                 //添加观察者，用来监视播放器的状态变化
                 [self.voicePlayer addObserver:self forKeyPath:@"statu" options:NSKeyValueObservingOptionNew context:nil];
-                //        //添加观察者，用来监听播放器的缓冲进度loadedTimeRanges属性
-                //            [Explayer addObserver:self forKeyPath:@"loadedTimeRange" options:NSKeyValueObservingOptionNew context:nil];
                 ExisRigester = YES;
             }
             
@@ -1439,8 +1433,6 @@
                 break;
             case AVPlayerStatusReadyToPlay:
                 NSLog(@"KVO：准备完毕，可以播放");
-                //自动播放
-//                [Explayer play];
                 break;
             case AVPlayerStatusFailed:
                 NSLog(@"KVO：加载失败，网络或者服务器出现问题");

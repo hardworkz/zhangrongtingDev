@@ -11,7 +11,7 @@
 #define SONGPLAYSTATUSCHANGE @"SongPlayStatusChange"
 
 typedef NS_ENUM(NSInteger, ChannelType) {
-    ChannelTypeChannelNone = 0,//不是列表播放
+    ChannelTypeChannelNone = 0,//不是频道列表播放
     ChannelTypeHomeChannelOne,//播放首页频道1(快讯)
     ChannelTypeHomeChannelTwo,//播放首页频道2（专栏）
     ChannelTypeHomeChannelClassify,//播放首页6大分类模块
@@ -20,7 +20,8 @@ typedef NS_ENUM(NSInteger, ChannelType) {
     ChannelTypeMineDownload,//播放我的模块下载列表
     ChannelTypeMineCollection,//播放我的模块收藏列表
     ChannelTypeMineCircleListen,//播放我的模块听友圈点击新闻单条播放
-    ChannelTypeMinePersonCenter,//播放我的模块听友圈点击新闻单条播放
+    ChannelTypeMinePersonCenter,//播放我的模块个人主页单条播放
+    ChannelTypeClassroomTryList,//播放课堂试听列表播放
 };
 typedef NS_ENUM(NSInteger, ZRTPlayType) {
     ZRTPlayTypeNews = 0,//播放新闻
@@ -35,15 +36,18 @@ typedef NS_ENUM(NSInteger, ZRTPlayStatus) {
     ZRTPlayStatusPause,//播放界面：暂停播放
     ZRTPlayStatusStop//播放界面：停止播放
 };
-@interface ZRT_PlayerManager : NSObject{
-    
+@interface ZRT_PlayerManager : NSObject
+{
     id _timeObserve; //监控进度
 }
-
 /**
  加载更多列表数据
  */
 @property (copy, nonatomic) void (^loadMoreList)(NSInteger currentSongIndex);
+/**
+ 播放完成设置界面状态
+ */
+@property (copy, nonatomic) void (^playDidEndReload)(NSInteger currentSongIndex);
 /**
  播放完成回调
  */
@@ -179,4 +183,10 @@ typedef NS_ENUM(NSInteger, ZRTPlayStatus) {
  @return 返回颜色
  */
 - (UIColor *)textColorFormID:(NSString *)post_id;
+/**
+ 已下载新闻id数组
+
+ @return ID数组
+ */
+- (NSMutableArray *)downloadPostIDArray;
 @end

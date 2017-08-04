@@ -87,7 +87,7 @@
     DefineWeakSelf;
     APPDELEGATE.shouyeSkipToPlayingVC = ^ (NSString *pushNewsID){
         
-        if (ExIsClassVCPlay && Exact_id != nil) {
+        if ([ZRT_PlayerManager manager].playType == ZRTPlayTypeClassroomTry && Exact_id != nil) {
                 NSMutableDictionary *dict = [CommonCode readFromUserD:@"is_free_data"];
             ClassViewController *vc = [ClassViewController shareInstance];
             vc.jiemuDescription = dict[@"jiemuDescription"];
@@ -788,28 +788,7 @@
             //标题
             UILabel *titleLab = [[UILabel alloc]initWithFrame:CGRectMake(15.0 / 375 * IPHONE_W, 16.0 / 667 * IPHONE_H + offsetY,  SCREEN_WIDTH - 155.0 / 375 * IPHONE_W, 21.0 / 667 *IPHONE_H)];
             titleLab.text = self.newsInfoArr[indexPath.row][@"post_title"];
-            titleLab.textColor = [UIColor blackColor];
-            if ([[CommonCode readFromUserD:@"yitingguoxinwenID"] isKindOfClass:[NSArray class]]){
-                NSArray *yitingguoArr = [NSArray arrayWithArray:[CommonCode readFromUserD:@"yitingguoxinwenID"]];
-                for (int i = 0; i < yitingguoArr.count - 1; i ++ ){
-                    if ([self.newsInfoArr[indexPath.row][@"id"] isEqualToString:yitingguoArr[i]]){
-                        if ([[CommonCode readFromUserD:@"dangqianbofangxinwenID"] isEqualToString:self.newsInfoArr[indexPath.row][@"id"]]){
-                            titleLab.textColor = gMainColor;
-                            break;
-                        }
-                        else{
-                            titleLab.textColor = [[UIColor grayColor]colorWithAlphaComponent:0.7f];
-                            break;
-                        }
-                    }
-                    else{
-                        titleLab.textColor = nTextColorMain;
-                    }
-                }
-            }
-            if ([[CommonCode readFromUserD:@"dangqianbofangxinwenID"] isEqualToString:self.newsInfoArr[indexPath.row][@"id"]]){
-                titleLab.textColor = gMainColor;
-            }
+            titleLab.textColor = [[ZRT_PlayerManager manager] textColorFormID:self.newsInfoArr[indexPath.row][@"id"]];
             titleLab.textAlignment = NSTextAlignmentLeft;
             titleLab.font = [UIFont boldSystemFontOfSize:17.0f ];
             [cell.contentView addSubview:titleLab];

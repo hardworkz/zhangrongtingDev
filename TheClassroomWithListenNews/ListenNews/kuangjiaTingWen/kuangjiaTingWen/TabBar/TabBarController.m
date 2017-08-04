@@ -39,21 +39,8 @@
 }
 - (void)viewWillAppear:(BOOL)animated{
     
-//    for (UIView *childView in self.tabBar.subviews) {
-//        if (![childView isKindOfClass:[TabbarView class]]) {
-//            // 移除添加到TabbarView之外的视图
-//            [childView removeFromSuperview];
-//        }
-//    }
     [super viewWillAppear:animated];
     
-    //判断是否当前需要开始播放按钮动画
-    if ([bofangVC shareInstance].isPlay || [ClassViewController shareInstance].isPlaying) {
-        [[NSNotificationCenter defaultCenter] postNotificationName:@"startAnimate" object:nil];
-    }
-    else{
-        [[NSNotificationCenter defaultCenter] postNotificationName:@"stopAnimate" object:nil];
-    }
 }
 
 - (void)viewDidLoad{

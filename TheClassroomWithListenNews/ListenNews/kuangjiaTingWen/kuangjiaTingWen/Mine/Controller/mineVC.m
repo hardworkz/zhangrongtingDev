@@ -66,7 +66,7 @@ typedef void(^animateBlock)();
     DefineWeakSelf;
     APPDELEGATE.woSkipToPlayingVC = ^ (NSString *pushNewsID){
         
-        if (ExIsClassVCPlay && Exact_id != nil) {
+        if ([ZRT_PlayerManager manager].playType == ZRTPlayTypeClassroomTry && Exact_id != nil) {
             NSMutableDictionary *dict = [CommonCode readFromUserD:@"is_free_data"];
             ClassViewController *vc = [ClassViewController shareInstance];
             vc.jiemuDescription = dict[@"jiemuDescription"];

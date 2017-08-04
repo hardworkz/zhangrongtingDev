@@ -62,10 +62,10 @@ static NSString *const playAct_id = @"playAct_id";/**<当前正在播放的课�
 @property (weak, nonatomic) UIImageView *lastImageView;
 @property (assign, nonatomic) CGRect originalFrame;
 //@property (strong, nonatomic) AVPlayer *voicePlayer;
-@property (strong, nonatomic) AVAudioSession *session;
+//@property (strong, nonatomic) AVAudioSession *session;
 @property (assign, nonatomic) NSInteger playingIndex;
-@property (assign, nonatomic) BOOL isVoicePlayEnd;//判断是否是播放完成回调
-@property (strong, nonatomic) AVPlayer *Player;
+//@property (assign, nonatomic) BOOL isVoicePlayEnd;//判断是否是播放完成回调
+//@property (strong, nonatomic) AVPlayer *Player;
 /**
  Vip购买选择表格
  */
@@ -113,12 +113,27 @@ static AVPlayer *_instancePlay = nil;
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(WechatPayResults:) name:WechatPayResultsClass object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(AliPayResultsMembers:) name:AliPayResultsMembers object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(WechatPayResultsMembers:) name:WechatPayResultsMembers object:nil];
+    
+    DefineWeakSelf
+    [ZRT_PlayerManager manager].playDidEnd = ^(NSInteger currentSongIndex) {
+        if ([ZRT_PlayerManager manager].playType == ZRTPlayTypeClassroomTry) {
+            weakSelf.playingIndex = currentSongIndex;
+            [weakSelf playTestMp:weakSelf.buttons[weakSelf.playingIndex]];
+        }
+    };
+    [ZRT_PlayerManager manager].playDidEndReload = ^(NSInteger currentSongIndex) {
+        if (currentSongIndex == self.playShiTingListArr.count - 1) {
+            _auditionnBtn.selected = [ZRT_PlayerManager manager].isPlaying;
+            for (UIButton *playBtn in self.buttons) {
+                playBtn.selected = [ZRT_PlayerManager manager].isPlaying;
+            }
+        }
+    };
 }
 
 - (void)viewWillAppear:(BOOL)animated{
     [super viewWillAppear:animated];
     
-    self.hidesBottomBarWhenPushed = YES;
     [self.navigationController setNavigationBarHidden:YES animated:YES];
     
     //单例模式刷新数据
@@ -134,7 +149,7 @@ static AVPlayer *_instancePlay = nil;
     }
     [self loadData];
     
-    if ([Exact_id isEqualToString:self.act_id] && _isPlaying)
+    if ([Exact_id isEqualToString:self.act_id] && [ZRT_PlayerManager manager].isPlaying)
     {
         self.auditionnBtn.selected = YES;
     }else{
@@ -157,32 +172,10 @@ static AVPlayer *_instancePlay = nil;
 - (void)viewWillDisappear:(BOOL)animated{
     [super viewWillDisappear:animated];
     [self.navigationController setNavigationBarHidden:NO animated:YES];
-    //自动处理键盘事件的第三方库
-//    IQKeyboardManager *manager = [IQKeyboardManager sharedManager];
-//    [manager setKeyboardDistanceFromTextField:0];
 }
 - (void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
-    
-//    IQKeyboardManager *manager = [IQKeyboardManager sharedManager];
-//    [manager setKeyboardDistanceFromTextField:0];
-//    manager.enable = YES;
-    
-    //测试代码
-//    zhuboXiangQingVCNewController *faxianzhuboVC = [[zhuboXiangQingVCNewController alloc]init];
-//    faxianzhuboVC.jiemuDescription = self.jiemuDescription;
-//    faxianzhuboVC.jiemuFan_num = self.jiemuFan_num;
-//    faxianzhuboVC.jiemuID = self.jiemuID;
-//    faxianzhuboVC.jiemuImages = self.jiemuImages;
-//    faxianzhuboVC.jiemuIs_fan = self.jiemuIs_fan;
-//    faxianzhuboVC.jiemuMessage_num = self.jiemuMessage_num;
-//    faxianzhuboVC.jiemuName = self.jiemuName;
-//    faxianzhuboVC.isfaxian = YES;
-//    faxianzhuboVC.isClass = YES;
-//    faxianzhuboVC.listVC = self.listVC;
-//    [self.navigationController pushViewController:faxianzhuboVC animated:YES];
-//    [[NSNotificationCenter defaultCenter] postNotificationName:ReloadClassList object:nil];
 }
 - (void)setUpData{
     _pinglunArr = [NSMutableArray new];
@@ -191,19 +184,20 @@ static AVPlayer *_instancePlay = nil;
     
     [self loadData];
     
-    _isPlaying = NO;
     _playingIndex = -1;
+    
+//    _isPlaying = NO;
 //    ExisRigester = NO;
     //AudioSession负责应用音频的设置，比如支不支持后台，打断等等
-    NSError *error;
+//    NSError *error;
     //设置音频会话
-    self.session = [AVAudioSession sharedInstance];
+//    self.session = [AVAudioSession sharedInstance];
     //AVAudioSessionCategoryPlayback一般用于支持后台播放
-    [self.session setCategory:AVAudioSessionCategoryPlayback error:&error];
+//    [self.session setCategory:AVAudioSessionCategoryPlayback error:&error];
     //激活会话
-    [self.session setActive:YES error:&error];
+//    [self.session setActive:YES error:&error];
     //接收播放完毕后发出的通知
-    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(voicePlayEnd:) name:AVPlayerItemDidPlayToEndTimeNotification object:ExclassPlayer.currentItem];
+//    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(voicePlayEnd:) name:AVPlayerItemDidPlayToEndTimeNotification object:ExclassPlayer.currentItem];
 }
 
 - (void)setUpView{
@@ -467,7 +461,6 @@ static AVPlayer *_instancePlay = nil;
         LoginVC *loginFriVC = [LoginVC new];
         LoginNavC *loginNavC = [[LoginNavC alloc]initWithRootViewController:loginFriVC];
         [loginNavC.navigationBar setBackgroundColor:[UIColor whiteColor]];
-        //        [loginNavC.navigationBar setBackgroundImage:[UIImage imageNamed:@"mian-1"] forBarMetrics:UIBarMetricsDefault];
         loginNavC.navigationBar.tintColor = [UIColor blackColor];
         [self presentViewController:loginNavC animated:YES completion:nil];
     }]];
@@ -477,47 +470,47 @@ static AVPlayer *_instancePlay = nil;
 
 #pragma mark - KVO
 //观察者方法，用来监听播放状态
-- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSString *,id> *)change context:(void *)context{
-    //当播放器状态（status）改变时，会进入此判断
-    if ([keyPath isEqualToString:@"statu"]){
-        switch (ExclassPlayer.status) {
-            case AVPlayerStatusUnknown:
-                NSLog(@"KVO：未知状态，此时不能播放");
-                break;
-            case AVPlayerStatusReadyToPlay:
-                NSLog(@"KVO：准备完毕，可以播放");
-                //自动播放
-                //                [ExclassPlayer play];
-                break;
-            case AVPlayerStatusFailed:
-                NSLog(@"KVO：加载失败，网络或者服务器出现问题");
-                break;
-            default:
-                break;
-        }
-    }
-}
+//- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSString *,id> *)change context:(void *)context{
+//    //当播放器状态（status）改变时，会进入此判断
+//    if ([keyPath isEqualToString:@"statu"]){
+//        switch (ExclassPlayer.status) {
+//            case AVPlayerStatusUnknown:
+//                NSLog(@"KVO：未知状态，此时不能播放");
+//                break;
+//            case AVPlayerStatusReadyToPlay:
+//                NSLog(@"KVO：准备完毕，可以播放");
+//                //自动播放
+//                //                [ExclassPlayer play];
+//                break;
+//            case AVPlayerStatusFailed:
+//                NSLog(@"KVO：加载失败，网络或者服务器出现问题");
+//                break;
+//            default:
+//                break;
+//        }
+//    }
+//}
 
 #pragma mark - NSNotification
-- (void)voicePlayEnd:(NSNotification *)notice {
-    if (!ExIsClassVCPlay) {
-        return;
-    }
-    NSArray *shitingArray = [CommonCode readFromUserD:playList];
-    if (_playingIndex < [shitingArray count] - 1) {
-        _isVoicePlayEnd = YES;
-        if (self.buttons.count != 0) {
-            UIButton *nextTextMPButton = self.buttons[_playingIndex + 1];
-            [self playTestMp:nextTextMPButton];
-        }else{
-            [self playTestMpWithIndex:_playingIndex + 1];
-        }
-    }
-    else{
-        [self performSelector:@selector(wanbi:) withObject:notice afterDelay:0.5f];
-        _isPlaying = NO;
-    }
-}
+//- (void)voicePlayEnd:(NSNotification *)notice {
+//    if (!ExIsClassVCPlay) {
+//        return;
+//    }
+//    NSArray *shitingArray = [CommonCode readFromUserD:playList];
+//    if (_playingIndex < [shitingArray count] - 1) {
+//        _isVoicePlayEnd = YES;
+//        if (self.buttons.count != 0) {
+//            UIButton *nextTextMPButton = self.buttons[_playingIndex + 1];
+//            [self playTestMp:nextTextMPButton];
+//        }else{
+//            [self playTestMpWithIndex:_playingIndex + 1];
+//        }
+//    }
+//    else{
+//        [self performSelector:@selector(wanbi:) withObject:notice afterDelay:0.5f];
+//        _isPlaying = NO;
+//    }
+//}
 
 - (void)wanbi:(NSNotification *)notice{
     
@@ -532,11 +525,10 @@ static AVPlayer *_instancePlay = nil;
     for ( int i = 0 ; i < self.buttons.count; i ++ ) {
         UIButton *anotherButton = self.buttons[i];
         anotherButton.selected = NO;
-        continue;
     }
-    [ExclassPlayer pause];
+//    [ExclassPlayer pause];
 //    [CommonCode writeToUserD:@"YES" andKey:TINGYOUQUANBOFANGWANBI];
-    _isPlaying = NO;
+//    _isPlaying = NO;
 }
 
 //- (void)dealloc {
@@ -824,92 +816,82 @@ static AVPlayer *_instancePlay = nil;
 //取消支付弹窗
 - (void)cancelAlert
 {
-//    APPDELEGATE.isClassPay = NO;
     APPDELEGATE.payType = PayTypeNone;
     [_alertView coverClick];
 }
 //点击底部试听按钮
-- (void)auditionnBtnAction:(UIButton *)sender{
-//    ExisRigester = NO;
+- (void)auditionnBtnAction:(UIButton *)sender
+{
+    _playingIndex = [Exact_id isEqualToString:self.act_id]?_playingIndex:-1;
     Exact_id = self.act_id;
     [CommonCode writeToUserD:Exact_id andKey:@"Exact_id"];
-    [CommonCode writeToUserD:self.playShiTingListArr andKey:playList];
-    [CommonCode writeToUserD:self.act_id andKey:playAct_id];
-    ExIsClassVCPlay = YES;
-    [CommonCode writeToUserD:@(YES) andKey:@"ExIsClassVCPlay"];
-//    ExIsFree = NO;
-//    [CommonCode writeToUserD:@(NO) andKey:@"ExIsFree"];
-    //有上一次浏览的课堂
-    [CommonCode writeToUserD:@"YES" andKey:@"haveTheLastNewsData"];
-    if (sender.selected == YES) {//选中状态，为播放状态,则将列表按钮设置全部设置为暂停
+    
+    //设置播放类型
+    [ZRT_PlayerManager manager].channelType = ChannelTypeClassroomTryList;
+    [ZRT_PlayerManager manager].playType = ZRTPlayTypeClassroomTry;
+    //设置试听列表数据
+    [ZRT_PlayerManager manager].songList = self.playShiTingListArr;
+
+    if ([ZRT_PlayerManager manager].isPlaying) {//选中状态，为播放状态,则将列表按钮设置全部设置为暂停
+        [[ZRT_PlayerManager manager] pausePlay];
         sender.selected = NO;
         for ( int i = 0 ; i < self.buttons.count; i ++ ) {
             UIButton *anotherButton = self.buttons[i];
             anotherButton.selected = NO;
-            continue;
         }
-        _playingIndex = -1;
-        [ExclassPlayer pause];
-        _isPlaying = NO;
-        [[NSNotificationCenter defaultCenter] postNotificationName:@"stopAnimate" object:nil];
     }
     else{//未选中状态，为暂停状态,判断当前播放第一个按钮，设置播放状态
-        [[NSNotificationCenter defaultCenter] postNotificationName:@"startAnimate" object:nil];
+        [[ZRT_PlayerManager manager] startPlay];
         sender.selected = YES;
-        for ( int i = 0 ; i < self.buttons.count; i ++ ) {
-            if (i == 0) {
-                UIButton *allDoneButton = [self.buttons firstObject];
-                allDoneButton.selected = YES;
-                continue;
+        if (_playingIndex < 0) {
+            _playingIndex = 0;
+            for ( int i = 0 ; i < self.buttons.count; i ++ ) {
+                if (i == 0) {
+                    UIButton *allDoneButton = [self.buttons objectAtIndex:_playingIndex];
+                    allDoneButton.selected = YES;
+                }
+                else{
+                    UIButton *anotherButton = self.buttons[i];
+                    anotherButton.selected = NO;
+                }
             }
-            else{
-                UIButton *anotherButton = self.buttons[i];
-                anotherButton.selected = NO;
-                continue;
+        }else{
+            for ( int i = 0 ; i < self.buttons.count; i ++ ) {
+                if (i == _playingIndex) {
+                    UIButton *allDoneButton = [self.buttons objectAtIndex:_playingIndex];
+                    allDoneButton.selected = YES;
+                }
+                else{
+                    UIButton *anotherButton = self.buttons[i];
+                    anotherButton.selected = NO;
+                }
             }
         }
-        
-        if ([bofangVC shareInstance].isPlay) {
-            [[bofangVC shareInstance] doplay2];
-        }
-        else{
-            
-        }
-        [ExclassPlayer pause];
-        
-        ExclassPlayer = self.Player;
-//        if (ExclassPlayer == nil) {
-//            ExclassPlayer = [[AVPlayer alloc]init];
-//        }
-        ClassAuditionListModel *auditionModel = [self.classModel.shiting firstObject];
-        [ExclassPlayer replaceCurrentItemWithPlayerItem:[[AVPlayerItem alloc]initWithURL:[NSURL URLWithString:auditionModel.s_mpurl]]];
-        
-        [ExclassPlayer play];
-        [Explayer pause];
-        _isPlaying = YES;
-        _playingIndex = 0;
-//        [CommonCode writeToUserD:@"YES" andKey:TINGYOUQUANBOFANGWANBI];
-//        if (ExisRigester == NO){
-//            ExisRigester = YES;
-//        }
+        //设置播放的index
+        [[ZRT_PlayerManager manager] loadSongInfoFromIndex:_playingIndex];
     }
 }
 //列表试听按钮点击
-- (void)playTestMp:(UIButton *)sender{
-    if (!_isVoicePlayEnd) {//判断不是播放完成调用该方法
-        [CommonCode writeToUserD:self.playShiTingListArr andKey:playList];
-        [CommonCode writeToUserD:self.act_id andKey:playAct_id];
-        Exact_id = self.act_id;
-        [CommonCode writeToUserD:Exact_id andKey:@"Exact_id"];
-//        ExIsFree = NO;
-//        [CommonCode writeToUserD:@(NO) andKey:@"ExIsFree"];
-        //有上一次浏览的课堂
-        [CommonCode writeToUserD:@"YES" andKey:@"haveTheLastNewsData"];
-        ExIsClassVCPlay = YES;
-        [CommonCode writeToUserD:@(YES) andKey:@"ExIsClassVCPlay"];
-    }
-    _isVoicePlayEnd = NO;
+- (void)playTestMp:(UIButton *)sender
+{
+    Exact_id = self.act_id;
+    [CommonCode writeToUserD:Exact_id andKey:@"Exact_id"];
     
+    //设置播放类型
+    [ZRT_PlayerManager manager].channelType = ChannelTypeClassroomTryList;
+    [ZRT_PlayerManager manager].playType = ZRTPlayTypeClassroomTry;
+    //设置试听列表数据
+    [ZRT_PlayerManager manager].songList = self.playShiTingListArr;
+    //播放试听音频
+    if ([ZRT_PlayerManager manager].isPlaying && sender.selected == YES) {//如果为点击当前正在播放按钮则暂停
+        [[ZRT_PlayerManager manager] pausePlay];
+    }
+    else{
+        //设置播放的index
+        [[ZRT_PlayerManager manager] loadSongInfoFromIndex:sender.tag];
+        
+        _playingIndex = sender.tag;
+    }
     BOOL isTestMpPlay = NO;//判断是否在试听列表里面有选中的按钮正在播放
     for ( int i = 0 ; i < self.buttons.count; i ++ ) {
         UIButton *allDoneButton = self.buttons[i];
@@ -927,79 +909,13 @@ static AVPlayer *_instancePlay = nil;
             }
         }
     }
+    //设置底部按钮状态
     if (isTestMpPlay) {
-        [[NSNotificationCenter defaultCenter] postNotificationName:@"startAnimate" object:nil];
         [self.auditionnBtn setSelected:YES];
     }
     else{
-        [[NSNotificationCenter defaultCenter] postNotificationName:@"stopAnimate" object:nil];
         [self.auditionnBtn setSelected:NO];
     }
-    //播放试听音频
-    if (_isPlaying && (_playingIndex == sender.tag)) {//如果为点击当前正在播放按钮则暂停
-        [ExclassPlayer pause];
-        _isPlaying = NO;
-    }
-    else{
-        if ([bofangVC shareInstance].isPlay) {
-            [[bofangVC shareInstance] doplay2];
-        }
-        else{
-            
-        }
-        [ExclassPlayer pause];
-//        if (ExclassPlayer == nil) {
-//            ExclassPlayer = [[AVPlayer alloc]init];
-            //添加观察者，用来监视播放器的状态变化
-//            [ExclassPlayer addObserver:self forKeyPath:@"statu" options:NSKeyValueObservingOptionNew context:nil];
-            //添加观察者，用来监听播放器的缓冲进度loadedTimeRanges属性
-            //            [ExclassPlayer addObserver:self forKeyPath:@"loadedTimeRanges" options:NSKeyValueObservingOptionNew context:nil];
-//        }
-        ExclassPlayer = self.Player;
-        
-        NSArray *shitingArray = [CommonCode readFromUserD:playList];
-        NSDictionary *auditionModel = shitingArray[sender.tag];
-        [ExclassPlayer replaceCurrentItemWithPlayerItem:[[AVPlayerItem alloc]initWithURL:[NSURL URLWithString:auditionModel[@"s_mpurl"]]]];
-        RTLog(@"%@",auditionModel[@"s_mpurl"]);
-        [ExclassPlayer play];
-        [Explayer pause];
-        _isPlaying = YES;
-        _playingIndex = sender.tag;
-//        [CommonCode writeToUserD:@"YES" andKey:TINGYOUQUANBOFANGWANBI];
-//        if (ExisRigester == NO){
-            //添加观察者，用来监视播放器的状态变化
-//            [ExclassPlayer addObserver:self forKeyPath:@"statu" options:NSKeyValueObservingOptionNew context:nil];
-            //添加观察者，用来监听播放器的缓冲进度loadedTimeRanges属性
-            //[ExclassPlayer addObserver:self forKeyPath:@"loadedTimeRange" options:NSKeyValueObservingOptionNew context:nil];
-//            ExisRigester = YES;
-//        }
-    }
-}
-//列表试听按钮点击
-- (void)playTestMpWithIndex:(NSInteger)index{
-    if (!_isVoicePlayEnd) {//判断不是播放完成调用该方法
-        [CommonCode writeToUserD:self.playShiTingListArr andKey:playList];
-        [CommonCode writeToUserD:self.act_id andKey:playAct_id];
-        Exact_id = self.act_id;
-        [CommonCode writeToUserD:Exact_id andKey:@"Exact_id"];
-    }
-    
-    _isVoicePlayEnd = NO;
-    
-    //播放试听音频
-    if ([bofangVC shareInstance].isPlay) {
-        [[bofangVC shareInstance] doplay2];
-    }
-    [ExclassPlayer pause];
-    ExclassPlayer = self.Player;
-    
-    NSArray *shitingArray = [CommonCode readFromUserD:playList];
-    NSDictionary *auditionModel = shitingArray[index];
-    [ExclassPlayer replaceCurrentItemWithPlayerItem:[[AVPlayerItem alloc]initWithURL:[NSURL URLWithString:auditionModel[@"s_mpurl"]]]];
-    [ExclassPlayer play];
-    [Explayer pause];
-    _isPlaying = YES;
-    _playingIndex = index;
 }
 - (void)pinglundianzanAction:(PinglundianzanCustomBtn *)pinglundianzanBtn frameModel:(PlayVCCommentFrameModel *)frameModel
 {
@@ -1096,14 +1012,13 @@ static AVPlayer *_instancePlay = nil;
         return cell;
     }else if(indexPath.row > self.classModel.imagesArray.count && (indexPath.row <= self.classModel.imagesArray.count + 1)){
         ClassAuditionTableViewCell *cell = [ClassAuditionTableViewCell cellWithTableView:tableView];
-        if ([Exact_id isEqualToString:self.act_id] && _isPlaying) {
+        if ([Exact_id isEqualToString:self.act_id] && [ZRT_PlayerManager manager].isPlaying) {
             cell.playingIndex = _playingIndex;
         }else{
             cell.playingIndex = -1;
         }
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
         cell.frameModel = self.frameArray[indexPath.row];
-//        [self.buttons removeAllObjects];
         self.buttons = cell.buttons;
         MJWeakSelf
         cell.playAudition = ^(UIButton *button, NSMutableArray *buttons) {
@@ -1259,11 +1174,9 @@ static AVPlayer *_instancePlay = nil;
     if (_titleLab == nil) {
         //课堂标题
         _titleLab = [[UILabel alloc] initWithFrame:CGRectMake(20.0 / 375 * IPHONE_W,CGRectGetMaxY(_zhengwenImg.frame) + 20.0 / 667 * SCREEN_HEIGHT, IPHONE_W - 40.0 / 375 * IPHONE_W, 40.0 / 667 * IPHONE_H)];
-//        _titleLab.text = self.classModel.title;
         _titleLab.textAlignment = NSTextAlignmentCenter;
         _titleLab.textColor = nTextColorMain;
         _titleLab.font = [UIFont boldSystemFontOfSize:self.titleFontSize];
-        //    titleLab.font = [UIFont fontWithName:@"Semibold" size:19];
         [_titleLab setNumberOfLines:0];
         _titleLab.lineBreakMode = NSLineBreakByWordWrapping;
 

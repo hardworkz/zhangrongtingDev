@@ -157,12 +157,6 @@
     
     //获取缓存的课堂ID，判断当前ID是否有值，没有值则不跳转课堂试听页面
     Exact_id = [CommonCode readFromUserD:@"Exact_id"];
-    if (Exact_id != nil) {
-        ExIsClassVCPlay = [[CommonCode readFromUserD:@"ExIsClassVCPlay"] boolValue];
-    }else{
-        ExIsClassVCPlay = NO;
-    }
-//    ExIsFree = [[CommonCode readFromUserD:@"ExIsFree"] boolValue];
     
     [self getAppVersion];
     [self getVipLimitData];
@@ -609,12 +603,12 @@
     [UIApplication sharedApplication].applicationIconBadgeNumber = 0;
     
     //MBAudioPlayer是我为播放器写的单例，这段就是当音乐还在播放状态的时候，给后台权限，不在播放状态的时候，收回后台权限
-    if ([bofangVC shareInstance].isPlay || [ClassViewController shareInstance].isPlaying) {
+    if ([ZRT_PlayerManager manager].isPlaying) {
         //有音乐播放时，才给后台权限，不做流氓应用。
         [[UIApplication sharedApplication] beginReceivingRemoteControlEvents];
         [self becomeFirstResponder];
         
-        [[bofangVC shareInstance] configNowPlayingInfoCenter];
+        [self configNowPlayingCenter];
     }
     else
     {
@@ -622,8 +616,6 @@
         [self resignFirstResponder];
     }
 }
-
-
 - (BOOL)canBecomeFirstResponder{
     return YES;
 }
