@@ -750,7 +750,7 @@
 }
 - (void)remoteControlReceivedWithEvent:(UIEvent *)event {
     //后台播放控制事件， 在此处设置对应的控制器进行相应
-    [[bofangVC shareInstance] remoteControlReceivedWithEvent:event];
+//    [[bofangVC shareInstance] remoteControlReceivedWithEvent:event];
     //新的播放器控制
     [[NewPlayVC shareInstance] remoteControlReceivedWithEvent:event];
 }

@@ -263,8 +263,20 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
     self.currentSongIndex = isFirst ? 0 : self.currentSongIndex + 1;
     
     //回调列表，刷新界面
-    if (self.playReloadList && self.playType == ZRTPlayTypeNews) {
-        self.playReloadList(self.currentSongIndex);
+    if (self.playReloadList) {
+        switch (self.playType) {
+            case ZRTPlayTypeNews:
+                self.playReloadList(self.currentSongIndex);
+                
+                break;
+            case ZRTPlayTypeClassroom:
+                self.playReloadList(self.currentSongIndex);
+                
+                break;
+                
+            default:
+                break;
+        }
     }
     //播放index设置
     //上一首<0则回到最后一首
@@ -322,8 +334,17 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
     self.currentSongIndex = index;
     
     //回调列表，刷新界面
-    if (self.playReloadList && self.playType == ZRTPlayTypeNews) {
-        self.playReloadList(self.currentSongIndex);
+    if (self.playReloadList) {
+        switch (self.playType) {
+            case ZRTPlayTypeNews:
+                self.playReloadList(self.currentSongIndex);
+                break;
+            case ZRTPlayTypeClassroom:
+                self.playReloadList(self.currentSongIndex);
+                break;
+            default:
+                break;
+        }
     }
     
     switch (self.playType) {
@@ -591,7 +612,7 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
         NSArray *yitingguoArr = [NSArray arrayWithArray:[CommonCode readFromUserD:@"yitingguoxinwenID"]];
         for (int i = 0; i < yitingguoArr.count; i ++){
             if ([post_id isEqualToString:yitingguoArr[i]]){
-                if ([[CommonCode readFromUserD:@"dangqianbofangxinwenID"] isEqualToString:post_id] && self.playType == ZRTPlayTypeNews){
+                if ([[CommonCode readFromUserD:@"dangqianbofangxinwenID"] isEqualToString:post_id]){
                     returnColor = gMainColor;
                     break;
                 }

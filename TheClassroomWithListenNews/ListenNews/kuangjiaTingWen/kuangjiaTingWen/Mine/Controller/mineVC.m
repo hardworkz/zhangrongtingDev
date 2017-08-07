@@ -15,7 +15,7 @@
 #import "LoginVC.h"
 #import "gerenzhuyeVC.h"
 #import "DownloadViewController.h"
-#import "FriendsNewsViewController.h"
+//#import "FriendsNewsViewController.h"
 #import "AppDelegate.h"
 #import "BlogViewController.h"
 #import "UIView+tap.h"

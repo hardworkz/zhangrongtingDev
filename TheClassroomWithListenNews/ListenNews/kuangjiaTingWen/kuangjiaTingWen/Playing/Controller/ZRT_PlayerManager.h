@@ -17,10 +17,12 @@ typedef NS_ENUM(NSInteger, ChannelType) {
     ChannelTypeHomeChannelClassify,//播放首页6大分类模块
     ChannelTypeSubscriptionChannel,//播放订阅列表
     ChannelTypeDiscoverAnchor,//播放发现模块主播详情新闻列表(课堂详情课程播放列表)
+    ChannelTypeDiscoverSearchNewsResult,//播放发现模块搜索新闻列表结果播放
     ChannelTypeMineDownload,//播放我的模块下载列表
     ChannelTypeMineCollection,//播放我的模块收藏列表
     ChannelTypeMineCircleListen,//播放我的模块听友圈点击新闻单条播放
     ChannelTypeMinePersonCenter,//播放我的模块个人主页单条播放
+    ChannelTypeMineUnreadMessage,//播放我的模块未读消息页面新闻单条播放
     ChannelTypeClassroomTryList,//播放课堂试听列表播放
 };
 typedef NS_ENUM(NSInteger, ZRTPlayType) {

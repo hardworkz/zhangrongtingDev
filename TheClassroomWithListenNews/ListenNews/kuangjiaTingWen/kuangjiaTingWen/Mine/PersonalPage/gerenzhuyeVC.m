@@ -893,10 +893,13 @@ didSelectLinkWithTransitInformation:(NSDictionary *)components {
 - (void)voicePlayedidEnd:(NSNotification *)notice {
     NSLog(@"voicePlaydidEnd");
     
-    if ([bofangVC shareInstance].isPlay) {
-        [[bofangVC shareInstance] doplay2];
-    }
+//    if ([bofangVC shareInstance].isPlay) {
+//        [[bofangVC shareInstance] doplay2];
+//    }
     
+    if ([ZRT_PlayerManager manager].isPlaying) {
+        [[ZRT_PlayerManager manager] pausePlay];
+    }
 }
 
 #pragma mark - Utilities

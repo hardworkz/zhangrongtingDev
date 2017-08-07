@@ -400,13 +400,13 @@
         sw.on = NO;
         return;
     }
-    if ([bofangVC shareInstance].isPlay) {
+    if ([ZRT_PlayerManager manager].isPlaying) {
         if (!sw.on) {
             [[UIDevice currentDevice] setProximityMonitoringEnabled:sw.on];
         }
     }
     [[NSUserDefaults standardUserDefaults] setBool:sw.on forKey:@"shoushi"];
-    [[bofangVC shareInstance].tableView reloadData];
+    [[NewPlayVC shareInstance] reloadInterface];
 }
 
 - (void)back{

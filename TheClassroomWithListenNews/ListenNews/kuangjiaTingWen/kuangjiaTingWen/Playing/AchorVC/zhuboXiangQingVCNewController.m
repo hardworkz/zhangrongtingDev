@@ -407,12 +407,6 @@
     if (selectedSwitchIndex != 4) {
         [self.pagingView pagingViewDidSelectedIndex:selectedSwitchIndex];
     }
-    
-    if (![bofangVC shareInstance].isPlay) {
-        [[NSNotificationCenter defaultCenter] postNotificationName:@"stopAnimate" object:nil];
-    }else {
-        [[NSNotificationCenter defaultCenter] postNotificationName:@"startAnimate" object:nil];
-    }
 }
 - (void)viewDidAppear:(BOOL)animated
 {
@@ -1508,7 +1502,6 @@
     button.selected = YES;
     button.titleLab.textColor = gMainColor;
     _isTapPlayBtn = YES;
-    [bofangVC shareInstance].isClass = YES;
     
     //设置频道类型
     [ZRT_PlayerManager manager].channelType = ChannelTypeDiscoverAnchor;
@@ -1680,13 +1673,16 @@
         titleLab.text = xinwenArr[indexPath.row][@"post_title"];
         
         titleLab.textColor = [[ZRT_PlayerManager manager] textColorFormID:xinwenArr[indexPath.row][@"id"]];
+        
         if ([[CommonCode readFromUserD:@"dangqianbofangxinwenID"] isEqualToString:xinwenArr[indexPath.row][@"id"]])
         {
-            if ([ZRT_PlayerManager manager].isPlaying){
+            if (![ZRT_PlayerManager manager].isPlaying){
                 playBtn.selected = NO;
             }else{
                 playBtn.selected = YES;
             }
+        }else{
+            playBtn.selected = NO;
         }
         titleLab.numberOfLines = 0;
         titleLab.textAlignment = NSTextAlignmentLeft;

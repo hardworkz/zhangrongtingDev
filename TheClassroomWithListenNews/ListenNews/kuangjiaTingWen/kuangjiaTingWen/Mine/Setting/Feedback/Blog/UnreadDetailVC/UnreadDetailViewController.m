@@ -340,12 +340,16 @@
     [self.voiceImgV startAnimating];
     NSIndexPath *indexPath = [self.unreadTableview indexPathForCell:cell];
     NSMutableDictionary *blog = self.infoArr[indexPath.row];
-    if ([bofangVC shareInstance].isPlay) {
-        [[bofangVC shareInstance] doplay2];
+//    if ([bofangVC shareInstance].isPlay) {
+//        [[bofangVC shareInstance] doplay2];
+//    }
+//    else{
+//        
+//    }
+    if ([ZRT_PlayerManager manager].isPlaying) {
+        [[ZRT_PlayerManager manager] pausePlay];
     }
-    else{
-        
-    }
+    
     //用一个uiimageview 盖住原来的再添加动画效果
     CGRect  frame  = [cell.voiceButton convertRect:self.voiceImgV.bounds toView:self.unreadTableview];
     CGRect finalFrame = CGRectMake(frame.origin.x + 10, frame.origin.y + 10, frame.size.width, frame.size.height);
@@ -877,97 +881,36 @@ didSelectLinkWithTransitInformation:(NSDictionary *)components {
     }
     else{
         //TODO:跳转新闻详情
+        //设置频道类型
+        [ZRT_PlayerManager manager].channelType = ChannelTypeMineUnreadMessage;
+        //设置播放器播放内容类型
+        [ZRT_PlayerManager manager].playType = ZRTPlayTypeNews;
+        //设置播放界面打赏view的状态
+        [NewPlayVC shareInstance].rewardType = RewardViewTypeNone;
+        //判断是否是点击当前正在播放的新闻，如果是则直接跳转
         if ([[CommonCode readFromUserD:@"dangqianbofangxinwenID"] isEqualToString:self.infoArr[indexPath.row][@"post"][@"id"]]){
-            self.hidesBottomBarWhenPushed = YES;
+            
+            //设置播放器播放数组
+            [ZRT_PlayerManager manager].songList = @[self.infoArr[indexPath.row][@"post"]];
+            [[NewPlayVC shareInstance] reloadInterface];
             [self.navigationController.navigationBar setHidden:YES];
-            [self.navigationController pushViewController:[bofangVC shareInstance] animated:YES];
-            [[bofangVC shareInstance].tableView reloadData];
-            self.hidesBottomBarWhenPushed = YES;
-            if ([bofangVC shareInstance].isPlay) {
-                
-            }
-            else{
-                [[bofangVC shareInstance] doplay2];
-            }
+            [self.navigationController pushViewController:[NewPlayVC shareInstance] animated:YES];
         }
         else{
-            [bofangVC shareInstance].newsModel.jiemuID = self.infoArr[indexPath.row][@"post"][@"id"];
-            [bofangVC shareInstance].newsModel.Titlejiemu = self.infoArr[indexPath.row][@"post"][@"post_title"];
-            [bofangVC shareInstance].newsModel.RiQijiemu = self.infoArr[indexPath.row][@"post"][@"post_date"];
-            [bofangVC shareInstance].newsModel.ImgStrjiemu = self.infoArr[indexPath.row][@"post"][@"smeta"];
-            [bofangVC shareInstance].newsModel.post_lai = self.infoArr[indexPath.row][@"post"][@"post_lai"];
-            [bofangVC shareInstance].newsModel.post_news = self.infoArr[indexPath.row][@"post"][@"post_news"];
-            //获取主播信息
-            [[NSNotificationCenter defaultCenter] postNotificationName:@"getActInfoNotification" object:self.infoArr[indexPath.row][@"post"][@"post_news"]];
-            [bofangVC shareInstance].newsModel.jiemuName = nil;
-            [bofangVC shareInstance].newsModel.jiemuDescription = nil;
-            [bofangVC shareInstance].newsModel.jiemuImages = nil;
-            [bofangVC shareInstance].newsModel.jiemuFan_num = nil;
-            [bofangVC shareInstance].newsModel.jiemuMessage_num = nil;
-            [bofangVC shareInstance].newsModel.jiemuIs_fan = nil;
-            [bofangVC shareInstance].newsModel.post_mp = self.infoArr[indexPath.row][@"post"][@"post_mp"];
-            [bofangVC shareInstance].newsModel.post_time = self.infoArr[indexPath.row][@"post"][@"post_time"];
-            [bofangVC shareInstance].iszhuboxiangqing = NO;
-            [bofangVC shareInstance].newsModel.post_keywords = self.infoArr[indexPath.row][@"post"][@"post_keywords"];
-            [bofangVC shareInstance].newsModel.url = self.infoArr[indexPath.row][@"post"][@"url"];
-            [bofangVC shareInstance].yinpinzongTime.text = [[bofangVC shareInstance] convertStringWithTime:[self.infoArr[indexPath.row][@"post"][@"post_time"] intValue] / 1000];
+            
+            //设置播放器播放数组
+            [ZRT_PlayerManager manager].songList = @[self.infoArr[indexPath.row][@"post"]];
+            //设置新闻ID
+            [NewPlayVC shareInstance].post_id = self.infoArr[indexPath.row][@"post"][@"id"];
+            //保存当前播放新闻Index
             ExcurrentNumber = (int)indexPath.row;
-            [bofangVC shareInstance].newsModel.ImgStrjiemu = self.infoArr[indexPath.row][@"post"][@"smeta"];
-            [bofangVC shareInstance].newsModel.ZhengWenjiemu = self.infoArr[indexPath.row][@"post"][@"post_excerpt"];
-            [bofangVC shareInstance].newsModel.praisenum = self.infoArr[indexPath.row][@"post"][@"praisenum"];
-            [[bofangVC shareInstance].tableView reloadData];
-            //        Explayer = [[AVPlayer alloc]initWithPlayerItem:[[AVPlayerItem alloc]initWithURL:[NSURL URLWithString:arr[indexPath.row][@"post_mp"]]]];
-            [Explayer replaceCurrentItemWithPlayerItem:[[AVPlayerItem alloc]initWithURL:[NSURL URLWithString:self.infoArr[indexPath.row][@"post"][@"post_mp"]]]];
-            if ([bofangVC shareInstance].isPlay || ExIsKaiShiBoFang == NO) {
-                
-            }
-            else{
-                [[bofangVC shareInstance] doplay2];
-            }
-            ExisRigester = YES;
-            ExIsKaiShiBoFang = YES;
-            ExwhichBoFangYeMianStr = @"shouyebofang";
-            self.hidesBottomBarWhenPushed = YES;
+            //调用播放对应Index方法
+            [[NewPlayVC shareInstance] playFromIndex:ExcurrentNumber];
+            //跳转播放界面
             [self.navigationController.navigationBar setHidden:YES];
-            [self.navigationController pushViewController:[bofangVC shareInstance] animated:YES];
-            [[bofangVC shareInstance].tableView reloadData];
-            //        [self.navigationController.navigationBar setHidden:NO];
-            self.hidesBottomBarWhenPushed = YES;
-            [[NSNotificationCenter defaultCenter] postNotificationName:@"yuanpanzhuan" object:nil];
-            [[NSNotificationCenter defaultCenter] postNotificationName:@"qiehuanxinwen" object:nil];
-            //            [CommonCode writeToUserD:self.blogArray andKey:@"zhuyeliebiao"];
-            [CommonCode writeToUserD:self.infoArr[indexPath.row][@"post"][@"id"] andKey:@"dangqianbofangxinwenID"];
-            if ([[CommonCode readFromUserD:@"yitingguoxinwenID"] isKindOfClass:[NSArray class]])
-            {
-                NSMutableArray *yitingguoArr = [NSMutableArray arrayWithArray:[CommonCode readFromUserD:@"yitingguoxinwenID"]];
-                [yitingguoArr addObject:self.infoArr[indexPath.row][@"post"][@"id"]];
-                [CommonCode writeToUserD:yitingguoArr andKey:@"yitingguoxinwenID"];
-            }else
-            {
-                NSMutableArray *yitingguoArr = [NSMutableArray array];
-                [yitingguoArr addObject:self.infoArr[indexPath.row][@"post"][@"id"]];
-                [CommonCode writeToUserD:yitingguoArr andKey:@"yitingguoxinwenID"];
-            }
+            [self.navigationController pushViewController:[NewPlayVC shareInstance] animated:YES];
             [tableView reloadData];
         }
-        
     }
 }
-
-
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
-}
-
-/*
-#pragma mark - Navigation
-
-// In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
-}
-*/
-
 @end

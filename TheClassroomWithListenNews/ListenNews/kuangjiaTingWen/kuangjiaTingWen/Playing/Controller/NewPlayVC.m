@@ -70,14 +70,6 @@
  */
 @property (strong, nonatomic) UIButton *scrollTopBtn;
 /**
- 标题字体大小
- */
-@property(assign,nonatomic)CGFloat titleFontSize;
-/**
- 日期字体大小
- */
-@property(assign,nonatomic)CGFloat dateFont;
-/**
  顶部自定义导航栏
  */
 @property (strong, nonatomic) UIView *topView;

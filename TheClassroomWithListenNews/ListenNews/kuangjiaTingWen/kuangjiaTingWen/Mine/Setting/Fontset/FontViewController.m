@@ -133,9 +133,9 @@ static UITableViewCell *cell1;
         dateFont = 11.0;
     }
     
-    [bofangVC shareInstance].titleFontSize = titleFontSize;
-    [bofangVC shareInstance].dateFont = dateFont;
-    [[bofangVC shareInstance].tableView reloadData];
+    [NewPlayVC shareInstance].titleFontSize = titleFontSize;
+    [NewPlayVC shareInstance].dateFont = dateFont;
+    [[NewPlayVC shareInstance] reloadInterface];
     
     [ClassViewController shareInstance].titleFontSize = titleFontSize;
     [[ClassViewController shareInstance] frameArrayWithClassModel:nil];

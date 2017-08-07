@@ -38,6 +38,14 @@ typedef NS_ENUM(NSInteger, RewardViewType) {
  */
 @property (nonatomic, assign) PlayType playType;
 
+/**
+ 标题字体大小
+ */
+@property(assign,nonatomic)CGFloat titleFontSize;
+/**
+ 日期字体大小
+ */
+@property(assign,nonatomic)CGFloat dateFont;
 @property(nonatomic)NSString *post_id;/**<新闻ID*/
 /**
  选中播放对应index的音频
