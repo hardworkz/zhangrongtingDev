@@ -65,8 +65,20 @@
         }
         
     }
-    [super pushViewController:viewController animated:animated];
-    APPDELEGATE.isTabbarCenterClicked = NO;
+    //判断栈中是否存在NewPlayVC控制器，如果存在，则pop，否则崩溃
+    BOOL isExist = NO;
+    NSMutableArray *marr = [[NSMutableArray alloc] initWithArray:self.childViewControllers];
+    for (UIViewController *vc in marr) {
+        if ([vc isKindOfClass:[NewPlayVC class]]) {
+            isExist = YES;
+            break;
+        }
+    }
+    if (isExist && [viewController isKindOfClass:[NewPlayVC class]]) {
+        [super popViewControllerAnimated:YES];
+    }else{
+        [super pushViewController:viewController animated:animated];
+    }
 }
 
 @end

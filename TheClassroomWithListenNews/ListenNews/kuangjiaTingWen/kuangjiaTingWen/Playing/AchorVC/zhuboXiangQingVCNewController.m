@@ -2002,8 +2002,12 @@
             [[NewPlayVC shareInstance] playFromIndex:ExcurrentNumber];
             //跳转播放界面
             [self.navigationController.navigationBar setHidden:YES];
-            [self.navigationController pushViewController:[NewPlayVC shareInstance] animated:YES];
-            [tableView reloadData];
+//            if (self.isbofangye) {
+//                [self.navigationController popViewControllerAnimated:YES];
+//            }else{
+                [self.navigationController pushViewController:[NewPlayVC shareInstance] animated:YES];
+                [tableView reloadData];
+//            }
         }
     }
     else if ([tableView isEqual:fansWallTableView]){

@@ -169,24 +169,24 @@ static AVPlayer *_instancePlay = nil;
     [super viewDidLoad];
     
     //初始化播放器判断限制状态
-//    NSDictionary *userInfoDict = [CommonCode readFromUserD:@"dangqianUserInfo"];
-//    if ([userInfoDict[results][member_type] intValue] == 0) {
-//        int limitTime = [[CommonCode readFromUserD:[NSString stringWithFormat:@"%@_%@",limit_time,ExdangqianUserUid]] intValue];
-//        int limitNum = [[CommonCode readFromUserD:[NSString stringWithFormat:@"%@",limit_num]] intValue];
-//        if (limitTime >= limitNum ||[userInfoDict[results][is_stop] intValue] == 1) {
-//            isLimitPlaying = YES;
-//            [NetWorkTool sendLimitDataWithaccessToken:AvatarAccessToken sccess:^(NSDictionary *responseObject) {
-//                if ([responseObject[status] intValue] == 1) {
-//                    [[NSNotificationCenter defaultCenter] postNotificationName:@"updateUserInfo" object:nil];
-//                }
-//            } failure:^(NSError *error) {
-//                
-//            }];
-//            
-//        }else{
-//            isLimitPlaying = NO;
-//        }
-//    }
+    NSDictionary *userInfoDict = [CommonCode readFromUserD:@"dangqianUserInfo"];
+    if ([userInfoDict[results][member_type] intValue] == 0) {
+        int limitTime = [[CommonCode readFromUserD:[NSString stringWithFormat:@"%@_%@",limit_time,ExdangqianUserUid]] intValue];
+        int limitNum = [[CommonCode readFromUserD:[NSString stringWithFormat:@"%@",limit_num]] intValue];
+        if (limitTime >= limitNum ||[userInfoDict[results][is_stop] intValue] == 1) {
+            isLimitPlaying = YES;
+            [NetWorkTool sendLimitDataWithaccessToken:AvatarAccessToken sccess:^(NSDictionary *responseObject) {
+                if ([responseObject[status] intValue] == 1) {
+                    [[NSNotificationCenter defaultCenter] postNotificationName:@"updateUserInfo" object:nil];
+                }
+            } failure:^(NSError *error) {
+                
+            }];
+            
+        }else{
+            isLimitPlaying = NO;
+        }
+    }
     
     self.view.backgroundColor = [UIColor whiteColor];
     isJiaZaiWan = NO;

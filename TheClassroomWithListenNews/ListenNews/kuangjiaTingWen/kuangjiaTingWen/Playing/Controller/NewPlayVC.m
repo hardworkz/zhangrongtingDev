@@ -74,6 +74,10 @@
  */
 @property (strong, nonatomic) UIView *topView;
 /**
+ 顶部自定义中心view
+ */
+@property (strong, nonatomic) UIView *topCenterView;
+/**
  返回按钮
  */
 @property (strong, nonatomic) UIButton *leftBtn;
@@ -123,6 +127,19 @@
  */
 @property (strong, nonatomic) UIImageView *mic;
 /**
+ 主播头像导航栏
+ */
+@property (strong, nonatomic) UIImageView *zhuboImgNav;
+/**
+ 主播昵称导航栏
+ */
+@property (strong, nonatomic) UILabel *zhuboTitleLabNav;
+/**
+ 主播标识麦克风图标导航栏
+ */
+@property (strong, nonatomic) UIImageView *micNav;
+
+/**
  主播一行空白区域点击事件view
  */
 @property (strong, nonatomic) UIView *achorTouch;
@@ -130,6 +147,10 @@
  关注图标
  */
 @property (strong, nonatomic) UIButton *guanzhuBtn;
+/**
+ 关注图标Nav
+ */
+@property (strong, nonatomic) UIButton *guanzhuBtnNav;
 /**
  分割线
  */
@@ -312,6 +333,30 @@ static NewPlayVC *_instance = nil;
     _rightBtn.accessibilityLabel = @"分享";
     [_rightBtn addTarget:self action:@selector(shareNewsBtnAction) forControlEvents:UIControlEventTouchUpInside];
     [_topView addSubview:_rightBtn];
+    
+    _topCenterView = [[UIView alloc] initWithFrame:CGRectMake(CGRectGetMaxX(_leftBtn.frame), 20, SCREEN_WIDTH - CGRectGetMaxX(_leftBtn.frame) - 55, 44)];
+    _topCenterView.backgroundColor = [UIColor clearColor];
+    [_topView addSubview:_topCenterView];
+    
+    //主播头像
+    self.zhuboImgNav.frame = CGRectMake(100.0 / 375 * IPHONE_W, (44 - 27)/2.0,  27.0, 27.0);
+    UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(zhuboBtnVAction:)];
+    [_zhuboImgNav addGestureRecognizer:tap];
+    
+    [_topCenterView addSubview:_zhuboImgNav];
+    //主播名字
+    self.zhuboTitleLabNav.frame = CGRectMake(CGRectGetMaxX(_zhuboImgNav.frame) + 4.0 / 375 * IPHONE_W, (44 - 15)/2.0, 88.0 / 375 * IPHONE_W, 15.0 );
+    [_zhuboTitleLabNav addTapGesWithTarget:self action:@selector(zhuboBtnVAction:)];
+    [_topCenterView addSubview:_zhuboTitleLabNav];
+    
+    //主播麦克风图标
+    self.micNav.frame = CGRectMake(CGRectGetMaxX(_zhuboTitleLabNav.frame) + 6.0 / 375 * SCREEN_WIDTH, _zhuboTitleLabNav.frame.origin.y + 1.0 / 667 * SCREEN_HEIGHT, 8.0 /375 * SCREEN_WIDTH, 14.0 / 667 * SCREEN_HEIGHT);
+    [_micNav addTapGesWithTarget:self action:@selector(zhuboBtnVAction:)];
+    [_topCenterView addSubview:_micNav];
+    
+    //关注、取消
+    self.guanzhuBtnNav.frame = CGRectMake(_topCenterView.width - 65.0 / 375 * IPHONE_W, 7, 60.0 / 375 * IPHONE_W, 30.0 / 667 * IPHONE_H);
+    [_topCenterView addSubview:_guanzhuBtnNav];
 }
 #pragma mark - 设置详情控件数据
 - (void)setupTableViewHeaderData
@@ -333,21 +378,27 @@ static NewPlayVC *_instance = nil;
     if([self.postDetailModel.act.images rangeOfString:@"/data/upload/"].location !=NSNotFound)//_roaldSearchText
     {
         IMAGEVIEWHTTP(self.zhuboImg, self.postDetailModel.act.images);
+        IMAGEVIEWHTTP(self.zhuboImgNav, self.postDetailModel.act.images);
     }
     else
     {
         IMAGEVIEWHTTP2(self.zhuboImg, self.postDetailModel.act.images);
+        IMAGEVIEWHTTP2(self.zhuboImgNav, self.postDetailModel.act.images);
     }
     //设置主播昵称
     self.zhuboTitleLab.text = self.postDetailModel.act.name;
+    self.zhuboTitleLabNav.text = self.postDetailModel.act.name;
     CGSize contentSize = [_zhuboTitleLab sizeThatFits:CGSizeMake(_zhuboTitleLab.frame.size.width, MAXFLOAT)];
     _zhuboTitleLab.frame = CGRectMake(_zhuboTitleLab.frame.origin.x, _zhuboTitleLab.frame.origin.y,contentSize.width, _zhuboTitleLab.frame.size.height);
+    _zhuboTitleLabNav.frame = CGRectMake(_zhuboTitleLabNav.frame.origin.x, _zhuboTitleLabNav.frame.origin.y,contentSize.width, _zhuboTitleLabNav.frame.size.height);
     //主播麦克风图标frame
     self.mic.frame = CGRectMake(CGRectGetMaxX(_zhuboTitleLab.frame) + 6.0 / 375 * SCREEN_WIDTH, _zhuboTitleLab.frame.origin.y + 1.0 / 667 * SCREEN_HEIGHT, 8.0 /375 * SCREEN_WIDTH, 14.0 / 667 * SCREEN_HEIGHT);
-    //设置标题名称
-    self.titleLab.text = self.postDetailModel.post_title;
+    self.micNav.frame = CGRectMake(CGRectGetMaxX(_zhuboTitleLabNav.frame) + 6.0 / 375 * SCREEN_WIDTH, _zhuboTitleLabNav.frame.origin.y + 1.0 / 667 * SCREEN_HEIGHT, 8.0 /375 * SCREEN_WIDTH, 14.0 / 667 * SCREEN_HEIGHT);
     //是否关注
     self.guanzhuBtn.selected = [self.postDetailModel.act.is_fan intValue] == 1;
+    self.guanzhuBtnNav.selected = [self.postDetailModel.act.is_fan intValue] == 1;
+    //设置标题名称
+    self.titleLab.text = self.postDetailModel.post_title;
     //是否收藏
     bofangfenxiangBtn.selected = [self.postDetailModel.is_collection intValue] == 1;
     [self reloadPlayAllTime];/**<刷新音频总时长*/
@@ -356,14 +407,18 @@ static NewPlayVC *_instance = nil;
 {
     //设置主播昵称
     self.zhuboTitleLab.text = self.postDetailModel.act.name;
+    self.zhuboTitleLabNav.text = self.postDetailModel.act.name;
     CGSize contentSize = [_zhuboTitleLab sizeThatFits:CGSizeMake(_zhuboTitleLab.frame.size.width, MAXFLOAT)];
     _zhuboTitleLab.frame = CGRectMake(_zhuboTitleLab.frame.origin.x, _zhuboTitleLab.frame.origin.y,contentSize.width, _zhuboTitleLab.frame.size.height);
+    _zhuboTitleLabNav.frame = CGRectMake(_zhuboTitleLabNav.frame.origin.x, _zhuboTitleLabNav.frame.origin.y,contentSize.width, _zhuboTitleLabNav.frame.size.height);
     //主播麦克风图标frame
     self.mic.frame = CGRectMake(CGRectGetMaxX(_zhuboTitleLab.frame) + 6.0 / 375 * SCREEN_WIDTH, _zhuboTitleLab.frame.origin.y + 1.0 / 667 * SCREEN_HEIGHT, 8.0 /375 * SCREEN_WIDTH, 14.0 / 667 * SCREEN_HEIGHT);
+    self.micNav.frame = CGRectMake(CGRectGetMaxX(_zhuboTitleLabNav.frame) + 6.0 / 375 * SCREEN_WIDTH, _zhuboTitleLabNav.frame.origin.y + 1.0 / 667 * SCREEN_HEIGHT, 8.0 /375 * SCREEN_WIDTH, 14.0 / 667 * SCREEN_HEIGHT);
     //设置标题名称
     self.titleLab.text = self.postDetailModel.post_title;
     //是否关注
     self.guanzhuBtn.selected = [self.postDetailModel.act.is_fan intValue] == 1;
+    self.guanzhuBtnNav.selected = [self.postDetailModel.act.is_fan intValue] == 1;
     //是否收藏
     bofangfenxiangBtn.selected = [self.postDetailModel.is_collection intValue] == 1;
     [self reloadPlayAllTime];/**<刷新音频总时长*/
@@ -558,6 +613,28 @@ static NewPlayVC *_instance = nil;
     };
     
     [ZRT_PlayerManager manager].playDidEnd = ^(NSInteger currentSongIndex) {
+        //判断是否是播放新闻，记录次数限制
+        NSDictionary *userInfoDict = [CommonCode readFromUserD:@"dangqianUserInfo"];
+        if (self.playType != PlayTypeClass) {
+            if ([userInfoDict[results][member_type] intValue] == 0) {
+                int limitTime = [[CommonCode readFromUserD:[NSString stringWithFormat:@"%@_%@",limit_time,ExdangqianUserUid]] intValue];
+                int limitNum = [[CommonCode readFromUserD:[NSString stringWithFormat:@"%@",limit_num]] intValue];
+                if (limitTime >= limitNum - 1) {
+                    ExLimitPlay = YES;
+                    [NetWorkTool sendLimitDataWithaccessToken:AvatarAccessToken sccess:^(NSDictionary *responseObject) {
+                        if ([responseObject[status] intValue] == 1) {
+                            [[NSNotificationCenter defaultCenter] postNotificationName:@"updateUserInfo" object:nil];
+                        }
+                    } failure:^(NSError *error) {
+                        
+                    }];
+                }else{
+                    ExLimitPlay = NO;
+                    [CommonCode writeToUserD:[NSString stringWithFormat:@"%d",limitTime + 1] andKey:[NSString stringWithFormat:@"%@_%@",limit_time,ExdangqianUserUid]];
+                }
+            }
+        }
+
         //设置详情模型
         self.postDetailModel = [newsDetailModel new];
         //保存当前播放新闻的ID
@@ -611,6 +688,36 @@ static NewPlayVC *_instance = nil;
     }
     return _mic;
 }
+- (UIImageView *)zhuboImgNav
+{
+    if (_zhuboImgNav == nil) {
+        _zhuboImgNav = [[UIImageView alloc] init];
+        _zhuboImgNav.layer.masksToBounds = YES;
+        _zhuboImgNav.userInteractionEnabled = YES;
+        _zhuboImgNav.layer.cornerRadius = 27.0 / 667 * IPHONE_H / 2;
+        _zhuboImgNav.contentMode = UIViewContentModeScaleAspectFill;
+    }
+    return _zhuboImgNav;
+}
+- (UILabel *)zhuboTitleLabNav
+{
+    if (_zhuboTitleLabNav == nil) {
+        _zhuboTitleLabNav = [[UILabel alloc] init];
+        _zhuboTitleLabNav.textColor = nTextColorSub;
+        _zhuboTitleLabNav.font = gFontMain14;
+        _zhuboTitleLabNav.textAlignment = NSTextAlignmentLeft;
+    }
+    return _zhuboTitleLabNav;
+}
+- (UIImageView *)micNav
+{
+    if (_micNav == nil) {
+        _micNav = [[UIImageView alloc] init];
+        [_micNav setImage:[UIImage imageNamed:@"home_news_ic_anchor"]];
+    }
+    return _micNav;
+}
+
 - (UIView *)achorTouch
 {
     if (_achorTouch == nil) {
@@ -636,6 +743,24 @@ static NewPlayVC *_instance = nil;
     }
     return _guanzhuBtn;
 }
+- (UIButton *)guanzhuBtnNav
+{
+    if (_guanzhuBtnNav == nil) {
+        _guanzhuBtnNav = [UIButton buttonWithType:UIButtonTypeCustom];
+        [_guanzhuBtnNav setTitle:@"+ 关注" forState:UIControlStateNormal];
+        [_guanzhuBtnNav setTitle:@"取消" forState:UIControlStateSelected];
+        [_guanzhuBtnNav setTitleColor:gMainColor forState:UIControlStateNormal];
+        _guanzhuBtnNav.titleLabel.font  = [UIFont systemFontOfSize:13.0];
+        _guanzhuBtnNav.layer.cornerRadius = 4;
+        _guanzhuBtnNav.layer.masksToBounds = YES;
+        _guanzhuBtnNav.layer.borderColor = gMainColor.CGColor;
+        _guanzhuBtnNav.layer.borderWidth = 0.5f;
+        _guanzhuBtnNav.bounds = CGRectMake(0, 0, 50, 30);
+        [_guanzhuBtnNav addTarget:self action:@selector(guanzhuBtnAction:) forControlEvents:UIControlEventTouchUpInside];
+    }
+    return _guanzhuBtnNav;
+}
+
 - (UIView *)seperatorLine
 {
     if (_seperatorLine == nil) {
@@ -692,7 +817,10 @@ static NewPlayVC *_instance = nil;
     }
     return _scrollTopBtn;
 }
-
+- (void)scrollToTop
+{
+    [self.tableView setContentOffset:CGPointZero animated:YES];
+}
 - (UIProgressView *)prgBufferProgress
 {
     if (!_prgBufferProgress)
@@ -867,6 +995,36 @@ static NewPlayVC *_instance = nil;
         return frameModel.cellHeight;
     }
 }
+#pragma mark - UIScrollViewDelegate
+
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView {
+    if (scrollView.contentOffset.y > 209.0 / 667 * SCREEN_HEIGHT) {
+        [_rightBtn setImage:[UIImage imageNamed:@"title_ic_share"] forState:UIControlStateNormal];
+        [_leftBtn setImage:[UIImage imageNamed:@"back"] forState:UIControlStateNormal];
+        _topView.backgroundColor = [UIColor whiteColor];
+        [UIView animateWithDuration:0.25 animations:^{
+            _topCenterView.alpha = 1.;
+        }];
+    }
+    else{
+        [_rightBtn setImage:[UIImage imageNamed:@"title_ic_share_white"] forState:UIControlStateNormal];
+        [_leftBtn setImage:[UIImage imageNamed:@"title_ic_white"] forState:UIControlStateNormal];
+        _topView.backgroundColor = [UIColor clearColor];
+        [UIView animateWithDuration:0.25 animations:^{
+            _topCenterView.alpha = 0.;
+        }];
+    }
+    
+    //设置置顶按钮alpha
+    float alpha = scrollView.contentOffset.y/(SCREEN_HEIGHT * 1.5);
+    if (alpha >= 0.75) {
+        alpha = 0.75;
+    }else{
+        alpha = alpha;
+    }
+    _scrollTopBtn.alpha = alpha;
+}
+
 #pragma mark --- 打赏按钮：OJLAnimationButtonDelegate
 -(void)OJLAnimationButtonDidStartAnimation:(OJLAnimationButton *)OJLAnimationButton{
     RTLog(@"start");
@@ -1731,7 +1889,8 @@ static NSInteger touchCount = 0;
         if (sender.selected == NO){
             [NetWorkTool postPaoGuoGuanZhuWithaccessToken:[DSE encryptUseDES:ExdangqianUser] andact_id:self.postDetailModel.act.act_id sccess:^(NSDictionary *responseObject) {
                 [sender setTitle:@"取消" forState:UIControlStateNormal];
-                sender.selected = YES;
+                _guanzhuBtn.selected = YES;
+                _guanzhuBtnNav.selected = YES;
                 //TODO:设置数据
 //                self.newsModel.jiemuIs_fan = @"1";
                 [self.tableView reloadData];
@@ -1742,7 +1901,8 @@ static NSInteger touchCount = 0;
         else{
             [NetWorkTool postPaoGuoQuXiaoGuanZhuWithaccessToken:[DSE encryptUseDES:ExdangqianUser] andact_id:self.postDetailModel.act.act_id sccess:^(NSDictionary *responseObject) {
                 [sender setTitle:@"+ 关注" forState:UIControlStateNormal];
-                sender.selected = NO;
+                _guanzhuBtn.selected = NO;
+                _guanzhuBtnNav.selected = NO;
                 //TODO:设置数据
 //                self.newsModel.jiemuIs_fan = @"0";
                 [self.tableView reloadData];

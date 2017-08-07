@@ -173,9 +173,11 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
  */
 - (void)startPlay
 {
-    _status = ZRTPlayStatusPlay;
-    SendNotify(SONGPLAYSTATUSCHANGE, nil)
-    [self.player play];
+    if (!ExLimitPlay) {
+        _status = ZRTPlayStatusPlay;
+        SendNotify(SONGPLAYSTATUSCHANGE, nil)
+        [self.player play];
+    }
 }
 /*
  * 暂停播放

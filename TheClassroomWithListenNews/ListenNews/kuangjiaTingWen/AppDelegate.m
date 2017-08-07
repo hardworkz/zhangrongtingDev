@@ -158,7 +158,9 @@
     //获取缓存的课堂ID，判断当前ID是否有值，没有值则不跳转课堂试听页面
     Exact_id = [CommonCode readFromUserD:@"Exact_id"];
     
+    //获取app版本
     [self getAppVersion];
+    //获取VIP限制
     [self getVipLimitData];
     //启动时获取已登录用户的信息、未读消息
     if ([[CommonCode readFromUserD:@"isLogin"] boolValue] == YES) {
@@ -368,7 +370,27 @@
         if ([responseObject[status] intValue] == 1) {
             [NetWorkTool isNewDayWithServer_date:responseObject[results][@"date"]];
             [CommonCode writeToUserD:responseObject[results][@"num"] andKey:[NSString stringWithFormat:@"%@",limit_num]];
-//        [CommonCode writeToUserD:@"3" andKey:[NSString stringWithFormat:@"%@_%@",limit_num,ExdangqianUserUid]];
+            //初始化播放器判断限制状态
+            NSDictionary *userInfoDict = [CommonCode readFromUserD:@"dangqianUserInfo"];
+            if ([userInfoDict[results][member_type] intValue] == 0) {//非会员
+                int limitTime = [[CommonCode readFromUserD:[NSString stringWithFormat:@"%@_%@",limit_time,ExdangqianUserUid]] intValue];
+                int limitNum = [responseObject[results][@"num"] intValue];
+                if (limitTime >= limitNum ||[userInfoDict[results][is_stop] intValue] == 1) {
+                    ExLimitPlay = YES;
+                    [NetWorkTool sendLimitDataWithaccessToken:AvatarAccessToken sccess:^(NSDictionary *responseObject) {
+                        if ([responseObject[status] intValue] == 1) {
+                            [[NSNotificationCenter defaultCenter] postNotificationName:@"updateUserInfo" object:nil];
+                        }
+                    } failure:^(NSError *error) {
+                        
+                    }];
+                    
+                }else{
+                    ExLimitPlay = NO;
+                }
+            }else{
+                ExLimitPlay = NO;
+            }
         }
     } failure:^(NSError *error) {
         

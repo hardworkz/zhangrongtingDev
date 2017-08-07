@@ -57,6 +57,9 @@
     [super viewWillAppear:animated];
     [self.navigationController setNavigationBarHidden:NO animated:YES];
     [self.navigationController.navigationBar setTranslucent:YES];
+    
+    [self.newsTableView reloadData];
+    [self.columnTableView reloadData];
 }
 
 - (void)setUpData{

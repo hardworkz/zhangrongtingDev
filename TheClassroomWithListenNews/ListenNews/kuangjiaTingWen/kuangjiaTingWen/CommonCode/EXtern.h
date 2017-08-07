@@ -44,4 +44,6 @@ extern BOOL ExIsFree;
 extern NSString *Exact_id;//保存当前课堂ID
 //课堂试听播放器
 extern AVPlayer *ExclassPlayer;
+//是否限制新闻播放
+extern BOOL ExLimitPlay;
 @end
