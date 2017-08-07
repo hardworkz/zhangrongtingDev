@@ -173,7 +173,13 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
  */
 - (void)startPlay
 {
-    if (!ExLimitPlay) {
+    if (self.playType == PlayTypeNews) {
+        if (!ExLimitPlay) {
+            _status = ZRTPlayStatusPlay;
+            SendNotify(SONGPLAYSTATUSCHANGE, nil)
+            [self.player play];
+        }
+    }else{
         _status = ZRTPlayStatusPlay;
         SendNotify(SONGPLAYSTATUSCHANGE, nil)
         [self.player play];
@@ -533,7 +539,7 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
                 break;
             case AVPlayerStatusReadyToPlay:
                 _status = ZRTPlayStatusReadyToPlay;
-                [self startPlay];
+//                [self startPlay];
                 RTLog(@"KVO：准备完毕");
                 break;
             case AVPlayerStatusFailed:

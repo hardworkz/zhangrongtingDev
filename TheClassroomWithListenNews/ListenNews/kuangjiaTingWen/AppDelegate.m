@@ -68,7 +68,7 @@
             //跳过按钮位置
             //        splashAd.skipButtonCenter = CGPointMake(0, 0);
             //设置开屏拉取时长限制，若超时则不再展示广告
-            splashAd.fetchDelay = 5;
+            splashAd.fetchDelay = 3;
             //［可选］拉取并展示全屏开屏广告
             //[splashAd loadAdAndShowInWindow:self.window];
             //设置开屏底部自定义LogoView，展示半屏开屏广告
@@ -79,15 +79,12 @@
             _bottomView.backgroundColor = [UIColor whiteColor];
             self.splash = splashAd;
         }
-
-        
         /* 使用GCD返回主线程 进行UI层面的赋值 */
         
         dispatch_async(dispatch_get_main_queue(), ^{
             //添加开屏广告空间到窗口
-            [splashAd loadAdAndShowInWindow:self.window withBottomView:_bottomView];
+            [self.splash loadAdAndShowInWindow:self.window withBottomView:_bottomView];
         });
-        
     });
     
     
