@@ -322,8 +322,17 @@
                     [qingshuruyonghuming addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
                     }]];
                     [qingshuruyonghuming addAction:[UIAlertAction actionWithTitle:@"前往开通会员" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-                        MyVipMenbersViewController *MyVip = [MyVipMenbersViewController new];
-                        [self.navigationController pushViewController:MyVip animated:YES];
+                        if ([[CommonCode readFromUserD:@"isLogin"] boolValue] == YES) {
+                            MyVipMenbersViewController *MyVip = [MyVipMenbersViewController new];
+                            [self.navigationController pushViewController:MyVip animated:YES];
+                        }else{
+                            LoginVC *loginFriVC = [LoginVC new];
+                            loginFriVC.isFormDownload = YES;
+                            LoginNavC *loginNavC = [[LoginNavC alloc]initWithRootViewController:loginFriVC];
+                            [loginNavC.navigationBar setBackgroundColor:[UIColor whiteColor]];
+                            loginNavC.navigationBar.tintColor = [UIColor blackColor];
+                            [self presentViewController:loginNavC animated:YES completion:nil];
+                        }
                     }]];
                     
                     [self presentViewController:qingshuruyonghuming animated:YES completion:nil];

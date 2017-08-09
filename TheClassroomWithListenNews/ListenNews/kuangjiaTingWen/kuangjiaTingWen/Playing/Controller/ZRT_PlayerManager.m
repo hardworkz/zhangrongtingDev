@@ -299,7 +299,20 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
     self.currentSong = self.songList[self.currentSongIndex];
     
     //刷新封面图片
-    self.currentCoverImage = NEWSSEMTPHOTOURL(self.currentSong[@"smeta"]);
+    switch (self.playType) {
+        case ZRTPlayTypeNews:
+            self.currentCoverImage = NEWSSEMTPHOTOURL(self.currentSong[@"smeta"]);
+            break;
+        case ZRTPlayTypeClassroom:
+            self.currentCoverImage = NEWSSEMTPHOTOURL(self.currentSong[@"smeta"]);
+            break;
+        case ZRTPlayTypeClassroomTry:
+            self.currentCoverImage = @"";
+            break;
+            
+        default:
+            break;
+    }
     
     //判断该新闻ID是否已经离线下载了
     BOOL isDownLoad = NO;
@@ -403,6 +416,7 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
             }
             break;
         case ZRTPlayTypeClassroomTry:
+            self.currentCoverImage = @"";
             self.playerItem = [[AVPlayerItem alloc] initWithURL:[NSURL URLWithString:self.currentSong[@"s_mpurl"]]];
             break;
         default:

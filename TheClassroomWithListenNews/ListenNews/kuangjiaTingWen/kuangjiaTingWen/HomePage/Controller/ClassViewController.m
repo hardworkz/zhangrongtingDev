@@ -66,6 +66,8 @@ static NSString *const playAct_id = @"playAct_id";/**<当前正在播放的课�
 @property (assign, nonatomic) NSInteger playingIndex;
 //@property (assign, nonatomic) BOOL isVoicePlayEnd;//判断是否是播放完成回调
 //@property (strong, nonatomic) AVPlayer *Player;
+@property (assign, nonatomic) NSInteger commentIndex;
+@property (assign, nonatomic) NSInteger commentPageSize;
 /**
  Vip购买选择表格
  */
@@ -129,6 +131,11 @@ static AVPlayer *_instancePlay = nil;
             }
         }
     };
+    self.commentIndex = 2;
+    self.commentPageSize = 5;
+    self.helpTableView.mj_footer = [MJRefreshAutoNormalFooter footerWithRefreshingBlock:^{
+        [weakSelf loadCommentData];
+    }];
 }
 
 - (void)viewWillAppear:(BOOL)animated{
@@ -246,25 +253,29 @@ static AVPlayer *_instancePlay = nil;
     }
     DefineWeakSelf;
     [NetWorkTool getAuditionListWithaccessToken:AvatarAccessToken act_id:self.act_id sccess:^(NSDictionary *responseObject) {
-        if ([responseObject[@"status"] integerValue] == 1) {
-//            ExisRigester = NO;
-            if ([responseObject[@"results"][@"shiting"] isKindOfClass:[NSArray class]]) {
-                self.playShiTingListArr = responseObject[@"results"][@"shiting"];
+        if ([responseObject[status] integerValue] == 1) {
+            if ([responseObject[results][@"shiting"] isKindOfClass:[NSArray class]]) {
+                weakSelf.playShiTingListArr = responseObject[results][@"shiting"];
             }
-            self.classModel = [ClassModel mj_objectWithKeyValues:responseObject[@"results"]];
-            self.frameArray = [self frameArrayWithClassModel:self.classModel];
-            self.pinglunArr = [self pinglunFrameModelArrayWithModelArray:[PlayVCCommentModel mj_objectArrayWithKeyValuesArray:responseObject[@"results"][@"comments"]]];
-            [self setTableHeadView];
-            [self.helpTableView reloadData];
+            _classModel = [ClassModel mj_objectWithKeyValues:responseObject[results]];
+            weakSelf.frameArray = [self frameArrayWithClassModel:self.classModel];
+            weakSelf.pinglunArr = [self pinglunFrameModelArrayWithModelArray:[PlayVCCommentModel mj_objectArrayWithKeyValuesArray:responseObject[results][@"comments"]]];
+            if (weakSelf.pinglunArr.count < self.commentPageSize) {
+                [weakSelf.helpTableView.mj_footer endRefreshingWithNoMoreData];
+            }else{
+                [weakSelf.helpTableView.mj_footer resetNoMoreData];
+            }
+            [weakSelf setTableHeadView];
+            [weakSelf.helpTableView reloadData];
             
             //判断是否是纯数字
-            NSString *textStr = [NSString stringWithFormat:@" ￥%@ ",[NetWorkTool formatFloat:[responseObject[@"results"][@"sprice"] floatValue]]];
+            NSString *textStr = [NSString stringWithFormat:@" ￥%@ ",[NetWorkTool formatFloat:[responseObject[results][@"sprice"] floatValue]]];
             //中划线
             NSDictionary *attribtDic = @{NSStrikethroughStyleAttributeName: [NSNumber numberWithInteger:NSUnderlineStyleSingle]};
             NSMutableAttributedString *attribtStr = [[NSMutableAttributedString alloc]initWithString:textStr attributes:attribtDic];
             // 赋值
-            self.spriceLabel.attributedText = attribtStr;
-            self.priceLabel.text = [NSString stringWithFormat:@" ￥%@",[NetWorkTool formatFloat:[responseObject[@"results"][@"price"] floatValue]]];
+            weakSelf.spriceLabel.attributedText = attribtStr;
+            weakSelf.priceLabel.text = [NSString stringWithFormat:@" ￥%@",[NetWorkTool formatFloat:[responseObject[results][@"price"] floatValue]]];
             
         }
     } failure:^(NSError *error) {
@@ -302,6 +313,35 @@ static AVPlayer *_instancePlay = nil;
     
     return array;
 }
+/**
+ 获取评论数据
+ */
+- (void)loadCommentData{
+    DefineWeakSelf;
+    [NetWorkTool getPaoguoJieMuOrZhuBoPingLunLieBiaoWithact_id:self.act_id andpage:[NSString stringWithFormat:@"%ld",(long)self.commentIndex] andlimit:[NSString stringWithFormat:@"%ld",(long)self.commentPageSize] sccess:^(NSDictionary *responseObject) {
+        [weakSelf endRefreshing];
+        if ([responseObject[results] isKindOfClass:[NSArray class]]){
+            weakSelf.commentIndex++;
+            NSArray *array = responseObject[results];
+            [weakSelf.pinglunArr addObjectsFromArray:[self pinglunFrameModelArrayWithModelArray:[PlayVCCommentModel mj_objectArrayWithKeyValuesArray:array]]];
+            weakSelf.pinglunArr = [[NSMutableArray alloc] initWithArray:weakSelf.pinglunArr];
+            [weakSelf.helpTableView reloadData];
+            if (array.count < weakSelf.commentPageSize) {
+//                [weakSelf.helpTableView.mj_header endRefreshing];
+                [weakSelf.helpTableView.mj_footer endRefreshingWithNoMoreData];
+            }else{
+                [weakSelf.helpTableView.mj_footer endRefreshing];
+                [weakSelf.helpTableView.mj_footer resetNoMoreData];
+            }
+        }
+    } failure:^(NSError *error) {
+        [weakSelf endRefreshing];
+    }];
+}
+
+/**
+ 评论model转为frameModel
+ */
 - (NSMutableArray *)pinglunFrameModelArrayWithModelArray:(NSArray *)array
 {
     NSMutableArray *frameArray = [NSMutableArray array];
@@ -312,6 +352,12 @@ static AVPlayer *_instancePlay = nil;
     }
     return frameArray;
 }
+
+- (void)endRefreshing{
+    [self.helpTableView.mj_header endRefreshing];
+    [self.helpTableView.mj_footer endRefreshing];
+}
+
 - (void)back {
     [self.navigationController popViewControllerAnimated:YES];
 }
@@ -364,15 +410,15 @@ static AVPlayer *_instancePlay = nil;
     self.helpTableView.tableHeaderView = _xiangqingView;
     
     //footer
-    if (self.helpTableView.tableFooterView == nil) {
-        UIButton *moreComment = [UIButton buttonWithType:UIButtonTypeCustom];
-        [moreComment setFrame:CGRectMake(0, 0, SCREEN_WIDTH, 44)];
-        [moreComment setTitle:@"查看更多评价" forState:UIControlStateNormal];
-        [moreComment.titleLabel setFont:gFontMain14];
-        [moreComment setTitleColor:gTextColorSub forState:UIControlStateNormal];
-        [moreComment addTarget:self action:@selector(morecommetAction:) forControlEvents:UIControlEventTouchUpInside];
-        self.helpTableView.tableFooterView = moreComment;
-    }
+//    if (self.helpTableView.tableFooterView == nil) {
+//        UIButton *moreComment = [UIButton buttonWithType:UIButtonTypeCustom];
+//        [moreComment setFrame:CGRectMake(0, 0, SCREEN_WIDTH, 44)];
+//        [moreComment setTitle:@"查看更多评价" forState:UIControlStateNormal];
+//        [moreComment.titleLabel setFont:gFontMain14];
+//        [moreComment setTitleColor:gTextColorSub forState:UIControlStateNormal];
+//        [moreComment addTarget:self action:@selector(morecommetAction:) forControlEvents:UIControlEventTouchUpInside];
+//        self.helpTableView.tableFooterView = moreComment;
+//    }
     
     [self.helpTableView reloadData];
 }
@@ -965,11 +1011,11 @@ static AVPlayer *_instancePlay = nil;
 {
     if (self.classModel != nil) {
         if ([self.classModel.comments isKindOfClass:[NSArray class]]){
-            if ([self.classModel.comments count] >= 3) {
-                return 3 + 2 + self.classModel.imagesArray.count;
+            if ([self.classModel.comments count] != 0) {
+                return self.pinglunArr.count + 2 + self.classModel.imagesArray.count;
             }
             else{
-                return  [self.classModel.comments count] + self.classModel.imagesArray.count + 2;
+                return self.classModel.imagesArray.count + 2;
             }
         }
         else{

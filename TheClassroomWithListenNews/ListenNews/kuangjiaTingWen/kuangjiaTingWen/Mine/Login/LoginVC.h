@@ -12,4 +12,6 @@
 
 @property (assign, nonatomic)BOOL isSubscription;
 
+@property (assign, nonatomic)BOOL isFormDownload;
+
 @end

@@ -161,15 +161,14 @@
 - (void)loadData{
     DefineWeakSelf;
     [NetWorkTool getPaoguoJieMuOrZhuBoPingLunLieBiaoWithact_id:self.act_id andpage:[NSString stringWithFormat:@"%ld",(long)self.commentIndex] andlimit:[NSString stringWithFormat:@"%ld",(long)self.commentPageSize] sccess:^(NSDictionary *responseObject) {
-        RTLog(@"%@",responseObject[@"results"]);
         [weakSelf endRefreshing];
-        if ([responseObject[@"results"] isKindOfClass:[NSArray class]]){
+        if ([responseObject[results] isKindOfClass:[NSArray class]]){
             if (weakSelf.commentIndex == 1) {
                 [weakSelf.commentInfoArr removeAllObjects];
             }
-            NSArray *array = responseObject[@"results"];
-            [weakSelf.commentInfoArr addObjectsFromArray:[PlayVCCommentModel mj_objectArrayWithKeyValuesArray:array]];
-            weakSelf.commentInfoArr = [[NSMutableArray alloc]initWithArray:[self pinglunFrameModelArrayWithModelArray:weakSelf.commentInfoArr]];
+            NSArray *array = responseObject[results];
+            [weakSelf.commentInfoArr addObjectsFromArray:[self pinglunFrameModelArrayWithModelArray:[PlayVCCommentModel mj_objectArrayWithKeyValuesArray:array]]];
+            weakSelf.commentInfoArr = [[NSMutableArray alloc] initWithArray:weakSelf.commentInfoArr];
             [weakSelf.commentTableView reloadData];
             if (array.count < self.commentPageSize) {
                 [self.commentTableView.mj_header endRefreshing];

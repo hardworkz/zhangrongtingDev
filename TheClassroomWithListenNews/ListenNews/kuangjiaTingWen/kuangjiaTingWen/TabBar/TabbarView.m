@@ -52,13 +52,20 @@
         [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(backgroundToPushNews:) name:@"backgroundToPushNews" object:nil];
         [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(setMyunreadMessageTips:) name:@"setMyunreadMessageTips" object:nil];
         
+        
         //播放器状态改变
         RegisterNotify(SONGPLAYSTATUSCHANGE, @selector(playStatusChange:))
     }
     return self;
 }
+- (void)startAnimate:(NSNotification *)notification{
+    [_rotationBarBtn setSelected:YES];
+    [self imgAnimate:_rotationBarBtn];
+}
 
-
+- (void)stopAnimate:(NSNotification *)notification{
+    [self stopAnimate];
+}
 - (void)setItems:(NSArray *)items{
     _items = items;
     // 进行遍历items -->> items里面是一个个的tabBar，
@@ -257,6 +264,7 @@
     _rotationAnimation.duration = 2.0;
     _rotationAnimation.cumulative = YES;
     _rotationAnimation.repeatCount = HUGE_VALF;
+    _rotationAnimation.removedOnCompletion = NO;
     
     [btn.layer addAnimation:_rotationAnimation forKey:@"rotationAnimation"];
     
@@ -307,7 +315,6 @@
 - (void)GoPushNews {
     [[NSNotificationCenter defaultCenter] postNotificationName:@"backgroundToPushNews" object:nil];
 }
-
 /**
  接收到推送通知点击打开播放器
  */

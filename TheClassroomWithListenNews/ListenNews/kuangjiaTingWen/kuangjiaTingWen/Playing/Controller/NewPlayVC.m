@@ -613,11 +613,12 @@ static NewPlayVC *_instance = nil;
     };
     
     [ZRT_PlayerManager manager].playDidEnd = ^(NSInteger currentSongIndex) {
+        
         //判断是否是播放新闻，记录次数限制
         NSDictionary *userInfoDict = [CommonCode readFromUserD:@"dangqianUserInfo"];
         if (self.playType != PlayTypeClass) {
             if ([userInfoDict[results][member_type] intValue] == 0) {
-                int limitTime = [[CommonCode readFromUserD:[NSString stringWithFormat:@"%@_%@",limit_time,ExdangqianUserUid]] intValue];
+                int limitTime = [[CommonCode readFromUserD:[NSString stringWithFormat:@"%@_%@",limit_time,ExdangqianUserUid?ExdangqianUserUid:@""]] intValue];
                 int limitNum = [[CommonCode readFromUserD:[NSString stringWithFormat:@"%@",limit_num]] intValue];
                 if (limitTime >= limitNum - 1) {
                     ExLimitPlay = YES;
@@ -1092,7 +1093,6 @@ static NewPlayVC *_instance = nil;
         XWAlerLoginView *xw = [[XWAlerLoginView alloc]initWithTitle:@"下载路径为空"];
         [xw show];
     }
-    
 }
 /**
  投金币
@@ -1392,28 +1392,27 @@ static NewPlayVC *_instance = nil;
 {
     static NSInteger tishi = 0;
     tishi ++;
-    if ([[NSUserDefaults standardUserDefaults]boolForKey:@"shoushitixing"] && tishi == 5 && !IS_IPAD) {
-        
-        [[NSUserDefaults standardUserDefaults]setBool:NO forKey:@"shoushitixing"];
-        
-        [[NSUserDefaults standardUserDefaults]setBool:NO forKey:@"shoushi"];
-        //手势控制提示框
-        GestureControlAlertView *gestureControlAlert = [[GestureControlAlertView alloc]init];
-        AppDelegate *appDelegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
-        [appDelegate.window addSubview:gestureControlAlert];
-        GestureControlAlertView *gestureCAView;
-        //获取手势控制提示框设置为弱引用
-        for (UIView *view in appDelegate.window.subviews) {
-            if ([view isKindOfClass:[GestureControlAlertView class]]) {
-                gestureCAView = (GestureControlAlertView *)view;
-                break;
+    if (tishi == 5 && !IS_IPAD) {
+        if ([[CommonCode readFromUserD:NewPlayVC_GESTUER_ALERT] boolValue] == YES) {
+            //手势控制提示框
+            GestureControlAlertView *gestureControlAlert = [[GestureControlAlertView alloc]init];
+            AppDelegate *appDelegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
+            [appDelegate.window addSubview:gestureControlAlert];
+            GestureControlAlertView *gestureCAView;
+            //获取手势控制提示框设置为弱引用
+            for (UIView *view in appDelegate.window.subviews) {
+                if ([view isKindOfClass:[GestureControlAlertView class]]) {
+                    gestureCAView = (GestureControlAlertView *)view;
+                    break;
+                }
             }
+            __weak __typeof(gestureCAView) weakGestureCAView = gestureCAView;
+            gestureControlAlert.clickKnowBlock = ^ {
+                [weakGestureCAView removeFromSuperview];
+            };
+
+            [CommonCode writeToUserD:@(NO) andKey:NewPlayVC_GESTUER_ALERT];
         }
-        __weak __typeof(gestureCAView) weakGestureCAView = gestureCAView;
-        gestureControlAlert.clickKnowBlock = ^ {
-            [weakGestureCAView removeFromSuperview];
-        };
-        
     }
 
 }
@@ -1552,6 +1551,17 @@ static NSInteger touchCount = 0;
  */
 - (void)bofangLeftAction:(UIButton *)sender
 {
+    if (ExLimitPlay) {
+        UIAlertController *qingshuruyonghuming = [UIAlertController alertControllerWithTitle:@"温馨提示" message:@"您还不是会员，是否前往开通会员，收听更多资讯" preferredStyle:UIAlertControllerStyleAlert];
+        [qingshuruyonghuming addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        }]];
+        [qingshuruyonghuming addAction:[UIAlertAction actionWithTitle:@"前往开通会员" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+            MyVipMenbersViewController *MyVip = [MyVipMenbersViewController new];
+            [self.navigationController pushViewController:MyVip animated:YES];
+        }]];
+        
+        [self presentViewController:qingshuruyonghuming animated:YES completion:nil];
+    }
     touchCount++;
     if(touchCount<2)
     {
@@ -1584,6 +1594,17 @@ static NSInteger touchCount = 0;
  */
 - (void)bofangRightAction:(UIButton *)sender
 {
+    if (ExLimitPlay) {
+        UIAlertController *qingshuruyonghuming = [UIAlertController alertControllerWithTitle:@"温馨提示" message:@"您还不是会员，是否前往开通会员，收听更多资讯" preferredStyle:UIAlertControllerStyleAlert];
+        [qingshuruyonghuming addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        }]];
+        [qingshuruyonghuming addAction:[UIAlertAction actionWithTitle:@"前往开通会员" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+            MyVipMenbersViewController *MyVip = [MyVipMenbersViewController new];
+            [self.navigationController pushViewController:MyVip animated:YES];
+        }]];
+        
+        [self presentViewController:qingshuruyonghuming animated:YES completion:nil];
+    }
     touchCount++;
     if(touchCount<2)
     {
@@ -2303,19 +2324,6 @@ static NSInteger touchCount = 0;
     
     NSDictionary *resultDic = notification.object;
     if ([resultDic[@"resultStatus"]integerValue] == 9000) {
-        //支付成功
-//        NSMutableDictionary *dic = [CommonCode readFromUserD:REWARDINFODICTKEY];
-//        if ([[CommonCode readFromUserD:@"isLogin"]boolValue] == YES){
-//            [NetWorkTool listenMoneyRechargeWithaccessToken:AvatarAccessToken listen_money:dic[@"listen_money"] act_id:dic[@"act_id"] post_id:dic[@"post_id"]  type:dic[@"type"] sccess:^(NSDictionary *responseObject) {
-//                //
-//            } failure:^(NSError *error) {
-//                //
-//            }];
-//        }
-//        else{
-//            
-//        }
-        
         title=@"PaySuccess1",msg=@"您已赞赏成功",sureTitle=@"确定";
         av= [AKAlertView alertView:title des:msg  type:AKAlertSuccess effect:AKAlertEffectDrop sureTitle:sureTitle cancelTitle:cancelTitle];
     }
@@ -2356,25 +2364,12 @@ static NSInteger touchCount = 0;
     NSString* title=@"PaySuccess1",*msg=@"您已赞赏成功",*sureTitle=@"确定" , *cancelTitle=@"取消吧";
     AKAlertView* av;
     if ([notification.object integerValue] == 0) {
-//        NSMutableDictionary *dic = [CommonCode readFromUserD:REWARDINFODICTKEY];
-//        if ([[CommonCode readFromUserD:@"isLogin"]boolValue] == YES){
-//            [NetWorkTool listenMoneyRechargeWithaccessToken:AvatarAccessToken listen_money:dic[@"listen_money"] act_id:dic[@"act_id"] post_id:dic[@"post_id"] type:dic[@"type"] sccess:^(NSDictionary *responseObject) {
-//                //
-//            } failure:^(NSError *error) {
-//                //
-//            }];
-//        }
-//        else{
-//            
-//        }
         title=@"PaySuccess1",msg=@"您已赞赏成功",sureTitle=@"确定";
         av= [AKAlertView alertView:title des:msg  type:AKAlertSuccess effect:AKAlertEffectDrop sureTitle:sureTitle cancelTitle:cancelTitle];
     }
     else if ([notification.object integerValue] == -2){
         title=@"PayFail1";msg=@"用户中途取消，请稍后再试";sureTitle=@"确定";
         av= [AKAlertView alertView:title des:msg  type:AKAlertFaild effect:AKAlertEffectDrop sureTitle:sureTitle cancelTitle:cancelTitle];
-        //        title=@"PaySuccess1",msg=@"您已赞赏成功",sureTitle=@"确定";
-        //        av= [AKAlertView alertView:title des:msg  type:AKAlertSuccess effect:AKAlertEffectDrop sureTitle:sureTitle cancelTitle:cancelTitle];
     }
     else{
         title=@"PayFail1";msg=@"返回信息错误，请稍后再试";sureTitle=@"确定";

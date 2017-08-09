@@ -37,6 +37,8 @@ static CGFloat const MaxScale = 1.0;/** 选中文字放大  */
 @property (strong, nonatomic) UIButton *downloadingCountButton;
 
 @property (assign, nonatomic) BOOL isShowVipTips;
+
+@property (assign, nonatomic) BOOL isShowVipTipsFromLogin;
 @end
 
 @implementation DownloadViewController
@@ -55,6 +57,18 @@ static CGFloat const MaxScale = 1.0;/** 选中文字放大  */
     [self.navigationController setNavigationBarHidden:YES animated:YES];
     
     [self click:self.buttons[1]];
+    
+    if (_isShowVipTipsFromLogin && [[CommonCode readFromUserD:@"isLogin"] boolValue] == YES) {
+        UIAlertController *qingshuruyonghuming = [UIAlertController alertControllerWithTitle:@"温馨提示" message:@"您还不是会员，无法使用批量下载功能，是否前往开通会员" preferredStyle:UIAlertControllerStyleAlert];
+        [qingshuruyonghuming addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        }]];
+        [qingshuruyonghuming addAction:[UIAlertAction actionWithTitle:@"前往开通会员" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+            MyVipMenbersViewController *MyVip = [MyVipMenbersViewController new];
+            [self.navigationController pushViewController:MyVip animated:YES];
+        }]];
+        [self presentViewController:qingshuruyonghuming animated:YES completion:nil];
+        _isShowVipTipsFromLogin = NO;
+    }
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -260,10 +274,19 @@ static CGFloat const MaxScale = 1.0;/** 选中文字放大  */
             [qingshuruyonghuming addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
             }]];
             [qingshuruyonghuming addAction:[UIAlertAction actionWithTitle:@"前往开通会员" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-                MyVipMenbersViewController *MyVip = [MyVipMenbersViewController new];
-                [self.navigationController pushViewController:MyVip animated:YES];
+                if ([[CommonCode readFromUserD:@"isLogin"] boolValue] == YES) {
+                    MyVipMenbersViewController *MyVip = [MyVipMenbersViewController new];
+                    [self.navigationController pushViewController:MyVip animated:YES];
+                }else{
+                    LoginVC *loginFriVC = [LoginVC new];
+                    loginFriVC.isFormDownload = YES;
+                    LoginNavC *loginNavC = [[LoginNavC alloc]initWithRootViewController:loginFriVC];
+                    [loginNavC.navigationBar setBackgroundColor:[UIColor whiteColor]];
+                    loginNavC.navigationBar.tintColor = [UIColor blackColor];
+                    [self presentViewController:loginNavC animated:YES completion:nil];
+                    _isShowVipTipsFromLogin = YES;
+                }
             }]];
-            
             [self presentViewController:qingshuruyonghuming animated:YES completion:nil];
         }
         _isShowVipTips = YES;

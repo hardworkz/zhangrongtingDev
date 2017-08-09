@@ -1730,10 +1730,9 @@ static AVPlayer *_instancePlay = nil;
     [SVProgressHUD dismiss];
 }
 
-- (void)back {
-
+- (void)back
+{
     [self.navigationController popViewControllerAnimated:YES];
-    
 }
 
 - (void)rightSwipeAction:(UIGestureRecognizer *)gesture {

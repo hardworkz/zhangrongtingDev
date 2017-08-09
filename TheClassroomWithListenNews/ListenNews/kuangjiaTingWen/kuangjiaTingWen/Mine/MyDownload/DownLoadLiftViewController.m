@@ -360,7 +360,8 @@ static NSInteger selectIndex2 = -1;
 /**
  初始化已经下载的数据
  */
-- (void)initData {
+- (void)initData
+{
     ProjiectDownLoadManager *manager = [ProjiectDownLoadManager defaultProjiectDownLoadManager];
     NSArray *arr = [manager downloadAllNewObjArrar];
     __weak __typeof(self) selfBlock = self;

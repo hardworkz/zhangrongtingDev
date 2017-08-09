@@ -14,6 +14,7 @@
 #define NewPlayVC_PLAYLIST @"NewPlayVC_PlayList"
 #define NewPlayVC_PLAY_INDEX @"NewPlayVC_CurrentPlayIndex"
 #define NewPlayVC_PLAY_CHANNEL @"NewPlayVC_PlayChannel"
+#define NewPlayVC_GESTUER_ALERT @"NewPlayVC_GestureAlert"
 
 typedef NS_ENUM(NSInteger, PlayType) {
     PlayTypeNone = 0,//未知播放

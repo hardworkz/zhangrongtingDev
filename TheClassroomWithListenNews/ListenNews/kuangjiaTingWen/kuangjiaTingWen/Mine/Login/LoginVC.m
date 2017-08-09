@@ -40,6 +40,16 @@
     [super viewWillDisappear:animated];
     APPDELEGATE.isLogin = YES;
 }
+- (void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
+    if (_isFormDownload) {
+        UIAlertController *qingshuruyonghuming = [UIAlertController alertControllerWithTitle:@"温馨提醒" message:@"您需要登录，才能开通会员。" preferredStyle:UIAlertControllerStyleAlert];
+        [qingshuruyonghuming addAction:[UIAlertAction actionWithTitle:@"知道了" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        }]];
+        [self presentViewController:qingshuruyonghuming animated:YES completion:nil];
+    }
+}
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.title = @"账号登录";

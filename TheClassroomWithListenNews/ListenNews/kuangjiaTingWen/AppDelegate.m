@@ -270,8 +270,6 @@
     [CommonCode writeToUserD:@"NO" andKey:TINGYOUQUANBOFANGWANBI];
     //手势控制
     [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"shoushi"];
-    //手势提醒
-    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"shoushitixing"];
     
     //注册QQ
     [[TencentOAuth alloc] initWithAppId:kAppId_QQ andDelegate:self];
@@ -370,7 +368,7 @@
             //初始化播放器判断限制状态
             NSDictionary *userInfoDict = [CommonCode readFromUserD:@"dangqianUserInfo"];
             if ([userInfoDict[results][member_type] intValue] == 0) {//非会员
-                int limitTime = [[CommonCode readFromUserD:[NSString stringWithFormat:@"%@_%@",limit_time,ExdangqianUserUid]] intValue];
+                int limitTime = [[CommonCode readFromUserD:[NSString stringWithFormat:@"%@_%@",limit_time,ExdangqianUserUid?ExdangqianUserUid:@""]] intValue];
                 int limitNum = [responseObject[results][@"num"] intValue];
                 if (limitTime >= limitNum ||[userInfoDict[results][is_stop] intValue] == 1) {
                     ExLimitPlay = YES;
@@ -622,18 +620,18 @@
     [UIApplication sharedApplication].applicationIconBadgeNumber = 0;
     
     //MBAudioPlayer是我为播放器写的单例，这段就是当音乐还在播放状态的时候，给后台权限，不在播放状态的时候，收回后台权限
-    if ([ZRT_PlayerManager manager].isPlaying) {
+//    if ([ZRT_PlayerManager manager].isPlaying) {
         //有音乐播放时，才给后台权限，不做流氓应用。
         [[UIApplication sharedApplication] beginReceivingRemoteControlEvents];
         [self becomeFirstResponder];
         
         [self configNowPlayingCenter];
-    }
-    else
-    {
-        [[UIApplication sharedApplication] endReceivingRemoteControlEvents];
-        [self resignFirstResponder];
-    }
+//    }
+//    else
+//    {
+//        [[UIApplication sharedApplication] endReceivingRemoteControlEvents];
+//        [self resignFirstResponder];
+//    }
 }
 - (BOOL)canBecomeFirstResponder{
     return YES;
@@ -641,12 +639,7 @@
 
 - (void)applicationWillEnterForeground:(UIApplication *)application {
     // Called as part of the transition from the background to the inactive state; here you can undo many of the changes made on entering the background.
-    if ([bofangVC shareInstance].isPlay) {
-        [[NSNotificationCenter defaultCenter] postNotificationName:@"startAnimate" object:nil];
-    }
-    else{
-        [[NSNotificationCenter defaultCenter] postNotificationName:@"stopAnimate" object:nil];
-    }
+    
     
     [UIApplication sharedApplication].applicationIconBadgeNumber = 0;
     if ([[CommonCode readFromUserD:@"isWhatLogin"] isEqualToString:@"QQ"]){
@@ -734,38 +727,38 @@
 #pragma mark - NowPlayingCenter & Remote Control
 - (void)configNowPlayingCenter
 {
-//    RTLog(@"%@",[ZRT_PlayerManager manager].currentSong);
-    if([[SDWebImageManager sharedManager] cachedImageExistsForURL:[NSURL URLWithString:[ZRT_PlayerManager manager].currentCoverImage]]){
-        UIImage* img = [[SDWebImageManager sharedManager].imageCache imageFromMemoryCacheForKey:[[SDWebImageManager sharedManager] cacheKeyForURL:[NSURL URLWithString:[ZRT_PlayerManager manager].currentCoverImage]]];
-        
-        if(!img)
-            img = [[SDWebImageManager sharedManager].imageCache imageFromDiskCacheForKey:[[SDWebImageManager sharedManager] cacheKeyForURL:[NSURL URLWithString:[ZRT_PlayerManager manager].currentCoverImage]]];
-        NSMutableDictionary * playingCenterInfo = [NSMutableDictionary dictionary];
-        [playingCenterInfo setObject:[ZRT_PlayerManager manager].currentSong[@"post_title"] forKey:MPMediaItemPropertyTitle];
-        [playingCenterInfo setObject:[ZRT_PlayerManager manager].currentSong[@"post_act"][@"name"] forKey:MPMediaItemPropertyArtist];
-        [playingCenterInfo setObject:@([ZRT_PlayerManager manager].playDuration) forKey:MPNowPlayingInfoPropertyElapsedPlaybackTime];
-        [playingCenterInfo setObject:@(1) forKey:MPNowPlayingInfoPropertyPlaybackRate];
-        [playingCenterInfo setObject:@([ZRT_PlayerManager manager].duration) forKey:MPMediaItemPropertyPlaybackDuration];
-        MPMediaItemArtwork * artwork = [[MPMediaItemArtwork alloc] initWithImage:img];
-        [playingCenterInfo setObject:artwork forKey:MPMediaItemPropertyArtwork];
-        [[MPNowPlayingInfoCenter defaultCenter] setNowPlayingInfo:playingCenterInfo];
-        
-    }else{
-        [[SDWebImageManager sharedManager] downloadImageWithURL:[NSURL URLWithString:[ZRT_PlayerManager manager].currentCoverImage] options:SDWebImageRetryFailed|SDWebImageLowPriority progress:nil completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, BOOL finished, NSURL *imageURL) {
-            if (image) {
-                NSMutableDictionary * playingCenterInfo = [NSMutableDictionary dictionary];
-                [playingCenterInfo setObject:[ZRT_PlayerManager manager].currentSong[@"post_title"] forKey:MPMediaItemPropertyTitle];
-                [playingCenterInfo setObject:[ZRT_PlayerManager manager].currentSong[@"post_act"][@"name"] forKey:MPMediaItemPropertyArtist];
-                [playingCenterInfo setObject:@([ZRT_PlayerManager manager].playDuration) forKey:MPNowPlayingInfoPropertyElapsedPlaybackTime];
-                [playingCenterInfo setObject:@(1) forKey:MPNowPlayingInfoPropertyPlaybackRate];
-                [playingCenterInfo setObject:@([ZRT_PlayerManager manager].duration) forKey:MPMediaItemPropertyPlaybackDuration];
-                MPMediaItemArtwork * artwork = [[MPMediaItemArtwork alloc] initWithImage:image];
-                [playingCenterInfo setObject:artwork forKey:MPMediaItemPropertyArtwork];
-                [[MPNowPlayingInfoCenter defaultCenter] setNowPlayingInfo:playingCenterInfo];
-            }
-        }];
+    if ([ZRT_PlayerManager manager].playType != ZRTPlayTypeClassroomTry) {
+        if([[SDWebImageManager sharedManager] cachedImageExistsForURL:[NSURL URLWithString:[ZRT_PlayerManager manager].currentCoverImage]]){
+            UIImage* img = [[SDWebImageManager sharedManager].imageCache imageFromMemoryCacheForKey:[[SDWebImageManager sharedManager] cacheKeyForURL:[NSURL URLWithString:[ZRT_PlayerManager manager].currentCoverImage]]];
+            
+            if(!img)
+                img = [[SDWebImageManager sharedManager].imageCache imageFromDiskCacheForKey:[[SDWebImageManager sharedManager] cacheKeyForURL:[NSURL URLWithString:[ZRT_PlayerManager manager].currentCoverImage]]];
+            NSMutableDictionary * playingCenterInfo = [NSMutableDictionary dictionary];
+            [playingCenterInfo setObject:[ZRT_PlayerManager manager].currentSong[@"post_title"]?[ZRT_PlayerManager manager].currentSong[@"post_title"]:@"" forKey:MPMediaItemPropertyTitle];
+            [playingCenterInfo setObject:[ZRT_PlayerManager manager].currentSong[@"post_act"][@"name"] forKey:MPMediaItemPropertyArtist];
+            [playingCenterInfo setObject:@([ZRT_PlayerManager manager].playDuration) forKey:MPNowPlayingInfoPropertyElapsedPlaybackTime];
+            [playingCenterInfo setObject:@(1) forKey:MPNowPlayingInfoPropertyPlaybackRate];
+            [playingCenterInfo setObject:@([ZRT_PlayerManager manager].duration) forKey:MPMediaItemPropertyPlaybackDuration];
+            MPMediaItemArtwork * artwork = [[MPMediaItemArtwork alloc] initWithImage:img];
+            [playingCenterInfo setObject:artwork forKey:MPMediaItemPropertyArtwork];
+            [[MPNowPlayingInfoCenter defaultCenter] setNowPlayingInfo:playingCenterInfo];
+            
+        }else{
+            [[SDWebImageManager sharedManager] downloadImageWithURL:[NSURL URLWithString:[ZRT_PlayerManager manager].currentCoverImage] options:SDWebImageRetryFailed|SDWebImageLowPriority progress:nil completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, BOOL finished, NSURL *imageURL) {
+                if (image) {
+                    NSMutableDictionary * playingCenterInfo = [NSMutableDictionary dictionary];
+                    [playingCenterInfo setObject:[ZRT_PlayerManager manager].currentSong[@"post_title"]?[ZRT_PlayerManager manager].currentSong[@"post_title"]:@"" forKey:MPMediaItemPropertyTitle];
+                    [playingCenterInfo setObject:[ZRT_PlayerManager manager].currentSong[@"post_act"][@"name"] forKey:MPMediaItemPropertyArtist];
+                    [playingCenterInfo setObject:@([ZRT_PlayerManager manager].playDuration) forKey:MPNowPlayingInfoPropertyElapsedPlaybackTime];
+                    [playingCenterInfo setObject:@(1) forKey:MPNowPlayingInfoPropertyPlaybackRate];
+                    [playingCenterInfo setObject:@([ZRT_PlayerManager manager].duration) forKey:MPMediaItemPropertyPlaybackDuration];
+                    MPMediaItemArtwork * artwork = [[MPMediaItemArtwork alloc] initWithImage:image];
+                    [playingCenterInfo setObject:artwork forKey:MPMediaItemPropertyArtwork];
+                    [[MPNowPlayingInfoCenter defaultCenter] setNowPlayingInfo:playingCenterInfo];
+                }
+            }];
+        }
     }
-    
 }
 - (void)remoteControlReceivedWithEvent:(UIEvent *)event {
     //后台播放控制事件， 在此处设置对应的控制器进行相应
