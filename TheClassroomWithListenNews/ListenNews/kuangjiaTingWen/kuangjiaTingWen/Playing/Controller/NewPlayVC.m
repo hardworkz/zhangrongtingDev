@@ -1979,7 +1979,7 @@ static NSInteger touchCount = 0;
         switch (selectedindex) {
             case 0:
             {
-                NSURL *url = [NSURL URLWithString:@""];
+                NSURL *url = [NSURL URLWithString:NEWSSEMTPHOTOURL(_postDetailModel.smeta)];
                 NSURLRequest *q = [NSURLRequest requestWithURL:url cachePolicy:NSURLRequestUseProtocolCachePolicy timeoutInterval:5];
                 NSData *dataImage = [NSURLConnection sendSynchronousRequest:q returningResponse:nil error:nil];
                 
@@ -1992,10 +1992,10 @@ static NSInteger touchCount = 0;
                 WBImageObject *imgObjc = [WBImageObject object];
                 imgObjc.imageData = UIImageJPEGRepresentation(image, 0.9f);
                 NSInteger strCount = 0;
-                NSString *contentURLStr = [NSString stringWithFormat:@"http://tingwen.me/index.php/article/yulan/id/%@.html",@""];
+                NSString *contentURLStr = [NSString stringWithFormat:@"http://tingwen.me/index.php/article/yulan/id/%@.html",_postDetailModel.post_id];
                 strCount = [CommonCode countWord:contentURLStr];
                 
-                strCount += [CommonCode countWord:@""];
+                strCount += [CommonCode countWord:_postDetailModel.post_title];
                 
                 strCount += [CommonCode countWord:@"【】详情内容：..... 收听地址："];
                 
@@ -2003,11 +2003,11 @@ static NSInteger touchCount = 0;
                 if (RemainingCount < 0) {
                     RemainingCount = 0;
                 }
-                NSInteger contentCount = [CommonCode countWord:@""];
-                NSString *contentStr = [@"" substringWithRange:NSMakeRange(0, contentCount > RemainingCount ? RemainingCount : contentCount)];
+                NSInteger contentCount = [CommonCode countWord:_postDetailModel.post_excerpt];
+                NSString *contentStr = [_postDetailModel.post_excerpt substringWithRange:NSMakeRange(0, contentCount > RemainingCount ? RemainingCount : contentCount)];
                 
                 //创建消息的文本内容
-                NSString *shareContent = [NSString stringWithFormat:@"【%@】详情内容：%@..... 收听地址：%@", @"", contentStr, contentURLStr];
+                NSString *shareContent = [NSString stringWithFormat:@"【%@】详情内容：%@..... 收听地址：%@", _postDetailModel.post_title, contentStr, contentURLStr];
                 //消息的文本内容
                 message.text = shareContent;
                 //设置消息的图片内容
@@ -2036,7 +2036,7 @@ static NSInteger touchCount = 0;
             default:
             {
                 UIPasteboard *gr                             = [UIPasteboard generalPasteboard];
-                gr.string                                    = [NSString stringWithFormat:@"http://tingwen.me/index.php/article/yulan/id/%@.html",@""];
+                gr.string                                    = [NSString stringWithFormat:@"http://tingwen.me/index.php/article/yulan/id/%@.html",_postDetailModel.post_id];
                 XWAlerLoginView *xw = [[XWAlerLoginView alloc]initWithTitle:@"分享链接已复制到您的剪切板~~"];
                 [xw show];
             }
@@ -2056,7 +2056,7 @@ static NSInteger touchCount = 0;
     }
     tencentOAuth = [[TencentOAuth alloc]initWithAppId:kAppId_QQ andDelegate:self];
     
-    [self getImageWithURLStr:@"" OnSucceed:^(UIImage *image) {
+    [self getImageWithURLStr:NEWSSEMTPHOTOURL(_postDetailModel.smeta) OnSucceed:^(UIImage *image) {
         //压缩图片大小
         CGFloat compression = 0.8f;
         CGFloat maxCompression = 0.1f;
@@ -2075,13 +2075,13 @@ static NSInteger touchCount = 0;
             //分享内容的预览图像
             NSData *thumbImageData = [thumbImage dataWithMaxFileSize:25 * 1024 maxSide:200];
             //分享跳转URL
-            NSString *url = [NSString stringWithFormat:@"http://tingwen.me/index.php/article/yulan/id/%@.html",@""];
+            NSString *url = [NSString stringWithFormat:@"http://tingwen.me/index.php/article/yulan/id/%@.html",_postDetailModel.post_id];
             
             //音乐播放的网络流媒体地址
-            NSString *flashURL = @"";
+            NSString *flashURL = _postDetailModel.post_mp;
             QQApiAudioObject *audioObj =[QQApiAudioObject
                                          objectWithURL :[NSURL URLWithString:url]
-                                         title:@""
+                                         title:_postDetailModel.post_title
                                          description:nil
                                          previewImageData:thumbImageData];
             //设置播放流媒体地址
@@ -2116,7 +2116,7 @@ static NSInteger touchCount = 0;
             
         }else{
             
-            [self getImageWithURLStr:@"" OnSucceed:^(UIImage *image) {
+            [self getImageWithURLStr:NEWSSEMTPHOTOURL(_postDetailModel.smeta) OnSucceed:^(UIImage *image) {
                 
                 //压缩图片大小
                 CGFloat compression = 0.8f;
@@ -2134,14 +2134,16 @@ static NSInteger touchCount = 0;
                 //分享内容的预览图像
                 NSData *thumbImageData = [thumbImage dataWithMaxFileSize:25 * 1024 maxSide:200];
                 //分享跳转URL
-                NSString *url = [NSString stringWithFormat:@"http://tingwen.me/index.php/article/yulan/id/%@.html",@""];
+                NSString *url = [NSString stringWithFormat:@"http://tingwen.me/index.php/article/yulan/id/%@.html",_postDetailModel.post_id];
+                
                 //音乐播放的网络流媒体地址
-                NSString *flashURL = @"";
+                NSString *flashURL = _postDetailModel.post_mp;
                 QQApiAudioObject *audioObj =[QQApiAudioObject
                                              objectWithURL :[NSURL URLWithString:url]
-                                             title:@""
+                                             title:_postDetailModel.post_title
                                              description:nil
                                              previewImageData:thumbImageData];
+
                 //设置播放流媒体地址
                 [audioObj setFlashURL:[NSURL URLWithString:flashURL]];
                 SendMessageToQQReq *req = [SendMessageToQQReq reqWithContent:audioObj];
@@ -2171,12 +2173,9 @@ static NSInteger touchCount = 0;
                     default:
                         break;
                 }
-                
-                
             }];
         }
     }];
-    
 }
 
 /**
@@ -2192,12 +2191,12 @@ static NSInteger touchCount = 0;
         return;
     }
     WXMediaMessage *message = [WXMediaMessage message];
-    message.title = @"";
+    message.title = _postDetailModel.post_title;
     message.description = @"";
-    NSString *musicUrl = [NSString stringWithFormat:@"http://admin.tingwen.me/index.php/article/yulan/id/%@.html",@""];
+    NSString *musicUrl = [NSString stringWithFormat:@"http://admin.tingwen.me/index.php/article/yulan/id/%@.html",_postDetailModel.post_id];
     //    NSString *musicUrl = @"https://zhidao.baidu.com/question/2143697514695119428.html";
     
-    [self getImageWithURLStr:@"" OnSucceed:^(UIImage *image) {
+    [self getImageWithURLStr:NEWSSEMTPHOTOURL(_postDetailModel.smeta) OnSucceed:^(UIImage *image) {
         //压缩图片大小
         CGFloat compression = 0.8f;
         CGFloat maxCompression = 0.1f;
@@ -2218,7 +2217,7 @@ static NSInteger touchCount = 0;
             WXMusicObject *ext = [WXMusicObject object];
             ext.musicUrl = musicUrl;
             ext.musicLowBandUrl = ext.musicUrl;
-            ext.musicDataUrl = @"";
+            ext.musicDataUrl = _postDetailModel.post_mp;
             ext.musicLowBandDataUrl = ext.musicDataUrl;
             message.mediaObject = ext;
             SendMessageToWXReq* req = [[SendMessageToWXReq alloc] init];
@@ -2234,7 +2233,7 @@ static NSInteger touchCount = 0;
             
         }else{
             
-            [self getImageWithURLStr:@"" OnSucceed:^(UIImage *image) {
+            [self getImageWithURLStr:NEWSSEMTPHOTOURL(_postDetailModel.smeta) OnSucceed:^(UIImage *image) {
                 
                 //压缩图片大小
                 CGFloat compression = 0.8f;
@@ -2253,7 +2252,7 @@ static NSInteger touchCount = 0;
                 [message setThumbImage:[UIImage imageWithData:thumbImageData]];
                 WXMusicObject *ext = [WXMusicObject object];
                 ext.musicUrl = musicUrl;
-                ext.musicDataUrl = @"";
+                ext.musicDataUrl = _postDetailModel.post_mp;
                 message.mediaObject = ext;
                 SendMessageToWXReq* req = [[SendMessageToWXReq alloc] init];
                 req.bText = NO;
