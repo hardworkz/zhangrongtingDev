@@ -35,6 +35,10 @@ typedef void (^WechatdidReceiveCode)(NSString *);
 @property (strong, nonatomic) UIWindow *window;
 
 /**
+ 无声播放器
+ */
+@property (strong, nonatomic) AVAudioPlayer *noSoundPlayer;
+/**
  支付类型
  */
 @property (nonatomic,assign) PayType payType;
@@ -43,10 +47,10 @@ typedef void (^WechatdidReceiveCode)(NSString *);
 
 @property (assign, nonatomic) BOOL isLogin;//是否登录
 
-@property (copy, nonatomic) SkipToPlayingVCBlock shouyeSkipToPlayingVC;
-@property (copy, nonatomic) SkipToPlayingVCBlock dingyueSkipToPlayingVC;
-@property (copy, nonatomic) SkipToPlayingVCBlock faxianSkipToPlayingVC;
-@property (copy, nonatomic) SkipToPlayingVCBlock woSkipToPlayingVC;
+//@property (copy, nonatomic) SkipToPlayingVCBlock shouyeSkipToPlayingVC;
+//@property (copy, nonatomic) SkipToPlayingVCBlock dingyueSkipToPlayingVC;
+//@property (copy, nonatomic) SkipToPlayingVCBlock faxianSkipToPlayingVC;
+//@property (copy, nonatomic) SkipToPlayingVCBlock woSkipToPlayingVC;
 
 @property (copy, nonatomic) WeibodidReceiveResponse weibologinSuccess;
 @property (copy, nonatomic) WechatdidReceiveCode wechatGetLoginCode;

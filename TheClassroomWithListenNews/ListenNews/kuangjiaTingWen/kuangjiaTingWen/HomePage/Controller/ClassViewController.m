@@ -117,16 +117,10 @@ static AVPlayer *_instancePlay = nil;
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(WechatPayResultsMembers:) name:WechatPayResultsMembers object:nil];
     
     DefineWeakSelf
-    [ZRT_PlayerManager manager].playDidEnd = ^(NSInteger currentSongIndex) {
-        if ([ZRT_PlayerManager manager].playType == ZRTPlayTypeClassroomTry) {
-            weakSelf.playingIndex = currentSongIndex;
-            [weakSelf playTestMp:weakSelf.buttons[weakSelf.playingIndex]];
-        }
-    };
     [ZRT_PlayerManager manager].playDidEndReload = ^(NSInteger currentSongIndex) {
-        if (currentSongIndex == self.playShiTingListArr.count - 1) {
+        if (currentSongIndex == weakSelf.playShiTingListArr.count - 1) {
             _auditionnBtn.selected = [ZRT_PlayerManager manager].isPlaying;
-            for (UIButton *playBtn in self.buttons) {
+            for (UIButton *playBtn in weakSelf.buttons) {
                 playBtn.selected = [ZRT_PlayerManager manager].isPlaying;
             }
         }
@@ -174,6 +168,13 @@ static AVPlayer *_instancePlay = nil;
         [dict setObject:self.jiemuMessage_num forKey:@"jiemuMessage_num"];
         [CommonCode writeToUserD:dict andKey:@"is_free_data"];
     }
+    DefineWeakSelf
+    [ZRT_PlayerManager manager].playDidEnd = ^(NSInteger currentSongIndex) {
+        if ([ZRT_PlayerManager manager].playType == ZRTPlayTypeClassroomTry) {
+            weakSelf.playingIndex = currentSongIndex;
+            [weakSelf playTestMp:weakSelf.buttons[weakSelf.playingIndex]];
+        }
+    };
 }
 
 - (void)viewWillDisappear:(BOOL)animated{

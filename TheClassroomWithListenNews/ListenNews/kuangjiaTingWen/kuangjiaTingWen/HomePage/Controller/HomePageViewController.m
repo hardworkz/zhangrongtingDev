@@ -62,7 +62,8 @@
     [self.columnTableView reloadData];
 }
 
-- (void)setUpData{
+- (void)setUpData
+{
     self.columnIndex = 1;
     self.columnPageSize = 15;
     self.newsIndex = 1;
@@ -87,58 +88,6 @@
     } failure:^(NSError *error) {
         NSLog(@"error = %@",error);
     }];
-    DefineWeakSelf;
-    APPDELEGATE.shouyeSkipToPlayingVC = ^ (NSString *pushNewsID){
-        
-        if ([ZRT_PlayerManager manager].playType == ZRTPlayTypeClassroomTry && Exact_id != nil) {
-                NSMutableDictionary *dict = [CommonCode readFromUserD:@"is_free_data"];
-            ClassViewController *vc = [ClassViewController shareInstance];
-            vc.jiemuDescription = dict[@"jiemuDescription"];
-            vc.jiemuFan_num = dict[@"jiemuFan_num"];
-            vc.jiemuID = dict[@"jiemuID"];
-            vc.jiemuImages = dict[@"jiemuImages"];
-            vc.jiemuIs_fan = dict[@"jiemuIs_fan"];
-            vc.jiemuMessage_num = dict[@"jiemuMessage_num"];
-            vc.jiemuName = dict[@"jiemuName"];
-            vc.act_id = Exact_id;
-            vc.listVC = self;
-            [weakSelf.navigationController.navigationBar setHidden:YES];
-            [weakSelf.navigationController pushViewController:vc animated:YES];
-            return;
-        }
-        
-        if ([pushNewsID isEqualToString:@"NO"]) {
-            //上一次听过的新闻
-            if ([ZRT_PlayerManager manager].currentSong) {
-                [weakSelf.navigationController pushViewController:[NewPlayVC shareInstance] animated:YES];
-            }
-            else{
-                //跳转上一次播放的新闻
-                [weakSelf skipToLastNews];
-            }
-        }
-        else{
-            NSString *pushNewsID = [[NSUserDefaults standardUserDefaults]valueForKey:@"pushNews"];
-            [[NSUserDefaults standardUserDefaults] synchronize];
-            if ([[CommonCode readFromUserD:@"dangqianbofangxinwenID"] isEqualToString:pushNewsID]){
-                if (![self.navigationController.topViewController isKindOfClass:[NewPlayVC class]]) {
-                    [self.navigationController pushViewController:[NewPlayVC shareInstance] animated:YES];
-                    if (![ZRT_PlayerManager manager].isPlaying) {
-                        [[ZRT_PlayerManager manager] startPlay];
-                    }
-                }
-                if (![ZRT_PlayerManager manager].isPlaying) {
-                    [[ZRT_PlayerManager manager] startPlay];
-                }
-            }
-            else{
-                [weakSelf getPushNewsDetail];
-            }
-            
-        }
-    };
-//    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(zidongjiazai:) name:@"bofangRightyaojiazaishujv" object:nil];
-//    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(gaibianyanse:) name:@"gaibianyanse" object:nil];
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(reloadClassList) name:ReloadClassList object:nil];
     RegisterNotify(ReloadHomeSelectPageData, @selector(reloadSelectedList))
     RegisterNotify(@"loginSccess", @selector(reloadClassList))
@@ -498,64 +447,64 @@
 /**
  点击中心按钮跳转上一次记录新闻详情界面播放
  */
-- (void)skipToLastNews
-{
-    [ZRT_PlayerManager manager].songList = [CommonCode readFromUserD:NewPlayVC_PLAYLIST];
-    [ZRT_PlayerManager manager].currentSong = [CommonCode readFromUserD:NewPlayVC_THELASTNEWSDATA];
-    //设置播放器播放内容类型
-    [ZRT_PlayerManager manager].playType = ZRTPlayTypeNews;
-    [NewPlayVC shareInstance].rewardType = RewardViewTypeNone;
-    [ZRT_PlayerManager manager].channelType = [[CommonCode readFromUserD:NewPlayVC_PLAY_CHANNEL] intValue];
-    [[NewPlayVC shareInstance] playFromIndex:[[CommonCode readFromUserD:NewPlayVC_PLAY_INDEX] integerValue]];
-    [self.navigationController.navigationBar setHidden:YES];
-    [self.navigationController pushViewController:[NewPlayVC shareInstance] animated:YES];
-}
+//- (void)skipToLastNews
+//{
+//    [ZRT_PlayerManager manager].songList = [CommonCode readFromUserD:NewPlayVC_PLAYLIST];
+//    [ZRT_PlayerManager manager].currentSong = [CommonCode readFromUserD:NewPlayVC_THELASTNEWSDATA];
+//    //设置播放器播放内容类型
+//    [ZRT_PlayerManager manager].playType = ZRTPlayTypeNews;
+//    [NewPlayVC shareInstance].rewardType = RewardViewTypeNone;
+//    [ZRT_PlayerManager manager].channelType = [[CommonCode readFromUserD:NewPlayVC_PLAY_CHANNEL] intValue];
+//    [[NewPlayVC shareInstance] playFromIndex:[[CommonCode readFromUserD:NewPlayVC_PLAY_INDEX] integerValue]];
+//    [self.navigationController.navigationBar setHidden:YES];
+//    [self.navigationController pushViewController:[NewPlayVC shareInstance] animated:YES];
+//}
 
 /**
  根据推送ID获取新闻详情数据
  */
-- (void)getPushNewsDetail{
-    DefineWeakSelf;
-    [NetWorkTool getpostinfoWithpost_id:[[NSUserDefaults standardUserDefaults]valueForKey:@"pushNews"] andpage:nil andlimit:nil sccess:^(NSDictionary *responseObject) {
-        if ([responseObject[@"status"] integerValue] == 1) {
-            weakSelf.pushNewsInfo = [responseObject[@"results"] mutableCopy];
-            [NetWorkTool getAllActInfoListWithAccessToken:nil ac_id:weakSelf.pushNewsInfo[@"post_news"] keyword:nil andPage:nil andLimit:nil sccess:^(NSDictionary *responseObject) {
-                if ([responseObject[@"status"] integerValue] == 1){
-                    [weakSelf.pushNewsInfo setObject:[responseObject[@"results"] firstObject] forKey:@"post_act"];
-                    [weakSelf presentPushNews];
-                }
-                else{
-                    [SVProgressHUD showErrorWithStatus:responseObject[@"msg"]];
-                }
-            } failure:^(NSError *error) {
-                //
-                [SVProgressHUD showErrorWithStatus:@"网络请求失败"];
-            }];
-        }
-        else{
-            [SVProgressHUD showErrorWithStatus:responseObject[@"msg"]];
-        }
-        
-    } failure:^(NSError *error) {
-        [SVProgressHUD showErrorWithStatus:@"网络请求失败"];
-        NSLog(@"%@",error);
-    }];
-}
+//- (void)getPushNewsDetail{
+//    DefineWeakSelf;
+//    [NetWorkTool getpostinfoWithpost_id:[[NSUserDefaults standardUserDefaults]valueForKey:@"pushNews"] andpage:nil andlimit:nil sccess:^(NSDictionary *responseObject) {
+//        if ([responseObject[@"status"] integerValue] == 1) {
+//            weakSelf.pushNewsInfo = [responseObject[@"results"] mutableCopy];
+//            [NetWorkTool getAllActInfoListWithAccessToken:nil ac_id:weakSelf.pushNewsInfo[@"post_news"] keyword:nil andPage:nil andLimit:nil sccess:^(NSDictionary *responseObject) {
+//                if ([responseObject[@"status"] integerValue] == 1){
+//                    [weakSelf.pushNewsInfo setObject:[responseObject[@"results"] firstObject] forKey:@"post_act"];
+//                    [weakSelf presentPushNews];
+//                }
+//                else{
+//                    [SVProgressHUD showErrorWithStatus:responseObject[@"msg"]];
+//                }
+//            } failure:^(NSError *error) {
+//                //
+//                [SVProgressHUD showErrorWithStatus:@"网络请求失败"];
+//            }];
+//        }
+//        else{
+//            [SVProgressHUD showErrorWithStatus:responseObject[@"msg"]];
+//        }
+//        
+//    } failure:^(NSError *error) {
+//        [SVProgressHUD showErrorWithStatus:@"网络请求失败"];
+//        NSLog(@"%@",error);
+//    }];
+//}
 /**
  通知消息点击跳转新闻详情界面播放
  */
-- (void)presentPushNews
-{
-    [ZRT_PlayerManager manager].songList = @[self.pushNewsInfo];
-    [ZRT_PlayerManager manager].currentSong = self.pushNewsInfo;
-    //设置播放器播放内容类型
-    [ZRT_PlayerManager manager].playType = ZRTPlayTypeNews;
-    [NewPlayVC shareInstance].rewardType = RewardViewTypeNone;
-    [ZRT_PlayerManager manager].channelType = ChannelTypeChannelNone;
-    [[NewPlayVC shareInstance] playFromIndex:0];
-    [self.navigationController.navigationBar setHidden:YES];
-    [self.navigationController pushViewController:[NewPlayVC shareInstance] animated:YES];
-}
+//- (void)presentPushNews
+//{
+//    [ZRT_PlayerManager manager].songList = @[self.pushNewsInfo];
+//    [ZRT_PlayerManager manager].currentSong = self.pushNewsInfo;
+//    //设置播放器播放内容类型
+//    [ZRT_PlayerManager manager].playType = ZRTPlayTypeNews;
+//    [NewPlayVC shareInstance].rewardType = RewardViewTypeNone;
+//    [ZRT_PlayerManager manager].channelType = ChannelTypeChannelNone;
+//    [[NewPlayVC shareInstance] playFromIndex:0];
+//    [self.navigationController.navigationBar setHidden:YES];
+//    [self.navigationController pushViewController:[NewPlayVC shareInstance] animated:YES];
+//}
 
 - (void)newsItemAction:(UIButton *)sender{
     NSString *term_id;
@@ -873,7 +822,9 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
     if (tableView == self.columnTableView || tableView == self.newsTableView) {
         
-        self.playListIndex = self.segmentedControl.selectedSegmentIndex;
+        if (self.segmentedControl.selectedSegmentIndex != 2) {
+            self.playListIndex = self.segmentedControl.selectedSegmentIndex;
+        }
         
         NSArray *arr;
         if (self.segmentedControl.selectedSegmentIndex == 0) {

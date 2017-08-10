@@ -53,53 +53,6 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    DefineWeakSelf;
-    APPDELEGATE.faxianSkipToPlayingVC = ^(NSString *pushNewsID){
-        
-        if ([ZRT_PlayerManager manager].playType == ZRTPlayTypeClassroomTry && Exact_id != nil) {
-            NSMutableDictionary *dict = [CommonCode readFromUserD:@"is_free_data"];
-            ClassViewController *vc = [ClassViewController shareInstance];
-            vc.jiemuDescription = dict[@"jiemuDescription"];
-            vc.jiemuFan_num = dict[@"jiemuFan_num"];
-            vc.jiemuID = dict[@"jiemuID"];
-            vc.jiemuImages = dict[@"jiemuImages"];
-            vc.jiemuIs_fan = dict[@"jiemuIs_fan"];
-            vc.jiemuMessage_num = dict[@"jiemuMessage_num"];
-            vc.jiemuName = dict[@"jiemuName"];
-            vc.act_id = Exact_id;
-            vc.listVC = self;
-            [weakSelf.navigationController.navigationBar setHidden:YES];
-            [weakSelf.navigationController pushViewController:vc animated:YES];
-            return;
-        }
-        if ([pushNewsID isEqualToString:@"NO"]) {
-            //上一次听过的新闻
-            if ([ZRT_PlayerManager manager].currentSong) {
-                [self.navigationController pushViewController:[NewPlayVC shareInstance] animated:YES];
-            }
-            else{
-                //跳转上一次播放的新闻
-                [self skipToLastNews];
-            }
-        }
-        else{
-            NSString *pushNewsID = [[NSUserDefaults standardUserDefaults]valueForKey:@"pushNews"];
-            if ([[CommonCode readFromUserD:@"dangqianbofangxinwenID"] isEqualToString:pushNewsID]){
-                if (![self.navigationController.topViewController isKindOfClass:[NewPlayVC class]]) {
-                    [self.navigationController pushViewController:[NewPlayVC shareInstance] animated:YES];
-                    if (![ZRT_PlayerManager manager].isPlaying) {
-                        [[ZRT_PlayerManager manager] startPlay];
-                    }
-                }
-                if (![ZRT_PlayerManager manager].isPlaying) {
-                    [[ZRT_PlayerManager manager] startPlay];
-                }
-            }
-            else{
-                [weakSelf getPushNewsDetail];
-            }
-        }
-    };
     
     self.edgesForExtendedLayout = UIRectEdgeNone;
     

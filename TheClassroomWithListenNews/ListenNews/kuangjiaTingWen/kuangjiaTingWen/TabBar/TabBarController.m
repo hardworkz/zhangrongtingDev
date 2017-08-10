@@ -25,6 +25,10 @@
 
 @property (nonatomic, strong)NSMutableArray *itemArray;
 
+@property (strong, nonatomic) NSMutableDictionary *pushNewsInfo;
+
+@property (strong, nonatomic) navigationC *navigationVC;
+
 @end
 
 @implementation TabBarController
@@ -64,14 +68,151 @@
     return imgName;
 }
 
-- (void)setTatBar{
+- (void)setTatBar
+{
     TabbarView *tabBar = [[TabbarView alloc] init];
     tabBar.backgroundColor = [UIColor whiteColor];
     tabBar.frame = self.tabBar.bounds;
     tabBar.items = self.itemArray;
     tabBar.delegate = self;
+    //点击中心圆按钮调用block
+    DefineWeakSelf
+    tabBar.rotationBarBtnAction = ^(UIButton *sender,NSInteger selectedIndex) {
+        //获取当前tabbar控制器选中的分页面导航栏控制器
+        _navigationVC = weakSelf.childViewControllers[selectedIndex];
+        
+        //判断是否是课堂试听界面跳转
+        if ([ZRT_PlayerManager manager].playType == ZRTPlayTypeClassroomTry && Exact_id != nil) {
+            NSMutableDictionary *dict = [CommonCode readFromUserD:@"is_free_data"];
+            ClassViewController *vc = [ClassViewController shareInstance];
+            vc.jiemuDescription = dict[@"jiemuDescription"];
+            vc.jiemuFan_num = dict[@"jiemuFan_num"];
+            vc.jiemuID = dict[@"jiemuID"];
+            vc.jiemuImages = dict[@"jiemuImages"];
+            vc.jiemuIs_fan = dict[@"jiemuIs_fan"];
+            vc.jiemuMessage_num = dict[@"jiemuMessage_num"];
+            vc.jiemuName = dict[@"jiemuName"];
+            vc.act_id = Exact_id;
+            vc.listVC = _navigationVC.topViewController;
+            [_navigationVC.navigationBar setHidden:YES];
+            [_navigationVC pushViewController:vc animated:YES];
+            return;
+        }
+        
+        //判断是否是推送跳转
+        NSString *pushNewsID = [CommonCode readFromUserD:pushNews];//获取推送ID
+        if (pushNewsID) {//存在推送新闻ID
+            //推送新闻是当前播放新闻
+            if ([[CommonCode readFromUserD:@"dangqianbofangxinwenID"] isEqualToString:pushNewsID]){
+                //如果没有跳转到新闻详情界面，跳转进去
+                if (![_navigationVC.topViewController isKindOfClass:[NewPlayVC class]]) {
+                    [_navigationVC pushViewController:[NewPlayVC shareInstance] animated:YES];
+                    //如果播放暂停，开始播放
+                    if (![ZRT_PlayerManager manager].isPlaying) {
+                        [[ZRT_PlayerManager manager] startPlay];
+                    }
+                }
+                //如果播放暂停，开始播放
+                if (![ZRT_PlayerManager manager].isPlaying) {
+                    [[ZRT_PlayerManager manager] startPlay];
+                }
+            }
+            else{
+                //获取推送新闻数据并跳转进入
+                [weakSelf getPushNewsDetail];
+            }
+        }else{
+            //判断是否是正在播放新闻跳转
+            if ([ZRT_PlayerManager manager].currentSong) {
+                [_navigationVC pushViewController:[NewPlayVC shareInstance] animated:YES];
+            }
+            else{//判断是否是新闻播放记录跳转
+                if ([CommonCode readFromUserD:NewPlayVC_THELASTNEWSDATA]) {
+                    //跳转上一次播放的新闻
+                    [weakSelf skipToLastNews];
+                }
+                else{
+                    [SVProgressHUD showInfoWithStatus:@"请至少选择一条新闻或者课堂"];
+                    [self performSelector:@selector(SVPDismiss) withObject:nil afterDelay:1.0];
+                    
+                }
+            }
+        }
+        
+        
+        
+        
+    };
     [self.tabBar addSubview:tabBar];
 }
+- (void)SVPDismiss {
+    [SVProgressHUD dismiss];
+}
+/**
+ 点击中心按钮跳转上一次记录新闻详情界面播放
+ */
+- (void)skipToLastNews
+{
+    [ZRT_PlayerManager manager].songList = [CommonCode readFromUserD:NewPlayVC_PLAYLIST];
+    [ZRT_PlayerManager manager].currentSong = [CommonCode readFromUserD:NewPlayVC_THELASTNEWSDATA];
+    //设置播放器播放内容类型
+    [ZRT_PlayerManager manager].playType = ZRTPlayTypeNews;
+    [NewPlayVC shareInstance].rewardType = RewardViewTypeNone;
+    [ZRT_PlayerManager manager].channelType = [[CommonCode readFromUserD:NewPlayVC_PLAY_CHANNEL] intValue];
+    [[NewPlayVC shareInstance] playFromIndex:[[CommonCode readFromUserD:NewPlayVC_PLAY_INDEX] integerValue]];
+    [_navigationVC.navigationBar setHidden:YES];
+    [_navigationVC pushViewController:[NewPlayVC shareInstance] animated:YES];
+}
+
+/**
+ 根据推送ID获取新闻详情数据
+ */
+- (void)getPushNewsDetail{
+    _pushNewsInfo = [NSMutableDictionary new];
+    DefineWeakSelf;
+    [NetWorkTool getpostinfoWithpost_id:[CommonCode readFromUserD:pushNews] andpage:nil andlimit:nil sccess:^(NSDictionary *responseObject) {
+        if ([responseObject[status] integerValue] == 1) {
+            weakSelf.pushNewsInfo = [responseObject[results] mutableCopy];
+            [NetWorkTool getAllActInfoListWithAccessToken:nil ac_id:weakSelf.pushNewsInfo[@"post_news"] keyword:nil andPage:nil andLimit:nil sccess:^(NSDictionary *responseObject) {
+                if ([responseObject[status] integerValue] == 1){
+                    [weakSelf.pushNewsInfo setObject:[responseObject[results] firstObject] forKey:@"post_act"];
+                    [weakSelf presentPushNews];
+                }
+                else{
+                    [SVProgressHUD showErrorWithStatus:responseObject[msg]];
+                }
+            } failure:^(NSError *error) {
+                //
+                [SVProgressHUD showErrorWithStatus:@"网络请求失败"];
+            }];
+        }
+        else{
+            [SVProgressHUD showErrorWithStatus:responseObject[msg]];
+        }
+        
+    } failure:^(NSError *error) {
+        [SVProgressHUD showErrorWithStatus:@"网络请求失败"];
+        NSLog(@"%@",error);
+    }];
+}
+/**
+ 通知消息点击跳转新闻详情界面播放
+ */
+- (void)presentPushNews
+{
+    [ZRT_PlayerManager manager].songList = @[self.pushNewsInfo];
+    [ZRT_PlayerManager manager].currentSong = self.pushNewsInfo;
+    //设置播放器播放内容类型
+    [ZRT_PlayerManager manager].playType = ZRTPlayTypeNews;
+    [NewPlayVC shareInstance].rewardType = RewardViewTypeNone;
+    [ZRT_PlayerManager manager].channelType = ChannelTypeChannelNone;
+    [[NewPlayVC shareInstance] playFromIndex:0];
+    [_navigationVC.navigationBar setHidden:YES];
+    [_navigationVC pushViewController:[NewPlayVC shareInstance] animated:YES];
+    //清空获取的推送新闻数据
+    self.pushNewsInfo = nil;
+}
+
 
 - (void)tabBarChildViewController:(UIViewController *)vc tabBarTitle:(NSString *)title norImage:(UIImage *)norImage selImage:(UIImage *)selImage{
     // 添加导航

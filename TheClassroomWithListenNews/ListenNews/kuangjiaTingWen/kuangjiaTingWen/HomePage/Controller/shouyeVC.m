@@ -83,47 +83,47 @@
     
     //这里是启动app时广告  
     [self getStartAD];
-    DefineWeakSelf;
-    APPDELEGATE.shouyeSkipToPlayingVC = ^ (NSString *pushNewsID){
-        if ([pushNewsID isEqualToString:@"NO"]) {
-            //上一次听过的新闻
-            if (ExIsKaiShiBoFang) {
-                self.hidesBottomBarWhenPushed = YES;
-                [self.navigationController pushViewController:[bofangVC shareInstance] animated:YES];
-                self.hidesBottomBarWhenPushed = NO;
-            }
-            else{
-                //跳转上一次播放的新闻
-                [self skipToLastNews];
-            }
-        }
-        else{
-            NSString *pushNewsID = [[NSUserDefaults standardUserDefaults]valueForKey:@"pushNews"];
-            [[NSUserDefaults standardUserDefaults] synchronize];
-            if ([[CommonCode readFromUserD:@"dangqianbofangxinwenID"] isEqualToString:pushNewsID]){
-                NSString *isPlayingVC = [CommonCode readFromUserD:@"isPlayingVC"];
-                if ([isPlayingVC isEqualToString:@"YES"]) {
-                    
-                }
-                else{
-                    self.hidesBottomBarWhenPushed = YES;
-                    [self.navigationController.navigationBar setHidden:YES];
-                    [self.navigationController pushViewController:[bofangVC shareInstance] animated:YES];
-                    self.hidesBottomBarWhenPushed = NO;
-                }
-                if ([bofangVC shareInstance].isPlay) {
-                    
-                }
-                else{
-                    [[bofangVC shareInstance] doplay2];
-                }
-            }
-            else{
-               [weakSelf getPushNewsDetail];
-            }
-            
-        }
-    };
+//    DefineWeakSelf;
+//    APPDELEGATE.shouyeSkipToPlayingVC = ^ (NSString *pushNewsID){
+//        if ([pushNewsID isEqualToString:@"NO"]) {
+//            //上一次听过的新闻
+//            if (ExIsKaiShiBoFang) {
+//                self.hidesBottomBarWhenPushed = YES;
+//                [self.navigationController pushViewController:[bofangVC shareInstance] animated:YES];
+//                self.hidesBottomBarWhenPushed = NO;
+//            }
+//            else{
+//                //跳转上一次播放的新闻
+//                [self skipToLastNews];
+//            }
+//        }
+//        else{
+//            NSString *pushNewsID = [[NSUserDefaults standardUserDefaults]valueForKey:@"pushNews"];
+//            [[NSUserDefaults standardUserDefaults] synchronize];
+//            if ([[CommonCode readFromUserD:@"dangqianbofangxinwenID"] isEqualToString:pushNewsID]){
+//                NSString *isPlayingVC = [CommonCode readFromUserD:@"isPlayingVC"];
+//                if ([isPlayingVC isEqualToString:@"YES"]) {
+//                    
+//                }
+//                else{
+//                    self.hidesBottomBarWhenPushed = YES;
+//                    [self.navigationController.navigationBar setHidden:YES];
+//                    [self.navigationController pushViewController:[bofangVC shareInstance] animated:YES];
+//                    self.hidesBottomBarWhenPushed = NO;
+//                }
+//                if ([bofangVC shareInstance].isPlay) {
+//                    
+//                }
+//                else{
+//                    [[bofangVC shareInstance] doplay2];
+//                }
+//            }
+//            else{
+//               [weakSelf getPushNewsDetail];
+//            }
+//            
+//        }
+//    };
     
     dangqianTableView = nil;
     

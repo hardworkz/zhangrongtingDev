@@ -27,7 +27,7 @@
 
 @property (nonatomic,strong)CABasicAnimation* rotationAnimation;
 
-@property (nonatomic,assign)BOOL isPushSkip;
+//@property (nonatomic,assign)BOOL isPushSkip;
 
 
 @property (nonatomic,strong) UIButton *newMessageButton;
@@ -141,120 +141,126 @@
     }
 }
 
-- (void)rotationBarBtnAction:(UIButton *)sender{
+- (void)rotationBarBtnAction:(UIButton *)sender
+{
+    //点击中心按钮调用block
+    if (self.rotationBarBtnAction) {
+        self.rotationBarBtnAction(sender,_currentIdx);
+    }
+//    return;
     
-    NSString *pushNewsID = @"";
-    if (_isPushSkip) {
-        pushNewsID = [[NSUserDefaults standardUserDefaults] valueForKey:@"pushNews"];
-        [[NSUserDefaults standardUserDefaults] synchronize];
-    }
-    else{
-        pushNewsID = @"NO";
-    }
+//    NSString *pushNewsID = @"";
+//    if (_isPushSkip) {
+//        pushNewsID = [CommonCode readFromUserD:pushNews];
+//    }
+//    else{
+//        pushNewsID = @"NO";
+//    }
     
-    if (ExIsKaiShiBoFang == YES){
-        switch (_currentIdx) {
-            case 0:
-                if (APPDELEGATE.shouyeSkipToPlayingVC) {
-                    APPDELEGATE.shouyeSkipToPlayingVC(pushNewsID);
-                }
-                break;
-            case 1:
-                if (APPDELEGATE.dingyueSkipToPlayingVC) {
-                    APPDELEGATE.dingyueSkipToPlayingVC(pushNewsID);
-                }
-                break;
-            case 2:
-                if (APPDELEGATE.faxianSkipToPlayingVC) {
-                    APPDELEGATE.faxianSkipToPlayingVC(pushNewsID);
-                }
-                break;
-            case 3:
-                if (APPDELEGATE.woSkipToPlayingVC) {
-                    APPDELEGATE.woSkipToPlayingVC(pushNewsID);
-                }
-                break;
-            default:
-                break;
-        }
-        [_rotationBarBtn setSelected:YES];
-        [CommonCode writeToUserD:@"NO" andKey:@"isPlayingGray"];
-    }
-    else{
-        if (_isPushSkip) {
-            //TODO:
-            [_rotationBarBtn setSelected:YES];
-            [CommonCode writeToUserD:@"NO" andKey:@"isPlayingGray"];
-            switch (_currentIdx) {
-                case 0:
-                    
-                    if (APPDELEGATE.shouyeSkipToPlayingVC) {
-                        APPDELEGATE.shouyeSkipToPlayingVC(pushNewsID);
-                    }
-                    else{
-                        //TODO:
-                        [self performSelector:@selector(GoPushNews) withObject:nil afterDelay:1.0];
-                    }
-                    break;
-                case 1:
-                    if (APPDELEGATE.dingyueSkipToPlayingVC) {
-                        APPDELEGATE.dingyueSkipToPlayingVC(pushNewsID);
-                    }
-                    break;
-                case 2:
-                    if (APPDELEGATE.faxianSkipToPlayingVC) {
-                        APPDELEGATE.faxianSkipToPlayingVC(pushNewsID);
-                    }
-                    break;
-                case 3:
-                    if (APPDELEGATE.woSkipToPlayingVC) {
-                        APPDELEGATE.woSkipToPlayingVC(pushNewsID);
-                    }
-                    break;
-                default:
-                    break;
-            }
-        }
-        else{
-            NSString *haveTheLastNewsData = [CommonCode readFromUserD:@"haveTheLastNewsData"];
-            if ([haveTheLastNewsData isEqualToString:@"YES"]) {
-                switch (_currentIdx) {
-                    case 0:
-                        if (APPDELEGATE.shouyeSkipToPlayingVC) {
-                            APPDELEGATE.shouyeSkipToPlayingVC(pushNewsID);
-                        }
-                        break;
-                    case 1:
-                        if (APPDELEGATE.dingyueSkipToPlayingVC) {
-                            APPDELEGATE.dingyueSkipToPlayingVC(pushNewsID);
-                        }
-                        break;
-                    case 2:
-                        if (APPDELEGATE.faxianSkipToPlayingVC) {
-                            APPDELEGATE.faxianSkipToPlayingVC(pushNewsID);
-                        }
-                        break;
-                    case 3:
-                        if (APPDELEGATE.woSkipToPlayingVC) {
-                            APPDELEGATE.woSkipToPlayingVC(pushNewsID);
-                        }
-                        break;
-                    default:
-                        break;
-                }
-                [_rotationBarBtn setSelected:YES];
-                [CommonCode writeToUserD:@"NO" andKey:@"isPlayingGray"];
-            
-            }
-            else{
-                [SVProgressHUD showInfoWithStatus:@"请至少选择一条新闻或者课堂"];
-                [self performSelector:@selector(SVPDismiss) withObject:nil afterDelay:1.0];
-                
-            }
-        }
-        
-    }
-    _isPushSkip = NO;
+//    if ([ZRT_PlayerManager manager].isPlaying == YES){
+//        switch (_currentIdx) {
+//            case 0:
+//                if (APPDELEGATE.shouyeSkipToPlayingVC) {
+//                    APPDELEGATE.shouyeSkipToPlayingVC(pushNewsID);
+//                }
+//                break;
+//            case 1:
+//                if (APPDELEGATE.dingyueSkipToPlayingVC) {
+//                    APPDELEGATE.dingyueSkipToPlayingVC(pushNewsID);
+//                }
+//                break;
+//            case 2:
+//                if (APPDELEGATE.faxianSkipToPlayingVC) {
+//                    APPDELEGATE.faxianSkipToPlayingVC(pushNewsID);
+//                }
+//                break;
+//            case 3:
+//                if (APPDELEGATE.woSkipToPlayingVC) {
+//                    APPDELEGATE.woSkipToPlayingVC(pushNewsID);
+//                }
+//                break;
+//            default:
+//                break;
+//        }
+//        [_rotationBarBtn setSelected:YES];
+//        [CommonCode writeToUserD:@"NO" andKey:@"isPlayingGray"];
+//    }
+//    else{
+//        if (YES) {
+//            //TODO:
+//            [_rotationBarBtn setSelected:YES];
+//            [CommonCode writeToUserD:@"NO" andKey:@"isPlayingGray"];
+//            switch (_currentIdx) {
+//                case 0:
+//                    
+//                    if (APPDELEGATE.shouyeSkipToPlayingVC) {
+//                        APPDELEGATE.shouyeSkipToPlayingVC(pushNewsID);
+//                    }
+//                    else{
+//                        //TODO:
+//                        [self performSelector:@selector(GoPushNews) withObject:nil afterDelay:1.0];
+//                    }
+//                    break;
+//                case 1:
+//                    if (APPDELEGATE.dingyueSkipToPlayingVC) {
+//                        APPDELEGATE.dingyueSkipToPlayingVC(pushNewsID);
+//                    }
+//                    break;
+//                case 2:
+//                    if (APPDELEGATE.faxianSkipToPlayingVC) {
+//                        APPDELEGATE.faxianSkipToPlayingVC(pushNewsID);
+//                    }
+//                    break;
+//                case 3:
+//                    if (APPDELEGATE.woSkipToPlayingVC) {
+//                        APPDELEGATE.woSkipToPlayingVC(pushNewsID);
+//                    }
+//                    break;
+//                default:
+//                    break;
+//            }
+//        }
+//        else{
+//            NSString *haveTheLastNewsData = [CommonCode readFromUserD:@"haveTheLastNewsData"];
+//            if ([haveTheLastNewsData isEqualToString:@"YES"]) {
+//                switch (_currentIdx) {
+//                    case 0:
+//                        if (APPDELEGATE.shouyeSkipToPlayingVC) {
+//                            APPDELEGATE.shouyeSkipToPlayingVC(pushNewsID);
+//                        }
+//                        break;
+//                    case 1:
+//                        if (APPDELEGATE.dingyueSkipToPlayingVC) {
+//                            APPDELEGATE.dingyueSkipToPlayingVC(pushNewsID);
+//                        }
+//                        break;
+//                    case 2:
+//                        if (APPDELEGATE.faxianSkipToPlayingVC) {
+//                            APPDELEGATE.faxianSkipToPlayingVC(pushNewsID);
+//                        }
+//                        break;
+//                    case 3:
+//                        if (APPDELEGATE.woSkipToPlayingVC) {
+//                            APPDELEGATE.woSkipToPlayingVC(pushNewsID);
+//                        }
+//                        break;
+//                    default:
+//                        break;
+//                }
+//                [_rotationBarBtn setSelected:YES];
+//                [CommonCode writeToUserD:@"NO" andKey:@"isPlayingGray"];
+//            
+//            }
+//            else{
+//                [SVProgressHUD showInfoWithStatus:@"请至少选择一条新闻或者课堂"];
+//                [self performSelector:@selector(SVPDismiss) withObject:nil afterDelay:1.0];
+//                
+//            }
+//        }
+//        
+//    }
+//    _isPushSkip = NO;
+    
 }
 
 - (void)imgAnimate:(UIButton*)btn{
@@ -321,13 +327,13 @@
 - (void)pushNewsDetail:(NSNotification *)notification {
     
     UIButton *playBtn = (UIButton *)[self viewWithTag:110];
-    _isPushSkip = YES;
+//    _isPushSkip = YES;
     [self rotationBarBtnAction:playBtn];
 }
 
 - (void)backgroundToPushNews:(NSNotification *)notification{
     UIButton *playBtn = (UIButton *)[self viewWithTag:110];
-    _isPushSkip = YES;
+//    _isPushSkip = YES;
     [self rotationBarBtnAction:playBtn];
 }
 

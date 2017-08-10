@@ -188,6 +188,43 @@ static NewPlayVC *_instance = nil;
     }else {
         [[UIDevice currentDevice] setProximityMonitoringEnabled:[[NSUserDefaults standardUserDefaults] boolForKey:@"shoushi"]];
     }
+    DefineWeakSelf
+    [ZRT_PlayerManager manager].playDidEnd = ^(NSInteger currentSongIndex) {
+        
+        //判断是否是播放新闻，记录次数限制
+        NSDictionary *userInfoDict = [CommonCode readFromUserD:@"dangqianUserInfo"];
+        if (weakSelf.playType != PlayTypeClass) {
+            if ([userInfoDict[results][member_type] intValue] == 0) {
+                int limitTime = [[CommonCode readFromUserD:[NSString stringWithFormat:@"%@_%@",limit_time,ExdangqianUserUid?ExdangqianUserUid:@""]] intValue];
+                int limitNum = [[CommonCode readFromUserD:[NSString stringWithFormat:@"%@",limit_num]] intValue];
+                if (limitTime >= limitNum) {
+                    ExLimitPlay = YES;
+                    [NetWorkTool sendLimitDataWithaccessToken:AvatarAccessToken sccess:^(NSDictionary *responseObject) {
+                        if ([responseObject[status] intValue] == 1) {
+                            [[NSNotificationCenter defaultCenter] postNotificationName:@"updateUserInfo" object:nil];
+                        }
+                    } failure:^(NSError *error) {
+                        
+                    }];
+                }else{
+                    ExLimitPlay = NO;
+                    [CommonCode writeToUserD:[NSString stringWithFormat:@"%d",limitTime + 1] andKey:[NSString stringWithFormat:@"%@_%@",limit_time,ExdangqianUserUid]];
+                }
+            }
+        }
+        
+        //设置详情模型
+        weakSelf.postDetailModel = [newsDetailModel new];
+        //保存当前播放新闻的ID
+        [weakSelf saveCurrentPlayNewsID];
+        //设置模型数据，从播放器中获取对应正在播放的数据赋值新闻模型
+        [weakSelf setPostDetailModelDataFormPlayManager];
+        //获取详情数据
+        [weakSelf loadData];
+        //获取评论数据
+        [weakSelf getCommentList];
+    };
+
 }
 - (void)viewWillDisappear:(BOOL)animated
 {
@@ -612,41 +649,6 @@ static NewPlayVC *_instance = nil;
         [weakSelf.prgBufferProgress setProgress:bufferProgress animated:YES];
     };
     
-    [ZRT_PlayerManager manager].playDidEnd = ^(NSInteger currentSongIndex) {
-        
-        //判断是否是播放新闻，记录次数限制
-        NSDictionary *userInfoDict = [CommonCode readFromUserD:@"dangqianUserInfo"];
-        if (self.playType != PlayTypeClass) {
-            if ([userInfoDict[results][member_type] intValue] == 0) {
-                int limitTime = [[CommonCode readFromUserD:[NSString stringWithFormat:@"%@_%@",limit_time,ExdangqianUserUid?ExdangqianUserUid:@""]] intValue];
-                int limitNum = [[CommonCode readFromUserD:[NSString stringWithFormat:@"%@",limit_num]] intValue];
-                if (limitTime >= limitNum - 1) {
-                    ExLimitPlay = YES;
-                    [NetWorkTool sendLimitDataWithaccessToken:AvatarAccessToken sccess:^(NSDictionary *responseObject) {
-                        if ([responseObject[status] intValue] == 1) {
-                            [[NSNotificationCenter defaultCenter] postNotificationName:@"updateUserInfo" object:nil];
-                        }
-                    } failure:^(NSError *error) {
-                        
-                    }];
-                }else{
-                    ExLimitPlay = NO;
-                    [CommonCode writeToUserD:[NSString stringWithFormat:@"%d",limitTime + 1] andKey:[NSString stringWithFormat:@"%@_%@",limit_time,ExdangqianUserUid]];
-                }
-            }
-        }
-
-        //设置详情模型
-        self.postDetailModel = [newsDetailModel new];
-        //保存当前播放新闻的ID
-        [self saveCurrentPlayNewsID];
-        //设置模型数据，从播放器中获取对应正在播放的数据赋值新闻模型
-        [self setPostDetailModelDataFormPlayManager];
-        //获取详情数据
-        [self loadData];
-        //获取评论数据
-        [self getCommentList];
-    };
 }
 #pragma mark - 懒加载新闻详情控件
 
@@ -1439,9 +1441,14 @@ static NewPlayVC *_instance = nil;
     //判断是否是后台音频
     if (event.type == UIEventTypeRemoteControl) {
         switch (event.subtype) {
+                
+            case UIEventSubtypeRemoteControlPlay:
+                //暂停
+                [[ZRT_PlayerManager manager] startPlay];
+                break;
             case UIEventSubtypeRemoteControlTogglePlayPause:
-                //暂停或播放
-                [self playPauseClicked:bofangCenterBtn];
+                //暂停
+                [[ZRT_PlayerManager manager] pausePlay];
                 break;
                 
             case UIEventSubtypeRemoteControlPreviousTrack:
@@ -1537,6 +1544,12 @@ static NSInteger touchCount = 0;
  */
 - (void)playPauseClicked:(UIButton *)sender
 {
+    if ([ZRT_PlayerManager manager].currentSong) {
+        [APPDELEGATE configNowPlayingCenter];
+    }
+    if (ExLimitPlay) {
+        return;
+    }
     if ([ZRT_PlayerManager manager].isPlaying) {//点击暂停
         [[ZRT_PlayerManager manager] pausePlay];
         sender.selected = NO;
@@ -1646,6 +1659,17 @@ static NSInteger touchCount = 0;
  */
 - (void)playFromIndex:(NSInteger)index
 {
+    if (ExLimitPlay) {
+        UIAlertController *qingshuruyonghuming = [UIAlertController alertControllerWithTitle:@"温馨提示" message:@"您还不是会员，是否前往开通会员，收听更多资讯" preferredStyle:UIAlertControllerStyleAlert];
+        [qingshuruyonghuming addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        }]];
+        [qingshuruyonghuming addAction:[UIAlertAction actionWithTitle:@"前往开通会员" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+            MyVipMenbersViewController *MyVip = [MyVipMenbersViewController new];
+            [self.navigationController pushViewController:MyVip animated:YES];
+        }]];
+        
+        [self presentViewController:qingshuruyonghuming animated:YES completion:nil];
+    }
     //设置播放器数据
     [[ZRT_PlayerManager manager] loadSongInfoFromIndex:index];
     //设置详情模型
@@ -1693,6 +1717,11 @@ static NSInteger touchCount = 0;
     [self.tableView reloadData];
     //滚动到顶部
     [self.tableView setContentOffset:CGPointZero animated:NO];
+    
+    //设置音乐锁屏界面
+    if (self.playType != ZRTPlayTypeClassroomTry) {
+        [[AppDelegate delegate] configNowPlayingCenter];
+    }
 }
 
 /**

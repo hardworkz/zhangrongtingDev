@@ -42,8 +42,31 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
             self.songList = [NSMutableArray array];
         }
         self.playRate = 1.0;
+        //获取限制播放状态
+        [self limitPlayStatus];
     }
     return self;
+}
+- (void)limitPlayStatus{
+    //判断是否是播放新闻，记录次数限制
+    NSDictionary *userInfoDict = [CommonCode readFromUserD:@"dangqianUserInfo"];
+    if ([userInfoDict[results][member_type] intValue] == 0) {
+        int limitTime = [[CommonCode readFromUserD:[NSString stringWithFormat:@"%@_%@",limit_time,ExdangqianUserUid?ExdangqianUserUid:@""]] intValue];
+        int limitNum = [[CommonCode readFromUserD:[NSString stringWithFormat:@"%@",limit_num]] intValue];
+        if (limitTime >= limitNum) {
+            ExLimitPlay = YES;
+            [NetWorkTool sendLimitDataWithaccessToken:AvatarAccessToken sccess:^(NSDictionary *responseObject) {
+                if ([responseObject[status] intValue] == 1) {
+                    [[NSNotificationCenter defaultCenter] postNotificationName:@"updateUserInfo" object:nil];
+                }
+            } failure:^(NSError *error) {
+                
+            }];
+        }else{
+            ExLimitPlay = NO;
+            [CommonCode writeToUserD:[NSString stringWithFormat:@"%d",limitTime + 1] andKey:[NSString stringWithFormat:@"%@_%@",limit_time,ExdangqianUserUid]];
+        }
+    }
 }
 - (NSMutableArray *)downloadPostIDArray
 {
@@ -123,9 +146,6 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
  */
 - (void)setPlayDuration:(float)playDuration {
     _playDuration = playDuration;
-    if (self.playType != ZRTPlayTypeClassroomTry) {
-        [[AppDelegate delegate] configNowPlayingCenter];
-    }
 }
 /*
  * 当前播放时间(00:00)
@@ -173,7 +193,7 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
  */
 - (void)startPlay
 {
-    if (self.playType == PlayTypeNews) {
+    if (self.playType == ZRTPlayTypeNews) {
         if (!ExLimitPlay) {
             _status = ZRTPlayStatusPlay;
             SendNotify(SONGPLAYSTATUSCHANGE, nil)

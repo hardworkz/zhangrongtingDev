@@ -17,6 +17,8 @@
 
 @interface TabbarView : UIView
 
+@property (copy, nonatomic) void (^ _Nonnull rotationBarBtnAction)(UIButton * _Nullable sender,NSInteger selectedIndex);
+
 @property(nullable,nonatomic,assign) id<TabbarViewDelegate> delegate;
 @property(nullable,nonatomic,copy) NSArray *items;
 

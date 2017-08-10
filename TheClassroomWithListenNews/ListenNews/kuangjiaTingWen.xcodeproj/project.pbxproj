@@ -142,6 +142,7 @@
 		698109561F1F5049000A1AD2 /* MembersDataModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 698109551F1F5049000A1AD2 /* MembersDataModel.m */; };
 		698109591F1F5D59000A1AD2 /* MyVipSectionTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 698109581F1F5D59000A1AD2 /* MyVipSectionTableViewCell.m */; };
 		6981095C1F1F6414000A1AD2 /* MyVipPrivilegeTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 6981095B1F1F6414000A1AD2 /* MyVipPrivilegeTableViewCell.m */; };
+		698530B51F3C487600641962 /* backSound.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 698530B41F3C487600641962 /* backSound.mp3 */; };
 		6985B9311D7404EE0081BCBD /* iAppInfos.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6985B92F1D7404EE0081BCBD /* iAppInfos.framework */; };
 		6985B9321D7404EF0081BCBD /* SAMTextView.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6985B9301D7404EE0081BCBD /* SAMTextView.framework */; };
 		6985B9341D740F6A0081BCBD /* TTTAttributedLabel.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6985B9331D740F690081BCBD /* TTTAttributedLabel.framework */; };
@@ -773,6 +774,7 @@
 		698109581F1F5D59000A1AD2 /* MyVipSectionTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MyVipSectionTableViewCell.m; sourceTree = "<group>"; };
 		6981095A1F1F6414000A1AD2 /* MyVipPrivilegeTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MyVipPrivilegeTableViewCell.h; sourceTree = "<group>"; };
 		6981095B1F1F6414000A1AD2 /* MyVipPrivilegeTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MyVipPrivilegeTableViewCell.m; sourceTree = "<group>"; };
+		698530B41F3C487600641962 /* backSound.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = backSound.mp3; sourceTree = "<group>"; };
 		6985B92F1D7404EE0081BCBD /* iAppInfos.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = iAppInfos.framework; path = "Pods/../build/Debug-iphoneos/iAppInfos/iAppInfos.framework"; sourceTree = "<group>"; };
 		6985B9301D7404EE0081BCBD /* SAMTextView.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SAMTextView.framework; path = "Pods/../build/Debug-iphoneos/SAMTextView/SAMTextView.framework"; sourceTree = "<group>"; };
 		6985B9331D740F690081BCBD /* TTTAttributedLabel.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = TTTAttributedLabel.framework; path = "Pods/../build/Debug-iphoneos/TTTAttributedLabel/TTTAttributedLabel.framework"; sourceTree = "<group>"; };
@@ -1625,6 +1627,7 @@
 		636E33861D01154C002BA6DD /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				698530B41F3C487600641962 /* backSound.mp3 */,
 				636E33871D01154C002BA6DD /* main.m */,
 				636E33D61D0127DD002BA6DD /* pchfile.pch */,
 			);
@@ -3563,6 +3566,7 @@
 				69DB00691EFB9E8400048B8E /* LICENSE in Resources */,
 				636B58B21D34D87600290681 /* IQKeyboardManager.bundle in Resources */,
 				E96ACDD81D6C6C41009856B1 /* Images.xcassets in Resources */,
+				698530B51F3C487600641962 /* backSound.mp3 in Resources */,
 				691907A51D3F74B00012A42E /* SVProgressHUD.bundle in Resources */,
 				69C713611EC0740F00F2729E /* GZ_Cell.xib in Resources */,
 				E9FC0F5D1E78EC6D008A36AE /* WeiboSDK.bundle in Resources */,

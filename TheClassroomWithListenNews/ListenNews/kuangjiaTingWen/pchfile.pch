@@ -293,4 +293,7 @@ static NSString *const WechatPayResultsRecharge = @"WechatPayResultsRecharge";
 static NSString *const AliPayResultsMembers = @"AliPayResultsMembers";
 static NSString *const WechatPayResultsMembers = @"WechatPayResultsMembers";
 
+
+static NSString *const pushNews = @"pushNews";
+
 #endif /* pchfile_pch */

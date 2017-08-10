@@ -62,56 +62,6 @@ typedef void(^animateBlock)();
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-//    self.navigationItem.title = @"我";
-    DefineWeakSelf;
-    APPDELEGATE.woSkipToPlayingVC = ^ (NSString *pushNewsID){
-        
-        if ([ZRT_PlayerManager manager].playType == ZRTPlayTypeClassroomTry && Exact_id != nil) {
-            NSMutableDictionary *dict = [CommonCode readFromUserD:@"is_free_data"];
-            ClassViewController *vc = [ClassViewController shareInstance];
-            vc.jiemuDescription = dict[@"jiemuDescription"];
-            vc.jiemuFan_num = dict[@"jiemuFan_num"];
-            vc.jiemuID = dict[@"jiemuID"];
-            vc.jiemuImages = dict[@"jiemuImages"];
-            vc.jiemuIs_fan = dict[@"jiemuIs_fan"];
-            vc.jiemuMessage_num = dict[@"jiemuMessage_num"];
-            vc.jiemuName = dict[@"jiemuName"];
-            vc.act_id = Exact_id;
-            vc.listVC = self;
-            [weakSelf.navigationController.navigationBar setHidden:YES];
-            [weakSelf.navigationController pushViewController:vc animated:YES];
-            return;
-        }
-        
-        if ([pushNewsID isEqualToString:@"NO"]) {
-            //上一次听过的新闻
-//            APPDELEGATE.isTabbarCenterClicked = YES;
-            if ([ZRT_PlayerManager manager].currentSong) {
-                [self.navigationController pushViewController:[NewPlayVC shareInstance] animated:YES];
-            }
-            else{
-                //跳转上一次播放的新闻
-                [self skipToLastNews];
-            }
-        }
-        else{
-            NSString *pushNewsID = [[NSUserDefaults standardUserDefaults]valueForKey:@"pushNews"];
-            if ([[CommonCode readFromUserD:@"dangqianbofangxinwenID"] isEqualToString:pushNewsID]){
-                if (![self.navigationController.topViewController isKindOfClass:[NewPlayVC class]]) {
-                    [self.navigationController pushViewController:[NewPlayVC shareInstance] animated:YES];
-                    if (![ZRT_PlayerManager manager].isPlaying) {
-                        [[ZRT_PlayerManager manager] startPlay];
-                    }
-                }
-                if (![ZRT_PlayerManager manager].isPlaying) {
-                    [[ZRT_PlayerManager manager] startPlay];
-                }
-            }
-            else{
-                [weakSelf getPushNewsDetail];
-            }
-        }
-    };
     
     self.view.backgroundColor = [UIColor whiteColor];
     [self.view addSubview:self.tableView];
@@ -133,20 +83,6 @@ typedef void(^animateBlock)();
     [_exp setTextColor:UIColorFromHex(0xF67825)];
     [_experienceView addSubview:_exp];
     
-//    dispatch_queue_t queue = dispatch_queue_create("kk", DISPATCH_QUEUE_SERIAL);
-//    dispatch_async(queue, ^{
-//        NSTimer * time = [NSTimer scheduledTimerWithTimeInterval:0.8 target:self selector:@selector(animat) userInfo:nil repeats:YES];
-//        [time fire];
-//        self.time = time;
-//        //将计时器添加到主线程，拖拽其他控件不会让计时器停止运行
-//        [[NSRunLoop currentRunLoop] addTimer:time forMode:NSRunLoopCommonModes];
-//    });
-//    dispatch_sync(dispatch_get_main_queue(), ^(){
-//        // 这里的代码会在主线程执行
-//        NSTimer * time = [NSTimer scheduledTimerWithTimeInterval:0.8 target:self selector:@selector(animat) userInfo:nil repeats:YES];
-//        [time fire];
-//        self.time = time;
-//    });
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(loginAlert:) name:@"loginAlert" object:nil];
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(updateUserInfo:) name:@"updateUserInfo" object:nil];
     
@@ -371,9 +307,9 @@ typedef void(^animateBlock)();
     }];
 }
 
-- (void)signInAction:(UITapGestureRecognizer *)tap{
+- (void)signInAction:(UITapGestureRecognizer *)tap
+{
     if (self.isSigned) {
-        self.isSigned = YES;
         [self.signInImageView setImage:[UIImage imageNamed:@"sign_ined"]];
         [self.signInView.layer removeAllAnimations];
         [[NSNotificationCenter defaultCenter] postNotificationName:@"updateUserInfo" object:nil];

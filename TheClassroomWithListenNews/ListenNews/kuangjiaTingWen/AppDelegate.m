@@ -30,7 +30,11 @@
 #import "GDTTrack.h"
 
 @interface AppDelegate ()<WeiboSDKDelegate,WXApiDelegate,QQApiInterfaceDelegate,MiPushSDKDelegate,UNUserNotificationCenterDelegate>
-
+{
+    //后台播放任务Id
+    UIBackgroundTaskIdentifier _bgTaskId;
+    NSTimer *timer;
+}
 @end
 
 @implementation AppDelegate
@@ -50,6 +54,18 @@
     }
 }
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+    //设置后台模式和锁屏模式下依然能够播放
+    [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback withOptions:AVAudioSessionCategoryOptionMixWithOthers error:nil];
+    [[AVAudioSession sharedInstance] setActive: YES error: nil];
+    //0kb mp3文件后台播放，防止应用被杀进程
+    NSError *noSoundError;
+    NSURL *urlNoSound = [[NSURL alloc]initWithString:[[NSBundle mainBundle]pathForResource:@"backSound" ofType:@"mp3"]];
+    self.noSoundPlayer = [[AVAudioPlayer alloc] initWithContentsOfURL:urlNoSound error:&noSoundError];
+    self.noSoundPlayer.numberOfLoops = -1;
+    if (noSoundError) {
+        XWAlerLoginView *alert = [XWAlerLoginView alertWithTitle:noSoundError.description];
+        [alert show];
+    }
     
     self.window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
@@ -123,7 +139,6 @@
             if(aError){
                 NSLog(@"active Category error:%@", [aError description]);
             }
-//            audioSession.delegate = [bofangVC shareInstance];//这个在后面会讲到
         }
     }
     
@@ -143,10 +158,6 @@
     }
     ExTouXiangPath = [[NSHomeDirectory() stringByAppendingPathComponent:@"Documents"] stringByAppendingPathComponent:@"userAvatar.png"];
     ExdangqianUserUid = [CommonCode readFromUserD:@"dangqianUserUid"];
-    
-//    UIView *view = [bofangVC shareInstance].view;
-//    view.frame = CGRectMake(0, IPHONE_H, IPHONE_W, IPHONE_H);
-    //    [self.window addSubview:view];
     
     //初始化播放器和播放控制器
     [ZRT_PlayerManager manager];
@@ -280,21 +291,6 @@
     [WeiboSDK enableDebugMode:YES];
     [WeiboSDK registerApp:KweiBoappkey];
     
-    
-    //设置app的友盟appKey
-    //打开调试日志
-//    [[UMSocialManager defaultManager] openLog:YES];
-//    //设置友盟appkey
-//    [[UMSocialManager defaultManager] setUmSocialAppkey:KuMappKey];
-    //设置微信的appKey和appSecret
-//    [[UMSocialManager defaultManager] setPlaform:UMSocialPlatformType_WechatSession appKey:KweChatappID appSecret:KweChatappSecret redirectURL:@"http://mobile.umeng.com/social"];
-//    //设置分享到QQ互联的appKey和appSecret
-//    // U-Share SDK为了兼容大部分平台命名，统一用appKey和appSecret进行参数设置，而QQ平台仅需将appID作为U-Share的appKey参数传进即可。
-//    [[UMSocialManager defaultManager] setPlaform:UMSocialPlatformType_QQ appKey:kAppId_QQ  appSecret:nil redirectURL:@"http://mobile.umeng.com/social"];
-//    //设置新浪的appKey和appSecret
-//    [[UMSocialManager defaultManager] setPlaform:UMSocialPlatformType_Sina appKey:KweiBoappkey  appSecret:KweiBoappSecret redirectURL:KweiBoUrl];
-    
-    
     //小米推送
     [self setMIPush];
     
@@ -304,7 +300,6 @@
     if (userInfo) {
         NSString *newsID  = userInfo[@"id"];
         [[NSUserDefaults standardUserDefaults] setValue:newsID forKey:@"pushNews"];
-//        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"isPush"];
         [[NSUserDefaults standardUserDefaults] synchronize];
         //跳转到通知的新闻详情
         [[NSNotificationCenter defaultCenter] postNotificationName:@"pushNewsDetail" object:newsID];
@@ -328,33 +323,8 @@
     NSError* error;
     [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:&error];
     
-//    AudioSessionInitialize(NULL, NULL, interruptionListenner, (__bridge void*)self);
     return YES;
 }
-
-/**
- 监听来电打断
- */
-//void interruptionListenner(void* inClientData, UInt32 inInterruptionState)
-//{
-//    AppDelegate* pTHIS = (__bridge AppDelegate*)inClientData;
-//    if (pTHIS) {
-//        NSLog(@"interruptionListenner %u", (unsigned int)inInterruptionState);
-//        if (kAudioSessionBeginInterruption == inInterruptionState) {
-//            NSLog(@"Begin interruption");
-//            if ([bofangVC shareInstance].isPlay) {
-//                [[bofangVC shareInstance] doPlay:[bofangVC shareInstance].centerBtn];
-//            }
-//        }
-//        else
-//        {
-//            NSLog(@"Begin end interruption");
-//            NSLog(@"End end interruption");
-//            [[bofangVC shareInstance] doPlay:[bofangVC shareInstance].centerBtn];
-//        }
-//        
-//    }
-//}
 /**
  获取每日免费收听数以及当前系统时间
  */
@@ -614,8 +584,7 @@
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application {
-    // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
-    // Use this method to pause ongoing tasks, disable timers, and throttle down OpenGL ES frame rates. Games should use this method to pause the game.
+    
     
     [UIApplication sharedApplication].applicationIconBadgeNumber = 0;
     
@@ -624,8 +593,8 @@
         //有音乐播放时，才给后台权限，不做流氓应用。
         [[UIApplication sharedApplication] beginReceivingRemoteControlEvents];
         [self becomeFirstResponder];
-        
-        [self configNowPlayingCenter];
+    
+//        [self configNowPlayingCenter];
 //    }
 //    else
 //    {
@@ -633,13 +602,14 @@
 //        [self resignFirstResponder];
 //    }
 }
+
 - (BOOL)canBecomeFirstResponder{
     return YES;
 }
 
 - (void)applicationWillEnterForeground:(UIApplication *)application {
     // Called as part of the transition from the background to the inactive state; here you can undo many of the changes made on entering the background.
-    
+    [self.noSoundPlayer pause];
     
     [UIApplication sharedApplication].applicationIconBadgeNumber = 0;
     if ([[CommonCode readFromUserD:@"isWhatLogin"] isEqualToString:@"QQ"]){
@@ -665,16 +635,16 @@
 
 - (void)applicationWillTerminate:(UIApplication *)application {
     
-    NSInteger count = (NSInteger)[CommonCode readFromUserD:@"topNameArr.count"];
+//    NSInteger count = (NSInteger)[CommonCode readFromUserD:@"topNameArr.count"];
     
-    NSArray *arr = [NSArray arrayWithArray:[CommonCode readFromUserD:@"topNameArr"]];
+//    NSArray *arr = [NSArray arrayWithArray:[CommonCode readFromUserD:@"topNameArr"]];
     
-    for (int i = 0; i < count; i ++ )
-    {
-        if (arr.count>=count) {
-            [CommonCode writeToUserD:@"1" andKey:[NSString stringWithFormat:@"page%@",arr[i][@"type"]]];//数组越界需要解决，导致崩溃
-        }
-    }
+//    for (int i = 0; i < count; i ++ )
+//    {
+//        if (arr.count>=count) {
+//            [CommonCode writeToUserD:@"1" andKey:[NSString stringWithFormat:@"page%@",arr[i][@"type"]]];//数组越界需要解决，导致崩溃
+//        }
+//    }
     
     [CommonCode writeToUserD:nil andKey:@"dangqianbofangxinwenID"];
     [CommonCode writeToUserD:nil andKey:@"dangqianbofangxinwen"];
@@ -682,9 +652,6 @@
 }
 
 - (void)applicationDidEnterBackground:(UIApplication *)application {
-    // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
-    // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
-    
     
     UIApplication*   app = [UIApplication sharedApplication];
     
@@ -696,20 +663,20 @@
         dispatch_async(dispatch_get_main_queue(), ^{
             
             if (bgTask != UIBackgroundTaskInvalid){
-                
+    
                 bgTask = UIBackgroundTaskInvalid;
                 
             }
-            
+    
         });
-        
+    
     }];
     
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         
         dispatch_async(dispatch_get_main_queue(), ^{
             
-            if (bgTask != UIBackgroundTaskInvalid){
+            if (_bgTaskId != UIBackgroundTaskInvalid){
                 
                 bgTask = UIBackgroundTaskInvalid;
                 
@@ -723,7 +690,34 @@
         });
         
     });
+    
+    if ([ZRT_PlayerManager manager].isPlaying) {
+        [self.noSoundPlayer pause];
+    }else{
+        [self.noSoundPlayer play];
+    }
 }
+//-(void)comeToBackgroundMode{
+//    //初始化一个后台任务BackgroundTask，这个后台任务的作用就是告诉系统当前app在后台有任务处理，需要时间
+//    UIApplication*  app = [UIApplication sharedApplication];
+//    _bgTaskId = [app beginBackgroundTaskWithExpirationHandler:^{
+//        [app endBackgroundTask:_bgTaskId];
+//        _bgTaskId = UIBackgroundTaskInvalid;
+//    }];
+//    //开启定时器 不断向系统请求后台任务执行的时间
+//    timer = [NSTimer scheduledTimerWithTimeInterval:25.0 target:self selector:@selector(applyForMoreTime) userInfo:nil repeats:YES];
+//    [timer fire];
+//}
+//-(void)applyForMoreTime {
+//    //如果系统给的剩余时间小于60秒 就终止当前的后台任务，再重新初始化一个后台任务，重新让系统分配时间，这样一直循环下去，保持APP在后台一直处于active状态。
+//    if ([UIApplication sharedApplication].backgroundTimeRemaining < 60) {
+//        [[UIApplication sharedApplication] endBackgroundTask:_bgTaskId];
+//        _bgTaskId = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
+//            [[UIApplication sharedApplication] endBackgroundTask:_bgTaskId];
+//            _bgTaskId = UIBackgroundTaskInvalid;
+//        }];
+//    }
+//}
 #pragma mark - NowPlayingCenter & Remote Control
 - (void)configNowPlayingCenter
 {
@@ -736,7 +730,7 @@
             NSMutableDictionary * playingCenterInfo = [NSMutableDictionary dictionary];
             [playingCenterInfo setObject:[ZRT_PlayerManager manager].currentSong[@"post_title"]?[ZRT_PlayerManager manager].currentSong[@"post_title"]:@"" forKey:MPMediaItemPropertyTitle];
             [playingCenterInfo setObject:[ZRT_PlayerManager manager].currentSong[@"post_act"][@"name"] forKey:MPMediaItemPropertyArtist];
-            [playingCenterInfo setObject:@([ZRT_PlayerManager manager].playDuration) forKey:MPNowPlayingInfoPropertyElapsedPlaybackTime];
+//            [playingCenterInfo setObject:@([ZRT_PlayerManager manager].playDuration) forKey:MPNowPlayingInfoPropertyElapsedPlaybackTime];
             [playingCenterInfo setObject:@(1) forKey:MPNowPlayingInfoPropertyPlaybackRate];
             [playingCenterInfo setObject:@([ZRT_PlayerManager manager].duration) forKey:MPMediaItemPropertyPlaybackDuration];
             MPMediaItemArtwork * artwork = [[MPMediaItemArtwork alloc] initWithImage:img];
@@ -749,7 +743,7 @@
                     NSMutableDictionary * playingCenterInfo = [NSMutableDictionary dictionary];
                     [playingCenterInfo setObject:[ZRT_PlayerManager manager].currentSong[@"post_title"]?[ZRT_PlayerManager manager].currentSong[@"post_title"]:@"" forKey:MPMediaItemPropertyTitle];
                     [playingCenterInfo setObject:[ZRT_PlayerManager manager].currentSong[@"post_act"][@"name"] forKey:MPMediaItemPropertyArtist];
-                    [playingCenterInfo setObject:@([ZRT_PlayerManager manager].playDuration) forKey:MPNowPlayingInfoPropertyElapsedPlaybackTime];
+//                    [playingCenterInfo setObject:@([ZRT_PlayerManager manager].playDuration) forKey:MPNowPlayingInfoPropertyElapsedPlaybackTime];
                     [playingCenterInfo setObject:@(1) forKey:MPNowPlayingInfoPropertyPlaybackRate];
                     [playingCenterInfo setObject:@([ZRT_PlayerManager manager].duration) forKey:MPMediaItemPropertyPlaybackDuration];
                     MPMediaItemArtwork * artwork = [[MPMediaItemArtwork alloc] initWithImage:image];
