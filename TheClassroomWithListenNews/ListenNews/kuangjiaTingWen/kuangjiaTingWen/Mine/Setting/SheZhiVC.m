@@ -400,11 +400,18 @@
         sw.on = NO;
         return;
     }
-    if ([ZRT_PlayerManager manager].isPlaying) {
+    
+//    if ([ZRT_PlayerManager manager].isPlaying) {
         if (!sw.on) {
             [[UIDevice currentDevice] setProximityMonitoringEnabled:sw.on];
+        }else{
+            UIAlertController *qingshuruyonghuming = [UIAlertController alertControllerWithTitle:@"温馨提示" message:@"手势控制：只需在手机镜头前，近距离用手晃一晃，就可以切换到下一条哦^_^" preferredStyle:UIAlertControllerStyleAlert];
+            [qingshuruyonghuming addAction:[UIAlertAction actionWithTitle:@"知道了" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+            }]];
+            [self presentViewController:qingshuruyonghuming animated:YES completion:nil];
+            [[UIDevice currentDevice] setProximityMonitoringEnabled:sw.on];
         }
-    }
+//    }
     [[NSUserDefaults standardUserDefaults] setBool:sw.on forKey:@"shoushi"];
     [[NewPlayVC shareInstance] reloadInterface];
 }

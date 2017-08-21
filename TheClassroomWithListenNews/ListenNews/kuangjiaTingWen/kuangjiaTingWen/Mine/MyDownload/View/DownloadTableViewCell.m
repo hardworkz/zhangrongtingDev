@@ -95,32 +95,7 @@
         [self.smetaImageView sd_setImageWithURL:[NSURL URLWithString:str] placeholderImage:[UIImage imageNamed:@"thumbnailsdefault"]];
     }
     [self.titleLabel setText:mdic[@"post_title"]];
-    if ([[CommonCode readFromUserD:@"yitingguoxinwenID"] isKindOfClass:[NSArray class]])
-    {
-        NSArray *yitingguoArr = [NSArray arrayWithArray:[CommonCode readFromUserD:@"yitingguoxinwenID"]];
-        for (int i = 0; i < yitingguoArr.count - 1; i ++ )
-        {
-            if ([mdic[@"id"] isEqualToString:yitingguoArr[i]])
-            {
-                if ([[CommonCode readFromUserD:@"dangqianbofangxinwenID"] isEqualToString:mdic[@"id"]])
-                {
-                    self.titleLabel.textColor = gMainColor;
-                    break;
-                }else
-                {
-                    self.titleLabel.textColor = [[UIColor grayColor]colorWithAlphaComponent:0.7f];
-                    break;
-                }
-            }else
-            {
-                self.titleLabel.textColor = [UIColor blackColor];
-            }
-        }
-    }
-    if ([[CommonCode readFromUserD:@"dangqianbofangxinwenID"] isEqualToString:mdic[@"id"]])
-    {
-        self.titleLabel.textColor = gMainColor;
-    }
+    self.titleLabel.textColor = [[ZRT_PlayerManager manager] textColorFormID:mdic[@"id"]];
     
 //    NSString *str = [NSString stringWithFormat:@"%.1lf%@",[mdic[@"post_size"] intValue] / 1024.0 / 1024.0,@"M"];
 //    if (str.length > 5)

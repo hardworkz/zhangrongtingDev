@@ -62,7 +62,7 @@
     
     if ([_is_member isEqualToString:@"1"]) {
         NSMutableAttributedString *attriStr = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"您已是会员，有效期至%@，新购买的会员将在此日期后自动生效",_end_date]];
-        [attriStr addAttribute:NSForegroundColorAttributeName value:gMainColor range:NSMakeRange(8,_end_date.length)];
+        [attriStr addAttribute:NSForegroundColorAttributeName value:gMainColor range:NSMakeRange(10,_end_date.length)];
         detailLabel.attributedText = attriStr;
     }else{
         detailLabel.text = @"您还不是会员，开通会员后可收听更多资讯";

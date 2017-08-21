@@ -160,7 +160,7 @@
 #pragma mark - Utilities
 - (void)loadData{
     DefineWeakSelf;
-    [NetWorkTool getPaoguoJieMuOrZhuBoPingLunLieBiaoWithact_id:self.act_id andpage:[NSString stringWithFormat:@"%ld",(long)self.commentIndex] andlimit:[NSString stringWithFormat:@"%ld",(long)self.commentPageSize] sccess:^(NSDictionary *responseObject) {
+    [NetWorkTool getPaoguoJieMuOrZhuBoPingLunLieBiaoWithact_id:self.act_id accessToken:ExdangqianUserUid andpage:[NSString stringWithFormat:@"%ld",(long)self.commentIndex] andlimit:[NSString stringWithFormat:@"%ld",(long)self.commentPageSize] sccess:^(NSDictionary *responseObject) {
         [weakSelf endRefreshing];
         if ([responseObject[results] isKindOfClass:[NSArray class]]){
             if (weakSelf.commentIndex == 1) {
@@ -253,31 +253,46 @@
 {
     PlayVCCommentModel *model = frameModel.model;
     UILabel *dianzanNumlab = pinglundianzanBtn.PingLundianzanNumLab;
+    pinglundianzanBtn.enabled = NO;
     if (pinglundianzanBtn.selected == YES){
         [NetWorkTool postPaoGuoXinWenPingLunDianZanWithaccessToken:[DSE encryptUseDES:ExdangqianUser] andact_id:model.playCommentID sccess:^(NSDictionary *responseObject) {
-            NSLog(@"responseObject = %@",responseObject);
-            NSLog(@"针对评论取消点赞");
-            dianzanNumlab.text = [NSString stringWithFormat:@"%d",[dianzanNumlab.text intValue] - 1];
-            dianzanNumlab.textColor = [UIColor grayColor];
-            dianzanNumlab.alpha = 0.7f;
-            pinglundianzanBtn.selected = NO;
+            pinglundianzanBtn.enabled = YES;
+            if ([responseObject[msg] isEqualToString:@"取消成功!"]) {
+                //设置点赞按钮状态
+                dianzanNumlab.text = [NSString stringWithFormat:@"%d",[dianzanNumlab.text intValue] - 1];
+                dianzanNumlab.textColor = [UIColor grayColor];
+                dianzanNumlab.alpha = 0.7f;
+                pinglundianzanBtn.selected = NO;
+                //设置模型数据状态
+                frameModel.model.praisenum = dianzanNumlab.text;
+                frameModel.model.praiseFlag = @"1";
+            }
         } failure:^(NSError *error) {
+            pinglundianzanBtn.enabled = YES;
             NSLog(@"error = %@",error);
         }];
     }
     else{
         [NetWorkTool postPaoGuoXinWenPingLunDianZanWithaccessToken:[DSE encryptUseDES:ExdangqianUser] andact_id:model.playCommentID sccess:^(NSDictionary *responseObject) {
+            pinglundianzanBtn.enabled = YES;
             NSLog(@"responseObject = %@",responseObject);
             NSLog(@"针对评论点赞");
-            dianzanNumlab.text = [NSString stringWithFormat:@"%d",[dianzanNumlab.text intValue] + 1];
-            dianzanNumlab.textColor = ColorWithRGBA(0, 159, 240, 1);
-            dianzanNumlab.alpha = 1.0f;
-            pinglundianzanBtn.selected = YES;
+            if ([responseObject[msg] isEqualToString:@"点赞成功!"]) {
+                //设置取消点赞按钮状态
+                dianzanNumlab.text = [NSString stringWithFormat:@"%d",[dianzanNumlab.text intValue] + 1];
+                dianzanNumlab.textColor = ColorWithRGBA(0, 159, 240, 1);
+                dianzanNumlab.alpha = 1.0f;
+                pinglundianzanBtn.selected = YES;
+                //设置模型数据状态
+                frameModel.model.praisenum = dianzanNumlab.text;
+                frameModel.model.praiseFlag = @"2";
+            }
+            
         } failure:^(NSError *error) {
+            pinglundianzanBtn.enabled = YES;
             NSLog(@"error = %@",error);
         }];
-    }
-    
+    }    
 }
 
 - (void)sentCommentAction:(UIButton *)sender {
@@ -400,8 +415,6 @@
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
     PlayVCCommentTableViewCell *cell = [PlayVCCommentTableViewCell cellWithTableView:tableView];
-    cell.hideZanBtn = YES;
-    cell.isClassComment = YES;
     cell.selectionStyle = UITableViewCellSelectionStyleNone;
     PlayVCCommentFrameModel *frameModel = self.commentInfoArr[indexPath.row];
     cell.selectionStyle = UITableViewCellSelectionStyleNone;

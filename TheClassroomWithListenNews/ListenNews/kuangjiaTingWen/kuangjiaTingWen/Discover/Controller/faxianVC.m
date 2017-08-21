@@ -250,28 +250,7 @@
                     imgLeft.contentMode = UIViewContentModeScaleToFill;
                     titleLab =[[UILabel alloc]initWithFrame:CGRectMake(20.0 / 375 * IPHONE_W, 16.0 / 667 * IPHONE_H , SCREEN_WIDTH - 155.0 / 375 * IPHONE_W, 21.0 / 667 *IPHONE_H)];
                     titleLab.text = self.SouSuodataArrM[indexPath.row][@"post_title"];
-                    if ([[CommonCode readFromUserD:@"yitingguoxinwenID"] isKindOfClass:[NSArray class]]){
-                        NSArray *yitingguoArr = [NSArray arrayWithArray:[CommonCode readFromUserD:@"yitingguoxinwenID"]];
-                        for (int i = 0; i < yitingguoArr.count - 1; i ++ ){
-                            if ([self.SouSuodataArrM[indexPath.row][@"id"] isEqualToString:yitingguoArr[i]]){
-                                if ([[CommonCode readFromUserD:@"dangqianbofangxinwenID"] isEqualToString:self.SouSuodataArrM[indexPath.row][@"id"]]){
-                                    titleLab.textColor = gMainColor;
-                                    break;
-                                }
-                                else{
-                                    titleLab.textColor = [[UIColor grayColor]colorWithAlphaComponent:0.7f];
-                                    break;
-                                }
-                            }
-                            else{
-                                titleLab.textColor = nTextColorMain;
-                            }
-                        }
-                    }
-                    if ([[CommonCode readFromUserD:@"dangqianbofangxinwenID"] isEqualToString:self.SouSuodataArrM[indexPath.row][@"id"]]){
-                        titleLab.textColor = gMainColor;
-                    }
-
+                    titleLab.textColor = [[ZRT_PlayerManager manager] textColorFormID:self.SouSuodataArrM[indexPath.row][@"id"] ];
                     titleLab.textAlignment = NSTextAlignmentLeft;
                     titleLab.font = [UIFont boldSystemFontOfSize:17.0f];
                     [cell.contentView addSubview:titleLab];
@@ -318,28 +297,7 @@
                     
                 titleLab = [[UILabel alloc]initWithFrame:CGRectMake(20.0 / 375 * IPHONE_W, 16.0 / 667 * IPHONE_H , SCREEN_WIDTH - 155.0 / 375 * IPHONE_W, 21.0 / 667 *IPHONE_H)];
                 titleLab.text = self.SouSuodataArrM[indexPath.row][@"post_title"];
-                if ([[CommonCode readFromUserD:@"yitingguoxinwenID"] isKindOfClass:[NSArray class]]){
-                    
-                    NSArray *yitingguoArr = [NSArray arrayWithArray:[CommonCode readFromUserD:@"yitingguoxinwenID"]];
-                    for (int i = 0; i < yitingguoArr.count - 1; i ++ ){
-                        
-                        if ([self.SouSuodataArrM[indexPath.row][@"id"] isEqualToString:yitingguoArr[i]]){
-                            
-                            if ([[CommonCode readFromUserD:@"dangqianbofangxinwenID"] isEqualToString:self.SouSuodataArrM[indexPath.row][@"id"]]){
-                                titleLab.textColor = gMainColor;
-                                break;
-                            }
-                            else{
-                                titleLab.textColor = [[UIColor grayColor]colorWithAlphaComponent:0.7f];
-                                break;
-                            }
-                        }
-                        else{
-                            titleLab.textColor = [UIColor blackColor];
-                        }
-                    }
-                }
-                
+                titleLab.textColor = [[ZRT_PlayerManager manager] textColorFormID:self.SouSuodataArrM[indexPath.row][@"id"]];
                 titleLab.textAlignment = NSTextAlignmentLeft;
                 titleLab.font = [UIFont boldSystemFontOfSize:17.0f];
                 [cell.contentView addSubview:titleLab];
@@ -607,8 +565,19 @@
     else if(tableView == self.SouSuotableView){
         if ([self.SearchActResultsArrM count]) {
             if (indexPath.section == 0) {
-                //TODO:搜索结果，课堂判断跳转
-//                NSDictionary *dic = [[NSDictionary alloc]initWithDictionary:self.SearchActResultsArrM[indexPath.row]];
+                //TODO:搜索结果，主播或者频道详情页判断跳转
+                NSDictionary *dic = [[NSDictionary alloc]initWithDictionary:self.SearchActResultsArrM[indexPath.row]];
+                zhuboXiangQingVCNewController *faxianzhuboVC = [[zhuboXiangQingVCNewController alloc]init];
+                faxianzhuboVC.jiemuDescription = dic[@"description"];
+                faxianzhuboVC.jiemuFan_num = dic[@"fan_num"];
+                faxianzhuboVC.jiemuID = dic[@"id"];
+                faxianzhuboVC.jiemuImages = dic[@"images"];
+                faxianzhuboVC.jiemuIs_fan = dic[@"is_fan"];
+                faxianzhuboVC.jiemuMessage_num = dic[@"message_num"];
+                faxianzhuboVC.jiemuName = dic[@"name"];
+                faxianzhuboVC.isfaxian = YES;
+                faxianzhuboVC.isClass = NO;
+                [self.navigationController pushViewController:faxianzhuboVC animated:YES];
 //                NSDictionary *userInfoDict = [CommonCode readFromUserD:@"dangqianUserInfo"];
 //                if ([dic[@"is_free"] isEqualToString:@"1"]||[userInfoDict[results][member_type] intValue] == 2) {
 //                    zhuboXiangQingVCNewController *faxianzhuboVC = [[zhuboXiangQingVCNewController alloc]init];
@@ -620,7 +589,7 @@
 //                    faxianzhuboVC.jiemuMessage_num = dic[@"message_num"];
 //                    faxianzhuboVC.jiemuName = dic[@"name"];
 //                    faxianzhuboVC.isfaxian = YES;
-//                    faxianzhuboVC.isClass = YES;
+//                    faxianzhuboVC.isClass = NO;
 //                    [self.navigationController pushViewController:faxianzhuboVC animated:YES];
 //                    
 //                }
@@ -761,7 +730,7 @@
                 faxianzhuboVC.jiemuMessage_num = dic.message_num;
                 faxianzhuboVC.jiemuName = dic.name;
                 faxianzhuboVC.isfaxian = YES;
-                faxianzhuboVC.isClass = YES;
+                faxianzhuboVC.isClass = NO;
                 self.hidesBottomBarWhenPushed=YES;
                 [self.navigationController pushViewController:faxianzhuboVC animated:YES];
                 self.hidesBottomBarWhenPushed=NO;

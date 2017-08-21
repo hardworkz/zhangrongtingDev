@@ -318,7 +318,7 @@ static NSInteger selectIndex2 = -1;
     //设置频道类型
     [ZRT_PlayerManager manager].channelType = ChannelTypeMineDownload;
     //设置播放器播放内容类型
-    [ZRT_PlayerManager manager].playType = ZRTPlayTypeNews;
+    [ZRT_PlayerManager manager].playType = ZRTPlayTypeDownload;
     DefineWeakSelf;
     //播放内容切换后刷新对应的播放列表
     [ZRT_PlayerManager manager].playReloadList = ^(NSInteger currentSongIndex) {

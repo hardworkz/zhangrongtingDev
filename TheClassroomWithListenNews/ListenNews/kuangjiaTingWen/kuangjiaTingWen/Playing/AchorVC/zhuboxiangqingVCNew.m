@@ -430,7 +430,7 @@
     
     liuyanPageNumber = 1;
     
-    [NetWorkTool getPaoguoJieMuOrZhuBoPingLunLieBiaoWithact_id:self.jiemuID andpage:@"1" andlimit:@"10" sccess:^(NSDictionary *responseObject) {
+    [NetWorkTool getPaoguoJieMuOrZhuBoPingLunLieBiaoWithact_id:self.jiemuID accessToken:AvatarAccessToken andpage:@"1" andlimit:@"10" sccess:^(NSDictionary *responseObject) {
         if ([responseObject[@"results"] isKindOfClass:[NSArray class]])
         {
             liuyanArr = [[NSMutableArray alloc]initWithArray:responseObject[@"results"]];
@@ -446,7 +446,7 @@
 - (void)liuyanshanglajiazai:(UITableView *)tableView{
     liuyanPageNumber ++ ;
     
-    [NetWorkTool getPaoguoJieMuOrZhuBoPingLunLieBiaoWithact_id:self.jiemuID andpage:[NSString stringWithFormat:@"%d",liuyanPageNumber] andlimit:@"10" sccess:^(NSDictionary *responseObject) {
+    [NetWorkTool getPaoguoJieMuOrZhuBoPingLunLieBiaoWithact_id:self.jiemuID accessToken:AvatarAccessToken andpage:[NSString stringWithFormat:@"%d",liuyanPageNumber] andlimit:@"10" sccess:^(NSDictionary *responseObject) {
         if ([responseObject[@"results"] isKindOfClass:[NSArray class]])
         {
             [liuyanArr addObjectsFromArray:responseObject[@"results"]];

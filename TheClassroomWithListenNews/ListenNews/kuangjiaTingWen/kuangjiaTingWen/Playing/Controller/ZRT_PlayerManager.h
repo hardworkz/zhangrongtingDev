@@ -27,6 +27,7 @@ typedef NS_ENUM(NSInteger, ChannelType) {
 };
 typedef NS_ENUM(NSInteger, ZRTPlayType) {
     ZRTPlayTypeNews = 0,//播放新闻
+    ZRTPlayTypeDownload,//播放下载新闻
     ZRTPlayTypeClassroomTry,//播放课堂试听
     ZRTPlayTypeClassroom,//播放课堂
 };
@@ -191,4 +192,11 @@ typedef NS_ENUM(NSInteger, ZRTPlayStatus) {
  @return ID数组
  */
 - (NSMutableArray *)downloadPostIDArray;
+
+/**
+ 获取播放器播放状态是否限制
+
+ @param isAdd 是否是播放完成回调+1或者下载次数+1
+ */
+- (void)limitPlayStatusWithAdd:(BOOL)isAdd;
 @end

@@ -166,6 +166,10 @@
  打赏金额
  */
 @property (assign, nonatomic) float rewardCount;
+/**
+ 是否显示开通会员弹窗提示
+ */
+@property (assign, nonatomic) BOOL isShowVipTipsFromLogin;
 @end
 static NewPlayVC *_instance = nil;
 @implementation NewPlayVC
@@ -191,28 +195,6 @@ static NewPlayVC *_instance = nil;
     DefineWeakSelf
     [ZRT_PlayerManager manager].playDidEnd = ^(NSInteger currentSongIndex) {
         
-        //判断是否是播放新闻，记录次数限制
-        NSDictionary *userInfoDict = [CommonCode readFromUserD:@"dangqianUserInfo"];
-        if (weakSelf.playType != PlayTypeClass) {
-            if ([userInfoDict[results][member_type] intValue] == 0) {
-                int limitTime = [[CommonCode readFromUserD:[NSString stringWithFormat:@"%@_%@",limit_time,ExdangqianUserUid?ExdangqianUserUid:@""]] intValue];
-                int limitNum = [[CommonCode readFromUserD:[NSString stringWithFormat:@"%@",limit_num]] intValue];
-                if (limitTime >= limitNum) {
-                    ExLimitPlay = YES;
-                    [NetWorkTool sendLimitDataWithaccessToken:AvatarAccessToken sccess:^(NSDictionary *responseObject) {
-                        if ([responseObject[status] intValue] == 1) {
-                            [[NSNotificationCenter defaultCenter] postNotificationName:@"updateUserInfo" object:nil];
-                        }
-                    } failure:^(NSError *error) {
-                        
-                    }];
-                }else{
-                    ExLimitPlay = NO;
-                    [CommonCode writeToUserD:[NSString stringWithFormat:@"%d",limitTime + 1] andKey:[NSString stringWithFormat:@"%@_%@",limit_time,ExdangqianUserUid]];
-                }
-            }
-        }
-        
         //设置详情模型
         weakSelf.postDetailModel = [newsDetailModel new];
         //保存当前播放新闻的ID
@@ -225,6 +207,17 @@ static NewPlayVC *_instance = nil;
         [weakSelf getCommentList];
     };
 
+    if (_isShowVipTipsFromLogin && [[CommonCode readFromUserD:@"isLogin"] boolValue] == YES) {
+        UIAlertController *qingshuruyonghuming = [UIAlertController alertControllerWithTitle:@"温馨提示" message:[NSString stringWithFormat:@"您还不是会员，每日可收听%@条已听完，是否前往开通会员，收听更多资讯",[CommonCode readFromUserD:[NSString stringWithFormat:@"%@",limit_num]]] preferredStyle:UIAlertControllerStyleAlert];
+        [qingshuruyonghuming addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        }]];
+        [qingshuruyonghuming addAction:[UIAlertAction actionWithTitle:@"前往开通会员" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+            MyVipMenbersViewController *MyVip = [MyVipMenbersViewController new];
+            [self.navigationController pushViewController:MyVip animated:YES];
+        }]];
+        [self presentViewController:qingshuruyonghuming animated:YES completion:nil];
+        _isShowVipTipsFromLogin = NO;
+    }
 }
 - (void)viewWillDisappear:(BOOL)animated
 {
@@ -284,6 +277,8 @@ static NewPlayVC *_instance = nil;
     [NetWorkTool getPostDetailWithaccessToken:AvatarAccessToken post_id:self.post_id sccess:^(NSDictionary *responseObject) {
         [self.tableView.mj_header endRefreshing];
         if ([responseObject[status] intValue] == 1){
+            //判断限制状态，记录次数限制
+            [[ZRT_PlayerManager manager] limitPlayStatusWithAdd:YES];
             //刷新新闻详情模型数据
             _postDetailModel = [newsDetailModel mj_objectWithKeyValues:responseObject[results]];
             //设置新闻内容详情的frame数据
@@ -375,25 +370,26 @@ static NewPlayVC *_instance = nil;
     _topCenterView.backgroundColor = [UIColor clearColor];
     [_topView addSubview:_topCenterView];
     
+    //关注、取消
+    self.guanzhuBtnNav.frame = CGRectMake(_topCenterView.width - 60.0 / 375 * IPHONE_W, 7, 55.0 / 375 * IPHONE_W, 30.0 / 667 * IPHONE_H);
+    [_topCenterView addSubview:_guanzhuBtnNav];
+    
+    //主播麦克风图标
+    self.micNav.frame = CGRectMake(_guanzhuBtnNav.x - 8.0 / 375 * SCREEN_WIDTH - 10, (44 - 15)/2.0 , 8.0 /375 * SCREEN_WIDTH, 14.0 / 667 * SCREEN_HEIGHT);
+    [_micNav addTapGesWithTarget:self action:@selector(zhuboBtnVAction:)];
+    [_topCenterView addSubview:_micNav];
+    
+    //主播名字
+    self.zhuboTitleLabNav.frame = CGRectMake(_micNav.x - 88.0 / 375 * IPHONE_W - 10, (44 - 15)/2.0, 88.0 / 375 * IPHONE_W, 15.0 );
+    [_zhuboTitleLabNav addTapGesWithTarget:self action:@selector(zhuboBtnVAction:)];
+    [_topCenterView addSubview:_zhuboTitleLabNav];
+    
     //主播头像
-    self.zhuboImgNav.frame = CGRectMake(100.0 / 375 * IPHONE_W, (44 - 27)/2.0,  27.0, 27.0);
+    self.zhuboImgNav.frame = CGRectMake(_zhuboTitleLabNav.x - 27.0 - 5, (44 - 27)/2.0,  27.0, 27.0);
     UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(zhuboBtnVAction:)];
     [_zhuboImgNav addGestureRecognizer:tap];
     
     [_topCenterView addSubview:_zhuboImgNav];
-    //主播名字
-    self.zhuboTitleLabNav.frame = CGRectMake(CGRectGetMaxX(_zhuboImgNav.frame) + 4.0 / 375 * IPHONE_W, (44 - 15)/2.0, 88.0 / 375 * IPHONE_W, 15.0 );
-    [_zhuboTitleLabNav addTapGesWithTarget:self action:@selector(zhuboBtnVAction:)];
-    [_topCenterView addSubview:_zhuboTitleLabNav];
-    
-    //主播麦克风图标
-    self.micNav.frame = CGRectMake(CGRectGetMaxX(_zhuboTitleLabNav.frame) + 6.0 / 375 * SCREEN_WIDTH, _zhuboTitleLabNav.frame.origin.y + 1.0 / 667 * SCREEN_HEIGHT, 8.0 /375 * SCREEN_WIDTH, 14.0 / 667 * SCREEN_HEIGHT);
-    [_micNav addTapGesWithTarget:self action:@selector(zhuboBtnVAction:)];
-    [_topCenterView addSubview:_micNav];
-    
-    //关注、取消
-    self.guanzhuBtnNav.frame = CGRectMake(_topCenterView.width - 65.0 / 375 * IPHONE_W, 7, 60.0 / 375 * IPHONE_W, 30.0 / 667 * IPHONE_H);
-    [_topCenterView addSubview:_guanzhuBtnNav];
 }
 #pragma mark - 设置详情控件数据
 - (void)setupTableViewHeaderData
@@ -427,10 +423,15 @@ static NewPlayVC *_instance = nil;
     self.zhuboTitleLabNav.text = self.postDetailModel.act.name;
     CGSize contentSize = [_zhuboTitleLab sizeThatFits:CGSizeMake(_zhuboTitleLab.frame.size.width, MAXFLOAT)];
     _zhuboTitleLab.frame = CGRectMake(_zhuboTitleLab.frame.origin.x, _zhuboTitleLab.frame.origin.y,contentSize.width, _zhuboTitleLab.frame.size.height);
-    _zhuboTitleLabNav.frame = CGRectMake(_zhuboTitleLabNav.frame.origin.x, _zhuboTitleLabNav.frame.origin.y,contentSize.width, _zhuboTitleLabNav.frame.size.height);
     //主播麦克风图标frame
     self.mic.frame = CGRectMake(CGRectGetMaxX(_zhuboTitleLab.frame) + 6.0 / 375 * SCREEN_WIDTH, _zhuboTitleLab.frame.origin.y + 1.0 / 667 * SCREEN_HEIGHT, 8.0 /375 * SCREEN_WIDTH, 14.0 / 667 * SCREEN_HEIGHT);
-    self.micNav.frame = CGRectMake(CGRectGetMaxX(_zhuboTitleLabNav.frame) + 6.0 / 375 * SCREEN_WIDTH, _zhuboTitleLabNav.frame.origin.y + 1.0 / 667 * SCREEN_HEIGHT, 8.0 /375 * SCREEN_WIDTH, 14.0 / 667 * SCREEN_HEIGHT);
+    
+    //导航栏主播信息控件frame
+    self.micNav.frame = CGRectMake(_guanzhuBtnNav.x - 8.0 / 375 * SCREEN_WIDTH - 10, (44 - 15)/2.0 , 8.0 /375 * SCREEN_WIDTH, 14.0 / 667 * SCREEN_HEIGHT);
+    self.zhuboTitleLabNav.frame = CGRectMake(_micNav.x - contentSize.width - 10, (44 - 15)/2.0, contentSize.width, 15.0 );
+    self.zhuboImgNav.frame = CGRectMake(_zhuboTitleLabNav.x - 27.0 - 5, (44 - 27)/2.0,  27.0, 27.0);
+
+    
     //是否关注
     self.guanzhuBtn.selected = [self.postDetailModel.act.is_fan intValue] == 1;
     self.guanzhuBtnNav.selected = [self.postDetailModel.act.is_fan intValue] == 1;
@@ -611,26 +612,27 @@ static NewPlayVC *_instance = nil;
     
     //播放进度条
     [self.sliderProgress setThumbImage:[UIImage imageNamed:@"slider"] forState:UIControlStateNormal];
+//    self.sliderProgress.backgroundColor = [UIColor redColor];
     self.sliderProgress.minimumTrackTintColor = gMainColor;
     self.sliderProgress.maximumTrackTintColor = [UIColor clearColor];
     [self.sliderProgress addTarget:self action:@selector(doChangeProgress:) forControlEvents:UIControlEventValueChanged];
     [self.sliderProgress addTarget:self action:@selector(sliderTouchDown:) forControlEvents:UIControlEventTouchDown];
     
 //    self.prgBufferProgress.frame = self.sliderProgress.frame;
-    if (IS_IPAD) {
-        self.prgBufferProgress.frame = CGRectMake(20.0 / 375 * IPHONE_W, 22.0 / 667 * IPHONE_H, SCREEN_WIDTH - 40.0 / 375 * SCREEN_WIDTH, 2.0);
-    }
-    else if (TARGETED_DEVICE_IS_IPHONE_736){
-        self.prgBufferProgress.frame = CGRectMake(20.0 / 375 * IPHONE_W, 22.0 / 667 * IPHONE_H, SCREEN_WIDTH - 40.0 / 375 * SCREEN_WIDTH, 2.0);
-    }else if (TARGETED_DEVICE_IS_IPHONE_667){
-        self.prgBufferProgress.frame = CGRectMake(20.0 / 375 * IPHONE_W, 22.0 / 667 * IPHONE_H, SCREEN_WIDTH - 40.0 / 375 * SCREEN_WIDTH, 2.0);
-    }else if (TARGETED_DEVICE_IS_IPHONE_568){
-        self.prgBufferProgress.frame = CGRectMake(20.0 / 375 * IPHONE_W, 22.0 / 667 * IPHONE_H, SCREEN_WIDTH - 40.0 / 375 * SCREEN_WIDTH, 2.0);
-    }
-    else{
-        self.prgBufferProgress.frame = CGRectMake(20.0 / 375 * IPHONE_W, 22.0 / 667 * IPHONE_H, SCREEN_WIDTH - 40.0 / 375 * SCREEN_WIDTH, 2.0);
-    }
-    
+//    if (IS_IPAD) {
+//        self.prgBufferProgress.frame = CGRectMake(20.0 / 375 * IPHONE_W, 22.0 / 667 * IPHONE_H, SCREEN_WIDTH - 40.0 / 375 * SCREEN_WIDTH, 2.0);
+//    }
+//    else if (TARGETED_DEVICE_IS_IPHONE_736){
+//        self.prgBufferProgress.frame = CGRectMake(20.0 / 375 * IPHONE_W, 22.0 / 667 * IPHONE_H, SCREEN_WIDTH - 40.0 / 375 * SCREEN_WIDTH, 2.0);
+//    }else if (TARGETED_DEVICE_IS_IPHONE_667){
+//        self.prgBufferProgress.frame = CGRectMake(20.0 / 375 * IPHONE_W, 22.0 / 667 * IPHONE_H, SCREEN_WIDTH - 40.0 / 375 * SCREEN_WIDTH, 2.0);
+//    }else if (TARGETED_DEVICE_IS_IPHONE_568){
+//        self.prgBufferProgress.frame = CGRectMake(20.0 / 375 * IPHONE_W, 22.0 / 667 * IPHONE_H, SCREEN_WIDTH - 40.0 / 375 * SCREEN_WIDTH, 2.0);
+//    }
+//    else{
+//        self.prgBufferProgress.frame = CGRectMake(20.0 / 375 * IPHONE_W, 22.0 / 667 * IPHONE_H, SCREEN_WIDTH - 40.0 / 375 * SCREEN_WIDTH, 2.0);
+//    }
+    self.prgBufferProgress.frame = self.sliderProgress.frame;
     self.prgBufferProgress.progressTintColor = gMainColor;;
     [dibuView addSubview:self.prgBufferProgress];
     [dibuView addSubview:self.sliderProgress];
@@ -646,7 +648,11 @@ static NewPlayVC *_instance = nil;
         weakSelf.sliderProgress.maximumValue = totalDuration;
     };
     [ZRT_PlayerManager manager].reloadBufferProgress = ^(float bufferProgress) {
-        [weakSelf.prgBufferProgress setProgress:bufferProgress animated:YES];
+        if (bufferProgress>0) {
+            [weakSelf.prgBufferProgress setProgress:bufferProgress animated:YES];
+        }else{
+            [weakSelf.prgBufferProgress setProgress:0. animated:YES];
+        }
     };
     
 }
@@ -836,7 +842,7 @@ static NewPlayVC *_instance = nil;
 {
     if (!_sliderProgress)
     {
-        _sliderProgress = [[UISlider alloc]initWithFrame:CGRectMake(20.0 / 375 * IPHONE_W, 22.0 / 667 * SCREEN_HEIGHT - 6, IPHONE_W - 40.0 / 375 * IPHONE_W, 14.0)];
+        _sliderProgress = [[UISlider alloc]initWithFrame:CGRectMake(20.0 / 375 * IPHONE_W, 22.0 / 667 * SCREEN_HEIGHT - 6, IPHONE_W - 40.0 / 375 * IPHONE_W, 2.0)];
         _sliderProgress.value = 0.0f;
         _sliderProgress.continuous = NO;
     }
@@ -850,6 +856,20 @@ static NewPlayVC *_instance = nil;
         _pinglunArr = [NSMutableArray array];
     }
     return _pinglunArr;
+}
+- (NSMutableArray *)listenedNewsIDArray
+{
+    if (!_listenedNewsIDArray) {
+        if ([[CommonCode readFromUserD:yitingguoxinwenID] isKindOfClass:[NSArray class]])
+        {
+            _listenedNewsIDArray = [NSMutableArray arrayWithArray:[CommonCode readFromUserD:yitingguoxinwenID]];;
+        }else
+        {
+            _listenedNewsIDArray = [NSMutableArray array];
+        }
+
+    }
+    return _listenedNewsIDArray;
 }
 #pragma mark - table datasource
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
@@ -909,7 +929,7 @@ static NewPlayVC *_instance = nil;
         }
     }else{
         PlayVCCommentTableViewCell *cell = [PlayVCCommentTableViewCell cellWithTableView:tableView];
-        cell.hideZanBtn = YES;
+        cell.commentCellType = CommentCellTypeNewsDetail;
         PlayVCCommentFrameModel *frameModel = self.pinglunArr[indexPath.row - 3];
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
         cell.frameModel = frameModel;
@@ -1548,6 +1568,7 @@ static NSInteger touchCount = 0;
         [APPDELEGATE configNowPlayingCenter];
     }
     if (ExLimitPlay) {
+        [self alertMessageWithVipLimit];
         return;
     }
     if ([ZRT_PlayerManager manager].isPlaying) {//点击暂停
@@ -1565,15 +1586,8 @@ static NSInteger touchCount = 0;
 - (void)bofangLeftAction:(UIButton *)sender
 {
     if (ExLimitPlay) {
-        UIAlertController *qingshuruyonghuming = [UIAlertController alertControllerWithTitle:@"温馨提示" message:@"您还不是会员，是否前往开通会员，收听更多资讯" preferredStyle:UIAlertControllerStyleAlert];
-        [qingshuruyonghuming addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-        }]];
-        [qingshuruyonghuming addAction:[UIAlertAction actionWithTitle:@"前往开通会员" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-            MyVipMenbersViewController *MyVip = [MyVipMenbersViewController new];
-            [self.navigationController pushViewController:MyVip animated:YES];
-        }]];
-        
-        [self presentViewController:qingshuruyonghuming animated:YES completion:nil];
+        [self alertMessageWithVipLimit];
+        return;
     }
     touchCount++;
     if(touchCount<2)
@@ -1608,15 +1622,8 @@ static NSInteger touchCount = 0;
 - (void)bofangRightAction:(UIButton *)sender
 {
     if (ExLimitPlay) {
-        UIAlertController *qingshuruyonghuming = [UIAlertController alertControllerWithTitle:@"温馨提示" message:@"您还不是会员，是否前往开通会员，收听更多资讯" preferredStyle:UIAlertControllerStyleAlert];
-        [qingshuruyonghuming addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-        }]];
-        [qingshuruyonghuming addAction:[UIAlertAction actionWithTitle:@"前往开通会员" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-            MyVipMenbersViewController *MyVip = [MyVipMenbersViewController new];
-            [self.navigationController pushViewController:MyVip animated:YES];
-        }]];
-        
-        [self presentViewController:qingshuruyonghuming animated:YES completion:nil];
+        [self alertMessageWithVipLimit];
+        return;
     }
     touchCount++;
     if(touchCount<2)
@@ -1638,7 +1645,7 @@ static NSInteger touchCount = 0;
         //获取评论数据
         [self getCommentList];
         //添加手势控制
-        [self setGestureControl];
+//        [self setGestureControl];
         
         [self performSelector:@selector(timeSetting) withObject:nil afterDelay:0.5];//1秒后点击次数清零
     }
@@ -1651,7 +1658,28 @@ static NSInteger touchCount = 0;
 {
     touchCount=0;
 }
-
+/**
+ 主播详情页面点击列表播放按钮调用
+ */
+- (void)achorVCDidClickedListPlayBtn
+{
+    DefineWeakSelf
+    [ZRT_PlayerManager manager].playDidEnd = ^(NSInteger currentSongIndex) {
+        
+        //判断限制状态，记录次数限制
+        [[ZRT_PlayerManager manager] limitPlayStatusWithAdd:YES];
+        //设置详情模型
+        weakSelf.postDetailModel = [newsDetailModel new];
+        //保存当前播放新闻的ID
+        [weakSelf saveCurrentPlayNewsID];
+        //设置模型数据，从播放器中获取对应正在播放的数据赋值新闻模型
+        [weakSelf setPostDetailModelDataFormPlayManager];
+        //获取详情数据
+        [weakSelf loadData];
+        //获取评论数据
+        [weakSelf getCommentList];
+    };
+}
 /**
  选中播放对应index的音频
  
@@ -1659,16 +1687,13 @@ static NSInteger touchCount = 0;
  */
 - (void)playFromIndex:(NSInteger)index
 {
+    //判断限制状态，记录次数限制
+    [[ZRT_PlayerManager manager] limitPlayStatusWithAdd:NO];
     if (ExLimitPlay) {
-        UIAlertController *qingshuruyonghuming = [UIAlertController alertControllerWithTitle:@"温馨提示" message:@"您还不是会员，是否前往开通会员，收听更多资讯" preferredStyle:UIAlertControllerStyleAlert];
-        [qingshuruyonghuming addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-        }]];
-        [qingshuruyonghuming addAction:[UIAlertAction actionWithTitle:@"前往开通会员" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-            MyVipMenbersViewController *MyVip = [MyVipMenbersViewController new];
-            [self.navigationController pushViewController:MyVip animated:YES];
-        }]];
-        
-        [self presentViewController:qingshuruyonghuming animated:YES completion:nil];
+        [[ZRT_PlayerManager manager] pausePlay];
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            [self alertMessageWithVipLimit];
+        });
     }
     //设置播放器数据
     [[ZRT_PlayerManager manager] loadSongInfoFromIndex:index];
@@ -1682,6 +1707,32 @@ static NSInteger touchCount = 0;
     [self loadData];
     //获取评论列表
     [self getCommentList];
+}
+
+/**
+ 弹窗提示已听完每日限制，需要购买会员才能继续收听
+ */
+- (void)alertMessageWithVipLimit
+{
+    UIAlertController *qingshuruyonghuming = [UIAlertController alertControllerWithTitle:@"温馨提示" message:[NSString stringWithFormat:@"您还不是会员，每日可收听%@条已听完，是否前往开通会员，收听更多资讯",[CommonCode readFromUserD:[NSString stringWithFormat:@"%@",limit_num]]] preferredStyle:UIAlertControllerStyleAlert];
+    [qingshuruyonghuming addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+    }]];
+    [qingshuruyonghuming addAction:[UIAlertAction actionWithTitle:@"前往开通会员" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        if ([[CommonCode readFromUserD:@"isLogin"] boolValue] == YES) {
+            MyVipMenbersViewController *MyVip = [MyVipMenbersViewController new];
+            [self.navigationController pushViewController:MyVip animated:YES];
+        }else{
+            LoginVC *loginFriVC = [LoginVC new];
+            loginFriVC.isFormDownload = YES;
+            LoginNavC *loginNavC = [[LoginNavC alloc]initWithRootViewController:loginFriVC];
+            [loginNavC.navigationBar setBackgroundColor:[UIColor whiteColor]];
+            loginNavC.navigationBar.tintColor = [UIColor blackColor];
+            [self presentViewController:loginNavC animated:YES completion:nil];
+            _isShowVipTipsFromLogin = YES;
+        }
+    }]];
+    
+    [self presentViewController:qingshuruyonghuming animated:YES completion:nil];
 }
 /**
  设置模型数据，从播放器中获取对应正在播放的数据赋值新闻模型
@@ -1701,7 +1752,7 @@ static NSInteger touchCount = 0;
     newsActModel *act = [newsActModel mj_objectWithKeyValues:[ZRT_PlayerManager manager].currentSong[@"post_act"]];
     _postDetailModel.act = act;
     
-    [ZRT_PlayerManager manager].duration = [_postDetailModel.post_time floatValue]/1000.0;
+//    [ZRT_PlayerManager manager].duration = [_postDetailModel.post_time floatValue]/1000.0;
     //设置新闻内容详情的frame数据
     [self setFrameModel];
     //设置详情头部数据
@@ -1735,21 +1786,22 @@ static NSInteger touchCount = 0;
         return;
     }
     //当前播放新闻ID
-    [CommonCode writeToUserD:self.post_id andKey:@"dangqianbofangxinwenID"];
+    [CommonCode writeToUserD:self.post_id andKey:dangqianbofangxinwenID];
     //保存已听过新闻的ID数据
-    if ([[CommonCode readFromUserD:@"yitingguoxinwenID"] isKindOfClass:[NSArray class]])
-    {
-        NSMutableArray *yitingguoArr = [NSMutableArray arrayWithArray:[CommonCode readFromUserD:@"yitingguoxinwenID"]];
-        [yitingguoArr addObject:self.post_id];
-        NSSet *set = [NSSet setWithArray:yitingguoArr];
-        [CommonCode writeToUserD:[set allObjects] andKey:@"yitingguoxinwenID"];
-    }else
-    {
-        NSMutableArray *yitingguoArr = [NSMutableArray array];
-        [yitingguoArr addObject:self.post_id];
-        NSSet *set = [NSSet setWithArray:yitingguoArr];
-        [CommonCode writeToUserD:[set allObjects] andKey:@"yitingguoxinwenID"];
-    }
+//    if ([[CommonCode readFromUserD:yitingguoxinwenID] isKindOfClass:[NSArray class]])
+//    {
+        [self.listenedNewsIDArray addObject:self.post_id];
+        NSSet *set = [NSSet setWithArray:self.listenedNewsIDArray];
+        self.listenedNewsIDArray = [NSMutableArray arrayWithArray:[set allObjects]];
+//        [CommonCode writeToUserD:[set allObjects] andKey:yitingguoxinwenID];
+//    }else
+//    {
+//        NSMutableArray *yitingguoArr = [NSMutableArray array];
+//        [yitingguoArr addObject:self.post_id];
+//        NSSet *set = [NSSet setWithArray:yitingguoArr];
+//        self.listenedNewsIDArray = [set allObjects];
+//        [CommonCode writeToUserD:[set allObjects] andKey:yitingguoxinwenID];
+//    }
 }
 
 /**

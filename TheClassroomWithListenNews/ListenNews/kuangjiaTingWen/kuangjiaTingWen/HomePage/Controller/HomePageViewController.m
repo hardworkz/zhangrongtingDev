@@ -306,6 +306,7 @@
         accessToken = [DSE encryptUseDES:ExdangqianUser];
     }
     DefineWeakSelf;
+    //[DSE encryptUseDES:@"tw1499171698533660"]
     [NetWorkTool getClassroomListWithaccessToken:AvatarAccessToken andPage:[NSString stringWithFormat:@"%ld",(long)self.classIndex] andLimit:[NSString stringWithFormat:@"%ld",(long)self.classPageSize] sccess:^(NSDictionary *responseObject) {
         if ([responseObject[@"results"] isKindOfClass:[NSArray class]]){
             if (weakSelf.classIndex == 1) {

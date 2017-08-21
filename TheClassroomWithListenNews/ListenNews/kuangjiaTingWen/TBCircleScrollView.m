@@ -278,14 +278,14 @@
         //遍历新闻数据列表，获取真正的index
         int index = 0;
         for (int i = 0 ; i<newsArr.count; i++) {
-            if ([newsArr[_curPage][@"post_list"][@"id"] isEqualToString:newsArr[i][@"post_list"][@"id"]]){
+            if ([newArr[_curPage][@"post_list"][@"id"] isEqualToString:newsArr[i][@"id"]]){
                 index = i;
                 break;
             }
         }
         //设置打赏控件状态
         [NewPlayVC shareInstance].rewardType = RewardViewTypeNone;
-        if ([[CommonCode readFromUserD:@"dangqianbofangxinwenID"] isEqualToString:newsArr[_curPage][@"post_list"][@"id"]])
+        if ([[CommonCode readFromUserD:@"dangqianbofangxinwenID"] isEqualToString:newsArr[index][@"id"]])
         {
             //设置播放器播放数组
             [ZRT_PlayerManager manager].songList = newsArr;
@@ -297,7 +297,7 @@
             //设置播放器播放数组
             [ZRT_PlayerManager manager].songList = newsArr;
             //设置新闻ID
-            [NewPlayVC shareInstance].post_id = newsArr[_curPage][@"post_list"][@"id"];
+            [NewPlayVC shareInstance].post_id = newsArr[index][@"id"];
             //保存当前播放新闻Index
             ExcurrentNumber = index;
             //播放频道

@@ -15,10 +15,12 @@
 
 + (void)isNewDayWithServer_date:(NSString *)dateString
 {
-    NSString *serverDate = [CommonCode readFromUserD:[NSString stringWithFormat:@"%@_%@",server_date,ExdangqianUserUid]];
+    NSString *serverDate = [CommonCode readFromUserD:[NSString stringWithFormat:@"%@_%@",server_date,ExdangqianUserUid?ExdangqianUserUid:@""]];
     if (![dateString isEqualToString:serverDate]) {//判断本地缓存时间和服务器返回时间是否一致，不一致则清空新闻播放限制次数
-        [CommonCode writeToUserD:[NSString stringWithFormat:@"0"] andKey:[NSString stringWithFormat:@"%@_%@",limit_time,ExdangqianUserUid]];
-        [CommonCode writeToUserD:dateString andKey:[NSString stringWithFormat:@"%@_%@",server_date,ExdangqianUserUid]];
+        [CommonCode writeToUserD:[NSString stringWithFormat:@"0"] andKey:[NSString stringWithFormat:@"%@_%@",limit_time,ExdangqianUserUid?ExdangqianUserUid:@""]];
+        [CommonCode writeToUserD:dateString andKey:[NSString stringWithFormat:@"%@_%@",server_date,ExdangqianUserUid?ExdangqianUserUid:@""]];
+        //更新用户信息
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"updateUserInfo" object:nil];
     }
 }
 /**
@@ -1425,6 +1427,7 @@ NSMutableDictionary *dic = [[NSMutableDictionary alloc]initWithCapacity:1
 }
 
 + (void)getPaoguoJieMuOrZhuBoPingLunLieBiaoWithact_id:(NSString *)act_id
+                                          accessToken:(NSString *)accessToken
                                               andpage:(NSString *)page
                                              andlimit:(NSString *)limit
                                                sccess:(void (^)(NSDictionary *responseObject))success
@@ -1432,6 +1435,7 @@ NSMutableDictionary *dic = [[NSMutableDictionary alloc]initWithCapacity:1
     
     NSMutableDictionary *dic = [[NSMutableDictionary alloc]initWithCapacity:1];
     dic[@"act_id"] = act_id;
+    dic[@"uid"] = accessToken;
     dic[@"page"] = page;
     dic[@"limit"] = limit;
     [self asyncNetworkingUrl:@"/interface/actList"

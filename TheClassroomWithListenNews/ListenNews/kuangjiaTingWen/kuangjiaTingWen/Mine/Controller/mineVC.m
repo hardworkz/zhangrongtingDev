@@ -101,7 +101,7 @@ typedef void(^animateBlock)();
     if ([[CommonCode readFromUserD:@"isLogin"]boolValue] == YES){
         self.signInView.hidden = NO;
         NSDictionary *userInfo = [CommonCode readFromUserD:@"dangqianUserInfo"];
-        if ([userInfo[@"results"][@"sign"] isEqualToString:@"0"]) {
+        if ([userInfo[results][@"sign"] isEqualToString:@"0"]) {
             self.isSigned = NO;
             [_signInImageView setImage:[UIImage imageNamed:@"sign_in"]];
             //TODO:未签到时添加动画
@@ -144,28 +144,34 @@ typedef void(^animateBlock)();
     else if ([[CommonCode readFromUserD:@"isWhatLogin"] isEqualToString:@"weixin"]){
         ExdangqianUser = [CommonCode readFromUserD:@"user_login"];
     }
-//    ExdangqianUser = [CommonCode readFromUserD:userInfo[@"results"][@"user_login"]];
-    [NetWorkTool getMyuserinfoWithaccessToken:AvatarAccessToken user_id:userInfo[@"results"][@"id"]  sccess:^(NSDictionary *responseObject) {
+//    ExdangqianUser = [CommonCode readFromUserD:userInfo[results][@"user_login"]];
+    [NetWorkTool getMyuserinfoWithaccessToken:AvatarAccessToken user_id:userInfo[results][@"id"]  sccess:^(NSDictionary *responseObject) {
         if ([responseObject[@"msg"] isEqualToString:@"获取成功!"]) {
             if ([[CommonCode readFromUserD:@"isWhatLogin"] isEqualToString:@"QQ"]){
-                ExdangqianUser = responseObject[@"results"][@"user_login"];
+                ExdangqianUser = responseObject[results][@"user_login"];
             }
             else if ([[CommonCode readFromUserD:@"isWhatLogin"] isEqualToString:@"ShouJi"]){
-                ExdangqianUser = responseObject[@"results"][@"user_phone"];
+                ExdangqianUser = responseObject[results][@"user_phone"];
             }
             else if ([[CommonCode readFromUserD:@"isWhatLogin"] isEqualToString:@"WeiBo"]){
-                ExdangqianUser = responseObject[@"results"][@"user_login"];
+                ExdangqianUser = responseObject[results][@"user_login"];
             }
             else if ([[CommonCode readFromUserD:@"isWhatLogin"] isEqualToString:@"weixin"]){
-                ExdangqianUser = responseObject[@"results"][@"user_login"];
+                ExdangqianUser = responseObject[results][@"user_login"];
             }
-//            ExdangqianUser = responseObject[@"results"][@"user_login"];
+//            ExdangqianUser = responseObject[results][@"user_login"];
             [CommonCode writeToUserD:ExdangqianUser andKey:@"dangqianUser"];
-            [CommonCode writeToUserD:responseObject[@"results"][@"id"] andKey:@"dangqianUserUid"];
+            [CommonCode writeToUserD:responseObject[results][@"id"] andKey:@"dangqianUserUid"];
             [CommonCode writeToUserD:@(YES) andKey:@"isLogin"];
             [CommonCode writeToUserD:responseObject andKey:@"dangqianUserInfo"];
+            //判断是否已经播放限制
+            if ([responseObject[results][is_stop] intValue] == 1) {
+                ExLimitPlay = YES;
+            }else{
+                ExLimitPlay = NO;
+            }
             //拿到图片
-            UIImage *userAvatar = [UIImage imageWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:USERPHOTOHTTPSTRING(responseObject[@"results"][@"avatar"])]]];
+            UIImage *userAvatar = [UIImage imageWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:USERPHOTOHTTPSTRING(responseObject[results][@"avatar"])]]];
             NSString *path_sandox = NSHomeDirectory();
             //设置一个图片的存储路径
             NSString *avatarPath = [path_sandox stringByAppendingString:@"/Documents/userAvatar.png"];
@@ -183,9 +189,9 @@ typedef void(^animateBlock)();
         gerenzhuyeVC *gerenzhuye = [gerenzhuyeVC new];
         gerenzhuye.isMypersonalPage = YES;
         gerenzhuye.isNewsComment = NO;
-        gerenzhuye.user_nicename = [CommonCode readFromUserD:@"dangqianUserInfo"][@"results"][@"user_nicename"];
-        gerenzhuye.sex = [CommonCode readFromUserD:@"dangqianUserInfo"][@"results"][@"sex"];
-        gerenzhuye.signature =  [CommonCode readFromUserD:@"dangqianUserInfo"][@"results"][@"signature"];
+        gerenzhuye.user_nicename = [CommonCode readFromUserD:@"dangqianUserInfo"][results][@"user_nicename"];
+        gerenzhuye.sex = [CommonCode readFromUserD:@"dangqianUserInfo"][results][@"sex"];
+        gerenzhuye.signature =  [CommonCode readFromUserD:@"dangqianUserInfo"][results][@"signature"];
         gerenzhuye.user_login = ExdangqianUser;
         gerenzhuye.fan_num = @"0";
         gerenzhuye.guan_num = @"0";
@@ -237,10 +243,10 @@ typedef void(^animateBlock)();
     DefineWeakSelf;
     [NetWorkTool getpostinfoWithpost_id:[[NSUserDefaults standardUserDefaults]valueForKey:@"pushNews"] andpage:nil andlimit:nil sccess:^(NSDictionary *responseObject) {
         if ([responseObject[@"status"] integerValue] == 1) {
-            weakSelf.pushNewsInfo = [responseObject[@"results"] mutableCopy];
+            weakSelf.pushNewsInfo = [responseObject[results] mutableCopy];
             [NetWorkTool getAllActInfoListWithAccessToken:nil ac_id:weakSelf.pushNewsInfo[@"post_news"] keyword:nil andPage:nil andLimit:nil sccess:^(NSDictionary *responseObject) {
                 if ([responseObject[@"status"] integerValue] == 1){
-                    [weakSelf.pushNewsInfo setObject:[responseObject[@"results"] firstObject] forKey:@"post_act"];
+                    [weakSelf.pushNewsInfo setObject:[responseObject[results] firstObject] forKey:@"post_act"];
                     [weakSelf presentPushNews];
                 }
                 else{
@@ -321,7 +327,7 @@ typedef void(^animateBlock)();
         NSString *accesstoken = nil;
         if ([[CommonCode readFromUserD:@"isWhatLogin"] isEqualToString:@"ShouJi"]) {
             //
-            accesstoken = [DSE encryptUseDES:userInfo[@"results"][@"user_phone"]];
+            accesstoken = [DSE encryptUseDES:userInfo[results][@"user_phone"]];
         }
         else{
             accesstoken = AvatarAccessToken;
@@ -413,13 +419,13 @@ typedef void(^animateBlock)();
             [NetWorkTool getFeedbackForMeWithaccessToken:AvatarAccessToken sccess:^(NSDictionary *responseObject) {
                 dispatch_group_leave(group);
                 if ([responseObject[@"status"] integerValue] == 1) {
-                    if ([responseObject[@"results"] isKindOfClass:[NSArray class]]){
+                    if ([responseObject[results] isKindOfClass:[NSArray class]]){
                         NSString *unreadID = [CommonCode readFromUserD:FEEDBACKFIRSTUNREADID];
-                        NSMutableArray *resultArr = [responseObject[@"results"] mutableCopy];
+                        NSMutableArray *resultArr = [responseObject[results] mutableCopy];
                         if (unreadID == nil) {
-                            unreadID = [responseObject[@"results"] firstObject][@"id"];
-                            [CommonCode writeToUserD:[responseObject[@"results"] firstObject][@"id"] andKey:FEEDBACKFIRSTUNREADID];
-                            [CommonCode writeToUserD:responseObject[@"results"] andKey:FEEDBACKFORMEDATAKEY];
+                            unreadID = [responseObject[results] firstObject][@"id"];
+                            [CommonCode writeToUserD:[responseObject[results] firstObject][@"id"] andKey:FEEDBACKFIRSTUNREADID];
+                            [CommonCode writeToUserD:responseObject[results] andKey:FEEDBACKFORMEDATAKEY];
                             [CommonCode writeToUserD:@"NO" andKey:FEEDBACKYMESSAGEREAD];
                             
                         }
@@ -463,13 +469,13 @@ typedef void(^animateBlock)();
             [NetWorkTool getNewPromptForMeWithaccessToken:AvatarAccessToken andpage:@"1" andlimit:@"100" sccess:^(NSDictionary *responseObject) {
                 dispatch_group_leave(group);
                 if ([responseObject[@"status"] integerValue] == 1) {
-                    if ([responseObject[@"results"] isKindOfClass:[NSArray class]]){
+                    if ([responseObject[results] isKindOfClass:[NSArray class]]){
                         NSString *unreadID1 = [CommonCode readFromUserD:TINGYOUQUANFIRSTUNREADID];
-                        NSMutableArray *resultArrr = [responseObject[@"results"] mutableCopy];
+                        NSMutableArray *resultArrr = [responseObject[results] mutableCopy];
                         if (unreadID1 == nil) {
-                            unreadID1 = [responseObject[@"results"] firstObject][@"id"];
-                            [CommonCode writeToUserD:[responseObject[@"results"] firstObject][@"id"] andKey:TINGYOUQUANFIRSTUNREADID];
-                            [CommonCode writeToUserD:responseObject[@"results"] andKey:NEWPROMPTFORMEDATAKEY];
+                            unreadID1 = [responseObject[results] firstObject][@"id"];
+                            [CommonCode writeToUserD:[responseObject[results] firstObject][@"id"] andKey:TINGYOUQUANFIRSTUNREADID];
+                            [CommonCode writeToUserD:responseObject[results] andKey:NEWPROMPTFORMEDATAKEY];
                             [CommonCode writeToUserD:@"NO" andKey:TINGYOUQUANMESSAGEREAD];
                         }
                         else{
@@ -516,10 +522,10 @@ typedef void(^animateBlock)();
             [NetWorkTool getAddcriticismNumWithaccessToken:AvatarAccessToken andpage:@"1" andlimit:@"100" anddate:lastReadTime sccess:^(NSDictionary *responseObject) {
                 dispatch_group_leave(group);
                 if ([responseObject[@"status"] integerValue] == 1) {
-                    if ([responseObject[@"results"] isKindOfClass:[NSArray class]]){
-                        [CommonCode writeToUserD:responseObject[@"results"] andKey:ADDCRITICISMNUMDATAKEY];
+                    if ([responseObject[results] isKindOfClass:[NSArray class]]){
+                        [CommonCode writeToUserD:responseObject[results] andKey:ADDCRITICISMNUMDATAKEY];
                         [self.newPersonMessageButton setHidden:NO];
-                        [self.newPersonMessageButton setTitle:[NSString stringWithFormat:@"%lu",[responseObject[@"results"] count]] forState:UIControlStateNormal];
+                        [self.newPersonMessageButton setTitle:[NSString stringWithFormat:@"%lu",[responseObject[results] count]] forState:UIControlStateNormal];
                         
                     }
                     else{
@@ -673,21 +679,21 @@ typedef void(^animateBlock)();
         
         if ([[CommonCode readFromUserD:@"isLogin"]boolValue] == YES){
             NSDictionary *userInfo = [CommonCode readFromUserD:@"dangqianUserInfo"];
-            NSString *isNameNil = userInfo[@"results"][@"user_nicename"];
+            NSString *isNameNil = userInfo[results][@"user_nicename"];
             if (isNameNil.length == 0){
-                lab.text = userInfo[@"results"][@"user_login"];
+                lab.text = userInfo[results][@"user_login"];
             }
             else{
-                lab.text = userInfo[@"results"][@"user_nicename"];
+                lab.text = userInfo[results][@"user_nicename"];
             }
             
             //账户信息
-            NSString *df = [NSString stringWithFormat:@"金币：%@ | 听币：%@",userInfo[@"results"][@"gold"],userInfo[@"results"][@"listen_money"]];
+            NSString *df = [NSString stringWithFormat:@"金币：%@ | 听币：%@",userInfo[results][@"gold"],userInfo[results][@"listen_money"]];
             NSMutableAttributedString *attriString =[[NSMutableAttributedString alloc] initWithString:df attributes:@{NSForegroundColorAttributeName:gTextDownload,NSFontAttributeName:gFontMain12}];
-            NSRange range1=[df rangeOfString:[NSString stringWithFormat:@"%@",userInfo[@"results"][@"gold"]]];
+            NSRange range1=[df rangeOfString:[NSString stringWithFormat:@"%@",userInfo[results][@"gold"]]];
             [attriString addAttributes:@{NSForegroundColorAttributeName:UIColorFromHex(0xf78540),NSFontAttributeName:gFontMain12} range:range1];
             [signtureLab addLinkToTransitInformation:nil withRange:range1];
-            NSRange range2=[df rangeOfString:[NSString stringWithFormat:@"%@",userInfo[@"results"][@"listen_money"]]];
+            NSRange range2=[df rangeOfString:[NSString stringWithFormat:@"%@",userInfo[results][@"listen_money"]]];
             [attriString addAttributes:@{NSForegroundColorAttributeName:UIColorFromHex(0xf78540),NSFontAttributeName:gFontMain12} range:range2];
             [signtureLab addLinkToTransitInformation:nil withRange:range2];
             signtureLab.attributedText = attriString;
@@ -707,7 +713,7 @@ typedef void(^animateBlock)();
             lab.frame = CGRectMake(lab.frame.origin.x, lab.frame.origin.y,contentSize.width, lab.frame.size.height);
             [lvView setFrame:CGRectMake(CGRectGetMaxX(lab.frame)+ 10, lab.frame.origin.y, 50.0 / 667 * IPHONE_H, 16.0 / 667 * IPHONE_H)];
             lvView.hidden = NO;
-            NSInteger lv = [userInfo[@"results"][@"level"] integerValue];
+            NSInteger lv = [userInfo[results][@"level"] integerValue];
             if (lv > 0 && lv < 10) {
                 [lvView setImage:[UIImage imageNamed:@"LV1~9"]];
             }
@@ -741,7 +747,7 @@ typedef void(^animateBlock)();
             else{
                 [lvView setImage:[UIImage imageNamed:@"LV100"]];
             }
-            [lvLab setText:userInfo[@"results"][@"level"]];
+            [lvLab setText:userInfo[results][@"level"]];
             
         }
         else{

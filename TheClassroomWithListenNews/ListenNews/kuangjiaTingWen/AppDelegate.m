@@ -171,8 +171,117 @@
     //获取VIP限制
     [self getVipLimitData];
     //启动时获取已登录用户的信息、未读消息
-    if ([[CommonCode readFromUserD:@"isLogin"] boolValue] == YES) {
+    [self getUserLoginInfoWithLoginStatus:[[CommonCode readFromUserD:@"isLogin"] boolValue]];
+    
+    [CommonCode writeToUserD:nil andKey:@"dangqianbofangxinwenID"];
+    [CommonCode writeToUserD:nil andKey:@"dangqianbofangxinwen"];
+    
+    
+    [CommonCode writeToUserD:@"NO" andKey:@"isPlayingVC"];
+    [CommonCode writeToUserD:@"YES" andKey:@"isPlayingGray"];
+    [CommonCode writeToUserD:@"NO" andKey:TINGYOUQUANBOFANGWANBI];
+    //手势控制
+    [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"shoushi"];
+    
+    //注册QQ
+    [[TencentOAuth alloc] initWithAppId:kAppId_QQ andDelegate:self];
+    //注册微信
+    [WXApi registerApp:KweChatappID];
+    
+    //设置新浪微博
+    [WeiboSDK enableDebugMode:YES];
+    [WeiboSDK registerApp:KweiBoappkey];
+    
+    //小米推送
+    [self setMIPush];
+    
+    
+    //推送唤醒APP的
+    NSDictionary *userInfo = launchOptions[UIApplicationLaunchOptionsRemoteNotificationKey];
+    if (userInfo) {
+        NSString *newsID  = userInfo[@"id"];
+        [[NSUserDefaults standardUserDefaults] setValue:newsID forKey:@"pushNews"];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+        //跳转到通知的新闻详情
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"pushNewsDetail" object:newsID];
+    }
+    
+    [[UIApplication sharedApplication]cancelAllLocalNotifications];
+    
+    [NSThread sleepForTimeInterval:2.0f];//设置启动页面时间
+    
+    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"sevaDownload"];
+    [[NSUserDefaults standardUserDefaults]synchronize];
+    
+    //自动处理键盘事件的第三方库
+    IQKeyboardManager *manager = [IQKeyboardManager sharedManager];
+    manager.enable = YES;//控制整个功能是否启用
+    manager.shouldResignOnTouchOutside = YES;//控制点击背景是否收起键盘
+    manager.shouldToolbarUsesTextFieldTintColor = YES;//控制键盘上的工具条文字颜色是否用户自定义
+    manager.enableAutoToolbar = NO;//控制是否显示键盘上的工具条
+    [manager setKeyboardDistanceFromTextField:0];
+    
+    NSError* error;
+    [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:&error];
+    
+    return YES;
+}
+/**
+ 获取每日免费收听数以及当前系统时间
+ */
+- (void)getVipLimitData
+{
+    [NetWorkTool get_VipLimitDataWithSccess:^(NSDictionary *responseObject) {
+        RTLog(@"%@",responseObject);
+        if ([responseObject[status] intValue] == 1) {
+            [NetWorkTool isNewDayWithServer_date:responseObject[results][@"date"]];
+            [CommonCode writeToUserD:responseObject[results][@"num"] andKey:[NSString stringWithFormat:@"%@",limit_num]];
+            //初始化播放器判断限制状态
+            [[ZRT_PlayerManager manager] limitPlayStatusWithAdd:NO];
+        }
+    } failure:^(NSError *error) {
         
+    }];
+}
+- (void)getAppVersion
+{
+    //请求是否为内购的接口
+    [NetWorkTool getAppVersionSccess:^(NSDictionary *responseObject) {
+        NSLog(@"%@",responseObject);
+        //听闻电台
+        if ([APPBUNDLEIDENTIFIER isEqualToString:@"com.popwcn.ListenNewsExploreVersion"]) {
+            //当前版本号与提交审核时后台配置的一样说明正在审核
+            if ([responseObject[@"results"][@"exploreVersion"] isEqualToString:APPVERSION]) {
+                [CommonCode writeToUserD:@(YES) andKey:@"isIAP"];
+            }
+            else{
+                [CommonCode writeToUserD:@(NO) andKey:@"isIAP"];
+            }
+        }
+        //听闻FM
+        else{
+            if ([responseObject[@"results"][@"listenNews"] isEqualToString:APPVERSION]) {
+                [CommonCode writeToUserD:@(YES) andKey:@"isIAP"];
+            }
+            else{
+                [CommonCode writeToUserD:@(NO) andKey:@"isIAP"];
+            }
+        }
+        
+    } failure:^(NSError *error) {
+        //
+        [CommonCode writeToUserD:nil andKey:@"isIAP"];
+    }];
+}
+
+/**
+ 获取用户数据
+
+ @param isLogin 是否已经登录
+ */
+- (void)getUserLoginInfoWithLoginStatus:(BOOL)isLogin
+{
+    if (isLogin) {
         //获取个人经验值，听币，金币,签到情况以及个人信息，粉丝数，关注数
         [NetWorkTool getMyuserinfoWithaccessToken:AvatarAccessToken user_id:ExdangqianUserUid  sccess:^(NSDictionary *responseObject) {
             if ([responseObject[@"msg"] isEqualToString:@"获取成功!"]) {
@@ -192,6 +301,12 @@
                 [CommonCode writeToUserD:responseObject[@"results"][@"id"] andKey:@"dangqianUserUid"];
                 [CommonCode writeToUserD:@(YES) andKey:@"isLogin"];
                 [CommonCode writeToUserD:responseObject andKey:@"dangqianUserInfo"];
+                //判断是否已经播放限制
+                if ([responseObject[results][is_stop] intValue] == 1) {
+                    ExLimitPlay = YES;
+                }else{
+                    ExLimitPlay = NO;
+                }
                 //拿到图片
                 UIImage *userAvatar = [UIImage imageWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:USERPHOTOHTTPSTRING(responseObject[@"results"][@"avatar"])]]];
                 NSString *path_sandox = NSHomeDirectory();
@@ -269,130 +384,8 @@
             //设置 我 的未读消息
             [[NSNotificationCenter defaultCenter] postNotificationName:@"setMyunreadMessageTips" object:nil];
         });
-        
     }
-    
-    [CommonCode writeToUserD:nil andKey:@"dangqianbofangxinwenID"];
-    [CommonCode writeToUserD:nil andKey:@"dangqianbofangxinwen"];
-    
-    
-    [CommonCode writeToUserD:@"NO" andKey:@"isPlayingVC"];
-    [CommonCode writeToUserD:@"YES" andKey:@"isPlayingGray"];
-    [CommonCode writeToUserD:@"NO" andKey:TINGYOUQUANBOFANGWANBI];
-    //手势控制
-    [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"shoushi"];
-    
-    //注册QQ
-    [[TencentOAuth alloc] initWithAppId:kAppId_QQ andDelegate:self];
-    //注册微信
-    [WXApi registerApp:KweChatappID];
-    
-    //设置新浪微博
-    [WeiboSDK enableDebugMode:YES];
-    [WeiboSDK registerApp:KweiBoappkey];
-    
-    //小米推送
-    [self setMIPush];
-    
-    
-    //推送唤醒APP的
-    NSDictionary *userInfo = launchOptions[UIApplicationLaunchOptionsRemoteNotificationKey];
-    if (userInfo) {
-        NSString *newsID  = userInfo[@"id"];
-        [[NSUserDefaults standardUserDefaults] setValue:newsID forKey:@"pushNews"];
-        [[NSUserDefaults standardUserDefaults] synchronize];
-        //跳转到通知的新闻详情
-        [[NSNotificationCenter defaultCenter] postNotificationName:@"pushNewsDetail" object:newsID];
-    }
-    
-    [[UIApplication sharedApplication]cancelAllLocalNotifications];
-    
-    [NSThread sleepForTimeInterval:2.0f];//设置启动页面时间
-    
-    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"sevaDownload"];
-    [[NSUserDefaults standardUserDefaults]synchronize];
-    
-    //自动处理键盘事件的第三方库
-    IQKeyboardManager *manager = [IQKeyboardManager sharedManager];
-    manager.enable = YES;//控制整个功能是否启用
-    manager.shouldResignOnTouchOutside = YES;//控制点击背景是否收起键盘
-    manager.shouldToolbarUsesTextFieldTintColor = YES;//控制键盘上的工具条文字颜色是否用户自定义
-    manager.enableAutoToolbar = NO;//控制是否显示键盘上的工具条
-    [manager setKeyboardDistanceFromTextField:0];
-    
-    NSError* error;
-    [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:&error];
-    
-    return YES;
 }
-/**
- 获取每日免费收听数以及当前系统时间
- */
-- (void)getVipLimitData
-{
-    [NetWorkTool get_VipLimitDataWithSccess:^(NSDictionary *responseObject) {
-        RTLog(@"%@",responseObject);
-        if ([responseObject[status] intValue] == 1) {
-            [NetWorkTool isNewDayWithServer_date:responseObject[results][@"date"]];
-            [CommonCode writeToUserD:responseObject[results][@"num"] andKey:[NSString stringWithFormat:@"%@",limit_num]];
-            //初始化播放器判断限制状态
-            NSDictionary *userInfoDict = [CommonCode readFromUserD:@"dangqianUserInfo"];
-            if ([userInfoDict[results][member_type] intValue] == 0) {//非会员
-                int limitTime = [[CommonCode readFromUserD:[NSString stringWithFormat:@"%@_%@",limit_time,ExdangqianUserUid?ExdangqianUserUid:@""]] intValue];
-                int limitNum = [responseObject[results][@"num"] intValue];
-                if (limitTime >= limitNum ||[userInfoDict[results][is_stop] intValue] == 1) {
-                    ExLimitPlay = YES;
-                    [NetWorkTool sendLimitDataWithaccessToken:AvatarAccessToken sccess:^(NSDictionary *responseObject) {
-                        if ([responseObject[status] intValue] == 1) {
-                            [[NSNotificationCenter defaultCenter] postNotificationName:@"updateUserInfo" object:nil];
-                        }
-                    } failure:^(NSError *error) {
-                        
-                    }];
-                    
-                }else{
-                    ExLimitPlay = NO;
-                }
-            }else{
-                ExLimitPlay = NO;
-            }
-        }
-    } failure:^(NSError *error) {
-        
-    }];
-}
-- (void)getAppVersion
-{
-    //请求是否为内购的接口
-    [NetWorkTool getAppVersionSccess:^(NSDictionary *responseObject) {
-        NSLog(@"%@",responseObject);
-        //听闻电台
-        if ([APPBUNDLEIDENTIFIER isEqualToString:@"com.popwcn.ListenNewsExploreVersion"]) {
-            //当前版本号与提交审核时后台配置的一样说明正在审核
-            if ([responseObject[@"results"][@"exploreVersion"] isEqualToString:APPVERSION]) {
-                [CommonCode writeToUserD:@(YES) andKey:@"isIAP"];
-            }
-            else{
-                [CommonCode writeToUserD:@(NO) andKey:@"isIAP"];
-            }
-        }
-        //听闻FM
-        else{
-            if ([responseObject[@"results"][@"listenNews"] isEqualToString:APPVERSION]) {
-                [CommonCode writeToUserD:@(YES) andKey:@"isIAP"];
-            }
-            else{
-                [CommonCode writeToUserD:@(NO) andKey:@"isIAP"];
-            }
-        }
-        
-    } failure:^(NSError *error) {
-        //
-        [CommonCode writeToUserD:nil andKey:@"isIAP"];
-    }];
-}
-
-
 - (BOOL)application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication annotation:(id)annotation{
     
     if ([url.host isEqualToString:@"safepay"]) {
@@ -635,23 +628,19 @@
 
 - (void)applicationWillTerminate:(UIApplication *)application {
     
-//    NSInteger count = (NSInteger)[CommonCode readFromUserD:@"topNameArr.count"];
-    
-//    NSArray *arr = [NSArray arrayWithArray:[CommonCode readFromUserD:@"topNameArr"]];
-    
-//    for (int i = 0; i < count; i ++ )
-//    {
-//        if (arr.count>=count) {
-//            [CommonCode writeToUserD:@"1" andKey:[NSString stringWithFormat:@"page%@",arr[i][@"type"]]];//数组越界需要解决，导致崩溃
-//        }
-//    }
+    //应用退出时保存已听过新闻ID
+    [CommonCode writeToUserD:[NewPlayVC shareInstance].listenedNewsIDArray andKey:yitingguoxinwenID];
     
     [CommonCode writeToUserD:nil andKey:@"dangqianbofangxinwenID"];
     [CommonCode writeToUserD:nil andKey:@"dangqianbofangxinwen"];
 
 }
 
-- (void)applicationDidEnterBackground:(UIApplication *)application {
+- (void)applicationDidEnterBackground:(UIApplication *)application
+{
+    
+    //应用退出时保存已听过新闻ID
+    [CommonCode writeToUserD:[NewPlayVC shareInstance].listenedNewsIDArray andKey:yitingguoxinwenID];
     
     UIApplication*   app = [UIApplication sharedApplication];
     

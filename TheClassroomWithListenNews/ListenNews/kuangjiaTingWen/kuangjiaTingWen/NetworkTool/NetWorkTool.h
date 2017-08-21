@@ -703,6 +703,7 @@
 
 ///获取主播或节目留言列表
 + (void)getPaoguoJieMuOrZhuBoPingLunLieBiaoWithact_id:(NSString *)act_id
+                                          accessToken:(NSString *)accessToken
                                               andpage:(NSString *)page
                                              andlimit:(NSString *)limit
                                                sccess:(void (^)(NSDictionary *responseObject))success

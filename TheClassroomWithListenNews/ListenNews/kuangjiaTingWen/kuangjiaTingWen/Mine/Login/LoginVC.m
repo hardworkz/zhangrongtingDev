@@ -491,6 +491,12 @@
         [self dismissViewControllerAnimated:YES completion:nil];
         [CommonCode writeToUserD:@(YES) andKey:@"isLogin"];
         [CommonCode writeToUserD:responseObject andKey:@"dangqianUserInfo"];
+        //判断是否已经播放限制
+        if ([responseObject[results][is_stop] intValue] == 1) {
+            ExLimitPlay = YES;
+        }else{
+            ExLimitPlay = NO;
+        }
         //拿到图片
         UIImage *userAvatar = [UIImage imageWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:responseObject[@"results"][@"avatar"]]]];
         NSString *path_sandox = NSHomeDirectory();
@@ -541,6 +547,12 @@
                     [self dismissViewControllerAnimated:YES completion:nil];
                     [CommonCode writeToUserD:@(YES) andKey:@"isLogin"];
                     [CommonCode writeToUserD:responseObject andKey:@"dangqianUserInfo"];
+                    //判断是否已经播放限制
+                    if ([responseObject[results][is_stop] intValue] == 1) {
+                        ExLimitPlay = YES;
+                    }else{
+                        ExLimitPlay = NO;
+                    }
                     //    //拿到图片
                     UIImage *userAvatar = [UIImage imageWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:USERPHOTOHTTPSTRING(responseObject[@"results"][@"avatar"])]]];
                     NSString *path_sandox = NSHomeDirectory();
@@ -554,25 +566,6 @@
                     XWAlerLoginView *alert = [[XWAlerLoginView alloc] initWithTitle:responseObject[msg]];
                     [alert show];
                 }
-//                if ([responseObject[@"msg"] isEqualToString:@"用户名不存在!"])
-//                {
-//                    UIAlertController *mimacuowu = [UIAlertController alertControllerWithTitle:@"用户名不存在！" message:nil preferredStyle:UIAlertControllerStyleAlert];
-//                    [mimacuowu addAction:[UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-//                    }]];
-//                    [self presentViewController:mimacuowu animated:YES completion:nil];
-//                }else
-//                {
-//                    if ([responseObject[@"msg"] isEqualToString:@"密码错误!"])
-//                    {
-//                        UIAlertController *mimacuowu = [UIAlertController alertControllerWithTitle:@"密码错误！" message:nil preferredStyle:UIAlertControllerStyleAlert];
-//                        [mimacuowu addAction:[UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-//                        }]];
-//                        [self presentViewController:mimacuowu animated:YES completion:nil];
-//                    }
-//                    else{
-                
-//                    }
-//                }
             } failure:^(NSError *error) {
                 NSLog(@"error = %@",error);
             }];

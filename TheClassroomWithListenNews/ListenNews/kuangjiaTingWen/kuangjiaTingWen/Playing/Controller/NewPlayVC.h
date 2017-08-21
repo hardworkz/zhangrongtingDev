@@ -15,6 +15,9 @@
 #define NewPlayVC_PLAY_INDEX @"NewPlayVC_CurrentPlayIndex"
 #define NewPlayVC_PLAY_CHANNEL @"NewPlayVC_PlayChannel"
 #define NewPlayVC_GESTUER_ALERT @"NewPlayVC_GestureAlert"
+#define yitingguoxinwenID @"yitingguoxinwenID"
+#define dangqianbofangxinwenID @"dangqianbofangxinwenID"
+
 
 typedef NS_ENUM(NSInteger, PlayType) {
     PlayTypeNone = 0,//未知播放
@@ -49,6 +52,10 @@ typedef NS_ENUM(NSInteger, RewardViewType) {
 @property(assign,nonatomic)CGFloat dateFont;
 @property(nonatomic)NSString *post_id;/**<新闻ID*/
 /**
+ 已经听过的新闻或者已购买课堂的ID
+ */
+@property (strong, nonatomic) NSMutableArray *listenedNewsIDArray;
+/**
  选中播放对应index的音频
  
  @param index 对应index
@@ -58,5 +65,8 @@ typedef NS_ENUM(NSInteger, RewardViewType) {
  刷新视图界面
  */
 - (void)reloadInterface;
-
+/**
+ 主播详情页面点击列表播放按钮调用
+ */
+- (void)achorVCDidClickedListPlayBtn;
 @end

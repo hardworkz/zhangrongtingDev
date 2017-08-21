@@ -340,73 +340,86 @@ static NSString *const VIPContent = @"普通会员:\n1.每日可收听新闻数�
     [_alertView coverClick];
 }
 #pragma mark - 支付结果通知方法
-- (void)AliPayResults:(NSNotification *)notification {
-    
-    NSString* title=@"PaySuccess1",*msg=@"您已支付成功",*sureTitle=@"确定" , *cancelTitle=@"取消吧";
-    AKAlertView* av;
-    APPDELEGATE.payType = PayTypeNone;
+- (void)AliPayResults:(NSNotification *)notification
+{
+    NSString* title=@"支付结果",*msg=@"您的会员已开通成功",*sureTitle=@"确定";
     NSDictionary *resultDic = notification.object;
     if ([resultDic[@"resultStatus"]integerValue] == 9000) {
-        NSString* title=@"PaySuccess1",*msg=@"您已支付成功",*sureTitle=@"确定" , *cancelTitle=@"取消吧";
-        av= [AKAlertView alertView:title des:msg  type:AKAlertFaild effect:AKAlertEffectDrop sureTitle:sureTitle cancelTitle:cancelTitle];
-        [self setUpData];
+        
+        UIAlertController *qingshuruyonghuming = [UIAlertController alertControllerWithTitle:title message:msg preferredStyle:UIAlertControllerStyleAlert];
+        [qingshuruyonghuming addAction:[UIAlertAction actionWithTitle:sureTitle style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+            [self setUpData];
+        }]];
+        [self presentViewController:qingshuruyonghuming animated:YES completion:nil];
+
     }
     else if ([resultDic[@"resultStatus"]integerValue] == 8000){
         //正在处理中
-        av= [AKAlertView alertView:title des:msg  type:AKAlertFaild effect:AKAlertEffectDrop sureTitle:sureTitle cancelTitle:cancelTitle];
+        title=@"支付结果";msg=@"正在处理中";sureTitle=@"确定";
+        UIAlertController *qingshuruyonghuming = [UIAlertController alertControllerWithTitle:title message:msg preferredStyle:UIAlertControllerStyleAlert];
+        [qingshuruyonghuming addAction:[UIAlertAction actionWithTitle:sureTitle style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        }]];
+        [self presentViewController:qingshuruyonghuming animated:YES completion:nil];
     }
     else if ([resultDic[@"resultStatus"]integerValue] == 4000){
         //订单支付失败
-        title=@"PayFail1";msg=@"返回信息错误，请稍后再试";sureTitle=@"确定";
-        av= [AKAlertView alertView:title des:msg  type:AKAlertFaild effect:AKAlertEffectDrop sureTitle:sureTitle cancelTitle:cancelTitle];
+        title=@"支付结果";msg=@"返回信息错误，请稍后再试";sureTitle=@"确定";
+        UIAlertController *qingshuruyonghuming = [UIAlertController alertControllerWithTitle:title message:msg preferredStyle:UIAlertControllerStyleAlert];
+        [qingshuruyonghuming addAction:[UIAlertAction actionWithTitle:sureTitle style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        }]];
+        [self presentViewController:qingshuruyonghuming animated:YES completion:nil];
     }
     else if ([resultDic[@"resultStatus"]integerValue] == 6001){
         //用户中途取消
-        title=@"PayFail1";msg=@"用户中途取消，请稍后再试";sureTitle=@"确定";
-        av= [AKAlertView alertView:title des:msg  type:AKAlertFaild effect:AKAlertEffectDrop sureTitle:sureTitle cancelTitle:cancelTitle];
+        title=@"支付结果";msg=@"用户中途取消，请稍后再试";sureTitle=@"确定";
+        UIAlertController *qingshuruyonghuming = [UIAlertController alertControllerWithTitle:title message:msg preferredStyle:UIAlertControllerStyleAlert];
+        [qingshuruyonghuming addAction:[UIAlertAction actionWithTitle:sureTitle style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        }]];
+        [self presentViewController:qingshuruyonghuming animated:YES completion:nil];
     }
     else if ([resultDic[@"resultStatus"]integerValue] == 6002){
         //网络连接出错
-        title=@"PayFail1";msg=@"网络连接出错，请稍后再试";sureTitle=@"确定";
-        av= [AKAlertView alertView:title des:msg  type:AKAlertFaild effect:AKAlertEffectDrop sureTitle:sureTitle cancelTitle:cancelTitle];
+        title=@"支付结果";msg=@"网络连接出错，请稍后再试";sureTitle=@"确定";
+        UIAlertController *qingshuruyonghuming = [UIAlertController alertControllerWithTitle:title message:msg preferredStyle:UIAlertControllerStyleAlert];
+        [qingshuruyonghuming addAction:[UIAlertAction actionWithTitle:sureTitle style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        }]];
+        [self presentViewController:qingshuruyonghuming animated:YES completion:nil];
     }
     else{
         //
-        title=@"PayFail1";msg=@"返回信息错误，请稍后再试";sureTitle=@"确定";
-        av= [AKAlertView alertView:title des:msg  type:AKAlertFaild effect:AKAlertEffectDrop sureTitle:sureTitle cancelTitle:cancelTitle];
+        title=@"支付结果";msg=@"返回信息错误，请稍后再试";sureTitle=@"确定";
+        UIAlertController *qingshuruyonghuming = [UIAlertController alertControllerWithTitle:title message:msg preferredStyle:UIAlertControllerStyleAlert];
+        [qingshuruyonghuming addAction:[UIAlertAction actionWithTitle:sureTitle style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        }]];
+        [self presentViewController:qingshuruyonghuming animated:YES completion:nil];
     }
-    
-    av.sureClick=^(AKAlertView* av,BOOL isMessageSelected,NSString *message){
-    };
-    [av show];
     //充值成功 --》 获取用户信息
     [[NSNotificationCenter defaultCenter] postNotificationName:@"updateUserInfo" object:nil];
 }
 
 - (void)WechatPayResults:(NSNotification *)notification {
-    NSString* title=@"PaySuccess1",*msg=@"您已支付成功",*sureTitle=@"确定" , *cancelTitle=@"取消吧";
-    APPDELEGATE.payType = PayTypeNone;
-    AKAlertView* av;
+    NSString* title=@"支付结果",*msg=@"您的会员已开通成功",*sureTitle=@"确定";
     if ([notification.object integerValue] == 0) {
-        NSString* title=@"PaySuccess1",*msg=@"您已支付成功",*sureTitle=@"确定" , *cancelTitle=@"取消吧";
-        av= [AKAlertView alertView:title des:msg  type:AKAlertFaild effect:AKAlertEffectDrop sureTitle:sureTitle cancelTitle:cancelTitle];
-        [self setUpData];
+        UIAlertController *qingshuruyonghuming = [UIAlertController alertControllerWithTitle:title message:msg preferredStyle:UIAlertControllerStyleAlert];
+        [qingshuruyonghuming addAction:[UIAlertAction actionWithTitle:sureTitle style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+            [self setUpData];
+        }]];
+        [self presentViewController:qingshuruyonghuming animated:YES completion:nil];
     }
     else if ([notification.object integerValue] == -2){
-        title=@"PayFail1";msg=@"用户中途取消，请稍后再试";sureTitle=@"确定";
-        av= [AKAlertView alertView:title des:msg  type:AKAlertFaild effect:AKAlertEffectDrop sureTitle:sureTitle cancelTitle:cancelTitle];
+        title=@"支付结果";msg=@"用户中途取消，请稍后再试";sureTitle=@"确定";
+        UIAlertController *qingshuruyonghuming = [UIAlertController alertControllerWithTitle:title message:msg preferredStyle:UIAlertControllerStyleAlert];
+        [qingshuruyonghuming addAction:[UIAlertAction actionWithTitle:sureTitle style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        }]];
+        [self presentViewController:qingshuruyonghuming animated:YES completion:nil];
     }
     else{
-        title=@"PayFail1";msg=@"返回信息错误，请稍后再试";sureTitle=@"确定";
-        av= [AKAlertView alertView:title des:msg  type:AKAlertFaild effect:AKAlertEffectDrop sureTitle:sureTitle cancelTitle:cancelTitle];
+        title=@"支付结果";msg=@"返回信息错误，请稍后再试";sureTitle=@"确定";
+        UIAlertController *qingshuruyonghuming = [UIAlertController alertControllerWithTitle:title message:msg preferredStyle:UIAlertControllerStyleAlert];
+        [qingshuruyonghuming addAction:[UIAlertAction actionWithTitle:sureTitle style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        }]];
+        [self presentViewController:qingshuruyonghuming animated:YES completion:nil];
     }
-    DefineWeakSelf
-    av.sureClick=^(AKAlertView* av,BOOL isMessageSelected,NSString *message){
-        [av removeFromSuperview];
-        [weakSelf.navigationController popViewControllerAnimated:YES];
-    };
-    
-    [av show];
     //充值成功 --》 获取用户信息
     [[NSNotificationCenter defaultCenter] postNotificationName:@"updateUserInfo" object:nil];
 }

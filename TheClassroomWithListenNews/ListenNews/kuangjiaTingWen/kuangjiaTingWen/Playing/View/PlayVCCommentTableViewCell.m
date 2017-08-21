@@ -161,48 +161,66 @@
 {
     PinglundianzanCustomBtn *pinglundianzanBtn = (PinglundianzanCustomBtn *)sender;
     UILabel *dianzanNumlab = pinglundianzanBtn.PingLundianzanNumLab;
-    if (!self.isClassComment) {//新闻评论点赞
-        
-        //    NSIndexPath *indexPath = [self.tableView indexPathForCell:self];
-        if ([[CommonCode readFromUserD:@"isLogin"]boolValue] == YES) {
-            if (sender.selected == YES){
-                if ([dianzanNumlab.text intValue] == 0) {
-                    dianzanNumlab.text = @"0";
-                }else
-                {
-                    dianzanNumlab.text = [NSString stringWithFormat:@"%d",[dianzanNumlab.text intValue] - 1];
+    switch (_commentCellType) {
+        case CommentCellTypeNewsDetail:{
+            if ([[CommonCode readFromUserD:@"isLogin"]boolValue] == YES) {
+                sender.enabled = NO;
+                if (sender.selected == YES){
+                    [NetWorkTool addAndCancelPraiseWithaccessToken:[DSE encryptUseDES:ExdangqianUser] comments_id:_frameModel.model.playCommentID sccess:^(NSDictionary *responseObject) {
+                        sender.enabled = YES;
+                        if ([responseObject[msg] isEqualToString:@"取消成功!"]) {
+                            //设置点赞按钮状态
+                            dianzanNumlab.text = [NSString stringWithFormat:@"%d",[dianzanNumlab.text intValue] - 1];
+                            dianzanNumlab.textColor = [UIColor grayColor];
+                            dianzanNumlab.alpha = 0.7f;
+                            sender.selected = NO;
+                            //设置模型数据状态
+                            _frameModel.model.praisenum = dianzanNumlab.text;
+                            _frameModel.model.praiseFlag = @"2";
+                        }
+                    } failure:^(NSError *error) {
+                        sender.enabled = YES;
+                        NSLog(@"error = %@",error);
+                    }];
                 }
-                dianzanNumlab.textColor = [UIColor grayColor];
-                dianzanNumlab.alpha = 0.7f;
-                sender.selected = NO;
-                [NetWorkTool addAndCancelPraiseWithaccessToken:[DSE encryptUseDES:ExdangqianUser] comments_id:_frameModel.model.playCommentID sccess:^(NSDictionary *responseObject) {
-                    NSLog(@"responseObject = %@",responseObject);
-                    NSLog(@"针对评论取消点赞");
-                } failure:^(NSError *error) {
-                    NSLog(@"error = %@",error);
-                }];
+                else{
+                    [NetWorkTool addAndCancelPraiseWithaccessToken:[DSE encryptUseDES:ExdangqianUser] comments_id:_frameModel.model.playCommentID sccess:^(NSDictionary *responseObject) {
+                        sender.enabled = YES;
+                        if ([responseObject[msg] isEqualToString:@"点赞成功!"]) {
+                            //设置点赞按钮状态
+                            dianzanNumlab.text = [NSString stringWithFormat:@"%d",[dianzanNumlab.text intValue] + 1];
+                            dianzanNumlab.textColor = ColorWithRGBA(0, 159, 240, 1);
+                            dianzanNumlab.alpha = 1.0f;
+                            sender.selected = YES;
+                            //设置模型数据状态
+                            _frameModel.model.praisenum = dianzanNumlab.text;
+                            _frameModel.model.praiseFlag = @"2";
+                        }
+                    } failure:^(NSError *error) {
+                        sender.enabled = YES;
+                        NSLog(@"error = %@",error);
+                    }];
+                }
+                
+            }else{
+                [self loginFirst];
             }
-            else{
-                dianzanNumlab.text = [NSString stringWithFormat:@"%d",[dianzanNumlab.text intValue] + 1];
-                dianzanNumlab.textColor = ColorWithRGBA(0, 159, 240, 1);
-                dianzanNumlab.alpha = 1.0f;
-                sender.selected = YES;
-                [NetWorkTool addAndCancelPraiseWithaccessToken:[DSE encryptUseDES:ExdangqianUser] comments_id:_frameModel.model.playCommentID sccess:^(NSDictionary *responseObject) {
-                    NSLog(@"responseObject = %@",responseObject);
-                    NSLog(@"针对评论点赞");
-                } failure:^(NSError *error) {
-                    NSLog(@"error = %@",error);
-                }];
-            }
+        }
             
-        }else{
-            [self loginFirst];
-        }
-    }else//课堂评论点赞
-    {
-        if (self.zanClicked) {
-            self.zanClicked(pinglundianzanBtn, self.frameModel);
-        }
+            break;
+        case CommentCellTypeClassroom:
+            if (self.zanClicked) {
+                self.zanClicked(pinglundianzanBtn, self.frameModel);
+            }
+            break;
+        case CommentCellTypeAchorCommentList:
+            if (self.achorVCZanClicked) {
+                self.achorVCZanClicked(pinglundianzanBtn, self.frameModel);
+            }
+            break;
+            
+        default:
+            break;
     }
 }
 - (void)loginFirst {

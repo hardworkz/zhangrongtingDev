@@ -47,11 +47,6 @@ typedef void (^WechatdidReceiveCode)(NSString *);
 
 @property (assign, nonatomic) BOOL isLogin;//是否登录
 
-//@property (copy, nonatomic) SkipToPlayingVCBlock shouyeSkipToPlayingVC;
-//@property (copy, nonatomic) SkipToPlayingVCBlock dingyueSkipToPlayingVC;
-//@property (copy, nonatomic) SkipToPlayingVCBlock faxianSkipToPlayingVC;
-//@property (copy, nonatomic) SkipToPlayingVCBlock woSkipToPlayingVC;
-
 @property (copy, nonatomic) WeibodidReceiveResponse weibologinSuccess;
 @property (copy, nonatomic) WechatdidReceiveCode wechatGetLoginCode;
 

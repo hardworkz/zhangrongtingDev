@@ -98,8 +98,6 @@
 
 - (void)setupData {
     
-//    [self.zhuyetableView registerNib:[UINib nibWithNibName:BlobNewTableViewCellID bundle:nil] forCellReuseIdentifier:BlobNewTableViewCellID];
-    
     if (self.isMypersonalPage || self.isNewsComment) {
 //        [self loadData];
     }
@@ -109,12 +107,18 @@
     if (!self.isMypersonalPage) {
         //获取用户信息
         [NetWorkTool getMyuserinfoWithaccessToken:nil user_id:self.user_id sccess:^(NSDictionary *responseObject) {
-            _friendsLv = responseObject[@"results"][@"level"];
+            _friendsLv = responseObject[results][@"level"];
             [weakSelf TopUI];
-            fensiNum.text = responseObject[@"results"][@"fan_num"];
-            guanzhuNum.text = responseObject[@"results"][@"guan_num"];
-            self.user_login = responseObject[@"results"][@"user_login"];
+            fensiNum.text = responseObject[results][@"fan_num"];
+            guanzhuNum.text = responseObject[results][@"guan_num"];
+            self.user_login = responseObject[results][@"user_login"];
             [self.zhuyetableView.mj_header beginRefreshing];
+            //判断是否已经播放限制
+            if ([responseObject[results][is_stop] intValue] == 1) {
+                ExLimitPlay = YES;
+            }else{
+                ExLimitPlay = NO;
+            }
             
         } failure:^(NSError *error) {
             //
@@ -125,8 +129,8 @@
         
         if ([[CommonCode readFromUserD:@"isLogin"]boolValue] == YES){
             [NetWorkTool getPaoGuoGuanZhuLieBiaoWithaccessToken:AvatarAccessToken andPage:@"1" andLimit:@"99999" sccess:^(NSDictionary *responseObject) {
-                if ([responseObject[@"results"] isKindOfClass:[NSArray class]]){
-                    NSArray *resultArr = responseObject[@"results"];
+                if ([responseObject[results] isKindOfClass:[NSArray class]]){
+                    NSArray *resultArr = responseObject[results];
                     for (int i = 0 ; i < [resultArr count]; i ++) {
                         if ([resultArr[i][@"user_login"] isEqualToString:self.user_login]) {
                             _isFan = YES;
@@ -161,8 +165,8 @@
         [weakSelf TopUI];
         self.user_login = ExdangqianUser;
         NSMutableDictionary *myUserInfo = [CommonCode readFromUserD:@"dangqianUserInfo"];
-        fensiNum.text = myUserInfo[@"results"][@"fan_num"];
-        guanzhuNum.text = myUserInfo[@"results"][@"guan_num"];
+        fensiNum.text = myUserInfo[results][@"fan_num"];
+        guanzhuNum.text = myUserInfo[results][@"guan_num"];
         [self refreshData];
         [self.zhuyetableView.mj_header beginRefreshing];
     }
@@ -225,8 +229,8 @@
     NSString *lastReadTime = [CommonCode readFromUserD:PERSONALLASTREAD];
     [NetWorkTool getAddcriticismNumWithaccessToken:AvatarAccessToken andpage:@"1" andlimit:@"100" anddate:lastReadTime sccess:^(NSDictionary *responseObject) {
         if ([responseObject[@"status"] integerValue] == 1) {
-            if ([responseObject[@"results"] isKindOfClass:[NSArray class]]){
-                [CommonCode writeToUserD:responseObject[@"results"] andKey:ADDCRITICISMNUMDATAKEY];
+            if ([responseObject[results] isKindOfClass:[NSArray class]]){
+                [CommonCode writeToUserD:responseObject[results] andKey:ADDCRITICISMNUMDATAKEY];
             }
             else{
                 [CommonCode writeToUserD:nil andKey:ADDCRITICISMNUMDATAKEY];
@@ -464,8 +468,8 @@
     NSInteger lv = 1;
     if (self.isMypersonalPage) {
         NSDictionary *userInfo = [CommonCode readFromUserD:@"dangqianUserInfo"];
-        lv = [userInfo[@"results"][@"level"] integerValue];
-        [lvLab setText:userInfo[@"results"][@"level"]];
+        lv = [userInfo[results][@"level"] integerValue];
+        [lvLab setText:userInfo[results][@"level"]];
     }
     else{
         lv = [_friendsLv integerValue];
@@ -907,8 +911,8 @@ didSelectLinkWithTransitInformation:(NSDictionary *)components {
 - (void)loadData {
     
     [NetWorkTool getPaoGuoSelfFenSiLieBiaoWithaccessToken:[DSE encryptUseDES:self.user_login] andPage:@"1" andLimit:@"99999" sccess:^(NSDictionary *responseObject) {
-        if ([responseObject[@"results"] isKindOfClass:[NSArray class]]){
-            NSArray *fanListArr = responseObject[@"results"];
+        if ([responseObject[results] isKindOfClass:[NSArray class]]){
+            NSArray *fanListArr = responseObject[results];
             if ([fanListArr count]) {
                 self.fanCount = [fanListArr count];
                 fensiNum.text = [NSString stringWithFormat:@"%ld",self.fanCount];
@@ -930,8 +934,8 @@ didSelectLinkWithTransitInformation:(NSDictionary *)components {
     
     
     [NetWorkTool getPaoGuoGuanZhuLieBiaoWithaccessToken:[DSE encryptUseDES:self.user_login] andPage:@"1" andLimit:@"99999" sccess:^(NSDictionary *responseObject) {
-        if ([responseObject[@"results"] isKindOfClass:[NSArray class]]){
-            NSArray *attentionListArr = responseObject[@"results"];
+        if ([responseObject[results] isKindOfClass:[NSArray class]]){
+            NSArray *attentionListArr = responseObject[results];
             if ([attentionListArr count]) {
                 self.attentionCount = [attentionListArr count];
                 guanzhuNum.text = [NSString stringWithFormat:@"%ld",self.attentionCount];
@@ -960,8 +964,8 @@ didSelectLinkWithTransitInformation:(NSDictionary *)components {
 - (void)shangLaJiaZai {
     numberPage++;
     [NetWorkTool getMyDynamicsListWithaccessToken:[DSE encryptUseDES:self.user_login] login_uid:ExdangqianUserUid andPage:[NSString stringWithFormat:@"%d",numberPage]  andLimit:@"10" sccess:^(NSDictionary *responseObject) {
-        if ([responseObject[@"results"] isKindOfClass:[NSArray class]]){
-            NSMutableArray *array = [FeedBackAndListenFriendModel mj_objectArrayWithKeyValuesArray:responseObject[@"results"]];
+        if ([responseObject[results] isKindOfClass:[NSArray class]]){
+            NSMutableArray *array = [FeedBackAndListenFriendModel mj_objectArrayWithKeyValuesArray:responseObject[results]];
             [self.infoArr addObjectsFromArray:[self frameArrayWithDataArray:array]];
             if (array.count < 10) {
                 [self.zhuyetableView.mj_footer endRefreshingWithNoMoreData];
@@ -995,10 +999,10 @@ didSelectLinkWithTransitInformation:(NSDictionary *)components {
 - (void)refreshData {
     
         [NetWorkTool getMyDynamicsListWithaccessToken:[DSE encryptUseDES:self.user_login] login_uid:ExdangqianUserUid andPage:@"1" andLimit:@"10" sccess:^(NSDictionary *responseObject) {
-            if ([responseObject[@"results"] isKindOfClass:[NSArray class]])
+            if ([responseObject[results] isKindOfClass:[NSArray class]])
             {
                 [self.infoArr removeAllObjects];
-                NSMutableArray *array = [FeedBackAndListenFriendModel mj_objectArrayWithKeyValuesArray:responseObject[@"results"]];
+                NSMutableArray *array = [FeedBackAndListenFriendModel mj_objectArrayWithKeyValuesArray:responseObject[results]];
                 [self.infoArr addObjectsFromArray:[self frameArrayWithDataArray:array]];
             }
             [self.zhuyetableView reloadData];

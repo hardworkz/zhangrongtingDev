@@ -43,29 +43,55 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
         }
         self.playRate = 1.0;
         //获取限制播放状态
-        [self limitPlayStatus];
+        [self limitPlayStatusWithAdd:NO];
     }
     return self;
 }
-- (void)limitPlayStatus{
+- (void)limitPlayStatusWithAdd:(BOOL)isAdd{
     //判断是否是播放新闻，记录次数限制
     NSDictionary *userInfoDict = [CommonCode readFromUserD:@"dangqianUserInfo"];
     if ([userInfoDict[results][member_type] intValue] == 0) {
         int limitTime = [[CommonCode readFromUserD:[NSString stringWithFormat:@"%@_%@",limit_time,ExdangqianUserUid?ExdangqianUserUid:@""]] intValue];
         int limitNum = [[CommonCode readFromUserD:[NSString stringWithFormat:@"%@",limit_num]] intValue];
-        if (limitTime >= limitNum) {
-            ExLimitPlay = YES;
-            [NetWorkTool sendLimitDataWithaccessToken:AvatarAccessToken sccess:^(NSDictionary *responseObject) {
-                if ([responseObject[status] intValue] == 1) {
-                    [[NSNotificationCenter defaultCenter] postNotificationName:@"updateUserInfo" object:nil];
-                }
-            } failure:^(NSError *error) {
-                
-            }];
+        if (limitTime >= limitNum||[userInfoDict[results][is_stop] intValue] == 1) {
+            switch (self.playType) {
+                case ZRTPlayTypeNews:
+                    ExLimitPlay = YES;
+                    [NetWorkTool sendLimitDataWithaccessToken:AvatarAccessToken sccess:^(NSDictionary *responseObject) {
+                        if ([responseObject[status] intValue] == 1) {
+                            [[NSNotificationCenter defaultCenter] postNotificationName:@"updateUserInfo" object:nil];
+                        }
+                    } failure:^(NSError *error) {
+                        
+                    }];
+                    break;
+                case ZRTPlayTypeDownload:
+                    ExLimitPlay = NO;
+                    break;
+                case ZRTPlayTypeClassroom:
+                    ExLimitPlay = NO;
+                    break;
+                    
+                default:
+                    ExLimitPlay = YES;
+                    [NetWorkTool sendLimitDataWithaccessToken:AvatarAccessToken sccess:^(NSDictionary *responseObject) {
+                        if ([responseObject[status] intValue] == 1) {
+                            [[NSNotificationCenter defaultCenter] postNotificationName:@"updateUserInfo" object:nil];
+                        }
+                    } failure:^(NSError *error) {
+                        
+                    }];
+                    break;
+            }
         }else{
             ExLimitPlay = NO;
-            [CommonCode writeToUserD:[NSString stringWithFormat:@"%d",limitTime + 1] andKey:[NSString stringWithFormat:@"%@_%@",limit_time,ExdangqianUserUid]];
+            if (isAdd) {
+                [CommonCode writeToUserD:[NSString stringWithFormat:@"%d",limitTime + 1] andKey:[NSString stringWithFormat:@"%@_%@",limit_time,ExdangqianUserUid?ExdangqianUserUid:@""]];
+            }
         }
+    }else
+    {
+        ExLimitPlay = NO;
     }
 }
 - (NSMutableArray *)downloadPostIDArray
@@ -588,10 +614,13 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
         
         NSArray * array = songItem.loadedTimeRanges;
         CMTimeRange timeRange = [array.firstObject CMTimeRangeValue]; //本次缓冲的时间范围
-        NSTimeInterval totalBuffer = CMTimeGetSeconds(timeRange.start) + CMTimeGetSeconds(timeRange.duration); //缓冲总长度
-        RTLog(@"共缓冲%.2f",totalBuffer);
+        NSTimeInterval totalBufferDuration = CMTimeGetSeconds(timeRange.start) + CMTimeGetSeconds(timeRange.duration); //缓冲总长度
+        NSTimeInterval totalDuration = CMTimeGetSeconds(songItem.duration);
+        if (totalDuration<=0 || isinf(totalDuration)) return;
+        self.duration = totalDuration;
+        RTLog(@"共缓冲:%.2f秒",totalBufferDuration);
         if (self.reloadBufferProgress) {
-            self.reloadBufferProgress(totalBuffer/self.duration);
+            self.reloadBufferProgress(totalBufferDuration/totalDuration);
         }
         
     }else if ([keyPath isEqualToString:kvo_playbackBufferEmpty])
@@ -650,11 +679,11 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
 - (UIColor *)textColorFormID:(NSString *)post_id
 {
     UIColor *returnColor = [UIColor blackColor];
-    if ([[CommonCode readFromUserD:@"yitingguoxinwenID"] isKindOfClass:[NSArray class]]){
-        NSArray *yitingguoArr = [NSArray arrayWithArray:[CommonCode readFromUserD:@"yitingguoxinwenID"]];
+    if ([[NewPlayVC shareInstance].listenedNewsIDArray isKindOfClass:[NSArray class]]){
+        NSArray *yitingguoArr = [NSArray arrayWithArray:[NewPlayVC shareInstance].listenedNewsIDArray];
         for (int i = 0; i < yitingguoArr.count; i ++){
             if ([post_id isEqualToString:yitingguoArr[i]]){
-                if ([[CommonCode readFromUserD:@"dangqianbofangxinwenID"] isEqualToString:post_id]){
+                if ([[CommonCode readFromUserD:dangqianbofangxinwenID] isEqualToString:post_id]){
                     returnColor = gMainColor;
                     break;
                 }

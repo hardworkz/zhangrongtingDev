@@ -130,26 +130,7 @@ typedef enum : NSUInteger {
         
         
         //判断是否是单次下载新闻，记录次数限制
-        NSDictionary *userInfoDict = [CommonCode readFromUserD:@"dangqianUserInfo"];
-        RTLog(@"%@",userInfoDict);
-        if ([userInfoDict[results][member_type] intValue] == 0) {
-            int limitTime = [[CommonCode readFromUserD:[NSString stringWithFormat:@"%@_%@",limit_time,ExdangqianUserUid?ExdangqianUserUid:@""]] intValue];
-            RTLog(@"limit_time---%d",limitTime);
-            int limitNum = [[CommonCode readFromUserD:[NSString stringWithFormat:@"%@",limit_num]] intValue];
-            if (limitTime >= limitNum) {
-                ExLimitPlay = YES;
-                [NetWorkTool sendLimitDataWithaccessToken:AvatarAccessToken sccess:^(NSDictionary *responseObject) {
-                    if ([responseObject[status] intValue] == 1) {
-                        [[NSNotificationCenter defaultCenter] postNotificationName:@"updateUserInfo" object:nil];
-                    }
-                } failure:^(NSError *error) {
-                    
-                }];
-            }else{
-                ExLimitPlay = NO;
-                [CommonCode writeToUserD:[NSString stringWithFormat:@"%d",limitTime + 1] andKey:[NSString stringWithFormat:@"%@_%@",limit_time,ExdangqianUserUid]];
-            }
-        }
+        [[ZRT_PlayerManager manager] limitPlayStatusWithAdd:YES];
     }
     return self;
 }
