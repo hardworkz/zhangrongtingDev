@@ -113,12 +113,6 @@
             guanzhuNum.text = responseObject[results][@"guan_num"];
             self.user_login = responseObject[results][@"user_login"];
             [self.zhuyetableView.mj_header beginRefreshing];
-            //判断是否已经播放限制
-            if ([responseObject[results][is_stop] intValue] == 1) {
-                ExLimitPlay = YES;
-            }else{
-                ExLimitPlay = NO;
-            }
             
         } failure:^(NSError *error) {
             //

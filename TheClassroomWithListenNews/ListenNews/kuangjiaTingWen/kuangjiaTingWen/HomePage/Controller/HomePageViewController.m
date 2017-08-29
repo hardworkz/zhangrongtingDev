@@ -15,7 +15,7 @@
 #import "AppDelegate.h"
 #import "bofangVC.h"
 #import "guanggaoVC.h"
-#import "lunboxiangqingVC.h"
+//#import "lunboxiangqingVC.h"
 #import "NewReportViewController.h"
 #import "ClassViewController.h"
 
@@ -192,7 +192,7 @@
 - (UITableView *)columnTableView{
     if (!_columnTableView){
         _columnTableView = [[UITableView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, self.scrollView.frame.size.height) style:UITableViewStylePlain];
-        [_classroomTableView setSeparatorStyle:UITableViewCellSeparatorStyleNone];
+        [_columnTableView setSeparatorStyle:UITableViewCellSeparatorStyleNone];
         _columnTableView.delegate = self;
         _columnTableView.dataSource = self;
         _columnTableView.tableFooterView = [UIView new];
@@ -384,30 +384,6 @@
     [self.classroomTableView.mj_footer endRefreshing];
 }
 
-- (void)downloadNewsAction:(UIButton *)sender{
-    [SVProgressHUD showInfoWithStatus:@"开始下载"];
-    [self performSelector:@selector(SVPDismiss) withObject:nil afterDelay:1.0];
-    NSMutableDictionary *dic = self.newsInfoArr[sender.tag - 100];
-    dispatch_async(dispatch_get_main_queue(), ^{
-        ProjiectDownLoadManager *manager = [ProjiectDownLoadManager defaultProjiectDownLoadManager];
-        [manager insertSevaDownLoadArray:dic];
-        WHC_Download *op = [[WHC_Download alloc]initStartDownloadWithURL:[NSURL URLWithString:dic[@"post_mp"]] savePath:manager.userDownLoadPath savefileName:[dic[@"post_mp"] stringByReplacingOccurrencesOfString:@"/" withString:@""] withObj:dic delegate:nil];
-        [manager.downLoadQueue addOperation:op];
-    });
-}
-
-- (void)downloadColumnNewsAction:(UIButton *)sender{
-    [SVProgressHUD showInfoWithStatus:@"开始下载"];
-    [self performSelector:@selector(SVPDismiss) withObject:nil afterDelay:1.0];
-    NSMutableDictionary *dic = self.columnInfoArr[sender.tag - 100];
-    dispatch_async(dispatch_get_main_queue(), ^{
-        ProjiectDownLoadManager *manager = [ProjiectDownLoadManager defaultProjiectDownLoadManager];
-        [manager insertSevaDownLoadArray:dic];
-        WHC_Download *op = [[WHC_Download alloc]initStartDownloadWithURL:[NSURL URLWithString:dic[@"post_mp"]] savePath:manager.userDownLoadPath savefileName:[dic[@"post_mp"] stringByReplacingOccurrencesOfString:@"/" withString:@""] withObj:dic delegate:nil];
-        [manager.downLoadQueue addOperation:op];
-    });
-}
-
 - (void)SVPDismiss {
     [SVProgressHUD dismiss];
 }
@@ -445,67 +421,6 @@
     [self.navigationController pushViewController:guangao animated:NO];
     self.hidesBottomBarWhenPushed = NO;
 }
-/**
- 点击中心按钮跳转上一次记录新闻详情界面播放
- */
-//- (void)skipToLastNews
-//{
-//    [ZRT_PlayerManager manager].songList = [CommonCode readFromUserD:NewPlayVC_PLAYLIST];
-//    [ZRT_PlayerManager manager].currentSong = [CommonCode readFromUserD:NewPlayVC_THELASTNEWSDATA];
-//    //设置播放器播放内容类型
-//    [ZRT_PlayerManager manager].playType = ZRTPlayTypeNews;
-//    [NewPlayVC shareInstance].rewardType = RewardViewTypeNone;
-//    [ZRT_PlayerManager manager].channelType = [[CommonCode readFromUserD:NewPlayVC_PLAY_CHANNEL] intValue];
-//    [[NewPlayVC shareInstance] playFromIndex:[[CommonCode readFromUserD:NewPlayVC_PLAY_INDEX] integerValue]];
-//    [self.navigationController.navigationBar setHidden:YES];
-//    [self.navigationController pushViewController:[NewPlayVC shareInstance] animated:YES];
-//}
-
-/**
- 根据推送ID获取新闻详情数据
- */
-//- (void)getPushNewsDetail{
-//    DefineWeakSelf;
-//    [NetWorkTool getpostinfoWithpost_id:[[NSUserDefaults standardUserDefaults]valueForKey:@"pushNews"] andpage:nil andlimit:nil sccess:^(NSDictionary *responseObject) {
-//        if ([responseObject[@"status"] integerValue] == 1) {
-//            weakSelf.pushNewsInfo = [responseObject[@"results"] mutableCopy];
-//            [NetWorkTool getAllActInfoListWithAccessToken:nil ac_id:weakSelf.pushNewsInfo[@"post_news"] keyword:nil andPage:nil andLimit:nil sccess:^(NSDictionary *responseObject) {
-//                if ([responseObject[@"status"] integerValue] == 1){
-//                    [weakSelf.pushNewsInfo setObject:[responseObject[@"results"] firstObject] forKey:@"post_act"];
-//                    [weakSelf presentPushNews];
-//                }
-//                else{
-//                    [SVProgressHUD showErrorWithStatus:responseObject[@"msg"]];
-//                }
-//            } failure:^(NSError *error) {
-//                //
-//                [SVProgressHUD showErrorWithStatus:@"网络请求失败"];
-//            }];
-//        }
-//        else{
-//            [SVProgressHUD showErrorWithStatus:responseObject[@"msg"]];
-//        }
-//        
-//    } failure:^(NSError *error) {
-//        [SVProgressHUD showErrorWithStatus:@"网络请求失败"];
-//        NSLog(@"%@",error);
-//    }];
-//}
-/**
- 通知消息点击跳转新闻详情界面播放
- */
-//- (void)presentPushNews
-//{
-//    [ZRT_PlayerManager manager].songList = @[self.pushNewsInfo];
-//    [ZRT_PlayerManager manager].currentSong = self.pushNewsInfo;
-//    //设置播放器播放内容类型
-//    [ZRT_PlayerManager manager].playType = ZRTPlayTypeNews;
-//    [NewPlayVC shareInstance].rewardType = RewardViewTypeNone;
-//    [ZRT_PlayerManager manager].channelType = ChannelTypeChannelNone;
-//    [[NewPlayVC shareInstance] playFromIndex:0];
-//    [self.navigationController.navigationBar setHidden:YES];
-//    [self.navigationController pushViewController:[NewPlayVC shareInstance] animated:YES];
-//}
 
 - (void)newsItemAction:(UIButton *)sender{
     NSString *term_id;
@@ -612,81 +527,10 @@
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
     if (tableView == self.columnTableView){
-        static NSString *columnCellIdentify = @"columnCellIdentify";
-        UITableViewCell *cell = [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:columnCellIdentify];
-        if (!cell){
-            cell = [tableView dequeueReusableCellWithIdentifier:columnCellIdentify];
-        }
+        NewsCell *cell = [NewsCell cellWithTableView:tableView];
         if ([self.columnInfoArr count]) {
-            CGFloat offsetY = 0;
-            //图片
-            UIImageView *imgLeft = [[UIImageView alloc]initWithFrame:CGRectMake(SCREEN_WIDTH - 120.0 / 375 * IPHONE_W, 19 + offsetY, 105.0 / 375 * IPHONE_W,   84.72 / 375 *IPHONE_W)];
-            if (IS_IPAD) {
-                [imgLeft setFrame:CGRectMake(SCREEN_WIDTH - 125.0 / 375 * IPHONE_W, 19 + offsetY, 105.0 / 375 * IPHONE_W, 70.0 / 375 *IPHONE_W)];
-            }
-            
-            if ([NEWSSEMTPHOTOURL(self.columnInfoArr[indexPath.row][@"smeta"])  rangeOfString:@"http"].location != NSNotFound){
-                [imgLeft sd_setImageWithURL:[NSURL URLWithString:NEWSSEMTPHOTOURL(self.columnInfoArr[indexPath.row][@"smeta"])]];
-                //placeholderImage:[UIImage imageNamed:@"thumbnailsdefault"]
-            }
-            else{
-                NSString *str = USERPHOTOHTTPSTRINGZhuBo(NEWSSEMTPHOTOURL(self.columnInfoArr[indexPath.row][@"smeta"]));
-                [imgLeft sd_setImageWithURL:[NSURL URLWithString:str]];
-                //placeholderImage:[UIImage imageNamed:@"thumbnailsdefault"]
-            }
-            [cell.contentView addSubview:imgLeft];
-            imgLeft.contentMode = UIViewContentModeScaleAspectFill;
-            imgLeft.clipsToBounds = YES;
-            
-            //标题
-            UILabel *titleLab = [[UILabel alloc]initWithFrame:CGRectMake(15.0 / 375 * IPHONE_W, 16.0 / 667 * IPHONE_H + offsetY,  SCREEN_WIDTH - 155.0 / 375 * IPHONE_W, 21.0 / 667 *IPHONE_H)];
-            titleLab.text = self.columnInfoArr[indexPath.row][@"post_title"];
-            titleLab.textColor = [[ZRT_PlayerManager manager] textColorFormID:self.columnInfoArr[indexPath.row][@"id"]];
-            titleLab.textAlignment = NSTextAlignmentLeft;
-            titleLab.font = [UIFont boldSystemFontOfSize:17.0f ];
-            [cell.contentView addSubview:titleLab];
-            [titleLab setNumberOfLines:3];
-            titleLab.lineBreakMode = NSLineBreakByWordWrapping;
-            CGSize size = [titleLab sizeThatFits:CGSizeMake(titleLab.frame.size.width, MAXFLOAT)];
-            titleLab.frame = CGRectMake(titleLab.frame.origin.x, titleLab.frame.origin.y, titleLab.frame.size.width, size.height);
-            if (IS_IPAD) {
-                //正文
-                UILabel *detailNews = [[UILabel alloc]initWithFrame:CGRectMake(15.0 / 375 * IPHONE_W, titleLab.frame.origin.y + titleLab.frame.size.height + 20.0 / 667 * SCREEN_HEIGHT, titleLab.frame.size.width, 21.0 / 667 *IPHONE_H)];
-                detailNews.text = self.columnInfoArr[indexPath.row][@"post_excerpt"];
-                detailNews.textColor = gTextColorSub;
-                detailNews.font = [UIFont systemFontOfSize:15.0f];
-                [cell.contentView addSubview:detailNews];
-            }
-            
-            //日期
-            UILabel *riqiLab = [[UILabel alloc]initWithFrame:CGRectMake(15.0 / 375 * IPHONE_W, 86.0 / 667 *IPHONE_H + offsetY, 135.0 / 375 * IPHONE_W, 21.0 / 667 *IPHONE_H)];
-            NSDate *date = [NSDate dateFromString:self.columnInfoArr[indexPath.row][@"post_modified"]];
-            riqiLab.text = [date showTimeByTypeA];
-            riqiLab.textColor = nSubColor;
-            riqiLab.font = [UIFont systemFontOfSize:13.0f];
-            [cell.contentView addSubview:riqiLab];
-            //大小
-            UILabel *dataLab = [[UILabel alloc]initWithFrame:CGRectMake(SCREEN_WIDTH - 213.0 / 375 * IPHONE_W, 86.0 / 667 *IPHONE_H + offsetY, 45.0 / 375 * IPHONE_W, 21.0 / 667 *IPHONE_H)];
-            dataLab.text = [NSString stringWithFormat:@"%.1lf%@",[self.columnInfoArr[indexPath.row][@"post_size"] intValue] / 1024.0 / 1024.0,@"M"];
-            dataLab.textColor = nSubColor;
-            dataLab.font = [UIFont systemFontOfSize:13.0f];
-            dataLab.textAlignment = NSTextAlignmentCenter;
-            [cell.contentView addSubview:dataLab];
-            //下载
-            UIButton *download = [UIButton buttonWithType:UIButtonTypeCustom];
-            [download setFrame:CGRectMake(CGRectGetMaxX(dataLab.frame), 86.0 / 667 *IPHONE_H + offsetY, 30.0 / 667 *IPHONE_H, 30.0 / 667 *IPHONE_H)];
-            [download setImage:[UIImage imageNamed:@"download_grey"] forState:UIControlStateNormal];
-            [download setImageEdgeInsets:UIEdgeInsetsMake(0, 0, 10, 10)];
-            [download setTag:(indexPath.row + 100)];
-            [download addTarget:self action:@selector(downloadColumnNewsAction:) forControlEvents:UIControlEventTouchUpInside];
-            download.accessibilityLabel = @"下载";
-            [cell.contentView addSubview:download];
-            
-            UIView *line = [[UIView alloc]initWithFrame:CGRectMake(15.0 / 375 * SCREEN_WIDTH, CGRectGetMaxY(dataLab.frame) + 12.0 / 667 * SCREEN_HEIGHT, SCREEN_WIDTH - 30.0 / 375 * SCREEN_WIDTH, 0.5)];
-            [line setBackgroundColor:nMineNameColor];
-            [cell.contentView addSubview:line];
+            cell.dataDict = self.columnInfoArr[indexPath.row];
         }
-        [cell setSelectionStyle:UITableViewCellSelectionStyleNone];
         return cell;
     }
     else if (tableView == self.newsTableView){
@@ -695,99 +539,35 @@
         if (!cell){
             cell = [tableView dequeueReusableCellWithIdentifier:NewsCellIdentify];
         }
-        if ([self.newsInfoArr count]) {
-            CGFloat offsetY = 0;
-            if (indexPath.row == 0) {
-                offsetY = 30;
-                //新闻频道
-                CGFloat newsItem_width = (SCREEN_WIDTH - 10.0 / 375 * IPHONE_W)/5;
-                NSArray *newsItemTitle = @[@"财经",@"文娱",@"国际",@"科技",@"时政"];
-                for (int i = 0 ; i < 5; i ++) {
-                    UIButton *newsItem = [UIButton buttonWithType:UIButtonTypeCustom];
-                    [newsItem setFrame:CGRectMake(newsItem_width * i + 5.0 / 375 * IPHONE_W + 5.0, 5, newsItem_width - 5, 25)];
-                    [newsItem.layer setMasksToBounds:YES];
-                    [newsItem.layer setCornerRadius:12.5];
-                    [newsItem.layer setBorderWidth:0.5];
-                    [newsItem.layer setBorderColor:gTextColorSub.CGColor];
-                    [newsItem setTitle:newsItemTitle[i] forState:UIControlStateNormal];
-                    [newsItem setTitleColor:gTextDownload forState:UIControlStateNormal];
-                    [newsItem.titleLabel setFont:gFontMain14];
-                    [newsItem setTag:(500+ i)];
-                    [newsItem addTarget:self action:@selector(newsItemAction:) forControlEvents:UIControlEventTouchUpInside];
-                    [cell.contentView addSubview:newsItem];
-                }
+        CGFloat offsetY = 0;
+        if (indexPath.row == 0) {
+            offsetY = 30;
+            //新闻频道
+            CGFloat newsItem_width = (SCREEN_WIDTH - 10.0 / 375 * IPHONE_W)/5;
+            NSArray *newsItemTitle = @[@"财经",@"文娱",@"国际",@"科技",@"时政"];
+            for (int i = 0 ; i < 5; i ++) {
+                UIButton *newsItem = [UIButton buttonWithType:UIButtonTypeCustom];
+                [newsItem setFrame:CGRectMake(newsItem_width * i + 5.0 / 375 * IPHONE_W + 5.0, 5, newsItem_width - 5, 25)];
+                [newsItem.layer setMasksToBounds:YES];
+                [newsItem.layer setCornerRadius:12.5];
+                [newsItem.layer setBorderWidth:0.5];
+                [newsItem.layer setBorderColor:gTextColorSub.CGColor];
+                [newsItem setTitle:newsItemTitle[i] forState:UIControlStateNormal];
+                [newsItem setTitleColor:gTextDownload forState:UIControlStateNormal];
+                [newsItem.titleLabel setFont:gFontMain14];
+                [newsItem setTag:(500+ i)];
+                [newsItem addTarget:self action:@selector(newsItemAction:) forControlEvents:UIControlEventTouchUpInside];
+                [cell.contentView addSubview:newsItem];
             }
-            else{
-                offsetY = 0;
-            }
-            //图片
-            UIImageView *imgLeft = [[UIImageView alloc]initWithFrame:CGRectMake(SCREEN_WIDTH - 120.0 / 375 * IPHONE_W, 19 + offsetY, 105.0 / 375 * IPHONE_W,   84.72 / 375 *IPHONE_W)];
-            if (IS_IPAD) {
-                [imgLeft setFrame:CGRectMake(SCREEN_WIDTH - 125.0 / 375 * IPHONE_W, 19 + offsetY, 105.0 / 375 * IPHONE_W, 70.0 / 375 *IPHONE_W)];
-            }
-            if ([NEWSSEMTPHOTOURL(self.newsInfoArr[indexPath.row][@"smeta"])  rangeOfString:@"http"].location != NSNotFound){
-                [imgLeft sd_setImageWithURL:[NSURL URLWithString:NEWSSEMTPHOTOURL(self.newsInfoArr[indexPath.row][@"smeta"])]];
-                //placeholderImage:[UIImage imageNamed:@"thumbnailsdefault"]
-            }
-            else{
-                NSString *str = USERPHOTOHTTPSTRINGZhuBo(NEWSSEMTPHOTOURL(self.newsInfoArr[indexPath.row][@"smeta"]));
-                [imgLeft sd_setImageWithURL:[NSURL URLWithString:str]];
-                //placeholderImage:[UIImage imageNamed:@"thumbnailsdefault"]
-            }
-            [cell.contentView addSubview:imgLeft];
-            imgLeft.contentMode = UIViewContentModeScaleAspectFill;
-            imgLeft.clipsToBounds = YES;
-            
-            //标题
-            UILabel *titleLab = [[UILabel alloc]initWithFrame:CGRectMake(15.0 / 375 * IPHONE_W, 16.0 / 667 * IPHONE_H + offsetY,  SCREEN_WIDTH - 155.0 / 375 * IPHONE_W, 21.0 / 667 *IPHONE_H)];
-            titleLab.text = self.newsInfoArr[indexPath.row][@"post_title"];
-            titleLab.textColor = [[ZRT_PlayerManager manager] textColorFormID:self.newsInfoArr[indexPath.row][@"id"]];
-            titleLab.textAlignment = NSTextAlignmentLeft;
-            titleLab.font = [UIFont boldSystemFontOfSize:17.0f ];
-            [cell.contentView addSubview:titleLab];
-            [titleLab setNumberOfLines:3];
-            titleLab.lineBreakMode = NSLineBreakByWordWrapping;
-            CGSize size = [titleLab sizeThatFits:CGSizeMake(titleLab.frame.size.width, MAXFLOAT)];
-            titleLab.frame = CGRectMake(titleLab.frame.origin.x, titleLab.frame.origin.y, titleLab.frame.size.width, size.height);
-            if (IS_IPAD) {
-                //正文
-                UILabel *detailNews = [[UILabel alloc]initWithFrame:CGRectMake(15.0 / 375 * IPHONE_W, titleLab.frame.origin.y + titleLab.frame.size.height + 20.0 / 667 * SCREEN_HEIGHT, titleLab.frame.size.width, 21.0 / 667 *IPHONE_H)];
-                detailNews.text = self.newsInfoArr[indexPath.row][@"post_excerpt"];
-                detailNews.textColor = gTextColorSub;
-                detailNews.font = [UIFont systemFontOfSize:15.0f];
-                [cell.contentView addSubview:detailNews];
-            }
-            
-            //日期
-            UILabel *riqiLab = [[UILabel alloc]initWithFrame:CGRectMake(15.0 / 375 * IPHONE_W, 86.0 / 667 *IPHONE_H + offsetY, 135.0 / 375 * IPHONE_W, 21.0 / 667 *IPHONE_H)];
-            NSDate *date = [NSDate dateFromString:self.newsInfoArr[indexPath.row][@"post_modified"]];
-            riqiLab.text = [date showTimeByTypeA];
-            riqiLab.textColor = nSubColor;
-            riqiLab.font = [UIFont systemFontOfSize:13.0f];
-            [cell.contentView addSubview:riqiLab];
-            //大小
-            UILabel *dataLab = [[UILabel alloc]initWithFrame:CGRectMake(SCREEN_WIDTH - 213.0 / 375 * IPHONE_W, 86.0 / 667 *IPHONE_H + offsetY, 45.0 / 375 * IPHONE_W, 21.0 / 667 *IPHONE_H)];
-            dataLab.text = [NSString stringWithFormat:@"%.1lf%@",[self.newsInfoArr[indexPath.row][@"post_size"] intValue] / 1024.0 / 1024.0,@"M"];
-            dataLab.textColor = nSubColor;
-            dataLab.font = [UIFont systemFontOfSize:13.0f];
-            dataLab.textAlignment = NSTextAlignmentCenter;
-            [cell.contentView addSubview:dataLab];
-            //下载
-            UIButton *download = [UIButton buttonWithType:UIButtonTypeCustom];
-            [download setFrame:CGRectMake(CGRectGetMaxX(dataLab.frame), 86.0 / 667 *IPHONE_H + offsetY, 30.0 / 667 *IPHONE_H, 30.0 / 667 *IPHONE_H)];
-            [download setImage:[UIImage imageNamed:@"download_grey"] forState:UIControlStateNormal];
-            [download setImageEdgeInsets:UIEdgeInsetsMake(0, 0, 10, 10)];
-            [download setTag:(indexPath.row + 100)];
-            [download addTarget:self action:@selector(downloadNewsAction:) forControlEvents:UIControlEventTouchUpInside];
-            download.accessibilityLabel = @"下载";
-            [cell.contentView addSubview:download];
-            
-            UIView *line = [[UIView alloc]initWithFrame:CGRectMake(15.0 / 375 * SCREEN_WIDTH, CGRectGetMaxY(dataLab.frame) + 12.0 / 667 * SCREEN_HEIGHT, SCREEN_WIDTH - 30.0 / 375 * SCREEN_WIDTH, 0.5)];
-            [line setBackgroundColor:nMineNameColor];
-            [cell.contentView addSubview:line];
+            return cell;
         }
-        [cell setSelectionStyle:UITableViewCellSelectionStyleNone];
-        return cell;
+        else{
+            NewsCell *cell = [NewsCell cellWithTableView:tableView];
+            if ([self.newsInfoArr count]) {
+                cell.dataDict = self.newsInfoArr[indexPath.row];
+            }
+            return cell;
+        }
     }
     else{
         MyClassroomTableViewCell *cell = [MyClassroomTableViewCell cellWithTableView:tableView];
@@ -807,7 +587,7 @@
     }
     else if (tableView == self.newsTableView){
         if (indexPath.row == 0) {
-            heightForRow = 150.0 / 667 * IPHONE_H;
+            heightForRow = 30.0;
         }
         else{
             heightForRow =  120.0 / 667 * IPHONE_H;

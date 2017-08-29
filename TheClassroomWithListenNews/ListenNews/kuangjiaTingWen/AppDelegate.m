@@ -54,18 +54,6 @@
     }
 }
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    //设置后台模式和锁屏模式下依然能够播放
-    [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback withOptions:AVAudioSessionCategoryOptionMixWithOthers error:nil];
-    [[AVAudioSession sharedInstance] setActive: YES error: nil];
-    //0kb mp3文件后台播放，防止应用被杀进程
-    NSError *noSoundError;
-    NSURL *urlNoSound = [[NSURL alloc]initWithString:[[NSBundle mainBundle]pathForResource:@"backSound" ofType:@"mp3"]];
-    self.noSoundPlayer = [[AVAudioPlayer alloc] initWithContentsOfURL:urlNoSound error:&noSoundError];
-    self.noSoundPlayer.numberOfLoops = -1;
-    if (noSoundError) {
-        XWAlerLoginView *alert = [XWAlerLoginView alertWithTitle:noSoundError.description];
-        [alert show];
-    }
     
     self.window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
@@ -123,6 +111,7 @@
     
     [[UIApplication sharedApplication] beginReceivingRemoteControlEvents];
     
+    //判断当前系统是否支持多任务处理
     UIDevice* device = [UIDevice currentDevice];
     if ([device respondsToSelector:@selector(isMultitaskingSupported)]) {
         if(device.multitaskingSupported) {
@@ -221,11 +210,36 @@
     manager.enableAutoToolbar = NO;//控制是否显示键盘上的工具条
     [manager setKeyboardDistanceFromTextField:0];
     
-    NSError* error;
-    [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:&error];
     
+//    NSError* error;
+//    [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:&error];
+    
+    //监听来电
+//    AudioSessionInitialize(NULL, NULL, interruptionListenner, (__bridge void*)self);
+
     return YES;
 }
+//void interruptionListenner(void* inClientData, UInt32 inInterruptionState)
+//{
+//    AppDelegate* pTHIS = (__bridge AppDelegate*)inClientData;
+//    if (pTHIS) {
+//        NSLog(@"interruptionListenner %u", (unsigned int)inInterruptionState);
+//        if (kAudioSessionBeginInterruption == inInterruptionState) {
+//            NSLog(@"Begin interruption");
+////            [APPDELEGATE.noSoundPlayer pause];
+//            }
+//        else
+//        {
+//            UIApplicationState state = [UIApplication sharedApplication].applicationState;
+//            if (![ZRT_PlayerManager manager].isPlaying && state == UIApplicationStateBackground) {
+////                [APPDELEGATE.noSoundPlayer play];
+//            }
+//            NSLog(@"Begin end interruption");
+//            NSLog(@"End end interruption");
+//        }
+//        
+//    }
+//}
 /**
  获取每日免费收听数以及当前系统时间
  */
@@ -235,9 +249,7 @@
         RTLog(@"%@",responseObject);
         if ([responseObject[status] intValue] == 1) {
             [NetWorkTool isNewDayWithServer_date:responseObject[results][@"date"]];
-            [CommonCode writeToUserD:responseObject[results][@"num"] andKey:[NSString stringWithFormat:@"%@",limit_num]];
-            //初始化播放器判断限制状态
-            [[ZRT_PlayerManager manager] limitPlayStatusWithAdd:NO];
+            [CommonCode writeToUserD:responseObject[results][@"num"] andKey:limit_num];
         }
     } failure:^(NSError *error) {
         
@@ -301,12 +313,6 @@
                 [CommonCode writeToUserD:responseObject[@"results"][@"id"] andKey:@"dangqianUserUid"];
                 [CommonCode writeToUserD:@(YES) andKey:@"isLogin"];
                 [CommonCode writeToUserD:responseObject andKey:@"dangqianUserInfo"];
-                //判断是否已经播放限制
-                if ([responseObject[results][is_stop] intValue] == 1) {
-                    ExLimitPlay = YES;
-                }else{
-                    ExLimitPlay = NO;
-                }
                 //拿到图片
                 UIImage *userAvatar = [UIImage imageWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:USERPHOTOHTTPSTRING(responseObject[@"results"][@"avatar"])]]];
                 NSString *path_sandox = NSHomeDirectory();
@@ -582,28 +588,18 @@
     [UIApplication sharedApplication].applicationIconBadgeNumber = 0;
     
     //MBAudioPlayer是我为播放器写的单例，这段就是当音乐还在播放状态的时候，给后台权限，不在播放状态的时候，收回后台权限
-//    if ([ZRT_PlayerManager manager].isPlaying) {
-        //有音乐播放时，才给后台权限，不做流氓应用。
-        [[UIApplication sharedApplication] beginReceivingRemoteControlEvents];
-        [self becomeFirstResponder];
-    
-//        [self configNowPlayingCenter];
-//    }
-//    else
-//    {
-//        [[UIApplication sharedApplication] endReceivingRemoteControlEvents];
-//        [self resignFirstResponder];
-//    }
+    //获取开始线控权限
+    [[UIApplication sharedApplication] beginReceivingRemoteControlEvents];
+    //成为第一响应者才能获取线控权限
+    [self becomeFirstResponder];
 }
-
+//是否成为第一响应者
 - (BOOL)canBecomeFirstResponder{
     return YES;
 }
 
-- (void)applicationWillEnterForeground:(UIApplication *)application {
-    // Called as part of the transition from the background to the inactive state; here you can undo many of the changes made on entering the background.
-    [self.noSoundPlayer pause];
-    
+- (void)applicationWillEnterForeground:(UIApplication *)application
+{
     [UIApplication sharedApplication].applicationIconBadgeNumber = 0;
     if ([[CommonCode readFromUserD:@"isWhatLogin"] isEqualToString:@"QQ"]){
         ExdangqianUser = [CommonCode readFromUserD:@"user_login"];
@@ -630,14 +626,16 @@
     
     //应用退出时保存已听过新闻ID
     [CommonCode writeToUserD:[NewPlayVC shareInstance].listenedNewsIDArray andKey:yitingguoxinwenID];
-    
+    //清空当前本地缓存的播放新闻，播放新闻ID
     [CommonCode writeToUserD:nil andKey:@"dangqianbofangxinwenID"];
     [CommonCode writeToUserD:nil andKey:@"dangqianbofangxinwen"];
-
 }
 
 - (void)applicationDidEnterBackground:(UIApplication *)application
 {
+    
+    [[UIApplication sharedApplication] beginReceivingRemoteControlEvents];
+    [self becomeFirstResponder];
     
     //应用退出时保存已听过新闻ID
     [CommonCode writeToUserD:[NewPlayVC shareInstance].listenedNewsIDArray andKey:yitingguoxinwenID];
@@ -679,34 +677,7 @@
         });
         
     });
-    
-    if ([ZRT_PlayerManager manager].isPlaying) {
-        [self.noSoundPlayer pause];
-    }else{
-        [self.noSoundPlayer play];
-    }
 }
-//-(void)comeToBackgroundMode{
-//    //初始化一个后台任务BackgroundTask，这个后台任务的作用就是告诉系统当前app在后台有任务处理，需要时间
-//    UIApplication*  app = [UIApplication sharedApplication];
-//    _bgTaskId = [app beginBackgroundTaskWithExpirationHandler:^{
-//        [app endBackgroundTask:_bgTaskId];
-//        _bgTaskId = UIBackgroundTaskInvalid;
-//    }];
-//    //开启定时器 不断向系统请求后台任务执行的时间
-//    timer = [NSTimer scheduledTimerWithTimeInterval:25.0 target:self selector:@selector(applyForMoreTime) userInfo:nil repeats:YES];
-//    [timer fire];
-//}
-//-(void)applyForMoreTime {
-//    //如果系统给的剩余时间小于60秒 就终止当前的后台任务，再重新初始化一个后台任务，重新让系统分配时间，这样一直循环下去，保持APP在后台一直处于active状态。
-//    if ([UIApplication sharedApplication].backgroundTimeRemaining < 60) {
-//        [[UIApplication sharedApplication] endBackgroundTask:_bgTaskId];
-//        _bgTaskId = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
-//            [[UIApplication sharedApplication] endBackgroundTask:_bgTaskId];
-//            _bgTaskId = UIBackgroundTaskInvalid;
-//        }];
-//    }
-//}
 #pragma mark - NowPlayingCenter & Remote Control
 - (void)configNowPlayingCenter
 {
@@ -719,10 +690,9 @@
             NSMutableDictionary * playingCenterInfo = [NSMutableDictionary dictionary];
             [playingCenterInfo setObject:[ZRT_PlayerManager manager].currentSong[@"post_title"]?[ZRT_PlayerManager manager].currentSong[@"post_title"]:@"" forKey:MPMediaItemPropertyTitle];
             [playingCenterInfo setObject:[ZRT_PlayerManager manager].currentSong[@"post_act"][@"name"] forKey:MPMediaItemPropertyArtist];
-//            [playingCenterInfo setObject:@([ZRT_PlayerManager manager].playDuration) forKey:MPNowPlayingInfoPropertyElapsedPlaybackTime];
             [playingCenterInfo setObject:@(1) forKey:MPNowPlayingInfoPropertyPlaybackRate];
             [playingCenterInfo setObject:@([ZRT_PlayerManager manager].duration) forKey:MPMediaItemPropertyPlaybackDuration];
-            MPMediaItemArtwork * artwork = [[MPMediaItemArtwork alloc] initWithImage:img];
+            MPMediaItemArtwork * artwork = [[MPMediaItemArtwork alloc] initWithImage:img?img:[UIImage imageNamed:@"thumbnailsdefault"]];
             [playingCenterInfo setObject:artwork forKey:MPMediaItemPropertyArtwork];
             [[MPNowPlayingInfoCenter defaultCenter] setNowPlayingInfo:playingCenterInfo];
             
@@ -732,10 +702,38 @@
                     NSMutableDictionary * playingCenterInfo = [NSMutableDictionary dictionary];
                     [playingCenterInfo setObject:[ZRT_PlayerManager manager].currentSong[@"post_title"]?[ZRT_PlayerManager manager].currentSong[@"post_title"]:@"" forKey:MPMediaItemPropertyTitle];
                     [playingCenterInfo setObject:[ZRT_PlayerManager manager].currentSong[@"post_act"][@"name"] forKey:MPMediaItemPropertyArtist];
-//                    [playingCenterInfo setObject:@([ZRT_PlayerManager manager].playDuration) forKey:MPNowPlayingInfoPropertyElapsedPlaybackTime];
                     [playingCenterInfo setObject:@(1) forKey:MPNowPlayingInfoPropertyPlaybackRate];
                     [playingCenterInfo setObject:@([ZRT_PlayerManager manager].duration) forKey:MPMediaItemPropertyPlaybackDuration];
-                    MPMediaItemArtwork * artwork = [[MPMediaItemArtwork alloc] initWithImage:image];
+                    MPMediaItemArtwork * artwork = [[MPMediaItemArtwork alloc] initWithImage:image?image:[UIImage imageNamed:@"thumbnailsdefault"]];
+                    [playingCenterInfo setObject:artwork forKey:MPMediaItemPropertyArtwork];
+                    [[MPNowPlayingInfoCenter defaultCenter] setNowPlayingInfo:playingCenterInfo];
+                }
+            }];
+        }
+    }else{
+        RTLog(@"%@",[ZRT_PlayerManager manager].currentCoverImage);
+        if([[SDWebImageManager sharedManager] cachedImageExistsForURL:[NSURL URLWithString:[ZRT_PlayerManager manager].currentCoverImage]]){
+            UIImage* img = [[SDWebImageManager sharedManager].imageCache imageFromMemoryCacheForKey:[[SDWebImageManager sharedManager] cacheKeyForURL:[NSURL URLWithString:[ZRT_PlayerManager manager].currentCoverImage]]];
+            
+            if(!img)
+                img = [[SDWebImageManager sharedManager].imageCache imageFromDiskCacheForKey:[[SDWebImageManager sharedManager] cacheKeyForURL:[NSURL URLWithString:[ZRT_PlayerManager manager].currentCoverImage]]];
+            NSMutableDictionary * playingCenterInfo = [NSMutableDictionary dictionary];
+            [playingCenterInfo setObject:[ZRT_PlayerManager manager].currentSong[@"s_title"]?[ZRT_PlayerManager manager].currentSong[@"s_title"]:@"" forKey:MPMediaItemPropertyTitle];
+            [playingCenterInfo setObject:[ZRT_PlayerManager manager].currentSong[@"name"] forKey:MPMediaItemPropertyArtist];            [playingCenterInfo setObject:@(1) forKey:MPNowPlayingInfoPropertyPlaybackRate];
+            [playingCenterInfo setObject:@([ZRT_PlayerManager manager].duration) forKey:MPMediaItemPropertyPlaybackDuration];
+            MPMediaItemArtwork * artwork = [[MPMediaItemArtwork alloc] initWithImage:img?img:[UIImage imageNamed:@"thumbnailsdefault"]];
+            [playingCenterInfo setObject:artwork forKey:MPMediaItemPropertyArtwork];
+            [[MPNowPlayingInfoCenter defaultCenter] setNowPlayingInfo:playingCenterInfo];
+            
+        }else{
+            [[SDWebImageManager sharedManager] downloadImageWithURL:[NSURL URLWithString:[ZRT_PlayerManager manager].currentCoverImage] options:SDWebImageRetryFailed|SDWebImageLowPriority progress:nil completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, BOOL finished, NSURL *imageURL) {
+                if (image) {
+                    NSMutableDictionary * playingCenterInfo = [NSMutableDictionary dictionary];
+                    [playingCenterInfo setObject:[ZRT_PlayerManager manager].currentSong[@"s_title"]?[ZRT_PlayerManager manager].currentSong[@"s_title"]:@"" forKey:MPMediaItemPropertyTitle];
+                    [playingCenterInfo setObject:[ZRT_PlayerManager manager].currentSong[@"name"] forKey:MPMediaItemPropertyArtist];
+                    [playingCenterInfo setObject:@(1) forKey:MPNowPlayingInfoPropertyPlaybackRate];
+                    [playingCenterInfo setObject:@([ZRT_PlayerManager manager].duration) forKey:MPMediaItemPropertyPlaybackDuration];
+                    MPMediaItemArtwork * artwork = [[MPMediaItemArtwork alloc] initWithImage:image?image:[UIImage imageNamed:@"thumbnailsdefault"]];
                     [playingCenterInfo setObject:artwork forKey:MPMediaItemPropertyArtwork];
                     [[MPNowPlayingInfoCenter defaultCenter] setNowPlayingInfo:playingCenterInfo];
                 }
@@ -745,8 +743,6 @@
 }
 - (void)remoteControlReceivedWithEvent:(UIEvent *)event {
     //后台播放控制事件， 在此处设置对应的控制器进行相应
-//    [[bofangVC shareInstance] remoteControlReceivedWithEvent:event];
-    //新的播放器控制
     [[NewPlayVC shareInstance] remoteControlReceivedWithEvent:event];
 }
 

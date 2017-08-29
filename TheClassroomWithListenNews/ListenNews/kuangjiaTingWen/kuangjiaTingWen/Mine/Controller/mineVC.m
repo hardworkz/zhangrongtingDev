@@ -90,13 +90,11 @@ typedef void(^animateBlock)();
 
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
-//    [self.navigationController setNavigationBarHidden:NO animated:YES];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     
-//    self.navBarBgAlpha = @"0.0";
     [self.navigationController setNavigationBarHidden:YES animated:YES];
     if ([[CommonCode readFromUserD:@"isLogin"]boolValue] == YES){
         self.signInView.hidden = NO;
@@ -122,7 +120,6 @@ typedef void(^animateBlock)();
     else{
         self.signInView.hidden = YES;
     }
-//    [self.tableView reloadData];
     [self getUnreadMessage];
     
 }
@@ -164,12 +161,6 @@ typedef void(^animateBlock)();
             [CommonCode writeToUserD:responseObject[results][@"id"] andKey:@"dangqianUserUid"];
             [CommonCode writeToUserD:@(YES) andKey:@"isLogin"];
             [CommonCode writeToUserD:responseObject andKey:@"dangqianUserInfo"];
-            //判断是否已经播放限制
-            if ([responseObject[results][is_stop] intValue] == 1) {
-                ExLimitPlay = YES;
-            }else{
-                ExLimitPlay = NO;
-            }
             //拿到图片
             UIImage *userAvatar = [UIImage imageWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:USERPHOTOHTTPSTRING(responseObject[results][@"avatar"])]]];
             NSString *path_sandox = NSHomeDirectory();
@@ -418,7 +409,7 @@ typedef void(^animateBlock)();
         dispatch_group_async(group, queue, ^{
             [NetWorkTool getFeedbackForMeWithaccessToken:AvatarAccessToken sccess:^(NSDictionary *responseObject) {
                 dispatch_group_leave(group);
-                if ([responseObject[@"status"] integerValue] == 1) {
+                if ([responseObject[status] integerValue] == 1) {
                     if ([responseObject[results] isKindOfClass:[NSArray class]]){
                         NSString *unreadID = [CommonCode readFromUserD:FEEDBACKFIRSTUNREADID];
                         NSMutableArray *resultArr = [responseObject[results] mutableCopy];
@@ -646,7 +637,27 @@ typedef void(^animateBlock)();
         [cell.contentView addSubview:lab];
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
         
-        UIImageView *lvView = [[UIImageView alloc]initWithFrame:CGRectMake(CGRectGetMaxX(lab.frame) + 5, lab.frame.origin.y, 44.0, 16.0)];
+        //vip图标
+        UIImageView *vipImgView = [[UIImageView alloc] init];
+        vipImgView.hidden = YES;
+        vipImgView.contentMode = UIViewContentModeScaleAspectFill;
+        [cell.contentView addSubview:vipImgView];
+        NSDictionary *userInfoDict = [CommonCode readFromUserD:@"dangqianUserInfo"];
+        if ([userInfoDict[results][member_type] intValue] == 1||[userInfoDict[results][member_type] intValue] == 2) {
+            
+            vipImgView.frame = CGRectMake(CGRectGetMaxX(lab.frame) + 5, lab.y + 2, 30, 30);
+            vipImgView.centerY = lab.centerY;
+            vipImgView.hidden = NO;
+            if ([userInfoDict[results][member_type] intValue] == 1) {
+                vipImgView.image = [UIImage imageNamed:@"vip"];
+            }else{
+                vipImgView.image = [UIImage imageNamed:@"svip"];
+            }
+        }else{
+            vipImgView.hidden = YES;
+        }
+        
+        UIImageView *lvView = [[UIImageView alloc]initWithFrame:CGRectMake(vipImgView.hidden? CGRectGetMaxX(lab.frame) + 5:CGRectGetMaxX(vipImgView.frame) + 5, lab.frame.origin.y, 44.0, 16.0)];
         [lvView setImage:[UIImage imageNamed:@"LV1~9"]];
         lvView.hidden = YES;
         lvView.contentMode = UIViewContentModeScaleAspectFill;
@@ -884,36 +895,29 @@ typedef void(^animateBlock)();
     else if (indexPath.row == 1) {
         if ([[CommonCode readFromUserD:@"isLogin"]boolValue] == YES){
             
-//            self.hidesBottomBarWhenPushed=YES;
             BlogViewController *blogVC = [BlogViewController new];
             blogVC.view.backgroundColor = [UIColor whiteColor];
             blogVC.isFeedbackVC = NO;
             [self.navigationController pushViewController:blogVC animated:YES];
-//            self.hidesBottomBarWhenPushed=NO;
         }
         else {
             [self loginFirst];
         }
-    }else if (indexPath.row == 2) {
+    }
+    else if (indexPath.row == 2) {
         if ([[CommonCode readFromUserD:@"isLogin"]boolValue] == YES){
-//            self.hidesBottomBarWhenPushed=YES;
             [self.navigationController pushViewController:[MyVipMenbersViewController new] animated:YES];
-//            self.hidesBottomBarWhenPushed=NO;
         }
         else {
             [self loginFirst];
         }
     }
     else  if (indexPath.row == 3) {
-//            self.hidesBottomBarWhenPushed=YES;
             [self.navigationController pushViewController:[DownloadViewController new] animated:NO];
-//            self.hidesBottomBarWhenPushed=NO;
     }
     else if (indexPath.row == 4) {
         if ([[CommonCode readFromUserD:@"isLogin"]boolValue] == YES){
-//            self.hidesBottomBarWhenPushed=YES;
             [self.navigationController pushViewController:[MyCollectionViewController new] animated:YES];
-//            self.hidesBottomBarWhenPushed=NO;
         }
         else {
             [self loginFirst];
@@ -921,18 +925,14 @@ typedef void(^animateBlock)();
     }
     else if (indexPath.row == 5) {
         if ([[CommonCode readFromUserD:@"isLogin"]boolValue] == YES){
-//            self.hidesBottomBarWhenPushed=YES;
             [self.navigationController pushViewController:[MyClassroomController new] animated:YES];
-//            self.hidesBottomBarWhenPushed=NO;
         }
         else {
             [self loginFirst];
         }
     }
     else if (indexPath.row == 6) {
-//        self.hidesBottomBarWhenPushed=YES;
         [self.navigationController pushViewController:[SheZhiVC new] animated:YES];
-//        self.hidesBottomBarWhenPushed=NO;
     }
 
 }
@@ -964,6 +964,7 @@ typedef void(^animateBlock)();
         _tableView = [[UITableView alloc]initWithFrame:CGRectMake(0, 0, IPHONE_W, IPHONE_H- 49) style:UITableViewStylePlain];
         _tableView.delegate = self;
         _tableView.dataSource = self;
+        _tableView.showsVerticalScrollIndicator = NO;
         _tableView.tableFooterView = [UIView new];
         _tableView.backgroundColor = [UIColor whiteColor];
         _tableView.separatorStyle = UITableViewCellSeparatorStyleNone;

@@ -238,109 +238,16 @@
                     return cell;
                 }
                 else {
-                    UIImageView *imgLeft = [[UIImageView alloc]initWithFrame:CGRectMake(SCREEN_WIDTH - 125.0 / 375 * IPHONE_W, 19, 105.0 / 375 * IPHONE_W,   84.72 / 375 *IPHONE_W)];
-                    if (IS_IPAD) {
-                        [imgLeft setFrame:CGRectMake(SCREEN_WIDTH - 125.0 / 375 * IPHONE_W, 19, 105.0 / 375 * IPHONE_W, 70.0 / 375 *IPHONE_W)];
-                    }
-#warning self.SouSuodataArrM 数组越界 已解决
-                    [imgLeft sd_setImageWithURL:[NSURL URLWithString:NEWSSEMTPHOTOURL(self.SouSuodataArrM[indexPath.row][@"smeta"])]];
-                    imgLeft.contentMode = UIViewContentModeScaleAspectFill;
-                    imgLeft.clipsToBounds = YES;
-                    [cell.contentView addSubview:imgLeft];
-                    imgLeft.contentMode = UIViewContentModeScaleToFill;
-                    titleLab =[[UILabel alloc]initWithFrame:CGRectMake(20.0 / 375 * IPHONE_W, 16.0 / 667 * IPHONE_H , SCREEN_WIDTH - 155.0 / 375 * IPHONE_W, 21.0 / 667 *IPHONE_H)];
-                    titleLab.text = self.SouSuodataArrM[indexPath.row][@"post_title"];
-                    titleLab.textColor = [[ZRT_PlayerManager manager] textColorFormID:self.SouSuodataArrM[indexPath.row][@"id"] ];
-                    titleLab.textAlignment = NSTextAlignmentLeft;
-                    titleLab.font = [UIFont boldSystemFontOfSize:17.0f];
-                    [cell.contentView addSubview:titleLab];
-                    [titleLab setNumberOfLines:3];
-                    titleLab.lineBreakMode = NSLineBreakByWordWrapping;
-                    CGSize size = [titleLab sizeThatFits:CGSizeMake(titleLab.frame.size.width, MAXFLOAT)];
-                    titleLab.frame = CGRectMake(titleLab.frame.origin.x, titleLab.frame.origin.y, titleLab.frame.size.width, size.height);
                     
-                    //日期
-                    UILabel *riqiLab = [[UILabel alloc]initWithFrame:CGRectMake(20.0 / 375 * IPHONE_W, 86.0 / 667 *IPHONE_H, 135.0 / 375 * IPHONE_W, 21.0 / 667 *IPHONE_H)];
-                    NSDate *date = [NSDate dateFromString:self.SouSuodataArrM[indexPath.row][@"post_modified"]];
-                    riqiLab.text = [date showTimeByTypeA];
-                    riqiLab.textColor = gTextColorSub;
-                    riqiLab.font = [UIFont systemFontOfSize:13.0f];
-                    [cell.contentView addSubview:riqiLab];
-                    //大小
-                    UILabel *dataLab = [[UILabel alloc]initWithFrame:CGRectMake(SCREEN_WIDTH - 213.0 / 375 * IPHONE_W, 86.0 / 667 *IPHONE_H, 45.0 / 375 * IPHONE_W, 21.0 / 667 *IPHONE_H)];
-                    dataLab.text = [NSString stringWithFormat:@"%.1lf%@",[self.SouSuodataArrM[indexPath.row][@"post_size"] intValue] / 1024.0 / 1024.0,@"M"];
-                    dataLab.textColor = gTextColorSub;
-                    dataLab.font = [UIFont systemFontOfSize:13.0f];
-                    dataLab.textAlignment = NSTextAlignmentCenter;
-                    [cell.contentView addSubview:dataLab];
-                    //下载
-                    UIButton *download = [UIButton buttonWithType:UIButtonTypeCustom];
-                    [download setFrame:CGRectMake(CGRectGetMaxX(dataLab.frame), 86.0 / 667 *IPHONE_H, 30.0 / 667 *IPHONE_H, 30.0 / 667 *IPHONE_H)];
-                    [download setImage:[UIImage imageNamed:@"download_grey"] forState:UIControlStateNormal];
-                    [download setImageEdgeInsets:UIEdgeInsetsMake(0, 0, 10, 10)];
-                    [download setTag:(indexPath.row + 100)];
-                    [download addTarget:self action:@selector(downloadNewsAction:) forControlEvents:UIControlEventTouchUpInside];
-                    [cell.contentView addSubview:download];
-                    
-                    cell.selectionStyle = UITableViewCellSelectionStyleNone;
-                    
+                    NewsCell *cell = [NewsCell cellWithTableView:tableView];
+                    cell.dataDict = self.SouSuodataArrM[indexPath.row];
                     return cell;
                 }
             }
             else {
-                UIImageView *imgLeft = [[UIImageView alloc]initWithFrame:CGRectMake(SCREEN_WIDTH - 125.0 / 375 * IPHONE_W, 19, 105.0 / 375 * IPHONE_W,   84.72 / 375 *IPHONE_W)];
-                [imgLeft sd_setImageWithURL:[NSURL URLWithString:NEWSSEMTPHOTOURL(self.SouSuodataArrM[indexPath.row][@"smeta"])]];
-                //placeholderImage:[UIImage imageNamed:@"thumbnailsdefault"]
-                [cell.contentView addSubview:imgLeft];
-                imgLeft.contentMode = UIViewContentModeScaleAspectFill;
-                imgLeft.clipsToBounds = YES;
-                    
-                titleLab = [[UILabel alloc]initWithFrame:CGRectMake(20.0 / 375 * IPHONE_W, 16.0 / 667 * IPHONE_H , SCREEN_WIDTH - 155.0 / 375 * IPHONE_W, 21.0 / 667 *IPHONE_H)];
-                titleLab.text = self.SouSuodataArrM[indexPath.row][@"post_title"];
-                titleLab.textColor = [[ZRT_PlayerManager manager] textColorFormID:self.SouSuodataArrM[indexPath.row][@"id"]];
-                titleLab.textAlignment = NSTextAlignmentLeft;
-                titleLab.font = [UIFont boldSystemFontOfSize:17.0f];
-                [cell.contentView addSubview:titleLab];
-                [titleLab setNumberOfLines:3];
-                titleLab.lineBreakMode = NSLineBreakByWordWrapping;
-                CGSize size = [titleLab sizeThatFits:CGSizeMake(titleLab.frame.size.width, MAXFLOAT)];
-                titleLab.frame = CGRectMake(titleLab.frame.origin.x, titleLab.frame.origin.y, titleLab.frame.size.width, size.height);
-                    if (IS_IPAD) {
-                        //正文
-                        UILabel *detailNews = [[UILabel alloc]initWithFrame:CGRectMake(titleLab.frame.origin.x, titleLab.frame.origin.y + titleLab.frame.size.height + 20.0 / 667 * SCREEN_HEIGHT, titleLab.frame.size.width, 21.0 / 667 *IPHONE_H)];
-                        detailNews.text = self.SouSuodataArrM[indexPath.row][@"post_excerpt"];
-                        detailNews.textColor = gTextColorSub;
-                        detailNews.font = [UIFont systemFontOfSize:15.0f];
-                        [cell.contentView addSubview:detailNews];
-                    }
-                    
-                    
-                    
-                //日期
-                UILabel *riqiLab =  [[UILabel alloc]initWithFrame:CGRectMake(20.0 / 375 * IPHONE_W, 86.0 / 667 *IPHONE_H, 135.0 / 375 * IPHONE_W, 21.0 / 667 *IPHONE_H)];
-                NSDate *date = [NSDate dateFromString:self.SouSuodataArrM[indexPath.row][@"post_modified"]];
-                riqiLab.text = [date showTimeByTypeA];
-                riqiLab.textColor = gTextColorSub;
-                riqiLab.font = [UIFont systemFontOfSize:13.0f ];
-                [cell.contentView addSubview:riqiLab];
-                //大小
-                UILabel *dataLab = [[UILabel alloc]initWithFrame:CGRectMake(SCREEN_WIDTH - 213.0 / 375 * IPHONE_W, 86.0 / 667 *IPHONE_H, 45.0 / 375 * IPHONE_W, 21.0 / 667 *IPHONE_H)];
-                dataLab.text = [NSString stringWithFormat:@"%.1lf%@",[self.SouSuodataArrM[indexPath.row][@"post_size"] intValue] / 1024.0 / 1024.0,@"M"];
-                dataLab.textColor = gTextColorSub;
-                dataLab.font = [UIFont systemFontOfSize:13.0f ];
-                dataLab.textAlignment = NSTextAlignmentCenter;
-                [cell.contentView addSubview:dataLab];
-                //下载
-                UIButton *download = [UIButton buttonWithType:UIButtonTypeCustom];
-                [download setFrame:CGRectMake(CGRectGetMaxX(dataLab.frame), 86.0 / 667 *IPHONE_H, 30.0 / 667 *IPHONE_H, 30.0 / 667 *IPHONE_H)];
-                [download setImage:[UIImage imageNamed:@"download_grey"] forState:UIControlStateNormal];
-                [download setImageEdgeInsets:UIEdgeInsetsMake(0, 0, 10, 10)];
-                [download setTag:(indexPath.row + 100)];
-                [download addTarget:self action:@selector(downloadNewsAction:) forControlEvents:UIControlEventTouchUpInside];
-                [cell.contentView addSubview:download];
                 
-                cell.selectionStyle = UITableViewCellSelectionStyleNone;
-                
+                NewsCell *cell = [NewsCell cellWithTableView:tableView];
+                cell.dataDict = self.SouSuodataArrM[indexPath.row];
                 return cell;
             }
         }
@@ -1002,20 +909,6 @@
     
 }
 
-- (void)downloadNewsAction:(UIButton *)sender {
-    
-    [SVProgressHUD showInfoWithStatus:@"开始下载"];
-    [self performSelector:@selector(SVPDismiss) withObject:nil afterDelay:1.0];
-    NSMutableDictionary *dic = self.SouSuodataArrM[sender.tag - 100];
-    dispatch_async(dispatch_get_main_queue(), ^{
-        ProjiectDownLoadManager *manager = [ProjiectDownLoadManager defaultProjiectDownLoadManager];
-        [manager insertSevaDownLoadArray:dic];
-        
-        WHC_Download *op = [[WHC_Download alloc]initStartDownloadWithURL:[NSURL URLWithString:dic[@"post_mp"]] savePath:manager.userDownLoadPath savefileName:[dic[@"post_mp"] stringByReplacingOccurrencesOfString:@"/" withString:@""] withObj:dic delegate:nil];
-        [manager.downLoadQueue addOperation:op];
-    });
-}
-
 - (void)SVPDismiss {
     [SVProgressHUD dismiss];
 }
@@ -1225,6 +1118,7 @@
         _SouSuotableView.dataSource = self;
         _SouSuotableView.tag = 1;
         _SouSuotableView.hidden = YES;
+        _SouSuotableView.separatorStyle = UITableViewCellSeparatorStyleNone;
         _SouSuotableView.mj_header = [MJRefreshNormalHeader headerWithRefreshingBlock:^{
             SouSuonumberPage = 1;
             [self SouSuorefreshData];

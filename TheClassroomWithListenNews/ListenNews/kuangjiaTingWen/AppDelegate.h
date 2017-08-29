@@ -37,7 +37,7 @@ typedef void (^WechatdidReceiveCode)(NSString *);
 /**
  无声播放器
  */
-@property (strong, nonatomic) AVAudioPlayer *noSoundPlayer;
+//@property (strong, nonatomic) AVAudioPlayer *noSoundPlayer;
 /**
  支付类型
  */
@@ -69,5 +69,9 @@ typedef void (^WechatdidReceiveCode)(NSString *);
  锁屏界面播放数据设置
  */
 - (void)configNowPlayingCenter;
+/**
+ 获取每日免费收听数以及当前系统时间
+ */
+- (void)getVipLimitData;
 @end
 

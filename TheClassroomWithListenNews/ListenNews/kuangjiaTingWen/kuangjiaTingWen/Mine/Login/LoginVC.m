@@ -491,12 +491,6 @@
         [self dismissViewControllerAnimated:YES completion:nil];
         [CommonCode writeToUserD:@(YES) andKey:@"isLogin"];
         [CommonCode writeToUserD:responseObject andKey:@"dangqianUserInfo"];
-        //判断是否已经播放限制
-        if ([responseObject[results][is_stop] intValue] == 1) {
-            ExLimitPlay = YES;
-        }else{
-            ExLimitPlay = NO;
-        }
         //拿到图片
         UIImage *userAvatar = [UIImage imageWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:responseObject[@"results"][@"avatar"]]]];
         NSString *path_sandox = NSHomeDirectory();
@@ -512,6 +506,8 @@
         [self getIAPInfomation];
         [[NSNotificationCenter defaultCenter] postNotificationName:@"updateUserInfo" object:nil];
         
+        //获取播放限制状态
+        [APPDELEGATE getVipLimitData];
     } failure:^(NSError *error) {
         //
     }];
@@ -547,13 +543,7 @@
                     [self dismissViewControllerAnimated:YES completion:nil];
                     [CommonCode writeToUserD:@(YES) andKey:@"isLogin"];
                     [CommonCode writeToUserD:responseObject andKey:@"dangqianUserInfo"];
-                    //判断是否已经播放限制
-                    if ([responseObject[results][is_stop] intValue] == 1) {
-                        ExLimitPlay = YES;
-                    }else{
-                        ExLimitPlay = NO;
-                    }
-                    //    //拿到图片
+                    //拿到图片
                     UIImage *userAvatar = [UIImage imageWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:USERPHOTOHTTPSTRING(responseObject[@"results"][@"avatar"])]]];
                     NSString *path_sandox = NSHomeDirectory();
                     //设置一个图片的存储路径
@@ -562,6 +552,9 @@
                     [UIImagePNGRepresentation(userAvatar) writeToFile:avatarPath atomically:YES];
                     [[NSNotificationCenter defaultCenter] postNotificationName:@"loginSccess" object:responseObject];
                     [CommonCode writeToUserD:@"ShouJi" andKey:@"isWhatLogin"];
+                    
+                    //获取播放限制状态
+                    [APPDELEGATE getVipLimitData];
                 }else{
                     XWAlerLoginView *alert = [[XWAlerLoginView alloc] initWithTitle:responseObject[msg]];
                     [alert show];

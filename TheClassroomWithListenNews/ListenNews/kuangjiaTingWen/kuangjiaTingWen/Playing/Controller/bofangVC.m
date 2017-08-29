@@ -1716,8 +1716,8 @@ static AVPlayer *_instancePlay = nil;
             ProjiectDownLoadManager *manager = [ProjiectDownLoadManager defaultProjiectDownLoadManager];
             [manager insertSevaDownLoadArray:dic];
             
-            WHC_Download *op = [[WHC_Download alloc]initStartDownloadWithURL:[NSURL URLWithString:dic[@"post_mp"]] savePath:manager.userDownLoadPath savefileName:[dic[@"post_mp"] stringByReplacingOccurrencesOfString:@"/" withString:@""] withObj:dic delegate:nil];
-            [manager.downLoadQueue addOperation:op];
+//            WHC_Download *op = [[WHC_Download alloc]initStartDownloadWithURL:[NSURL URLWithString:dic[@"post_mp"]] savePath:manager.userDownLoadPath savefileName:[dic[@"post_mp"] stringByReplacingOccurrencesOfString:@"/" withString:@""] withObj:dic delegate:nil];
+//            [manager.downLoadQueue addOperation:op];
         });
     }else{
         XWAlerLoginView *xw = [[XWAlerLoginView alloc]initWithTitle:@"下载路径为空"];
@@ -2458,7 +2458,7 @@ static AVPlayer *_instancePlay = nil;
     if (type == AVAudioSessionInterruptionTypeBegan) {//进入别的应用
         //Handle InterruptionBegan
         //系统暂停音频，则设置暂停播放器
-        [self doPlay:bofangCenterBtn];
+//        [self doPlay:bofangCenterBtn];
         RTLog(@"interruptionTypeBegan");
     }else{
         RTLog(@"interruptionTypeEnd");

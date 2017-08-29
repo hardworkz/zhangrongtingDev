@@ -66,19 +66,19 @@
     [self.tableView.tableHeaderView addSubview:topImgV];
 }
 
-- (void)downloadNewsAction:(UIButton *)sender {
-    
-    [SVProgressHUD showInfoWithStatus:@"开始下载"];
-    [self performSelector:@selector(SVPDismiss) withObject:nil afterDelay:1.0];
-    NSMutableDictionary *dic = self.infoArr[sender.tag - 100];
-    dispatch_async(dispatch_get_main_queue(), ^{
-        ProjiectDownLoadManager *manager = [ProjiectDownLoadManager defaultProjiectDownLoadManager];
-        [manager insertSevaDownLoadArray:dic];
+//- (void)downloadNewsAction:(UIButton *)sender {
+//    
+//    [SVProgressHUD showInfoWithStatus:@"开始下载"];
+//    [self performSelector:@selector(SVPDismiss) withObject:nil afterDelay:1.0];
+//    NSMutableDictionary *dic = self.infoArr[sender.tag - 100];
+//    dispatch_async(dispatch_get_main_queue(), ^{
+//        ProjiectDownLoadManager *manager = [ProjiectDownLoadManager defaultProjiectDownLoadManager];
+//        [manager insertSevaDownLoadArray:dic];
         
-        WHC_Download *op = [[WHC_Download alloc]initStartDownloadWithURL:[NSURL URLWithString:dic[@"post_mp"]] savePath:manager.userDownLoadPath savefileName:[dic[@"post_mp"] stringByReplacingOccurrencesOfString:@"/" withString:@""] withObj:dic delegate:nil];
-        [manager.downLoadQueue addOperation:op];
-    });
-}
+//        WHC_Download *op = [[WHC_Download alloc]initStartDownloadWithURL:[NSURL URLWithString:dic[@"post_mp"]] savePath:manager.userDownLoadPath savefileName:[dic[@"post_mp"] stringByReplacingOccurrencesOfString:@"/" withString:@""] withObj:dic delegate:nil];
+//        [manager.downLoadQueue addOperation:op];
+//    });
+//}
 
 - (void)SVPDismiss {
     [SVProgressHUD dismiss];

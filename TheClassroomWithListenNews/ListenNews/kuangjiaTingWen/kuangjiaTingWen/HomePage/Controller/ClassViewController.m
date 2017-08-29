@@ -260,6 +260,10 @@ static AVPlayer *_instancePlay = nil;
         if ([responseObject[status] integerValue] == 1) {
             if ([responseObject[results][@"shiting"] isKindOfClass:[NSArray class]]) {
                 weakSelf.playShiTingListArr = responseObject[results][@"shiting"];
+                for (NSMutableDictionary *dict in weakSelf.playShiTingListArr) {
+                    [dict setObject:responseObject[results][@"lai"] forKey:@"name"];
+                    [dict setObject:responseObject[results][@"smeta"] forKey:@"smeta"];
+                }
             }
             _classModel = [ClassModel mj_objectWithKeyValues:responseObject[results]];
             weakSelf.frameArray = [self frameArrayWithClassModel:self.classModel];
@@ -394,7 +398,7 @@ static AVPlayer *_instancePlay = nil;
     if ([NEWSSEMTPHOTOURL(self.classModel.smeta) rangeOfString:@"userDownLoadPathImage"].location != NSNotFound) {
         [_zhengwenImg sd_setImageWithURL:[NSURL fileURLWithPath:NEWSSEMTPHOTOURL(self.classModel.smeta)] placeholderImage:[UIImage imageNamed:@"thumbnailsdefault"]];
     }
-    else if ([NEWSSEMTPHOTOURL(self.classModel.smeta)  rangeOfString:@"http"].location != NSNotFound)
+    else if ([NEWSSEMTPHOTOURL(self.classModel.smeta) rangeOfString:@"http"].location != NSNotFound)
     {
         [_zhengwenImg sd_setImageWithURL:[NSURL URLWithString:NEWSSEMTPHOTOURL(self.classModel.smeta)] placeholderImage:[UIImage imageNamed:@"thumbnailsdefault"]];
     }
@@ -923,6 +927,7 @@ static AVPlayer *_instancePlay = nil;
         //设置播放的index
         [[ZRT_PlayerManager manager] loadSongInfoFromIndex:_playingIndex];
     }
+    [APPDELEGATE configNowPlayingCenter];
 }
 //列表试听按钮点击
 - (void)playTestMp:(UIButton *)sender
@@ -945,6 +950,9 @@ static AVPlayer *_instancePlay = nil;
         
         _playingIndex = sender.tag;
     }
+    
+    [APPDELEGATE configNowPlayingCenter];
+    
     BOOL isTestMpPlay = NO;//判断是否在试听列表里面有选中的按钮正在播放
     for ( int i = 0 ; i < self.buttons.count; i ++ ) {
         UIButton *allDoneButton = self.buttons[i];
@@ -1500,13 +1508,13 @@ static AVPlayer *_instancePlay = nil;
             label.text = @"无";
         }else if (i == 16) {
             label.font = [UIFont systemFontOfSize:12.];
-            label.text = @"从0学起！快速成为\"超级演说家\"";
+            label.text = self.classModel.title;
         }else if (i == 17) {
             label.text = @"无";
         }
     }
     
-    vipPriceLabel = [[UILabel alloc] initWithFrame:CGRectMake(SCREEN_WIDTH - 30 - 10 - 60, CGRectGetMaxY(tableView.frame) + 10, 60, 20)];
+    vipPriceLabel = [[UILabel alloc] initWithFrame:CGRectMake(SCREEN_WIDTH - 15 - 60, CGRectGetMaxY(tableView.frame) + 10, 60, 20)];
     vipPriceLabel.numberOfLines = 0;
     vipPriceLabel.text = @"¥1980";
     vipPriceLabel.textAlignment = NSTextAlignmentCenter;
@@ -1514,9 +1522,9 @@ static AVPlayer *_instancePlay = nil;
     vipPriceLabel.font = [UIFont systemFontOfSize:15];
     [contentView addSubview:vipPriceLabel];
 
-    UIButton *commit = [[UIButton alloc] initWithFrame:CGRectMake(SCREEN_WIDTH - 30 - 10 - 50, CGRectGetMaxY(vipPriceLabel.frame) + 5, 50, 25)];
+    UIButton *commit = [[UIButton alloc] initWithFrame:CGRectMake(SCREEN_WIDTH - 10 - 10 - 50, CGRectGetMaxY(vipPriceLabel.frame) + 5, 50, 25)];
     commit.layer.cornerRadius = commit.height * 0.5;
-    commit.layer.borderWidth = 1;
+    commit.layer.borderWidth = 0.5;
     [commit setTitle:@"提交"];
     [commit setTitleColor:[UIColor lightGrayColor]];
     commit.titleLabel.font = [UIFont systemFontOfSize:15];

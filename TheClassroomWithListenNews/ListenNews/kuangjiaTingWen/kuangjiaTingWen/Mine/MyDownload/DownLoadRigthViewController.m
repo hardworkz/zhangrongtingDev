@@ -78,7 +78,7 @@
                 @autoreleasepool {
                     NSDictionary *dic = (NSDictionary *)sevaArray[i];
                     NSMutableDictionary *newObj = [dic mutableCopy];
-                    WHC_Download *op = [[WHC_Download alloc]initStartDownloadWithURL:[NSURL URLWithString:newObj[@"post_mp"]] savePath:manager.userDownLoadPath savefileName:[newObj[@"post_mp"] stringByReplacingOccurrencesOfString:@"/" withString:@""] withObj:newObj delegate:nil];
+                    WHC_Download *op = [[WHC_Download alloc]initStartDownloadWithURL:[NSURL URLWithString:newObj[@"post_mp"]] savePath:manager.userDownLoadPath savefileName:[newObj[@"post_mp"] stringByReplacingOccurrencesOfString:@"/" withString:@""] withObj:newObj withCell:nil isSingleDownload:NO delegate:nil];
                     if (op) {
                         UIAlertView *al = [[UIAlertView alloc]initWithTitle:nil message:@"是否恢复上次未完成的下载" delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"恢复", nil];
                         al.tag = 300;
@@ -91,17 +91,9 @@
         }
         
         self.downLoadArray = [downManager.downLoadQueue.operations mutableCopy];
-//        self.downLoadSet = [NSMutableSet setWithArray:downManager.downLoadQueue.operations];
         [self.tableView reloadData];
     });
 }
-
-//- (void)downloadQueue:(NSNotification *)notification {
-////    if (_) {
-////        <#statements#>
-////    }
-//    [_downLoadArray addObject:notification.object];
-//}
 
 - (void)downloaddelete:(NSNotification *)notification {
     __weak __typeof(self) selfBlock = self;
@@ -114,10 +106,6 @@
                     [_downLoadArray removeObjectAtIndex:idx];
                     NSIndexPath *indexP = [NSIndexPath indexPathForRow:idx inSection:0];
                     [selfBlock.tableView deleteRowsAtIndexPaths:@[indexP] withRowAnimation:UITableViewRowAnimationLeft];
-//                    NSMutableSet *set = [NSMutableSet setWithArray:_downLoadArray];
-//                    [set addObjectsFromArray:[ProjiectDownLoadManager defaultProjiectDownLoadManager].downLoadQueue.operations];
-//                    [_downLoadArray removeAllObjects];
-//                    self.downLoadArray = [downManager.downLoadQueue.operations mutableCopy];
                     if (!_downLoadArray.count) {
                         self.downLoadArray = [downManager.downLoadQueue.operations mutableCopy];
                         [selfBlock.tableView reloadData];
@@ -233,7 +221,7 @@
                 @autoreleasepool {
                     NSDictionary *dic = (NSDictionary *)obj;
                     NSMutableDictionary *newObj = [dic mutableCopy];
-                    WHC_Download *op = [[WHC_Download alloc]initStartDownloadWithURL:[NSURL URLWithString:newObj[@"post_mp"]] savePath:manager.userDownLoadPath savefileName:[newObj[@"post_mp"] stringByReplacingOccurrencesOfString:@"/" withString:@""] withObj:newObj delegate:nil];
+                    WHC_Download *op = [[WHC_Download alloc]initStartDownloadWithURL:[NSURL URLWithString:newObj[@"post_mp"]] savePath:manager.userDownLoadPath savefileName:[newObj[@"post_mp"] stringByReplacingOccurrencesOfString:@"/" withString:@""] withObj:newObj withCell:nil isSingleDownload:NO delegate:nil];
                     if (op) {
                         [manager.downLoadQueue addOperation:op];
                     }
@@ -256,60 +244,5 @@
         [self.tableView reloadData];
     }
 }
-
-
-/*
- - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
- UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:<#@"reuseIdentifier"#> forIndexPath:indexPath];
- 
- // Configure the cell...
- 
- return cell;
- }
- */
-
-/*
- // Override to support conditional editing of the table view.
- - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
- // Return NO if you do not want the specified item to be editable.
- return YES;
- }
- */
-
-/*
- // Override to support editing the table view.
- - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
- if (editingStyle == UITableViewCellEditingStyleDelete) {
- // Delete the row from the data source
- [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
- } else if (editingStyle == UITableViewCellEditingStyleInsert) {
- // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
- }
- }
- */
-
-/*
- // Override to support rearranging the table view.
- - (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)fromIndexPath toIndexPath:(NSIndexPath *)toIndexPath {
- }
- */
-
-/*
- // Override to support conditional rearranging of the table view.
- - (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
- // Return NO if you do not want the item to be re-orderable.
- return YES;
- }
- */
-
-/*
- #pragma mark - Navigation
- 
- // In a storyboard-based application, you will often want to do a little preparation before navigation
- - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
- // Get the new view controller using [segue destinationViewController].
- // Pass the selected object to the new view controller.
- }
- */
 
 @end

@@ -12,6 +12,7 @@
 {
     UIImageView *userHeadImageView;
     UILabel *nameLabel;
+    UIImageView *vipImgView;
     UILabel *detailLabel;
 }
 @end
@@ -44,7 +45,13 @@
         nameLabel.font = [UIFont boldSystemFontOfSize:17];
         nameLabel.textColor = [UIColor blackColor];
         [self.contentView addSubview:nameLabel];
-        //
+        
+        vipImgView = [[UIImageView alloc] init];
+        vipImgView.hidden = YES;
+        vipImgView.contentMode = UIViewContentModeScaleAspectFill;
+        [self.contentView addSubview:vipImgView];
+        
+        //vip说明
         detailLabel = [[UILabel alloc] init];
         detailLabel.numberOfLines = 0;
         detailLabel.frame = CGRectMake(CGRectGetMaxX(userHeadImageView.frame) + 10, CGRectGetMaxY(nameLabel.frame) + 5, SCREEN_WIDTH - 100, 35);
@@ -59,12 +66,23 @@
     _user = user;
     
     nameLabel.text = user[@"user_nicename"];
+    nameLabel.width = [nameLabel.text boundingRectWithSize:CGSizeMake(MAXFLOAT, MAXFLOAT) options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:nameLabel.font} context:nil].size.width;
     
-    if ([_is_member isEqualToString:@"1"]) {
+    if ([_is_member isEqualToString:@"1"]||[_is_member isEqualToString:@"2"]) {
         NSMutableAttributedString *attriStr = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"您已是会员，有效期至%@，新购买的会员将在此日期后自动生效",_end_date]];
         [attriStr addAttribute:NSForegroundColorAttributeName value:gMainColor range:NSMakeRange(10,_end_date.length)];
         detailLabel.attributedText = attriStr;
+        
+        vipImgView.frame = CGRectMake(CGRectGetMaxX(nameLabel.frame) + 5, nameLabel.y + 2, 30, 30);
+        vipImgView.centerY = nameLabel.centerY;
+        vipImgView.hidden = NO;
+        if ([_is_member isEqualToString:@"1"]) {
+            vipImgView.image = [UIImage imageNamed:@"vip"];
+        }else{
+            vipImgView.image = [UIImage imageNamed:@"svip"];
+        }
     }else{
+        vipImgView.hidden = YES;
         detailLabel.text = @"您还不是会员，开通会员后可收听更多资讯";
     }
     
@@ -76,6 +94,5 @@
         NSString *str = USERPHOTOHTTPSTRING(NEWSSEMTPHOTOURL(user[@"avatar"]));
         [userHeadImageView sd_setImageWithURL:[NSURL URLWithString:str] placeholderImage:AvatarPlaceHolderImage];
     }
-
 }
 @end

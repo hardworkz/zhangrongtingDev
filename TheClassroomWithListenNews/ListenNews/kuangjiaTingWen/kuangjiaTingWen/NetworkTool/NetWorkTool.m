@@ -15,10 +15,14 @@
 
 + (void)isNewDayWithServer_date:(NSString *)dateString
 {
-    NSString *serverDate = [CommonCode readFromUserD:[NSString stringWithFormat:@"%@_%@",server_date,ExdangqianUserUid?ExdangqianUserUid:@""]];
+    NSString *serverDate = [CommonCode readFromUserD:server_date];
     if (![dateString isEqualToString:serverDate]) {//判断本地缓存时间和服务器返回时间是否一致，不一致则清空新闻播放限制次数
-        [CommonCode writeToUserD:[NSString stringWithFormat:@"0"] andKey:[NSString stringWithFormat:@"%@_%@",limit_time,ExdangqianUserUid?ExdangqianUserUid:@""]];
-        [CommonCode writeToUserD:dateString andKey:[NSString stringWithFormat:@"%@_%@",server_date,ExdangqianUserUid?ExdangqianUserUid:@""]];
+//        if ([[CommonCode readFromUserD:@"isLogin"] boolValue] == YES) {
+//            [CommonCode writeToUserD:[NSString stringWithFormat:@"0"] andKey:[NSString stringWithFormat:@"%@_%@",limit_time,AvatarAccessToken]];
+//        }else{
+        [CommonCode writeToUserD:[NSString stringWithFormat:@"0"] andKey:limit_time];
+//        }
+        [CommonCode writeToUserD:dateString andKey:server_date];
         //更新用户信息
         [[NSNotificationCenter defaultCenter] postNotificationName:@"updateUserInfo" object:nil];
     }
@@ -2226,6 +2230,7 @@ NSMutableDictionary *dic = [[NSMutableDictionary alloc]initWithCapacity:1
     }else if ([pay_type intValue] == 4) {
         dic[@"money"] = money;
     }
+    RTLog(@"支付参数：%@",dic);
     [self asyncNetworkingUrl:@"/Alipay/alipay" andDict:dic success:success failure:failure];
 }
 //微信购买统一接口
@@ -2251,6 +2256,7 @@ NSMutableDictionary *dic = [[NSMutableDictionary alloc]initWithCapacity:1
     }else if ([pay_type intValue] == 4) {
         dic[@"money"] = money;
     }
+    RTLog(@"支付参数：%@",dic);
     [self asyncNetworkingUrl:@"/Wxpay/wxpay" andDict:dic success:success failure:failure];
 }
 //获取会员限制数据

@@ -192,11 +192,16 @@ typedef NS_ENUM(NSInteger, ZRTPlayStatus) {
  @return ID数组
  */
 - (NSMutableArray *)downloadPostIDArray;
+/**
+ 判断当前ID是否是已下载过新闻ID
 
+ @param post_id 新闻ID
+ */
+- (NSString *)post_mpWithDownloadNewsID:(NSString *)post_id;
 /**
  获取播放器播放状态是否限制
 
  @param isAdd 是否是播放完成回调+1或者下载次数+1
  */
-- (void)limitPlayStatusWithAdd:(BOOL)isAdd;
+- (BOOL)limitPlayStatusWithAdd:(BOOL)isAdd;
 @end

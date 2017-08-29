@@ -180,7 +180,7 @@
 /**
  *  获取下载的所有文件
  *
- *  @return <#return value description#>
+ *  @return 数据数组
  */
 - (NSArray *)downloadAllNewObjArrar {
     NSString *str = [self.userDownLoadPlsit stringByAppendingPathComponent:@"downloadArrar"];

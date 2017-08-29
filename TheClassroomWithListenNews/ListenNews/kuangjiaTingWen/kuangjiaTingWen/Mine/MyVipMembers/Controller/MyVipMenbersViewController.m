@@ -148,7 +148,7 @@ static NSString *const VIPContent = @"普通会员:\n1.每日可收听新闻数�
     if (indexPath.row == 0) {
         MyUserVipTableViewCell *cell = [MyUserVipTableViewCell cellWithTableView:tableView];
         cell.end_date = _end_date;
-        cell.is_member = _is_member;
+        cell.is_member = self.is_member;
         cell.user = _user;
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
         return cell;
@@ -159,15 +159,10 @@ static NSString *const VIPContent = @"普通会员:\n1.每日可收听新闻数�
         return cell;
     }else if (indexPath.row == 2||indexPath.row == 3||indexPath.row == 4) {
         MyVipMonthTableViewCell *cell = [MyVipMonthTableViewCell cellWithTableView:tableView];
+        MembersDataModel *model = self.dataSourceArr[indexPath.row - 2];
         DefineWeakSelf
         cell.payBlock = ^(MyVipMonthTableViewCell *cell) {
-            if (indexPath.row == 2) {
-                _currenPayMonth = 1;
-            }else if (indexPath.row == 3) {
-                _currenPayMonth = 2;
-            }else if (indexPath.row == 4) {
-                _currenPayMonth = 3;
-            }
+            _currenPayMonth = [cell.model.monthes intValue];
             APPDELEGATE.payType = PayTypeMembers;
             _alertView = [[CustomAlertView alloc] initWithCustomView:[weakSelf setupPayAlert]];
             _alertView.alertHeight = 155;
@@ -178,7 +173,7 @@ static NSString *const VIPContent = @"普通会员:\n1.每日可收听新闻数�
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
         cell.is_member = _is_member;
         if (self.dataSourceArr.count) {
-            cell.model = self.dataSourceArr[indexPath.row - 2];
+            cell.model = model;
         }
         return cell;
     }else if (indexPath.row == 5) {
@@ -190,7 +185,7 @@ static NSString *const VIPContent = @"普通会员:\n1.每日可收听新闻数�
         MyVipMonthTableViewCell *cell = [MyVipMonthTableViewCell cellWithTableView:tableView];
         DefineWeakSelf
         cell.payBlock = ^(MyVipMonthTableViewCell *cell) {
-            _currenPayMonth = 12;
+            _currenPayMonth = 20;
             APPDELEGATE.payType = PayTypeMembers;
             _alertView = [[CustomAlertView alloc] initWithCustomView:[weakSelf setupPayAlert]];
             _alertView.alertHeight = 155;
@@ -272,7 +267,7 @@ static NSString *const VIPContent = @"普通会员:\n1.每日可收听新闻数�
 - (void)zhifubaoBtnClicked
 {
     [_alertView coverClick];
-    [NetWorkTool AliPayWithaccessToken:AvatarAccessToken pay_type:@"2" act_id:nil money:nil mem_type:_currenPayMonth == 12?@"2":@"1" month:[NSString stringWithFormat:@"%ld",(long)_currenPayMonth] sccess:^(NSDictionary *responseObject) {
+    [NetWorkTool AliPayWithaccessToken:AvatarAccessToken pay_type:@"2" act_id:nil money:nil mem_type:_currenPayMonth == 20?@"2":@"1" month:_currenPayMonth == 20?@"12":[NSString stringWithFormat:@"%ld",(long)_currenPayMonth] sccess:^(NSDictionary *responseObject) {
         RTLog(@"%@",responseObject);
         if ([responseObject[status] intValue] == 1) {
             // NOTE: 调用支付结果开始支付
@@ -309,7 +304,7 @@ static NSString *const VIPContent = @"普通会员:\n1.每日可收听新闻数�
 - (void)weixinBtnClicked
 {
     [_alertView coverClick];
-    [NetWorkTool WXPayWithaccessToken:AvatarAccessToken pay_type:@"2" act_id:nil money:nil mem_type:_currenPayMonth == 12?@"2":@"1" month:[NSString stringWithFormat:@"%ld",(long)_currenPayMonth] sccess:^(NSDictionary *responseObject) {
+    [NetWorkTool WXPayWithaccessToken:AvatarAccessToken pay_type:@"2" act_id:nil money:nil mem_type:_currenPayMonth == 20?@"2":@"1" month:_currenPayMonth == 20?@"12":[NSString stringWithFormat:@"%ld",(long)_currenPayMonth] sccess:^(NSDictionary *responseObject) {
         RTLog(@"%@",responseObject);
         if ([responseObject[status] intValue] == 1) {
             NSDictionary *payDic = responseObject[results];

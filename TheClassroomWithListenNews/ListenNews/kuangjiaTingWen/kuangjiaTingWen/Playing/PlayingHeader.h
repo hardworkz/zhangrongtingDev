@@ -28,6 +28,7 @@
 #import "newsDetailModel.h"
 #import "newsActModel.h"
 #import "rewardModel.h"
+#import "DownloadDataModel.h"
 
 #import "PlayVCCommentModel.h"
 #import "PlayVCCommentFrameModel.h"
@@ -42,6 +43,7 @@
 #import "AutoImageTableViewCell.h"
 #import "zhuboxiangqingNewVCPlayBtn.h"
 #import "CustomPageScrollView.h"
+#import "NewsCell.h"
 
 #import "AKAlertView.h"
 #import "PinglundianzanCustomBtn.h"

@@ -47,52 +47,75 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
     }
     return self;
 }
-- (void)limitPlayStatusWithAdd:(BOOL)isAdd{
+- (BOOL)limitPlayStatusWithAdd:(BOOL)isAdd{
     //判断是否是播放新闻，记录次数限制
-    NSDictionary *userInfoDict = [CommonCode readFromUserD:@"dangqianUserInfo"];
-    if ([userInfoDict[results][member_type] intValue] == 0) {
-        int limitTime = [[CommonCode readFromUserD:[NSString stringWithFormat:@"%@_%@",limit_time,ExdangqianUserUid?ExdangqianUserUid:@""]] intValue];
-        int limitNum = [[CommonCode readFromUserD:[NSString stringWithFormat:@"%@",limit_num]] intValue];
-        if (limitTime >= limitNum||[userInfoDict[results][is_stop] intValue] == 1) {
+    BOOL isStopPlay = NO;
+    if ([[CommonCode readFromUserD:@"isLogin"] boolValue] == YES) {
+        NSDictionary *userInfoDict = [CommonCode readFromUserD:@"dangqianUserInfo"];
+        if ([userInfoDict[results][member_type] intValue] == 0) {
+            int limitTime = [[CommonCode readFromUserD:limit_time] intValue];
+            int limitNum = [[CommonCode readFromUserD:limit_num] intValue];
+            RTLog(@"limitTime--:%d  is_stop---:%d",limitTime,[userInfoDict[results][is_stop] intValue]);
+            if (limitTime >= limitNum||[userInfoDict[results][is_stop] intValue] == 1) {
+                switch (self.playType) {
+                    case ZRTPlayTypeNews:
+                        isStopPlay = YES;
+                        [NetWorkTool sendLimitDataWithaccessToken:AvatarAccessToken sccess:^(NSDictionary *responseObject) {
+                            if ([responseObject[status] intValue] == 1) {
+                                [[NSNotificationCenter defaultCenter] postNotificationName:@"updateUserInfo" object:nil];
+                            }
+                        } failure:^(NSError *error) {
+                            
+                        }];
+                        break;
+                    case ZRTPlayTypeDownload:
+                        isStopPlay = NO;
+                        break;
+                    case ZRTPlayTypeClassroom:
+                        isStopPlay = NO;
+                        break;
+                        
+                    default:
+                        isStopPlay = NO;
+                        break;
+                }
+            }else{
+                isStopPlay = NO;
+                if (isAdd) {
+                    [CommonCode writeToUserD:[NSString stringWithFormat:@"%d",limitTime + 1] andKey:limit_time];
+                }
+            }
+        }else
+        {
+            isStopPlay = NO;
+        }
+    }else{
+        int limitTime = [[CommonCode readFromUserD:limit_time] intValue];
+        int limitNum = [[CommonCode readFromUserD:limit_num] intValue];
+        RTLog(@"limitTime--:%d",limitTime);
+        if (limitTime >= limitNum) {
             switch (self.playType) {
                 case ZRTPlayTypeNews:
-                    ExLimitPlay = YES;
-                    [NetWorkTool sendLimitDataWithaccessToken:AvatarAccessToken sccess:^(NSDictionary *responseObject) {
-                        if ([responseObject[status] intValue] == 1) {
-                            [[NSNotificationCenter defaultCenter] postNotificationName:@"updateUserInfo" object:nil];
-                        }
-                    } failure:^(NSError *error) {
-                        
-                    }];
+                    isStopPlay = YES;
                     break;
                 case ZRTPlayTypeDownload:
-                    ExLimitPlay = NO;
+                    isStopPlay = NO;
                     break;
                 case ZRTPlayTypeClassroom:
-                    ExLimitPlay = NO;
+                    isStopPlay = NO;
                     break;
-                    
                 default:
-                    ExLimitPlay = YES;
-                    [NetWorkTool sendLimitDataWithaccessToken:AvatarAccessToken sccess:^(NSDictionary *responseObject) {
-                        if ([responseObject[status] intValue] == 1) {
-                            [[NSNotificationCenter defaultCenter] postNotificationName:@"updateUserInfo" object:nil];
-                        }
-                    } failure:^(NSError *error) {
-                        
-                    }];
+                    isStopPlay = NO;
                     break;
             }
         }else{
-            ExLimitPlay = NO;
+            isStopPlay = NO;
             if (isAdd) {
-                [CommonCode writeToUserD:[NSString stringWithFormat:@"%d",limitTime + 1] andKey:[NSString stringWithFormat:@"%@_%@",limit_time,ExdangqianUserUid?ExdangqianUserUid:@""]];
+                [CommonCode writeToUserD:[NSString stringWithFormat:@"%d",limitTime + 1] andKey:limit_time];
             }
         }
-    }else
-    {
-        ExLimitPlay = NO;
     }
+    return isStopPlay;
 }
 - (NSMutableArray *)downloadPostIDArray
 {
@@ -103,12 +126,29 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
     [arr enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
         @autoreleasepool {
             NewObj *nObj = [NewObj newObjWithDictionary:obj];
-            [weakDownloadArray addObject:nObj.i_id];
+            DownloadDataModel *model = [DownloadDataModel new];
+            model.post_id = nObj.i_id;
+            model.post_mp = nObj.post_mp;
+            [weakDownloadArray addObject:model];
         }
     }];
     return downloadArray;
 }
-
+- (NSMutableArray *)downloadingPostIDArray
+{
+    NSMutableArray *downloadingArray = [NSMutableArray array];
+    ProjiectDownLoadManager *manager = [ProjiectDownLoadManager defaultProjiectDownLoadManager];
+    NSArray *arr = [manager sevaDownloadArray];
+    RTLog(@"%@",arr[0]);
+    __weak __typeof(downloadingArray) weakDownloadArray = downloadingArray;
+    [arr enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        @autoreleasepool {
+            NewObj *nObj = [NewObj newObjWithDictionary:obj];
+            [weakDownloadArray addObject:nObj.i_id];
+        }
+    }];
+    return downloadingArray;
+}
 #pragma mark - 播放器
 /*
  * 播放器播放状态
@@ -219,16 +259,52 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
  */
 - (void)startPlay
 {
-    if (self.playType == ZRTPlayTypeNews) {
-        if (!ExLimitPlay) {
+//    if (self.playType == ZRTPlayTypeNews) {
+//        if (![[ZRT_PlayerManager manager] limitPlayStatusWithAdd:NO]) {
+//            _status = ZRTPlayStatusPlay;
+//            SendNotify(SONGPLAYSTATUSCHANGE, nil)
+//            [self.player play];
+//        }
+//    }else{
+//        _status = ZRTPlayStatusPlay;
+//        SendNotify(SONGPLAYSTATUSCHANGE, nil)
+//        [self.player play];
+//    }
+    switch (_playType) {
+        case ZRTPlayTypeNews:
+            if ([self post_mpWithDownloadNewsID:self.currentSong[@"id"]] != nil) {
+                _status = ZRTPlayStatusPlay;
+                SendNotify(SONGPLAYSTATUSCHANGE, nil)
+                [self.player play];
+            }else{
+                if (![[ZRT_PlayerManager manager] limitPlayStatusWithAdd:NO]) {
+                    _status = ZRTPlayStatusPlay;
+                    SendNotify(SONGPLAYSTATUSCHANGE, nil)
+                    [self.player play];
+                }
+            }
+            break;
+        case ZRTPlayTypeDownload:
             _status = ZRTPlayStatusPlay;
             SendNotify(SONGPLAYSTATUSCHANGE, nil)
             [self.player play];
-        }
-    }else{
-        _status = ZRTPlayStatusPlay;
-        SendNotify(SONGPLAYSTATUSCHANGE, nil)
-        [self.player play];
+            break;
+        case ZRTPlayTypeClassroom:
+            _status = ZRTPlayStatusPlay;
+            SendNotify(SONGPLAYSTATUSCHANGE, nil)
+            [self.player play];
+            break;
+        case ZRTPlayTypeClassroomTry:
+            _status = ZRTPlayStatusPlay;
+            SendNotify(SONGPLAYSTATUSCHANGE, nil)
+            [self.player play];
+            break;
+            
+        default:
+            _status = ZRTPlayStatusPlay;
+            SendNotify(SONGPLAYSTATUSCHANGE, nil)
+            [self.player play];
+            break;
     }
 }
 /*
@@ -327,6 +403,10 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
                 self.playReloadList(self.currentSongIndex);
                 
                 break;
+            case ZRTPlayTypeDownload:
+                self.playReloadList(self.currentSongIndex);
+                
+                break;
                 
             default:
                 break;
@@ -353,25 +433,16 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
             self.currentCoverImage = NEWSSEMTPHOTOURL(self.currentSong[@"smeta"]);
             break;
         case ZRTPlayTypeClassroomTry:
-            self.currentCoverImage = @"";
+            self.currentCoverImage = NEWSSEMTPHOTOURL(self.currentSong[@"smeta"]);
             break;
             
         default:
             break;
     }
     
-    //判断该新闻ID是否已经离线下载了
-    BOOL isDownLoad = NO;
-    NSMutableArray *postIDArray = [self downloadPostIDArray];
-    for (NSString *post_id in postIDArray) {
-        if ([post_id isEqualToString:self.currentSong[@"id"]]) {
-            isDownLoad = YES;
-            break;
-        }
-    }
     //获取播放器播放对象
-    if (isDownLoad) {
-        self.playerItem = [[AVPlayerItem alloc] initWithURL:[NSURL fileURLWithPath:self.currentSong[@"post_mp"]]];
+    if ([self post_mpWithDownloadNewsID:self.currentSong[@"id"]] != nil) {
+        self.playerItem = [[AVPlayerItem alloc] initWithURL:[NSURL fileURLWithPath:[self post_mpWithDownloadNewsID:self.currentSong[@"id"]]]];
     }else{
         self.playerItem = [[AVPlayerItem alloc] initWithURL:[NSURL URLWithString:self.currentSong[@"post_mp"]]];
     }
@@ -419,53 +490,49 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
             //刷新封面图片
             self.currentCoverImage = NEWSSEMTPHOTOURL(self.currentSong[@"smeta"]);
             
-            if (self.channelType == ChannelTypeMineDownload) {
-                self.playerItem = [[AVPlayerItem alloc] initWithURL:[NSURL fileURLWithPath:self.currentSong[@"post_mp"]]];
-            }else{//判断该新闻ID是否已经离线下载了
-                BOOL isDownLoad = NO;
-                NSMutableArray *postIDArray = [self downloadPostIDArray];
-                for (NSString *post_id in postIDArray) {
-                    if ([post_id isEqualToString:self.currentSong[@"id"]]) {
-                        isDownLoad = YES;
-                        break;
-                    }
-                }
-                //获取播放器播放对象
-                if (isDownLoad) {
-                    self.playerItem = [[AVPlayerItem alloc] initWithURL:[NSURL fileURLWithPath:self.currentSong[@"post_mp"]]];
-                }else{
-                    self.playerItem = [[AVPlayerItem alloc] initWithURL:[NSURL URLWithString:self.currentSong[@"post_mp"]]];
-                }
+            //判断该新闻ID是否已经离线下载了
+            //获取播放器播放对象
+            RTLog(@"post_mp:%@",self.currentSong[@"post_mp"]);
+            if ([self post_mpWithDownloadNewsID:self.currentSong[@"id"]] != nil) {
+                self.playerItem = [[AVPlayerItem alloc] initWithURL:[NSURL fileURLWithPath:[self post_mpWithDownloadNewsID:self.currentSong[@"id"]]]];
+            }else{
+                self.playerItem = [[AVPlayerItem alloc] initWithURL:[NSURL URLWithString:self.currentSong[@"post_mp"]]];
             }
+            break;
+        case ZRTPlayTypeDownload:
+            //刷新封面图片
+            self.currentCoverImage = NEWSSEMTPHOTOURL(self.currentSong[@"smeta"]);
+            
+            RTLog(@"post_mp:%@",self.currentSong[@"post_mp"]);
+            self.playerItem = [[AVPlayerItem alloc] initWithURL:[NSURL fileURLWithPath:self.currentSong[@"post_mp"]]];
             break;
         case ZRTPlayTypeClassroom:
             //刷新封面图片
             self.currentCoverImage = NEWSSEMTPHOTOURL(self.currentSong[@"smeta"]);
             
-            if (self.channelType == ChannelTypeMineDownload) {
-                self.playerItem = [[AVPlayerItem alloc] initWithURL:[NSURL fileURLWithPath:self.currentSong[@"post_mp"]]];
-            }else{//判断该新闻ID是否已经离线下载了
-                BOOL isDownLoad = NO;
-                NSMutableArray *postIDArray = [self downloadPostIDArray];
-                for (NSString *post_id in postIDArray) {
-                    if ([post_id isEqualToString:self.currentSong[@"id"]]) {
-                        isDownLoad = YES;
-                        break;
-                    }
-                }
-                //获取播放器播放对象
-                if (isDownLoad) {
-                    self.playerItem = [[AVPlayerItem alloc] initWithURL:[NSURL fileURLWithPath:self.currentSong[@"post_mp"]]];
-                }else{
-                    self.playerItem = [[AVPlayerItem alloc] initWithURL:[NSURL URLWithString:self.currentSong[@"post_mp"]]];
-                }
+            //获取播放器播放对象
+            if ([self post_mpWithDownloadNewsID:self.currentSong[@"id"]] != nil) {
+                self.playerItem = [[AVPlayerItem alloc] initWithURL:[NSURL fileURLWithPath:[self post_mpWithDownloadNewsID:self.currentSong[@"id"]]]];
+            }else{
+                self.playerItem = [[AVPlayerItem alloc] initWithURL:[NSURL URLWithString:self.currentSong[@"post_mp"]]];
             }
             break;
         case ZRTPlayTypeClassroomTry:
-            self.currentCoverImage = @"";
+            //设置图片
+            if ([NEWSSEMTPHOTOURL(self.currentSong[@"smeta"]) rangeOfString:@"userDownLoadPathImage"].location != NSNotFound) {
+                self.currentCoverImage = NEWSSEMTPHOTOURL(self.currentSong[@"smeta"]);
+            }
+            else if ([NEWSSEMTPHOTOURL(self.currentSong[@"smeta"]) rangeOfString:@"http"].location != NSNotFound)
+            {
+                self.currentCoverImage = NEWSSEMTPHOTOURL(self.currentSong[@"smeta"]);
+            }
+            else{
+                self.currentCoverImage = USERPHOTOHTTPSTRINGZhuBo(NEWSSEMTPHOTOURL(self.currentSong[@"smeta"]));
+            }
             self.playerItem = [[AVPlayerItem alloc] initWithURL:[NSURL URLWithString:self.currentSong[@"s_mpurl"]]];
             break;
         default:
+            
             break;
     }
     
@@ -600,6 +667,7 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
             case AVPlayerStatusReadyToPlay:
                 _status = ZRTPlayStatusReadyToPlay;
 //                [self startPlay];
+                [APPDELEGATE configNowPlayingCenter];
                 RTLog(@"KVO：准备完毕");
                 break;
             case AVPlayerStatusFailed:
@@ -699,4 +767,73 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
     }
     return returnColor;
 }
+
+/**
+ 是否是已下载过的id
+
+ @param post_id 新闻ID
+ @return 下载过的新闻ID
+ */
+- (NSString *)post_mpWithDownloadNewsID:(NSString *)post_id
+{
+    NSString *post_mp = nil;
+    NSMutableArray *postIDArray = [self downloadPostIDArray];
+    for (DownloadDataModel *model in postIDArray) {
+        if ([model.post_id isEqualToString:post_id]) {
+            post_mp = model.post_mp;
+            break;
+        }
+    }
+    return post_mp;
+}
+
+/**
+ 判断是否该音频路径是否下载成功
+
+ @param post_mp 音频网络路径
+ @return 返回YES下载成功,返回NO未下载成功
+ */
+//- (BOOL)isDownloadingWithPost_mp:(NSString *)post_mp
+//{
+//    BOOL isDownloading = NO;
+//    //判断是否下载完成
+////    for (NSMutableDictionary *d in [[ProjiectDownLoadManager defaultProjiectDownLoadManager] downloadAllNewObjArrar]) {
+////        if ([d[@"post_mp"] rangeOfString:[post_mp stringByReplacingOccurrencesOfString:@"/" withString:@""]].location != NSNotFound) {
+////            RTLog(@"存在");
+////            isDownloading = YES;
+////        }
+////    }
+//    //判断是否是正在下载中的音频文件
+//    NSString * fielName = nil;
+//    NSURL *post_mp_url = [NSURL URLWithString:post_mp];
+//    if(post_mp_url){
+//        NSString * format = [self fileFormat:post_mp_url.absoluteString];
+//        if([format isEqualToString:[NSString stringWithFormat:@".%@",[[post_mp componentsSeparatedByString:@"."] lastObject]]]){
+//            fielName = post_mp;
+//        }else{
+//            fielName = [NSString stringWithFormat:@"%@%@",post_mp,format];
+//        }
+//    }
+//    for (WHC_Download * tempDownload in [ProjiectDownLoadManager defaultProjiectDownLoadManager].downLoadQueue.operations) {
+//        if ([fielName isEqualToString:tempDownload.saveFileName]){
+//            //下载文件中存在该路径，下载完成
+//            isDownloading = YES;
+//            break;
+//        }
+//    }
+//    return isDownloading;
+//}
+
+/**
+ 获取要下载的文件格式
+ */
+//- (NSString *)fileFormat:(NSString *)downloadUrl{
+//    NSArray  * strArr = [downloadUrl componentsSeparatedByString:@"."];
+//    if(strArr && strArr.count > 0){
+//        NSString *s = [NSString stringWithFormat:@".%@",strArr.lastObject];
+//        return s;
+//    }else{
+//        return nil;
+//    }
+//}
 @end

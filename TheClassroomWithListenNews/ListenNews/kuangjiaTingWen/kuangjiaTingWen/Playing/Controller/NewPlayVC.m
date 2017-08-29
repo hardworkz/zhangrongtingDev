@@ -101,14 +101,6 @@
  是否已经收藏
  */
 @property (assign, nonatomic) BOOL isCollected;
-/**
- 投金币数
- */
-//@property (strong, nonatomic) UILabel *appreciateNum;
-/**
- 评论数
- */
-//@property (strong, nonatomic) UILabel *commentNum;
 //新闻详情控件------------------------------------
 /**
  新闻图片
@@ -159,6 +151,9 @@
  标题
  */
 @property (strong, nonatomic) UILabel *titleLab;
+/**
+ 日期
+ */
 @property (strong, nonatomic) UILabel *riqiLab;
 //新闻详情控件------------------------------------
 
@@ -170,6 +165,14 @@
  是否显示开通会员弹窗提示
  */
 @property (assign, nonatomic) BOOL isShowVipTipsFromLogin;
+/**
+ 分页数
+ */
+@property (assign, nonatomic) NSInteger commentPage;
+/**
+ 分页评论条数
+ */
+@property (assign, nonatomic) NSInteger commentPageSize;
 @end
 static NewPlayVC *_instance = nil;
 @implementation NewPlayVC
@@ -227,6 +230,9 @@ static NewPlayVC *_instance = nil;
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    //评论分页数据
+    self.commentPage = 1;
+    self.commentPageSize = 10;
     //添加tableView控件
     [self.view addSubview:self.tableView];
     //置顶按钮
@@ -254,6 +260,9 @@ static NewPlayVC *_instance = nil;
     //通知
     //后台系统中断音频控制通知
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleInterruption:) name:AVAudioSessionInterruptionNotification object:[AVAudioSession sharedInstance]];
+    //其他App占据AudioSession通知
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleInterruptionHint:) name:AVAudioSessionSilenceSecondaryAudioHintNotification object:[AVAudioSession sharedInstance]];
+    
     //添加通知，拔出耳机后暂停播放
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(routeChange:) name:AVAudioSessionRouteChangeNotification object:nil];
     //支付宝支付回调
@@ -277,8 +286,11 @@ static NewPlayVC *_instance = nil;
     [NetWorkTool getPostDetailWithaccessToken:AvatarAccessToken post_id:self.post_id sccess:^(NSDictionary *responseObject) {
         [self.tableView.mj_header endRefreshing];
         if ([responseObject[status] intValue] == 1){
-            //判断限制状态，记录次数限制
-            [[ZRT_PlayerManager manager] limitPlayStatusWithAdd:YES];
+            //判断当前播放内容为新闻播放，新闻播放限制数+1
+            if ([ZRT_PlayerManager manager].playType == ZRTPlayTypeNews) {
+                //判断限制状态，记录次数限制
+                [[ZRT_PlayerManager manager] limitPlayStatusWithAdd:YES];
+            }
             //刷新新闻详情模型数据
             _postDetailModel = [newsDetailModel mj_objectWithKeyValues:responseObject[results]];
             //设置新闻内容详情的frame数据
@@ -314,12 +326,21 @@ static NewPlayVC *_instance = nil;
 #pragma mark - 获取评论列表
 - (void)getCommentList{
     //获取评论列表
-    [NetWorkTool getPaoGuoJieMuPingLunLieBiaoWithJieMuID:self.post_id anduid:ExdangqianUserUid andPage:@"1" andLimit:@"10" sccess:^(NSDictionary *responseObject) {
+    [NetWorkTool getPaoGuoJieMuPingLunLieBiaoWithJieMuID:self.post_id anduid:ExdangqianUserUid andPage:[NSString stringWithFormat:@"%ld",self.commentPage] andLimit:[NSString stringWithFormat:@"%ld",self.commentPageSize] sccess:^(NSDictionary *responseObject) {
         if ([responseObject[status] intValue] == 1) {
             if ([responseObject[@"results"] isKindOfClass:[NSArray class]])
             {
                 NSArray *array = [PlayVCCommentModel mj_objectArrayWithKeyValuesArray:responseObject[@"results"]];
                 self.pinglunArr = [self pinglunFrameModelArrayWithModelArray:array];
+                if (array.count == 10 && self.commentPage == 1) {
+                    DefineWeakSelf
+                    self.tableView.mj_footer = [MJRefreshAutoNormalFooter footerWithRefreshingBlock:^{
+                        [weakSelf getCommentList];
+                    }];
+                }
+                if (array.count == 10) {
+                    self.commentPage++;
+                }
             }
             else{
                 self.pinglunArr = [NSMutableArray array];
@@ -396,6 +417,9 @@ static NewPlayVC *_instance = nil;
 {
     //设置新闻图片
     NSString *imgUrl4 = NEWSSEMTPHOTOURL(self.postDetailModel.smeta);
+    if (imgUrl4 == nil) {
+        return;
+    }
     if ([imgUrl4 rangeOfString:@"userDownLoadPathImage"].location != NSNotFound) {
         [self.zhengwenImg sd_setImageWithURL:[NSURL fileURLWithPath:imgUrl4] placeholderImage:[UIImage imageNamed:@"thumbnailsdefault"]];
     }
@@ -1098,7 +1122,17 @@ static NewPlayVC *_instance = nil;
 /**
  下载
  */
-- (void)downloadAction:(UIButton *)sender {
+- (void)downloadAction:(UIButton *)sender
+{
+    if ([[ZRT_PlayerManager manager] limitPlayStatusWithAdd:NO]) {
+        [self alertMessageWithVipLimit];
+        return;
+    }
+    if ([[ZRT_PlayerManager manager] post_mpWithDownloadNewsID:self.postDetailModel.post_id] != nil) {
+        XWAlerLoginView *alert = [XWAlerLoginView alertWithTitle:@"该新闻已下载过"];
+        [alert show];
+        return;
+    }
     [SVProgressHUD showInfoWithStatus:@"开始下载"];
     [self performSelector:@selector(SVPDismiss) withObject:nil afterDelay:1.0];
     //TODO:下载单条新闻
@@ -1108,7 +1142,7 @@ static NewPlayVC *_instance = nil;
             ProjiectDownLoadManager *manager = [ProjiectDownLoadManager defaultProjiectDownLoadManager];
             [manager insertSevaDownLoadArray:dic];
             
-            WHC_Download *op = [[WHC_Download alloc]initStartDownloadWithURL:[NSURL URLWithString:dic[@"post_mp"]] savePath:manager.userDownLoadPath savefileName:[dic[@"post_mp"] stringByReplacingOccurrencesOfString:@"/" withString:@""] withObj:dic delegate:nil];
+            WHC_Download *op = [[WHC_Download alloc]initStartDownloadWithURL:[NSURL URLWithString:dic[@"post_mp"]] savePath:manager.userDownLoadPath savefileName:[dic[@"post_mp"] stringByReplacingOccurrencesOfString:@"/" withString:@""] withObj:dic withCell:nil isSingleDownload:YES delegate:nil];
             [manager.downLoadQueue addOperation:op];
         });
     }else{
@@ -1439,34 +1473,50 @@ static NewPlayVC *_instance = nil;
 
 }
 #pragma mark -通知- 后台系统中断音频控制
+
+- (void)handleInterruptionHint:(NSNotification *)notification{
+    NSDictionary *info = notification.userInfo;
+    AVAudioSessionInterruptionType hintType = [info[AVAudioSessionSilenceSecondaryAudioHintTypeKey] unsignedIntegerValue];
+    if (hintType == AVAudioSessionSilenceSecondaryAudioHintTypeBegin) {//别的应用占用session
+        //Handle InterruptionBegan
+        //系统暂停音频，则设置暂停播放器
+        RTLog(@"interruptionTypeBegan");
+        [[ZRT_PlayerManager manager] pausePlay];
+    }
+}
+
 - (void)handleInterruption:(NSNotification *)notification{
     NSDictionary *info = notification.userInfo;
     AVAudioSessionInterruptionType type = [info[AVAudioSessionInterruptionTypeKey] unsignedIntegerValue];
-    if (type == AVAudioSessionInterruptionTypeBegan) {//进入别的应用
+    if (type == AVAudioSessionInterruptionTypeBegan) {//中断开始
         //Handle InterruptionBegan
         //系统暂停音频，则设置暂停播放器
-        [self playPauseClicked:bofangCenterBtn];
         RTLog(@"interruptionTypeBegan");
+        [[ZRT_PlayerManager manager] pausePlay];
     }else{
         RTLog(@"interruptionTypeEnd");
         AVAudioSessionInterruptionOptions options = [info[AVAudioSessionInterruptionOptionKey] unsignedIntegerValue];
         if (options == AVAudioSessionInterruptionOptionShouldResume) {
             //Handle Resume 重新开始播放
-            //            [self doPlay:bofangCenterBtn];
+            [[ZRT_PlayerManager manager] startPlay];
         }
     }
 }
 #pragma mark - 线控方法
 - (void)remoteControlReceivedWithEvent:(UIEvent *)event {
     //判断是否是后台音频
-    if (event.type == UIEventTypeRemoteControl) {
+    if (event.type == UIEventTypeRemoteControl||event.type == UIEventTypeTouches) {
         switch (event.subtype) {
                 
             case UIEventSubtypeRemoteControlPlay:
-                //暂停
+                //开始播放
                 [[ZRT_PlayerManager manager] startPlay];
                 break;
             case UIEventSubtypeRemoteControlTogglePlayPause:
+                //暂停
+                [[ZRT_PlayerManager manager] pausePlay];
+                break;
+            case UIEventSubtypeRemoteControlStop:
                 //暂停
                 [[ZRT_PlayerManager manager] pausePlay];
                 break;
@@ -1481,6 +1531,8 @@ static NewPlayVC *_instance = nil;
                 break;
                 
             default:
+                //暂停
+                [[ZRT_PlayerManager manager] pausePlay];
                 break;
         }
     }
@@ -1567,7 +1619,7 @@ static NSInteger touchCount = 0;
     if ([ZRT_PlayerManager manager].currentSong) {
         [APPDELEGATE configNowPlayingCenter];
     }
-    if (ExLimitPlay) {
+    if ([[ZRT_PlayerManager manager] limitPlayStatusWithAdd:NO] &&![ZRT_PlayerManager manager].isPlaying) {
         [self alertMessageWithVipLimit];
         return;
     }
@@ -1585,12 +1637,13 @@ static NSInteger touchCount = 0;
  */
 - (void)bofangLeftAction:(UIButton *)sender
 {
-    if (ExLimitPlay) {
+    //判断限制状态，记录次数限制
+    if ([[ZRT_PlayerManager manager] limitPlayStatusWithAdd:NO]) {
         [self alertMessageWithVipLimit];
         return;
     }
     touchCount++;
-    if(touchCount<2)
+    if(touchCount==1)
     {
         //播放上一首
         BOOL isfirst = [[ZRT_PlayerManager manager] previousSong];
@@ -1621,12 +1674,13 @@ static NSInteger touchCount = 0;
  */
 - (void)bofangRightAction:(UIButton *)sender
 {
-    if (ExLimitPlay) {
+    //判断限制状态，记录次数限制
+    if ([[ZRT_PlayerManager manager] limitPlayStatusWithAdd:NO]) {
         [self alertMessageWithVipLimit];
         return;
     }
     touchCount++;
-    if(touchCount<2)
+    if(touchCount==1)
     {
         //播放下一首
         BOOL isLast = [[ZRT_PlayerManager manager] nextSong];
@@ -1666,8 +1720,6 @@ static NSInteger touchCount = 0;
     DefineWeakSelf
     [ZRT_PlayerManager manager].playDidEnd = ^(NSInteger currentSongIndex) {
         
-        //判断限制状态，记录次数限制
-        [[ZRT_PlayerManager manager] limitPlayStatusWithAdd:YES];
         //设置详情模型
         weakSelf.postDetailModel = [newsDetailModel new];
         //保存当前播放新闻的ID
@@ -1688,12 +1740,14 @@ static NSInteger touchCount = 0;
 - (void)playFromIndex:(NSInteger)index
 {
     //判断限制状态，记录次数限制
-    [[ZRT_PlayerManager manager] limitPlayStatusWithAdd:NO];
-    if (ExLimitPlay) {
-        [[ZRT_PlayerManager manager] pausePlay];
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            [self alertMessageWithVipLimit];
-        });
+    if ([[ZRT_PlayerManager manager] limitPlayStatusWithAdd:NO]) {
+        if ([[ZRT_PlayerManager manager] post_mpWithDownloadNewsID:self.post_id] == nil) {
+            [[ZRT_PlayerManager manager] pausePlay];
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                [self alertMessageWithVipLimit];
+                return;
+            });
+        }
     }
     //设置播放器数据
     [[ZRT_PlayerManager manager] loadSongInfoFromIndex:index];
@@ -1752,7 +1806,6 @@ static NSInteger touchCount = 0;
     newsActModel *act = [newsActModel mj_objectWithKeyValues:[ZRT_PlayerManager manager].currentSong[@"post_act"]];
     _postDetailModel.act = act;
     
-//    [ZRT_PlayerManager manager].duration = [_postDetailModel.post_time floatValue]/1000.0;
     //设置新闻内容详情的frame数据
     [self setFrameModel];
     //设置详情头部数据
@@ -1770,9 +1823,7 @@ static NSInteger touchCount = 0;
     [self.tableView setContentOffset:CGPointZero animated:NO];
     
     //设置音乐锁屏界面
-    if (self.playType != ZRTPlayTypeClassroomTry) {
-        [[AppDelegate delegate] configNowPlayingCenter];
-    }
+    [[AppDelegate delegate] configNowPlayingCenter];
 }
 
 /**
@@ -1788,20 +1839,9 @@ static NSInteger touchCount = 0;
     //当前播放新闻ID
     [CommonCode writeToUserD:self.post_id andKey:dangqianbofangxinwenID];
     //保存已听过新闻的ID数据
-//    if ([[CommonCode readFromUserD:yitingguoxinwenID] isKindOfClass:[NSArray class]])
-//    {
-        [self.listenedNewsIDArray addObject:self.post_id];
-        NSSet *set = [NSSet setWithArray:self.listenedNewsIDArray];
-        self.listenedNewsIDArray = [NSMutableArray arrayWithArray:[set allObjects]];
-//        [CommonCode writeToUserD:[set allObjects] andKey:yitingguoxinwenID];
-//    }else
-//    {
-//        NSMutableArray *yitingguoArr = [NSMutableArray array];
-//        [yitingguoArr addObject:self.post_id];
-//        NSSet *set = [NSSet setWithArray:yitingguoArr];
-//        self.listenedNewsIDArray = [set allObjects];
-//        [CommonCode writeToUserD:[set allObjects] andKey:yitingguoxinwenID];
-//    }
+    [self.listenedNewsIDArray addObject:self.post_id];
+    NSSet *set = [NSSet setWithArray:self.listenedNewsIDArray];
+    self.listenedNewsIDArray = [NSMutableArray arrayWithArray:[set allObjects]];
 }
 
 /**

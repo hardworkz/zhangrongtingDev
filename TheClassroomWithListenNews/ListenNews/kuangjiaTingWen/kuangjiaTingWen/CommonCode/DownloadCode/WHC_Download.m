@@ -62,6 +62,15 @@ typedef enum : NSUInteger {
 @property (nonatomic, strong) NSOutputStream *outputStream;
 @property (readwrite, nonatomic, strong) NSRecursiveLock *lock;
 @property (nonatomic) DownloadStatue downloadStatue;
+
+/**
+ 下载完成通知新闻列表对应cell刷新的对象
+ */
+@property (strong, nonatomic) NSObject *notificationObject;
+/**
+ 是否为单条下载（注：批量下载为会员功能）
+ */
+@property (assign, nonatomic) BOOL isSingleDownload;
 @end
 
 
@@ -74,14 +83,19 @@ typedef enum : NSUInteger {
                       savePath:(NSString *)savePath
                   savefileName:(NSString*)savefileName
                        withObj:(NSMutableDictionary *)obj
+                      withCell:(NSObject *)cell
+              isSingleDownload:(BOOL)isSingleDownload
                       delegate:(id<WHCDownloadDelegate>)delegate {
+    
     if (self = [super init]) {
+        //判断是否下载完成
         for (NSMutableDictionary *d in [ProManager downloadAllNewObjArrar]) {
             if ([d[@"post_mp"] rangeOfString:[obj[@"post_mp"] stringByReplacingOccurrencesOfString:@"/" withString:@""]].location != NSNotFound) {
                 RTLog(@"存在");
                 return nil;
             }
         }
+        //判断是否在下载队列中
         NSString * fielName = nil;
         if(savefileName){
             NSString * format = [self fileFormat:url.absoluteString];
@@ -96,6 +110,8 @@ typedef enum : NSUInteger {
                 //                if(delegate && [delegate respondsToSelector:@selector(WHCDownload:filePath:hasACompleteDownload:)]){
                 //                    [delegate WHCDownload:tempDownload filePath:savePath hasACompleteDownload:YES];
                 //                }
+                
+                //返回nil表示没有需要恢复的下载
                 return nil;
             }
         }
@@ -128,9 +144,13 @@ typedef enum : NSUInteger {
         self.downloadStatue = downloadStop;
         [ProManager insertSevaDownLoadArray:obj];
         
+        self.isSingleDownload = isSingleDownload;
         
-        //判断是否是单次下载新闻，记录次数限制
-        [[ZRT_PlayerManager manager] limitPlayStatusWithAdd:YES];
+        if (cell != nil) {
+            self.notificationObject = cell;
+        }else{
+            self.notificationObject = nil;
+        }
     }
     return self;
 }
@@ -385,6 +405,7 @@ typedef enum : NSUInteger {
         _timer = nil;
     }
     //        [[NSNotificationCenter defaultCenter]postNotificationName:kWHC_DownloadDidCompleteNotification object:self];
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 #pragma mark - publicMothed
@@ -498,12 +519,8 @@ typedef enum : NSUInteger {
     [self.lock unlock];
 }
 
-- (void)connectionDidFinishLoading:(NSURLConnection*)connection{
-    //    if(_fileHandle){
-    //        [_fileHandle writeData:_downloadData];
-    //        self.downloadData = nil;
-    //        self.downloadData = [NSMutableData data];
-    //    }
+- (void)connectionDidFinishLoading:(NSURLConnection*)connection
+{
     [self.lock lock];
     dispatch_async(dispatch_get_main_queue(), ^{
         if(_delegate && [_delegate respondsToSelector:@selector(WHCDownload:filePath:isSuccess:)]){
@@ -512,7 +529,6 @@ typedef enum : NSUInteger {
     });
     [self cancelledDownloadNotify];
     
-    //    [_downloadData writeToFile:self.saveFileName atomically:YES] ? NSLog(@"下载成功") : NSLog(@"下载失败");
     NSMutableDictionary *objDic = [_obj mutableCopy];
     __weak __typeof(self) selfBlock = self;
     [objDic setValue:[_obj[@"post_mp"] stringByReplacingOccurrencesOfString:@"/" withString:@""] forKey:@"post_mp"];
@@ -562,10 +578,20 @@ typedef enum : NSUInteger {
             [[NSNotificationCenter defaultCenter]postNotificationName:@"downloaddelete" object:@[selfBlock]];
             [ProManager.downloadArray removeObject:selfBlock];
         }
-        
+        //下载完成通知
         [[NSNotificationCenter defaultCenter] postNotificationName:@"addDownload" object:objDic];
         
+        //下载完成通知新闻列表cell设置按钮状态
+        if (self.notificationObject) {
+            [[NSNotificationCenter defaultCenter] postNotificationName:DownloadNewsSuccessNotification object:self.notificationObject userInfo:objDic];
+        }
+        
         [[NSNotificationCenter defaultCenter]postNotificationName:@"changeNumber" object:nil];
+        
+        //判断是否是单次下载新闻，记录次数限制
+        if (_isSingleDownload) {
+            [[ZRT_PlayerManager manager] limitPlayStatusWithAdd:YES];
+        }
     }];
     [self.lock unlock];
 }

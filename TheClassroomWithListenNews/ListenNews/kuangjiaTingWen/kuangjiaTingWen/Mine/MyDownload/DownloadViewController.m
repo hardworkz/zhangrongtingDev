@@ -242,14 +242,6 @@ static CGFloat const MaxScale = 1.0;/** 选中文字放大  */
         
             ProjiectDownLoadManager *manager = [ProjiectDownLoadManager defaultProjiectDownLoadManager];
             NSArray *arr = [manager downloadAllNewObjArrar];
-//            __weak __typeof(self) selfBlock = self;
-//            [arr enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-//                @autoreleasepool {
-//                    NewObj *nObj = [NewObj newObjWithDictionary:obj];
-//                    [selfBlock.downloadArray addObject:nObj];
-//                }
-//            }];
-        
         
         if (i == 0){
             [self click:btn];
