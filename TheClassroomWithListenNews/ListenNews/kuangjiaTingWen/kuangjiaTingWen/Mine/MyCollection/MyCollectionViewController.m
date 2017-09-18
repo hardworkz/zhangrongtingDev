@@ -63,7 +63,7 @@
         }
 
     } failure:^(NSError *error) {
-        //
+        RTLog(@"error:%@",error);
     }];
 }
 

@@ -110,6 +110,7 @@
             }
         }
     } failure:^(NSError *error) {
+        RTLog(@"error:%@",error);
         [self.tableView.mj_footer endRefreshing];
     }];
 }

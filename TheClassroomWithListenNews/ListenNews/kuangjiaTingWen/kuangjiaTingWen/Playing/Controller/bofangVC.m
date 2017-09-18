@@ -1214,9 +1214,9 @@ static AVPlayer *_instancePlay = nil;
 }
 
 - (void)bofangwanbi:(NSNotification *)notice{
-    if (ExIsClassVCPlay) {
-        return;
-    }
+//    if (ExIsClassVCPlay) {
+//        return;
+//    }
     //判断是否是播放新闻，记录次数限制
     NSDictionary *userInfoDict = [CommonCode readFromUserD:@"dangqianUserInfo"];
     if (!_isClass) {

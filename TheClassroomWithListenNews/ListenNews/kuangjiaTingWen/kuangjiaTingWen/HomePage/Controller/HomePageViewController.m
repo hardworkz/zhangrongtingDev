@@ -448,9 +448,7 @@
     NewReportViewController *newreportVC = [[NewReportViewController alloc]init];
     newreportVC.term_id = term_id;
     newreportVC.NewsTpye = newsType;
-    self.hidesBottomBarWhenPushed=YES;
     [self.navigationController pushViewController:newreportVC animated:YES];
-    self.hidesBottomBarWhenPushed=NO;
 }
 
 #pragma mark - NSNotificationAction

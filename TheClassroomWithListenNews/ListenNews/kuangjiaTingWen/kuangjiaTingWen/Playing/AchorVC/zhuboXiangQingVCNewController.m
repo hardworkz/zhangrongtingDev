@@ -1519,9 +1519,10 @@
 //点击播放按钮
 - (void)playBtnPlay:(zhuboxiangqingNewVCPlayBtn *)button
 {
-    ExIsClassVCPlay = NO;
-    [CommonCode writeToUserD:@(NO) andKey:@"ExIsClassVCPlay"];
-    [CommonCode writeToUserD:nil andKey:@"Exact_id"];
+//    ExIsClassVCPlay = YES;
+//    [CommonCode writeToUserD:@(NO) andKey:@"ExIsClassVCPlay"];
+//    [CommonCode writeToUserD:nil andKey:@"Exact_id"];
+    
     //当前选中按钮为播放状态，设置为未播放状态并停止播放
     if (button.selected == YES) {
         [[ZRT_PlayerManager manager] pausePlay];
@@ -1702,11 +1703,11 @@
         
         if ([[CommonCode readFromUserD:@"dangqianbofangxinwenID"] isEqualToString:xinwenArr[indexPath.row][@"id"]])
         {
-            if (![ZRT_PlayerManager manager].isPlaying){
-                playBtn.selected = NO;
-            }else{
+//            if (![ZRT_PlayerManager manager].isPlaying){
+//                playBtn.selected = NO;
+//            }else{
                 playBtn.selected = YES;
-            }
+//            }
         }else{
             playBtn.selected = NO;
         }

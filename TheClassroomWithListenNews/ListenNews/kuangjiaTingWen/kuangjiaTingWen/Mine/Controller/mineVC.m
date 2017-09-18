@@ -632,6 +632,7 @@ typedef void(^animateBlock)();
         UILabel *lab = [[UILabel alloc]initWithFrame:CGRectMake(CGRectGetMaxX(imgBorderView.frame) + 12, imgBorderView.frame.origin.y + 10.0 / 667 * IPHONE_H, SCREEN_WIDTH - 150, 20.0 / 667 * IPHONE_H)];
         lab.font = [UIFont fontWithName:@"Semibold" size:18.0f ];
         lab.textColor = [UIColor blackColor];
+//        lab.backgroundColor = [UIColor greenColor];
         lab.textAlignment = NSTextAlignmentLeft;
         [lab addTapGesWithTarget:self action:@selector(dianjitouxiangshijian)];
         [cell.contentView addSubview:lab];
@@ -642,20 +643,6 @@ typedef void(^animateBlock)();
         vipImgView.hidden = YES;
         vipImgView.contentMode = UIViewContentModeScaleAspectFill;
         [cell.contentView addSubview:vipImgView];
-        NSDictionary *userInfoDict = [CommonCode readFromUserD:@"dangqianUserInfo"];
-        if ([userInfoDict[results][member_type] intValue] == 1||[userInfoDict[results][member_type] intValue] == 2) {
-            
-            vipImgView.frame = CGRectMake(CGRectGetMaxX(lab.frame) + 5, lab.y + 2, 30, 30);
-            vipImgView.centerY = lab.centerY;
-            vipImgView.hidden = NO;
-            if ([userInfoDict[results][member_type] intValue] == 1) {
-                vipImgView.image = [UIImage imageNamed:@"vip"];
-            }else{
-                vipImgView.image = [UIImage imageNamed:@"svip"];
-            }
-        }else{
-            vipImgView.hidden = YES;
-        }
         
         UIImageView *lvView = [[UIImageView alloc]initWithFrame:CGRectMake(vipImgView.hidden? CGRectGetMaxX(lab.frame) + 5:CGRectGetMaxX(vipImgView.frame) + 5, lab.frame.origin.y, 44.0, 16.0)];
         [lvView setImage:[UIImage imageNamed:@"LV1~9"]];
@@ -664,6 +651,7 @@ typedef void(^animateBlock)();
         lvView.clipsToBounds = YES;
         [lvView addTapGesWithTarget:self action:@selector(lvQAButtonAction)];
         [cell.contentView addSubview:lvView];
+        
         UILabel *lvLab = [[UILabel alloc]initWithFrame:CGRectMake(lvView.frame.size.width - 20, 0, 25, 16)];
         if (TARGETED_DEVICE_IS_IPHONE_480) {
             [lvLab setFrame:CGRectMake(lvView.frame.size.width - 25, 0, 25, 16)];
@@ -722,7 +710,23 @@ typedef void(^animateBlock)();
             
             CGSize contentSize = [lab sizeThatFits:CGSizeMake(lab.frame.size.width, MAXFLOAT)];
             lab.frame = CGRectMake(lab.frame.origin.x, lab.frame.origin.y,contentSize.width, lab.frame.size.height);
-            [lvView setFrame:CGRectMake(CGRectGetMaxX(lab.frame)+ 10, lab.frame.origin.y, 50.0 / 667 * IPHONE_H, 16.0 / 667 * IPHONE_H)];
+            
+            NSDictionary *userInfoDict = [CommonCode readFromUserD:@"dangqianUserInfo"];
+            if ([userInfoDict[results][member_type] intValue] == 1||[userInfoDict[results][member_type] intValue] == 2) {
+                
+                vipImgView.frame = CGRectMake(CGRectGetMaxX(lab.frame) + 5, lab.y + 2, 30, 30);
+                vipImgView.centerY = lab.centerY;
+                vipImgView.hidden = NO;
+                if ([userInfoDict[results][member_type] intValue] == 1) {
+                    vipImgView.image = [UIImage imageNamed:@"vip"];
+                }else{
+                    vipImgView.image = [UIImage imageNamed:@"svip"];
+                }
+            }else{
+                vipImgView.hidden = YES;
+            }
+
+            [lvView setFrame:CGRectMake(vipImgView.hidden? CGRectGetMaxX(lab.frame) + 5:CGRectGetMaxX(vipImgView.frame) + 5, lab.frame.origin.y, 50.0 / 667 * IPHONE_H, 16.0 / 667 * IPHONE_H)];
             lvView.hidden = NO;
             NSInteger lv = [userInfo[results][@"level"] integerValue];
             if (lv > 0 && lv < 10) {
@@ -765,6 +769,7 @@ typedef void(^animateBlock)();
             lab.text = nil;
             signtureLab.text = nil;
             lvView.hidden = YES;
+            vipImgView.hidden = YES;
         }
         
         return cell;

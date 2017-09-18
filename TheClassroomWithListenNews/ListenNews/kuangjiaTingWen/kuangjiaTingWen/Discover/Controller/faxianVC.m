@@ -483,7 +483,7 @@
                 faxianzhuboVC.jiemuMessage_num = dic[@"message_num"];
                 faxianzhuboVC.jiemuName = dic[@"name"];
                 faxianzhuboVC.isfaxian = YES;
-                faxianzhuboVC.isClass = NO;
+                faxianzhuboVC.isClass = YES;
                 [self.navigationController pushViewController:faxianzhuboVC animated:YES];
 //                NSDictionary *userInfoDict = [CommonCode readFromUserD:@"dangqianUserInfo"];
 //                if ([dic[@"is_free"] isEqualToString:@"1"]||[userInfoDict[results][member_type] intValue] == 2) {
@@ -637,10 +637,10 @@
                 faxianzhuboVC.jiemuMessage_num = dic.message_num;
                 faxianzhuboVC.jiemuName = dic.name;
                 faxianzhuboVC.isfaxian = YES;
-                faxianzhuboVC.isClass = NO;
-                self.hidesBottomBarWhenPushed=YES;
+                faxianzhuboVC.isClass = YES;
+//                self.hidesBottomBarWhenPushed=YES;
                 [self.navigationController pushViewController:faxianzhuboVC animated:YES];
-                self.hidesBottomBarWhenPushed=NO;
+//                self.hidesBottomBarWhenPushed=NO;
                 
             }
             //跳转未购买课堂界面

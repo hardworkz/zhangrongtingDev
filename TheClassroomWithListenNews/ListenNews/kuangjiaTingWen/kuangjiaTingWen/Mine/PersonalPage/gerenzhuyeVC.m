@@ -254,10 +254,6 @@
     } failure:^(NSError *error) {
         
     }];
-    
-    
-    
-    
 }
 
 - (void)viewDidDisappear:(BOOL)animated{

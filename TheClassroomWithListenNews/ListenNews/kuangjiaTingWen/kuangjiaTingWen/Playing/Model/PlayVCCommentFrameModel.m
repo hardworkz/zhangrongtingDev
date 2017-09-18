@@ -12,6 +12,9 @@
 - (void)setModel:(PlayVCCommentModel *)model
 {
     _model = model;
+    
+    if (![model isKindOfClass:[PlayVCCommentModel class]]) return;
+    
     _pinglunImgF = CGRectMake(10.0 / 375 * IPHONE_W, 8.0 / 667 * IPHONE_H, 50.0 / 667 * IPHONE_H, 50.0 / 667 * IPHONE_H);
     
     _pinglunTitleF = CGRectMake(CGRectGetMaxX(_pinglunImgF) + 8.0 / 375 * IPHONE_W, 10.0 / 667 * IPHONE_H, 200.0 / 375 * IPHONE_W, 20.0 / 667 * IPHONE_H);
