@@ -15,7 +15,7 @@ typedef void (^addFavBlock)(NSInteger );
 @property (copy, nonatomic) void (^addFav)(BlobNewTableViewCell *cell,int iszan);
 @property (copy, nonatomic) void (^addComment)(BlobNewTableViewCell *cell);
 @property (copy, nonatomic) void (^addReview)(BlobNewTableViewCell *cell,child_commentModel *model);
-@property (copy, nonatomic) void (^deleteBlog)(BlobNewTableViewCell *cell);
+@property (copy, nonatomic) void (^deleteBlog)(BlobNewTableViewCell *cell,FeedBackAndListenFriendFrameModel *frameModel);
 @property (copy, nonatomic) void (^clickHeadView)(BlobNewTableViewCell *cell);
 @property (copy, nonatomic) void (^longPressHeadView)(BlobNewTableViewCell *cell);
 @property (copy, nonatomic) void (^playVoice)(BlobNewTableViewCell *cell);

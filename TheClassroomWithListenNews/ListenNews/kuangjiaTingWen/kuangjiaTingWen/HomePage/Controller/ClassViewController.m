@@ -284,6 +284,7 @@ static AVPlayer *_instancePlay = nil;
             // 赋值
             weakSelf.spriceLabel.attributedText = attribtStr;
             weakSelf.priceLabel.text = [NSString stringWithFormat:@" ￥%@",[NetWorkTool formatFloat:[responseObject[results][@"price"] floatValue]]];
+            rewardMoney = responseObject[results][@"price"];
             
         }
     } failure:^(NSError *error) {
@@ -659,19 +660,22 @@ static AVPlayer *_instancePlay = nil;
         [weixinBtn addTarget:self action:@selector(weixinBtnClicked)];
         [bgView addSubview:weixinBtn];
         
-        UIButton *tingbiBtn = [[UIButton alloc] init];
-        tingbiBtn.frame = CGRectMake(0, 100, SCREEN_WIDTH, 50);
-        tingbiBtn.backgroundColor = [UIColor whiteColor];
-        [tingbiBtn setImage:@"pay2"];
-        tingbiBtn.imageEdgeInsets = UIEdgeInsetsMake(0, -20, 0, 0);
-        [tingbiBtn setTitle:@"听币支付" forState:UIControlStateNormal];
-        [tingbiBtn setTitleColor:gMainColor forState:UIControlStateNormal];
-        tingbiBtn.titleLabel.font = [UIFont systemFontOfSize:17];
-        [tingbiBtn addTarget:self action:@selector(tingbiBtnClicked)];
-        [bgView addSubview:tingbiBtn];
+        //购买会员不用听币
+        if (![VipSelected.accessibilityIdentifier isEqualToString:@"vip"]) {
+            UIButton *tingbiBtn = [[UIButton alloc] init];
+            tingbiBtn.frame = CGRectMake(0, 100, SCREEN_WIDTH, 50);
+            tingbiBtn.backgroundColor = [UIColor whiteColor];
+            [tingbiBtn setImage:@"pay2"];
+            tingbiBtn.imageEdgeInsets = UIEdgeInsetsMake(0, -20, 0, 0);
+            [tingbiBtn setTitle:@"听币支付" forState:UIControlStateNormal];
+            [tingbiBtn setTitleColor:gMainColor forState:UIControlStateNormal];
+            tingbiBtn.titleLabel.font = [UIFont systemFontOfSize:17];
+            [tingbiBtn addTarget:self action:@selector(tingbiBtnClicked)];
+            [bgView addSubview:tingbiBtn];
+        }
         
         UIButton *cancelBtn = [[UIButton alloc] init];
-        cancelBtn.frame = CGRectMake(0, 155, SCREEN_WIDTH, 50);
+        cancelBtn.frame = CGRectMake(0,[VipSelected.accessibilityIdentifier isEqualToString:@"vip"]?105:155, SCREEN_WIDTH, 50);
         cancelBtn.backgroundColor = [UIColor whiteColor];
         [cancelBtn setTitle:@"取消" forState:UIControlStateNormal];
         [cancelBtn setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
@@ -832,8 +836,26 @@ static AVPlayer *_instancePlay = nil;
                         [NetWorkTool buyActWithaccessToken:AvatarAccessToken act_id:self.classModel.ID money:rewardMoney sccess:^(NSDictionary *responseObject) {
                             if ([responseObject[status] integerValue] == 1) {
                                 //购买成功，退出课堂购买界面，刷新列表
-                                XWAlerLoginView *xw = [[XWAlerLoginView alloc]initWithTitle:@"课程购买成功"];
-                                [xw show];
+//                                XWAlerLoginView *xw = [[XWAlerLoginView alloc]initWithTitle:@"课程购买成功"];
+//                                [xw show];
+                                zhuboXiangQingVCNewController *faxianzhuboVC = [[zhuboXiangQingVCNewController alloc]init];
+                                faxianzhuboVC.jiemuDescription = self.jiemuDescription;
+                                faxianzhuboVC.jiemuFan_num = self.jiemuFan_num;
+                                faxianzhuboVC.jiemuID = self.jiemuID;
+                                faxianzhuboVC.jiemuImages = self.jiemuImages;
+                                faxianzhuboVC.jiemuIs_fan = self.jiemuIs_fan;
+                                faxianzhuboVC.jiemuMessage_num = self.jiemuMessage_num;
+                                faxianzhuboVC.jiemuName = self.jiemuName;
+                                faxianzhuboVC.isfaxian = YES;
+                                faxianzhuboVC.isClass = YES;
+                                faxianzhuboVC.listVC = self.listVC;
+                                [self.navigationController pushViewController:faxianzhuboVC animated:YES];
+                                //刷新课堂列表
+                                [[NSNotificationCenter defaultCenter] postNotificationName:ReloadClassList object:nil];
+                                
+                                //充值成功 --》 获取用户信息
+                                [[NSNotificationCenter defaultCenter] postNotificationName:@"updateUserInfo" object:nil];
+   
                                 //上传订单
                                 [NetWorkTool order_notifyWithaccessToken:AvatarAccessToken order_num:orderNum sccess:^(NSDictionary *responseObject) {
                                     if ([responseObject[status] integerValue] == 1) {
@@ -847,15 +869,15 @@ static AVPlayer *_instancePlay = nil;
                                     
                                 }];
                             }else{
-                                XWAlerLoginView *xw = [[XWAlerLoginView alloc]initWithTitle:@"课程购买失败，请重新再试"];
+                                XWAlerLoginView *xw = [[XWAlerLoginView alloc]initWithTitle:responseObject[msg]];
                                 [xw show];
                             }
                         } failure:^(NSError *error) {
-                            
+                            RTLog(@"%@",error);
                         }];
                     }
                 }else{
-                    XWAlerLoginView *xw = [[XWAlerLoginView alloc]initWithTitle:@"获取听币余额失败"];
+                    XWAlerLoginView *xw = [[XWAlerLoginView alloc]initWithTitle:responseObject[msg]];
                     [xw show];
                 }
             } failure:^(NSError *error) {
@@ -1594,13 +1616,24 @@ static AVPlayer *_instancePlay = nil;
     else
     {//当前为支付宝，微信，听币支付路线
         if ([[CommonCode readFromUserD:@"isLogin"]boolValue] == YES){
-            APPDELEGATE.payType = PayTypeClassPay;
-            _alertView = [[CustomAlertView alloc] initWithCustomView:[self setupPayAlertWithIAP:NO]];
-            _alertView.alertHeight = 205;
-            _alertView.alertDuration = 0.25;
-            _alertView.coverAlpha = 0.6;
-            [_alertView show];
-            _purchaseBtn.enabled = YES;
+            if ([VipSelected.accessibilityIdentifier isEqualToString:@"vip"]) {
+                
+                APPDELEGATE.payType = PayTypeMembers;
+                _alertView = [[CustomAlertView alloc] initWithCustomView:[self setupPayAlertWithIAP:NO]];
+                _alertView.alertHeight = 155;
+                _alertView.alertDuration = 0.25;
+                _alertView.coverAlpha = 0.6;
+                [_alertView show];
+                _purchaseBtn.enabled = YES;
+            }else{
+                APPDELEGATE.payType = PayTypeClassPay;
+                _alertView = [[CustomAlertView alloc] initWithCustomView:[self setupPayAlertWithIAP:NO]];
+                _alertView.alertHeight = 205;
+                _alertView.alertDuration = 0.25;
+                _alertView.coverAlpha = 0.6;
+                [_alertView show];
+                _purchaseBtn.enabled = YES;
+            }
         }
         else{
             _purchaseBtn.enabled = YES;

@@ -28,6 +28,7 @@
 #import "TabBarController.h"
 #import "SVProgressHUD.h"
 #import "GDTTrack.h"
+#import "AvoidCrash.h"
 
 @interface AppDelegate ()<WeiboSDKDelegate,WXApiDelegate,QQApiInterfaceDelegate,MiPushSDKDelegate,UNUserNotificationCenterDelegate>
 {
@@ -210,36 +211,23 @@
     manager.enableAutoToolbar = NO;//控制是否显示键盘上的工具条
     [manager setKeyboardDistanceFromTextField:0];
     
-    
-//    NSError* error;
-//    [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:&error];
-    
-    //监听来电
-//    AudioSessionInitialize(NULL, NULL, interruptionListenner, (__bridge void*)self);
+    [self avoidCrash];
 
     return YES;
 }
-//void interruptionListenner(void* inClientData, UInt32 inInterruptionState)
-//{
-//    AppDelegate* pTHIS = (__bridge AppDelegate*)inClientData;
-//    if (pTHIS) {
-//        NSLog(@"interruptionListenner %u", (unsigned int)inInterruptionState);
-//        if (kAudioSessionBeginInterruption == inInterruptionState) {
-//            NSLog(@"Begin interruption");
-////            [APPDELEGATE.noSoundPlayer pause];
-//            }
-//        else
-//        {
-//            UIApplicationState state = [UIApplication sharedApplication].applicationState;
-//            if (![ZRT_PlayerManager manager].isPlaying && state == UIApplicationStateBackground) {
-////                [APPDELEGATE.noSoundPlayer play];
-//            }
-//            NSLog(@"Begin end interruption");
-//            NSLog(@"End end interruption");
-//        }
-//        
-//    }
-//}
+- (void)avoidCrash
+{
+    //全局启动崩溃预防
+    [AvoidCrash becomeEffective];
+    //监听崩溃的信息通知
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(dealwithCrashMessage:) name:AvoidCrashNotification object:nil];
+}
+- (void)dealwithCrashMessage:(NSNotification *)note {
+    //注意:所有的信息都在userInfo中
+    //你可以在这里收集相应的崩溃信息进行相应的处理(比如传到自己服务器)
+    NSLog(@"%@",note.userInfo);
+}
+
 /**
  获取每日免费收听数以及当前系统时间
  */
@@ -689,7 +677,7 @@
                 img = [[SDWebImageManager sharedManager].imageCache imageFromDiskCacheForKey:[[SDWebImageManager sharedManager] cacheKeyForURL:[NSURL URLWithString:[ZRT_PlayerManager manager].currentCoverImage]]];
             NSMutableDictionary * playingCenterInfo = [NSMutableDictionary dictionary];
             [playingCenterInfo setObject:[ZRT_PlayerManager manager].currentSong[@"post_title"]?[ZRT_PlayerManager manager].currentSong[@"post_title"]:@"" forKey:MPMediaItemPropertyTitle];
-            [playingCenterInfo setObject:[ZRT_PlayerManager manager].currentSong[@"post_act"][@"name"] forKey:MPMediaItemPropertyArtist];
+            [playingCenterInfo setObject:[ZRT_PlayerManager manager].currentSong[@"post_act"][@"name"]?[ZRT_PlayerManager manager].currentSong[@"post_act"][@"name"]:@"" forKey:MPMediaItemPropertyArtist];
             [playingCenterInfo setObject:@(1) forKey:MPNowPlayingInfoPropertyPlaybackRate];
             [playingCenterInfo setObject:@([ZRT_PlayerManager manager].duration) forKey:MPMediaItemPropertyPlaybackDuration];
             MPMediaItemArtwork * artwork = [[MPMediaItemArtwork alloc] initWithImage:img?img:[UIImage imageNamed:@"thumbnailsdefault"]];
@@ -701,7 +689,7 @@
                 if (image) {
                     NSMutableDictionary * playingCenterInfo = [NSMutableDictionary dictionary];
                     [playingCenterInfo setObject:[ZRT_PlayerManager manager].currentSong[@"post_title"]?[ZRT_PlayerManager manager].currentSong[@"post_title"]:@"" forKey:MPMediaItemPropertyTitle];
-                    [playingCenterInfo setObject:[ZRT_PlayerManager manager].currentSong[@"post_act"][@"name"] forKey:MPMediaItemPropertyArtist];
+                    [playingCenterInfo setObject:[ZRT_PlayerManager manager].currentSong[@"post_act"][@"name"]?[ZRT_PlayerManager manager].currentSong[@"post_act"][@"name"]:@"" forKey:MPMediaItemPropertyArtist];
                     [playingCenterInfo setObject:@(1) forKey:MPNowPlayingInfoPropertyPlaybackRate];
                     [playingCenterInfo setObject:@([ZRT_PlayerManager manager].duration) forKey:MPMediaItemPropertyPlaybackDuration];
                     MPMediaItemArtwork * artwork = [[MPMediaItemArtwork alloc] initWithImage:image?image:[UIImage imageNamed:@"thumbnailsdefault"]];
@@ -711,7 +699,6 @@
             }];
         }
     }else{
-        RTLog(@"%@",[ZRT_PlayerManager manager].currentCoverImage);
         if([[SDWebImageManager sharedManager] cachedImageExistsForURL:[NSURL URLWithString:[ZRT_PlayerManager manager].currentCoverImage]]){
             UIImage* img = [[SDWebImageManager sharedManager].imageCache imageFromMemoryCacheForKey:[[SDWebImageManager sharedManager] cacheKeyForURL:[NSURL URLWithString:[ZRT_PlayerManager manager].currentCoverImage]]];
             
@@ -719,7 +706,7 @@
                 img = [[SDWebImageManager sharedManager].imageCache imageFromDiskCacheForKey:[[SDWebImageManager sharedManager] cacheKeyForURL:[NSURL URLWithString:[ZRT_PlayerManager manager].currentCoverImage]]];
             NSMutableDictionary * playingCenterInfo = [NSMutableDictionary dictionary];
             [playingCenterInfo setObject:[ZRT_PlayerManager manager].currentSong[@"s_title"]?[ZRT_PlayerManager manager].currentSong[@"s_title"]:@"" forKey:MPMediaItemPropertyTitle];
-            [playingCenterInfo setObject:[ZRT_PlayerManager manager].currentSong[@"name"] forKey:MPMediaItemPropertyArtist];            [playingCenterInfo setObject:@(1) forKey:MPNowPlayingInfoPropertyPlaybackRate];
+            [playingCenterInfo setObject:[ZRT_PlayerManager manager].currentSong[@"name"]?[ZRT_PlayerManager manager].currentSong[@"name"]:@"" forKey:MPMediaItemPropertyArtist];            [playingCenterInfo setObject:@(1) forKey:MPNowPlayingInfoPropertyPlaybackRate];
             [playingCenterInfo setObject:@([ZRT_PlayerManager manager].duration) forKey:MPMediaItemPropertyPlaybackDuration];
             MPMediaItemArtwork * artwork = [[MPMediaItemArtwork alloc] initWithImage:img?img:[UIImage imageNamed:@"thumbnailsdefault"]];
             [playingCenterInfo setObject:artwork forKey:MPMediaItemPropertyArtwork];
@@ -730,7 +717,7 @@
                 if (image) {
                     NSMutableDictionary * playingCenterInfo = [NSMutableDictionary dictionary];
                     [playingCenterInfo setObject:[ZRT_PlayerManager manager].currentSong[@"s_title"]?[ZRT_PlayerManager manager].currentSong[@"s_title"]:@"" forKey:MPMediaItemPropertyTitle];
-                    [playingCenterInfo setObject:[ZRT_PlayerManager manager].currentSong[@"name"] forKey:MPMediaItemPropertyArtist];
+                    [playingCenterInfo setObject:[ZRT_PlayerManager manager].currentSong[@"name"]?[ZRT_PlayerManager manager].currentSong[@"name"]:@"" forKey:MPMediaItemPropertyArtist];
                     [playingCenterInfo setObject:@(1) forKey:MPNowPlayingInfoPropertyPlaybackRate];
                     [playingCenterInfo setObject:@([ZRT_PlayerManager manager].duration) forKey:MPMediaItemPropertyPlaybackDuration];
                     MPMediaItemArtwork * artwork = [[MPMediaItemArtwork alloc] initWithImage:image?image:[UIImage imageNamed:@"thumbnailsdefault"]];

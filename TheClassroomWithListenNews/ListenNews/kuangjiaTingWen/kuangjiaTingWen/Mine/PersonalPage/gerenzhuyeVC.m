@@ -199,9 +199,6 @@
     weakSelf.zhuyetableView.mj_header = [MJRefreshNormalHeader headerWithRefreshingBlock:^{
         [weakSelf refreshData];
     }];
-    weakSelf.zhuyetableView.mj_footer = [MJRefreshAutoStateFooter footerWithRefreshingBlock:^{
-        [weakSelf shangLaJiaZai];
-    }];
     
 }
 
@@ -701,7 +698,7 @@
     [cell setAddReview:^(BlobNewTableViewCell *cell, child_commentModel *model) {
         [weakSelf reviewWithCell:cell andModel:model];
     }];
-    [cell setDeleteBlog:^(BlobNewTableViewCell *cell) {
+    [cell setDeleteBlog:^(BlobNewTableViewCell *cell,FeedBackAndListenFriendFrameModel *frameModel) {
         [weakSelf deleteBlogIntableViewCell:cell];
     }];
     [cell setPlayVoice:^(BlobNewTableViewCell *cell) {
@@ -713,7 +710,9 @@
     [cell.photosImageView setTapImageBlock:^(MultiImageView *view, UIImageView *imgv, NSInteger idx) {
         [weakSelf showPhotos:view.images selectedIndex:idx];
     }];
-
+    [cell setDeleteComment:^(BlobNewTableViewCell *cell,NSInteger index,NSInteger commentIndex){
+        [weakSelf reloadFrameArrayWithIndex:index commnetIndex:commentIndex];
+    }];
     
     return cell;
     
@@ -987,19 +986,24 @@ didSelectLinkWithTransitInformation:(NSDictionary *)components {
 }
 
 - (void)refreshData {
-    
-        [NetWorkTool getMyDynamicsListWithaccessToken:[DSE encryptUseDES:self.user_login] login_uid:ExdangqianUserUid andPage:@"1" andLimit:@"10" sccess:^(NSDictionary *responseObject) {
-            if ([responseObject[results] isKindOfClass:[NSArray class]])
-            {
-                [self.infoArr removeAllObjects];
-                NSMutableArray *array = [FeedBackAndListenFriendModel mj_objectArrayWithKeyValuesArray:responseObject[results]];
-                [self.infoArr addObjectsFromArray:[self frameArrayWithDataArray:array]];
-            }
-            [self.zhuyetableView reloadData];
-        } failure:^(NSError *error) {
-            NSLog(@"error = %@",error);
-        }];
-        [self.zhuyetableView.mj_header endRefreshing];
+    DefineWeakSelf
+    [NetWorkTool getMyDynamicsListWithaccessToken:[DSE encryptUseDES:self.user_login] login_uid:ExdangqianUserUid andPage:@"1" andLimit:@"10" sccess:^(NSDictionary *responseObject) {
+        if ([responseObject[results] isKindOfClass:[NSArray class]])
+        {
+            [weakSelf.infoArr removeAllObjects];
+            NSMutableArray *array = [FeedBackAndListenFriendModel mj_objectArrayWithKeyValuesArray:responseObject[results]];
+            [weakSelf.infoArr addObjectsFromArray:[self frameArrayWithDataArray:array]];
+            weakSelf.zhuyetableView.mj_footer = [MJRefreshAutoStateFooter footerWithRefreshingBlock:^{
+                [weakSelf shangLaJiaZai];
+            }];
+        }else{
+            weakSelf.zhuyetableView.mj_footer = nil;
+        }
+        [self.zhuyetableView reloadData];
+    } failure:^(NSError *error) {
+        NSLog(@"error = %@",error);
+    }];
+    [self.zhuyetableView.mj_header endRefreshing];
 }
 
 - (void)showZoomImageView:(UITapGestureRecognizer *)tap{
@@ -1118,19 +1122,35 @@ didSelectLinkWithTransitInformation:(NSDictionary *)components {
     }
     
 }
-
-- (void)deleteBlogIntableViewCell:(UITableViewCell *)cell{
+- (void)reloadFrameArrayWithIndex:(NSInteger)index commnetIndex:(NSInteger)commentIndex
+{
+    FeedBackAndListenFriendFrameModel *frameModel = [[FeedBackAndListenFriendFrameModel alloc] init];
+    FeedBackAndListenFriendFrameModel *Fmodel = self.infoArr[index];
+    //    child_commentModel *model = Fmodel.model.child_comment[commentIndex];
+    [Fmodel.model.child_comment removeObjectAtIndex:commentIndex];
+    
+    frameModel.isFeedbackVC = NO;
+    frameModel.model = Fmodel.model;
+    [self.infoArr replaceObjectAtIndex:index withObject:frameModel];
+    [self.zhuyetableView reloadRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:index inSection:0]] withRowAnimation:UITableViewRowAnimationNone];
+}
+- (void)deleteBlogIntableViewCell:(UITableViewCell *)cell {
     NSIndexPath *indexPath = [self.zhuyetableView indexPathForCell:cell];
-    //        BlogModel *blog = self.blogArray[indexPath.row];
     DefineWeakSelf;
     FeedBackAndListenFriendFrameModel *frameModel = self.infoArr[indexPath.row];
     [UIAlertView alertViewWithTitle:@"提示" message:@"确认删除吗？" cancelButtonTitle:@"取消" otherButtonTitles:@[@"删除"] onDismiss:^(int buttonIndex) {
-        //            [weakSelf deleteBlog:blog];
-        [NetWorkTool delCommentWithaccessToken:AvatarAccessToken comment_id:frameModel.model.post.i_id sccess:^(NSDictionary *responseObject) {
+        
+        [NetWorkTool delCommentWithaccessToken:AvatarAccessToken comment_id:frameModel.model.ID sccess:^(NSDictionary *responseObject) {
             //
-            NSLog(@"delSuccess");
-            [Explayer pause];
-            [weakSelf refreshData];
+            if ([responseObject[status] intValue] == 1) {
+                NSLog(@"delSuccess");
+                [Explayer pause];
+                //删除数据和cell
+                [weakSelf.infoArr removeObject:frameModel];
+                [weakSelf.zhuyetableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationLeft];
+            }
+            
+//            [weakSelf refreshData];
         } failure:^(NSError *error) {
             //
             NSLog(@"%@",error);
@@ -1296,9 +1316,9 @@ didSelectLinkWithTransitInformation:(NSDictionary *)components {
             tuid = self.replyComment_tuid;
         }
         else{
-            
-            tuid = self.infoArr[row][@"uid"];
-            to_comment_id = self.infoArr[row][@"id"];
+            FeedBackAndListenFriendFrameModel *frameModel = self.infoArr[row];
+            tuid = frameModel.model.uid;
+            to_comment_id = frameModel.model.ID;
         }
         FeedBackAndListenFriendFrameModel *frameModel = self.infoArr[indexPath.row];
         if ([frameModel.model.post_id isEqualToString:@"0"]) {
@@ -1397,7 +1417,7 @@ didSelectLinkWithTransitInformation:(NSDictionary *)components {
 //    _isToEditInfomation = YES;
 //    [self.navigationController pushViewController:vc animated:YES];
     _isToEditInfomation = YES;
-    NSURL *url = [NSURL URLWithString:@"http://admin.tingwen.me/help/help_core.html"];
+    NSURL *url = [NSURL URLWithString:HelpCenterUrl];
     SingleWebViewController *singleWebVC = [[SingleWebViewController alloc] initWithTitle:@"帮助中心" url:url];
     [self.navigationController pushViewController:singleWebVC animated:YES];
     

@@ -30,7 +30,7 @@
 /**
  自定义赞赏
  */
-@property (copy, nonatomic) void (^finalRewardButtonAciton)(OJLAnimationButton *item);
+@property (copy, nonatomic) void (^finalRewardButtonAciton)(OJLAnimationButton *item ,UITextField *payTextField);
 /**
  返回赞赏
  */

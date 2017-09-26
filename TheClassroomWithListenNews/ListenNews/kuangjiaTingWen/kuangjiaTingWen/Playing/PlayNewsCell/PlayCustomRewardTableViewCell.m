@@ -187,7 +187,7 @@
 }
 - (void)finalRewardButtonAciton:(OJLAnimationButton *)sender {
     if (self.finalRewardButtonAciton) {
-        self.finalRewardButtonAciton(sender);
+        self.finalRewardButtonAciton(sender,_customRewardTextField);
     }
 }
 - (void)backButtonAction:(UIButton *)sender {

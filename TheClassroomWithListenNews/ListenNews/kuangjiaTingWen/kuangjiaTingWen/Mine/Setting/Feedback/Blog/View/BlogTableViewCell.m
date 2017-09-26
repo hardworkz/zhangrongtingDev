@@ -269,7 +269,7 @@ static NSString *const kUserNameKey = @"UserName";
         if (![self.blog[@"images"] isEqualToString:@""]){
             NSArray *array = [self.blog[@"images"] componentsSeparatedByString:@","];
             for (int i = 0 ; i < array.count ; i ++ ) {
-                [urls addObject:[NSURL URLWithString:[NSString stringWithFormat:@"http://admin.tingwen.me/%@", array[i]]]];
+                [urls addObject:[NSURL URLWithString:[NSString stringWithFormat:@"%@%@",APPHost, array[i]]]];
             }
         }
     }
@@ -277,7 +277,7 @@ static NSString *const kUserNameKey = @"UserName";
         if (![self.blog[@"timages"] isEqualToString:@""]){
             NSArray *array = [self.blog[@"timages"] componentsSeparatedByString:@","];
             for (int i = 0 ; i < array.count ; i ++ ) {
-                [urls addObject:[NSURL URLWithString:[NSString stringWithFormat:@"http://admin.tingwen.me/%@", array[i]]]];
+                [urls addObject:[NSURL URLWithString:[NSString stringWithFormat:@"%@%@",APPHost,array[i]]]];
             }
         }
     }

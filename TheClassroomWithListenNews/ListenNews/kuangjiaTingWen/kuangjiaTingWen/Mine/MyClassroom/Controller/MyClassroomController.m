@@ -75,7 +75,8 @@
     [self.navigationController setNavigationBarHidden:YES animated:YES];
 }
 
-- (void)setUpData{
+- (void)setUpData
+{
     [NetWorkTool listBuyWithaccessToken:AvatarAccessToken andPage:[NSString stringWithFormat:@"%ld",currentPage] andLimit:@"10" sccess:^(NSDictionary *responseObject) {
         [self.tableView.mj_footer endRefreshing];
         if ([responseObject[@"results"] isKindOfClass:[NSArray class]]) {

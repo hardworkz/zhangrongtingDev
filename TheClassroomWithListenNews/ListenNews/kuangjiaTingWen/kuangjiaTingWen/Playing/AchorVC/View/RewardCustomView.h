@@ -16,7 +16,6 @@ typedef void (^ConfirmButtonBlock)(float );
 - (void)setSelectItemWithTitleArr:(NSMutableArray *)itemArr;
 
 
-
 @property (copy, nonatomic) ConfirmButtonBlock rewardBlock;
 
 @end

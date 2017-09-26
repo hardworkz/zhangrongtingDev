@@ -361,7 +361,7 @@
     manager.responseSerializer = [AFHTTPResponseSerializer serializer];
     NSDictionary *dict = @{@"accessToken":AvatarAccessToken};
     
-    [manager POST:@"http://admin.tingwen.me/index.php/api/interfaceNew/uploadHeadImg" parameters:dict constructingBodyWithBlock:^(id<AFMultipartFormData> formData) {
+    [manager POST:@"http://api.tingwen.me/index.php/api/interfaceNew/uploadHeadImg" parameters:dict constructingBodyWithBlock:^(id<AFMultipartFormData> formData) {
         [formData appendPartWithFileData:imgData name:@"photo" fileName:@"image.jpeg" mimeType:@"image.jpeg"];
     } success:^(NSURLSessionDataTask *task, id responseObject) {
 

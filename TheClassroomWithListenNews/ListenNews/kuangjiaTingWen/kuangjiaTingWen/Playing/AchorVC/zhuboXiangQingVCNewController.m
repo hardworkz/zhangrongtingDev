@@ -403,9 +403,9 @@
         [self rewardAlert];
     }
     
-    [self xinwenRefresh:xinwenshuaxinTableView];
-    [self fansRefresh:fansWallTableView];
-    [self liuyanRefresh:pinglunhoushuaxinTableView];
+//    [self xinwenRefresh:xinwenshuaxinTableView];
+//    [self fansRefresh:fansWallTableView];
+//    [self liuyanRefresh:pinglunhoushuaxinTableView];
     //主播图片数据转换截取
     NSMutableArray *imageUrlArray = [NSMutableArray arrayWithArray:@[[self imageUrlSubStringWithStr:self.post_content]]];
     if ([[self imageUrlSubStringWithStr:self.post_content] isEqualToString:@""]) {
@@ -1920,14 +1920,15 @@
     }
     else if ([tableView isEqual:pinglunhoushuaxinTableView]){
         //TODO:删除自己的留言 或者回复、复制
-        NSDictionary *dic = liuyanArr[indexPath.row];
-        if ([ExdangqianUserUid isEqualToString:dic[@"uid"]]) {
+        PlayVCCommentFrameModel *frameModel = liuyanArr[indexPath.row];
+        if ([ExdangqianUserUid isEqualToString:frameModel.model.uid]) {
             [UIActionSheet actionSheetWithTitle:nil message:nil buttons:@[@"删除", @"复制"] showInView:self.view onDismiss:^(int buttonIndex) {
                 if (buttonIndex == 0) {
-                    [NetWorkTool delActWithaccessToken:AvatarAccessToken act_id:dic[@"id"] sccess:^(NSDictionary *responseObject) {
+                    [NetWorkTool delActWithaccessToken:AvatarAccessToken act_id:frameModel.model.playCommentID sccess:^(NSDictionary *responseObject) {
                         //刷新留言列表
-                        UITableView *fansBoardTableView = (UITableView *)[TwoScrollV viewWithTag:5];
-                        [fansBoardTableView.mj_header beginRefreshing];
+                        [self liuyanRefresh:pinglunhoushuaxinTableView];
+//                        UITableView *fansBoardTableView = (UITableView *)[TwoScrollV viewWithTag:5];
+//                        [fansBoardTableView.mj_header beginRefreshing];
                         
                     } failure:^(NSError *error) {
                         //
@@ -1936,7 +1937,7 @@
                 }
                 else{
                     UIPasteboard *gr                             = [UIPasteboard generalPasteboard];
-                    gr.string                                    = [NSString stringWithFormat:@"%@",dic[@"content"]];
+                    gr.string                                    = [NSString stringWithFormat:@"%@",frameModel.model.content];
                     XWAlerLoginView *xw = [[XWAlerLoginView alloc]initWithTitle:@"分享链接已复制到您的剪切板~~"];
                     [xw show];
                 }
@@ -1951,9 +1952,10 @@
                     if ([[CommonCode readFromUserD:@"isLogin"]boolValue] == YES){
                         //TODO:弹起键盘上方带@xxx
                         _isReplyComment = YES;
-                        _replyTouid = liuyanArr[indexPath.row][@"uid"];
-                        _replyCommentid = liuyanArr[indexPath.row][@"id"];
-                        pinglunTextF.placeholder = [NSString stringWithFormat:@"@%@",liuyanArr[indexPath.row][@"full_name"]];
+                        PlayVCCommentFrameModel *frameModel = liuyanArr[indexPath.row];
+                        _replyTouid = frameModel.model.uid;
+                        _replyCommentid = frameModel.model.playCommentID;
+                        pinglunTextF.placeholder = [NSString stringWithFormat:@"@%@",frameModel.model.full_name];
                         [pinglunTextF becomeFirstResponder];
                         
                     }
@@ -1963,7 +1965,7 @@
                 }
                 else{
                     UIPasteboard *gr                             = [UIPasteboard generalPasteboard];
-                    gr.string                                    = [NSString stringWithFormat:@"%@",dic[@"content"]];
+                    gr.string                                    = [NSString stringWithFormat:@"%@",frameModel.model.content];
                     XWAlerLoginView *xw = [[XWAlerLoginView alloc]initWithTitle:@"分享链接已复制到您的剪切板~~"];
                     [xw show];
                 }

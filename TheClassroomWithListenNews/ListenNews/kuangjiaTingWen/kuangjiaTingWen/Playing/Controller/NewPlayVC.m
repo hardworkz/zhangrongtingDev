@@ -173,6 +173,10 @@
  分页评论条数
  */
 @property (assign, nonatomic) NSInteger commentPageSize;
+/**
+ 打赏输入框
+ */
+@property (strong, nonatomic) UITextField *customRewardTextField;
 @end
 static NewPlayVC *_instance = nil;
 @implementation NewPlayVC
@@ -942,8 +946,8 @@ static NewPlayVC *_instance = nil;
             cell.selecteRewardCountAction = ^(UIButton *item, NSArray *buttons) {
                 [weakSelf selecteRewardCountAction:item buttons:buttons];
             };
-            cell.finalRewardButtonAciton = ^(OJLAnimationButton *item) {
-                [weakSelf finalRewardButtonAciton:item];
+            cell.finalRewardButtonAciton = ^(OJLAnimationButton *item,UITextField *payTextField) {
+                [weakSelf finalRewardButtonAciton:item payTextField:payTextField];
             };
             cell.backButtonAction = ^(UIButton *item) {
                 [weakSelf backButtonAction:item];
@@ -1085,7 +1089,7 @@ static NewPlayVC *_instance = nil;
 }
 
 -(void)OJLAnimationButtonWillFinishAnimation:(OJLAnimationButton *)OJLAnimationButton{
-        [self rewarding];
+    [self rewarding];
 }
 #pragma mark - UIButtonAction
 
@@ -1235,9 +1239,10 @@ static NewPlayVC *_instance = nil;
     
 }
 
-- (void)finalRewardButtonAciton:(OJLAnimationButton *)sender {
+- (void)finalRewardButtonAciton:(OJLAnimationButton *)sender payTextField:(UITextField *)textField {
     [self.view endEditing:YES];
     if ([[CommonCode readFromUserD:@"isLogin"]boolValue] == YES){
+        self.customRewardTextField = textField;
         [sender startAnimation];
     }
     else{
@@ -1278,7 +1283,7 @@ static NewPlayVC *_instance = nil;
             RTLog(@"%@",responseObject);
             if ([responseObject[@"status"] integerValue] == 1) {
                 vc.balanceCount = [responseObject[@"results"][@"listen_money"] doubleValue];
-                vc.rewardCount = self.rewardCount;
+                vc.rewardCount = _customRewardTextField.text.floatValue;
                 vc.uid = (self.postDetailModel.post_news != nil) ? self.postDetailModel.post_news : self.postDetailModel.act.act_id;
                 vc.post_id = self.post_id;
                 vc.act_id = self.postDetailModel.act.act_id;
@@ -2314,7 +2319,7 @@ static NSInteger touchCount = 0;
     WXMediaMessage *message = [WXMediaMessage message];
     message.title = _postDetailModel.post_title;
     message.description = @"";
-    NSString *musicUrl = [NSString stringWithFormat:@"http://admin.tingwen.me/index.php/article/yulan/id/%@.html",_postDetailModel.post_id];
+    NSString *musicUrl = [NSString stringWithFormat:@"http://api.tingwen.me/index.php/article/yulan/id/%@.html",_postDetailModel.post_id];
     //    NSString *musicUrl = @"https://zhidao.baidu.com/question/2143697514695119428.html";
     
     [self getImageWithURLStr:NEWSSEMTPHOTOURL(_postDetailModel.smeta) OnSucceed:^(UIImage *image) {

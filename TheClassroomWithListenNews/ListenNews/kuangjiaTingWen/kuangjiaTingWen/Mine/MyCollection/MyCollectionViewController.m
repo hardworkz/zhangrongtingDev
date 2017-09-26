@@ -25,14 +25,19 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    DefineWeakSelf
+    self.helpTableView.mj_header = [MJRefreshNormalHeader headerWithRefreshingBlock:^{
+        [weakSelf setUpData];
+    }];
     [self setUpData];
+//    [self.helpTableView.mj_header beginRefreshing];
     [self setUpView];
-    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(gaibianyanse:) name:@"gaibianyanse" object:nil];
+//    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(gaibianyanse:) name:@"gaibianyanse" object:nil];
 }
-- (void)gaibianyanse:(NSNotification *)notification
-{
-    [self.helpTableView reloadData];
-}
+//- (void)gaibianyanse:(NSNotification *)notification
+//{
+//    [self.helpTableView reloadData];
+//}
 - (void)viewWillAppear:(BOOL)animated{
     [super viewWillAppear:animated];
     self.hidesBottomBarWhenPushed = YES;
@@ -40,8 +45,8 @@
 }
 
 - (void)setUpData{
-    
     [NetWorkTool get_collectionWithaccessToken:AvatarAccessToken sccess:^(NSDictionary *responseObject) {
+        [self.helpTableView.mj_header endRefreshing];
         if ([responseObject[@"results"] isKindOfClass:[NSArray class]]) {
             self.dataSourceArr = [responseObject[@"results"] mutableCopy];
             //替换id为当前新闻ID
@@ -63,6 +68,7 @@
         }
 
     } failure:^(NSError *error) {
+        [self.helpTableView.mj_header endRefreshing];
         RTLog(@"error:%@",error);
     }];
 }

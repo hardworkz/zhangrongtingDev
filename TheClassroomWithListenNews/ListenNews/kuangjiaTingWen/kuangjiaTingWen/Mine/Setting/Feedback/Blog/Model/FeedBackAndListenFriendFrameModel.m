@@ -54,7 +54,7 @@
         if (![model.images isEqualToString:@""]){
             NSArray *array = [model.images componentsSeparatedByString:@","];
             for (int i = 0 ; i < array.count ; i ++ ) {
-                [urls addObject:[NSURL URLWithString:[NSString stringWithFormat:@"http://admin.tingwen.me/%@", array[i]]]];
+                [urls addObject:[NSURL URLWithString:[NSString stringWithFormat:@"%@%@",APPHost,array[i]]]];
             }
         }
     }
@@ -62,7 +62,7 @@
         if (![model.timages isEqualToString:@""]){
             NSArray *array = [model.timages componentsSeparatedByString:@","];
             for (int i = 0 ; i < array.count ; i ++ ) {
-                [urls addObject:[NSURL URLWithString:[NSString stringWithFormat:@"http://admin.tingwen.me/%@", array[i]]]];
+                [urls addObject:[NSURL URLWithString:[NSString stringWithFormat:@"%@%@",APPHost,array[i]]]];
             }
         }
     }

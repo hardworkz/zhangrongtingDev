@@ -158,8 +158,14 @@ selector:_selector name:_name object:nil];
 //测试环境地址
 //#define APPHostURL @"http://admin.tingwen.me/index.php/api"
 //发布环境地址
-#define APPHostURL @"http://admin.tingwen.me/index.php/api"
-
+#define APPOldHostURL @"http://admin.tingwen.me/index.php/api"
+#define APPHostURL @"http://api.tingwen.me/index.php/api"
+// 图片拼接处理
+#define APPHost @"http://admin.tingwen.me/"
+// 广告VC
+#define APPHostAds @"http://admin.tingwen.me"
+//帮助中心url
+#define HelpCenterUrl @"http://admin.tingwen.me/help/help_core.html"
 
 //新闻默认图
 #define NewsPlaceHolderImage [UIImage imageNamed:@"thumbnailsdefault"]

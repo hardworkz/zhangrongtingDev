@@ -20,6 +20,7 @@ PODS:
   - AFNetworking/UIKit (2.6.3):
     - AFNetworking/NSURLConnection
     - AFNetworking/NSURLSession
+  - AvoidCrash (1.6.7)
   - DACircularProgress (2.3.1)
   - iAppInfos (0.1.0)
   - MBProgressHUD (0.9.2)
@@ -43,6 +44,7 @@ PODS:
 
 DEPENDENCIES:
   - AFNetworking (~> 2.6)
+  - AvoidCrash
   - iAppInfos (~> 0.1.0)
   - MJExtension (~> 3.0.13)
   - MWPhotoBrowser (~> 2.1.2)
@@ -58,6 +60,7 @@ DEPENDENCIES:
 
 SPEC CHECKSUMS:
   AFNetworking: cb8d14a848e831097108418f5d49217339d4eb60
+  AvoidCrash: 74136074de17bde312719c0b44fa0c9b26a4b652
   DACircularProgress: 4dd437c0fc3da5161cb289e07ac449493d41db71
   iAppInfos: 638d1ada1528b98350aea8d06b836c77d75e6cf3
   MBProgressHUD: 1569cf7ace17a8bac47aabfbb8580a49690386d1
@@ -74,6 +77,6 @@ SPEC CHECKSUMS:
   UMengAnalytics: ef8d45f94c0e5771dc364cf6a5731d9d3b101da2
   WechatOpenSDK: cbd332148eb792d444ed4eec94f421d98f2046ee
 
-PODFILE CHECKSUM: 2d1060b40d8e13119adfdcd222d1a8622415d5e4
+PODFILE CHECKSUM: 13fbef02c72a1f17bbcaa7aa1e10646cdf115ac1
 
 COCOAPODS: 1.0.1

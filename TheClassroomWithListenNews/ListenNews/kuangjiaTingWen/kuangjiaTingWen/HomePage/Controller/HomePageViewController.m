@@ -43,6 +43,24 @@
 @end
 
 @implementation HomePageViewController
+/**
+ 系统公告方法
+ */
+- (void)getSystemNotice
+{
+    RTLog(@"getSystemNotice");
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        UIAlertController *qingshuruyonghuming = [UIAlertController alertControllerWithTitle:@"公告" message:@"请前往App Store升级最新版本" preferredStyle:UIAlertControllerStyleAlert];
+        [qingshuruyonghuming addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+            
+        }]];
+        [qingshuruyonghuming addAction:[UIAlertAction actionWithTitle:@"前往App Store" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+            [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"https://itunes.apple.com/cn/app/id1160650661?mt=8"]];
+            
+        }]];
+        [self presentViewController:qingshuruyonghuming animated:YES completion:nil];
+    });
+}
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -51,6 +69,9 @@
     [self getStartAD];
     [self setUpData];
     [self setUpView];
+    
+    //系统消息提醒
+    [self getSystemNotice];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -92,7 +113,7 @@
     RegisterNotify(ReloadHomeSelectPageData, @selector(reloadSelectedList))
     RegisterNotify(@"loginSccess", @selector(reloadClassList))
     RegisterNotify(@"tuichuLoginSeccess", @selector(reloadClassList))
-    RegisterNotify(@"setMyunreadMessageTips", @selector(reloadClassList))
+//    RegisterNotify(@"setMyunreadMessageTips", @selector(reloadClassList))
 }
 
 - (void)setUpView{

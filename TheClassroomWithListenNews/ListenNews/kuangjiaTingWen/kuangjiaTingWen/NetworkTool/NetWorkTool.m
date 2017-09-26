@@ -281,7 +281,14 @@
     [mgr.requestSerializer willChangeValueForKey:@"timeoutInterval"];
     mgr.requestSerializer.timeoutInterval = TimeOutSecond;
     [mgr.requestSerializer didChangeValueForKey:@"timeoutInterval"];
-    NSString *urlStr=[NSString stringWithFormat:@"%@%@",APPHostURL,url];
+    NSString *urlStr;
+    if ([url isEqualToString:@"/Alipay/alipay"]) {
+        urlStr = [NSString stringWithFormat:@"%@%@",APPOldHostURL,url];
+    }else if ([url isEqualToString:@"/Wxpay/wxpay"]){
+        urlStr = [NSString stringWithFormat:@"%@%@",APPOldHostURL,url];
+    }else{
+        urlStr = [NSString stringWithFormat:@"%@%@",APPHostURL,url];
+    }
     if ([[CommonCode readFromUserD:@"isLogin"] boolValue] == NO && ![url isEqualToString:@"/interfaceNew/login"] && ![url isEqualToString:@"/interfaceNew/oauthLogin"]) {//拦截判断当前是否登录，未登录则清空accessToken
         [param setValue:@"" forKey:@"accessToken"];
     }

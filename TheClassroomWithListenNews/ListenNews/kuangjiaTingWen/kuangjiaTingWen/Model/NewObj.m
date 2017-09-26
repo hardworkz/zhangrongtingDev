@@ -63,7 +63,7 @@
         if ([a[0] rangeOfString:@"thumb"].location != NSNotFound) {
             self.smeta = [[[[a[0] stringByReplacingOccurrencesOfString:@"\\" withString:@""] stringByReplacingOccurrencesOfString:@"}" withString:@""] stringByReplacingOccurrencesOfString:@"{\"thumb\":" withString:@""]stringByReplacingOccurrencesOfString:@"\"" withString:@""];
             if ([self.smeta rangeOfString:@"http"].location == NSNotFound) {
-                self.smeta = [NSString stringWithFormat:@"http://admin.tingwen.me%@",self.smeta];
+                self.smeta = [NSString stringWithFormat:@"%@%@",APPHostAds,self.smeta];
             }
             return;
         }else if([value hasPrefix:@"http://"]){

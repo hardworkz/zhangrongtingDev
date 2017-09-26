@@ -402,8 +402,8 @@
     [cell setAddReview:^(BlobNewTableViewCell *cell, child_commentModel *model) {
         [weakSelf reviewWithCell:cell andModel:model];
     }];
-    [cell setDeleteBlog:^(BlobNewTableViewCell *cell) {
-        [weakSelf deleteBlogIntableViewCell:cell];
+    [cell setDeleteBlog:^(BlobNewTableViewCell *cell,FeedBackAndListenFriendFrameModel *frameModel) {
+        [weakSelf deleteBlogIntableViewCell:cell frameModel:frameModel];
     }];
     [cell setPlayVoice:^(BlobNewTableViewCell *cell) {
         [weakSelf playVoiceInTableViewCell:cell];
@@ -961,25 +961,32 @@
     
 }
 
-- (void)deleteBlogIntableViewCell:(BlobNewTableViewCell *)cell{
+- (void)deleteBlogIntableViewCell:(BlobNewTableViewCell *)cell frameModel:(FeedBackAndListenFriendFrameModel *)frameModel{
         NSIndexPath *indexPath = [self.blogTableview indexPathForCell:cell];
 //        BlogModel *blog = self.blogArray[indexPath.row];
         DefineWeakSelf;
-    FeedBackAndListenFriendFrameModel *frameModel = self.blogArray[indexPath.row];
+//    FeedBackAndListenFriendFrameModel *frameModel = self.blogArray[indexPath.row];
+    
         [UIAlertView alertViewWithTitle:@"提示" message:@"确认删除吗？" cancelButtonTitle:@"取消" otherButtonTitles:@[@"删除"] onDismiss:^(int buttonIndex) {
 //            [weakSelf deleteBlog:blog];
             [NetWorkTool delCommentWithaccessToken:AvatarAccessToken comment_id:frameModel.model.ID sccess:^(NSDictionary *responseObject) {
                 //
-                NSLog(@"delSuccess");
-                [self.player stop];
-                [self.voicePlayer pause];
-                [self.voiceImgV removeFromSuperview];
-                [weakSelf loadData];
+                if ([responseObject[status] intValue] == 1) {
+                    
+                    NSLog(@"deleteBlogSuccess");
+                    [weakSelf.player stop];
+                    [weakSelf.voicePlayer pause];
+                    [weakSelf.voiceImgV removeFromSuperview];
+                    //删除数据和cell
+                    [weakSelf.blogArray removeObject:frameModel];
+                    [weakSelf.blogTableview deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationLeft];
+                }
             } failure:^(NSError *error) {
                 //
                 NSLog(@"%@",error);
             }];
         } onCancel:^{
+            
         }];
 }
 

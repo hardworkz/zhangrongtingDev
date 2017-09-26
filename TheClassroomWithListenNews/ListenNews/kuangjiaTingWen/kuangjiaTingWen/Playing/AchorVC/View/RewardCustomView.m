@@ -22,9 +22,9 @@
 @property (assign, nonatomic) BOOL isCustomRewardCount;
 @property (nonatomic, strong) NSMutableArray *buttons;
 @property (strong, nonatomic) OJLAnimationButton *finalRewardButton;
-@property (strong, nonatomic) UITextField *customRewardTextField;
 @property (assign, nonatomic) float rewardCount;
 
+@property (strong, nonatomic) UITextField *customRewardTextField;
 
 @end
 

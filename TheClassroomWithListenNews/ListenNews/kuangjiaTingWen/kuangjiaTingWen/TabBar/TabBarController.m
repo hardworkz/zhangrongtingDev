@@ -45,7 +45,10 @@
     
     [super viewWillAppear:animated];
 }
-
+- (void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
+}
 - (void)viewDidLoad{
     [super viewDidLoad];
     _itemArray = [NSMutableArray array];
@@ -62,7 +65,10 @@
     
     // 自定义TatBar
     [self setTatBar];
+    
 }
+
+
 - (UIImage *)changColorXuanRan:(NSString *)img{
     UIImage *imgName = [[UIImage imageNamed:img] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
     return imgName;

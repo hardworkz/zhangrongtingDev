@@ -14,7 +14,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "FDEF537E015DCA5162FF1E6DDD74083E"
+               BlueprintIdentifier = "2FD334D40167D042CEC0A209CDC56DEE"
                BuildableName = "UIView_Positioning.framework"
                BlueprintName = "UIView+Positioning"
                ReferencedContainer = "container:Pods.xcodeproj">
@@ -45,7 +45,7 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "FDEF537E015DCA5162FF1E6DDD74083E"
+            BlueprintIdentifier = "2FD334D40167D042CEC0A209CDC56DEE"
             BuildableName = "UIView_Positioning.framework"
             BlueprintName = "UIView+Positioning"
             ReferencedContainer = "container:Pods.xcodeproj">

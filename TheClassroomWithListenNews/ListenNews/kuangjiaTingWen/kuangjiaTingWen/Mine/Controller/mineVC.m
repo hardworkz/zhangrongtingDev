@@ -83,8 +83,8 @@ typedef void(^animateBlock)();
     [_exp setTextColor:UIColorFromHex(0xF67825)];
     [_experienceView addSubview:_exp];
     
-    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(loginAlert:) name:@"loginAlert" object:nil];
-    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(updateUserInfo:) name:@"updateUserInfo" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(loginAlert:) name:@"loginAlert" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateUserInfo:) name:@"updateUserInfo" object:nil];
     
 }
 
@@ -143,6 +143,7 @@ typedef void(^animateBlock)();
     }
 //    ExdangqianUser = [CommonCode readFromUserD:userInfo[results][@"user_login"]];
     [NetWorkTool getMyuserinfoWithaccessToken:AvatarAccessToken user_id:userInfo[results][@"id"]  sccess:^(NSDictionary *responseObject) {
+        RTLog(@"%@",responseObject);
         if ([responseObject[@"msg"] isEqualToString:@"获取成功!"]) {
             if ([[CommonCode readFromUserD:@"isWhatLogin"] isEqualToString:@"QQ"]){
                 ExdangqianUser = responseObject[results][@"user_login"];
@@ -353,12 +354,13 @@ typedef void(^animateBlock)();
 
 - (void)lvQAButtonAction{
     
-    NSURL *url = [NSURL URLWithString:@"http://admin.tingwen.me/help/help_core.html"];
+    NSURL *url = [NSURL URLWithString:HelpCenterUrl];
     SingleWebViewController *singleWebVC = [[SingleWebViewController alloc] initWithTitle:@"帮助中心" url:url];
     [self.navigationController pushViewController:singleWebVC animated:YES];
 }
 
-- (void)showUpAnimations{
+- (void)showUpAnimations
+{
     animateBlock up = ^(){
         _experienceView.frame = CGRectMake(SCREEN_WIDTH - 63, SCREEN_HEIGHT - 160, 40, 40);
         _experienceView.alpha=0;

@@ -304,7 +304,7 @@
         if (![model.images isEqualToString:@""]){
             NSArray *array = [model.images componentsSeparatedByString:@","];
             for (int i = 0 ; i < array.count ; i ++ ) {
-                [urls addObject:[NSURL URLWithString:[NSString stringWithFormat:@"http://admin.tingwen.me/%@", array[i]]]];
+                [urls addObject:[NSURL URLWithString:[NSString stringWithFormat:@"%@%@",APPHost,array[i]]]];
             }
         }
     }
@@ -312,7 +312,7 @@
         if (![model.timages isEqualToString:@""]){
             NSArray *array = [model.timages componentsSeparatedByString:@","];
             for (int i = 0 ; i < array.count ; i ++ ) {
-                [urls addObject:[NSURL URLWithString:[NSString stringWithFormat:@"http://admin.tingwen.me/%@", array[i]]]];
+                [urls addObject:[NSURL URLWithString:[NSString stringWithFormat:@"%@%@",APPHost, array[i]]]];
             }
         }
     }
@@ -406,7 +406,7 @@
 }
 - (void)actionDeleteBlog:(UIButton *)sender {
     if (self.deleteBlog) {
-        self.deleteBlog(self);
+        self.deleteBlog(self,self.frameModel);
     }
 }
 
@@ -472,11 +472,17 @@
     CommentAndReviewFrameModel *frameModel = self.dataArray[indexPath.row];
     _commentIndexRow = indexPath.row;
     if ([frameModel.model.uid isEqualToString:ExdangqianUserUid]) {//判断点击评论是否为当前用户
-        _alertView = [[CustomAlertView alloc] initWithCustomView:[self setupDeleteAlertView]];
-        _alertView.alertHeight = 105;
-        _alertView.alertDuration = 0.25;
-        _alertView.coverAlpha = 0.6;
-        [_alertView show];
+        if (_frameModel.isFeedbackVC) {//判断是否为意见反馈页面，意见反馈页面无法删除
+//            if (self.addReview) {
+//                self.addReview(self,frameModel.model);
+//            }
+        }else{
+            _alertView = [[CustomAlertView alloc] initWithCustomView:[self setupDeleteAlertView]];
+            _alertView.alertHeight = 105;
+            _alertView.alertDuration = 0.25;
+            _alertView.coverAlpha = 0.6;
+            [_alertView show];
+        }
     }else{
         if (self.addReview) {
             self.addReview(self,frameModel.model);

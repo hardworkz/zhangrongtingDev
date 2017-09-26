@@ -39,33 +39,33 @@
     
     [NetWorkTool getIntoAppGuangGaoPage:@"1" andLimit:@"10" sccess:^(NSDictionary *responseObject) {
         if (TARGETED_DEVICE_IS_IPHONE_480){
-            self.urlStr = [NSString stringWithFormat:@"http://admin.tingwen.me%@",responseObject[@"results"][0][@"ad_content"]];
+            self.urlStr = [NSString stringWithFormat:@"%@%@",APPHostAds,responseObject[@"results"][0][@"ad_content"]];
             self.tapUrlStr = responseObject[@"results"][0][@"ad_name"];
             [imgV sd_setImageWithURL:[NSURL URLWithString:self.urlStr]];
             [self performSelector:@selector(afterAction) withObject:nil afterDelay:3.0f];
         }
         else if (TARGETED_DEVICE_IS_IPHONE_568){
             NSLog(@"IPHONE6");
-            self.urlStr = [NSString stringWithFormat:@"http://admin.tingwen.me%@",responseObject[@"results"][1][@"ad_content"]];
+            self.urlStr = [NSString stringWithFormat:@"%@%@",APPHostAds,responseObject[@"results"][1][@"ad_content"]];
             self.tapUrlStr = responseObject[@"results"][1][@"ad_name"];
             [imgV sd_setImageWithURL:[NSURL URLWithString:self.urlStr]];
             [self performSelector:@selector(afterAction) withObject:nil afterDelay:3.0f];
         }
         else if (TARGETED_DEVICE_IS_IPHONE_667){
             NSLog(@"IPHONE6P");
-            self.urlStr = [NSString stringWithFormat:@"http://admin.tingwen.me%@",responseObject[@"results"][2][@"ad_content"]];
+            self.urlStr = [NSString stringWithFormat:@"%@%@",APPHostAds,responseObject[@"results"][2][@"ad_content"]];
             self.tapUrlStr = responseObject[@"results"][2][@"ad_name"];
             [imgV sd_setImageWithURL:[NSURL URLWithString:self.urlStr]];
             [self performSelector:@selector(afterAction) withObject:nil afterDelay:3.0f];
         }
         else if (TARGETED_DEVICE_IS_IPHONE_736){
-            self.urlStr = [NSString stringWithFormat:@"http://admin.tingwen.me%@",responseObject[@"results"][3][@"ad_content"]];
+            self.urlStr = [NSString stringWithFormat:@"%@%@",APPHostAds,responseObject[@"results"][3][@"ad_content"]];
             self.tapUrlStr = responseObject[@"results"][3][@"ad_name"];
             [imgV sd_setImageWithURL:[NSURL URLWithString:self.urlStr]];
             [self performSelector:@selector(afterAction) withObject:nil afterDelay:3.0f];
         }
         else if (IS_IPAD){
-            self.urlStr = [NSString stringWithFormat:@"http://admin.tingwen.me%@",responseObject[@"results"][3][@"ad_content"]];
+            self.urlStr = [NSString stringWithFormat:@"%@%@",APPHostAds,responseObject[@"results"][3][@"ad_content"]];
             self.tapUrlStr = responseObject[@"results"][3][@"ad_name"];
             [imgV sd_setImageWithURL:[NSURL URLWithString:self.urlStr]];
             [self performSelector:@selector(afterAction) withObject:nil afterDelay:3.0f];
