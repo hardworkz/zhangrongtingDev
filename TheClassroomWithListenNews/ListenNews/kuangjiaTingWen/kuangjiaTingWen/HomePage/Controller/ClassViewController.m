@@ -661,21 +661,21 @@ static AVPlayer *_instancePlay = nil;
         [bgView addSubview:weixinBtn];
         
         //购买会员不用听币
-        if (![VipSelected.accessibilityIdentifier isEqualToString:@"vip"]) {
-            UIButton *tingbiBtn = [[UIButton alloc] init];
-            tingbiBtn.frame = CGRectMake(0, 100, SCREEN_WIDTH, 50);
-            tingbiBtn.backgroundColor = [UIColor whiteColor];
-            [tingbiBtn setImage:@"pay2"];
-            tingbiBtn.imageEdgeInsets = UIEdgeInsetsMake(0, -20, 0, 0);
-            [tingbiBtn setTitle:@"听币支付" forState:UIControlStateNormal];
-            [tingbiBtn setTitleColor:gMainColor forState:UIControlStateNormal];
-            tingbiBtn.titleLabel.font = [UIFont systemFontOfSize:17];
-            [tingbiBtn addTarget:self action:@selector(tingbiBtnClicked)];
-            [bgView addSubview:tingbiBtn];
-        }
+//        if (![VipSelected.accessibilityIdentifier isEqualToString:@"vip"]) {
+//            UIButton *tingbiBtn = [[UIButton alloc] init];
+//            tingbiBtn.frame = CGRectMake(0, 100, SCREEN_WIDTH, 50);
+//            tingbiBtn.backgroundColor = [UIColor whiteColor];
+//            [tingbiBtn setImage:@"pay2"];
+//            tingbiBtn.imageEdgeInsets = UIEdgeInsetsMake(0, -20, 0, 0);
+//            [tingbiBtn setTitle:@"听币支付" forState:UIControlStateNormal];
+//            [tingbiBtn setTitleColor:gMainColor forState:UIControlStateNormal];
+//            tingbiBtn.titleLabel.font = [UIFont systemFontOfSize:17];
+//            [tingbiBtn addTarget:self action:@selector(tingbiBtnClicked)];
+//            [bgView addSubview:tingbiBtn];
+//        }
         
         UIButton *cancelBtn = [[UIButton alloc] init];
-        cancelBtn.frame = CGRectMake(0,[VipSelected.accessibilityIdentifier isEqualToString:@"vip"]?105:155, SCREEN_WIDTH, 50);
+        cancelBtn.frame = CGRectMake(0,105, SCREEN_WIDTH, 50);
         cancelBtn.backgroundColor = [UIColor whiteColor];
         [cancelBtn setTitle:@"取消" forState:UIControlStateNormal];
         [cancelBtn setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
@@ -690,6 +690,7 @@ static AVPlayer *_instancePlay = nil;
 - (void)zhifubaoBtnClicked
 {
     [_alertView coverClick];
+//    APPDELEGATE.payType = PayTypeClassPay;
     //判断是选择购买vip，还是购买课程
     if ([VipSelected.accessibilityIdentifier isEqualToString:@"vip"]) {
         [NetWorkTool AliPayWithaccessToken:AvatarAccessToken pay_type:@"2" act_id:nil money:nil mem_type:@"2" month:@"12" sccess:^(NSDictionary *responseObject) {
@@ -762,6 +763,7 @@ static AVPlayer *_instancePlay = nil;
 - (void)weixinBtnClicked
 {
     [_alertView coverClick];
+//    APPDELEGATE.payType = PayTypeClassPay;
     //判断是选择购买vip，还是购买课程
     if ([VipSelected.accessibilityIdentifier isEqualToString:@"vip"]) {
         [NetWorkTool WXPayWithaccessToken:AvatarAccessToken pay_type:@"2" act_id:nil money:nil mem_type:@"2" month:@"12" sccess:^(NSDictionary *responseObject) {
@@ -813,85 +815,85 @@ static AVPlayer *_instancePlay = nil;
     }
 }
 //听币支付
-- (void)tingbiBtnClicked
-{
-    [_alertView coverClick];
-    [NetWorkTool get_orderWithaccessToken:AvatarAccessToken act_id:self.classModel.act_id sccess:^(NSDictionary *responseObject) {
-        if ([responseObject[status] intValue] == 1) {
-            //获取听币余额
-            PayOnlineViewController *vc = [PayOnlineViewController new];
-            
-            [NetWorkTool getListenMoneyWithaccessToken:AvatarAccessToken sccess:^(NSDictionary *responseObject) {
-                NSLog(@"%@",responseObject);
-                if ([responseObject[status] integerValue] == 1) {
-                    if ([responseObject[results][@"listen_money"] doubleValue] < [rewardMoney floatValue]) {//余额不足，前往充值
-                        vc.balanceCount = [responseObject[results][@"listen_money"] doubleValue];
-                        vc.rewardCount = [rewardMoney floatValue];
-                        vc.uid = self.classModel.act_id;
-                        vc.post_id = self.classModel.ID;
-                        vc.isPayClass = NO;
-                        self.hidesBottomBarWhenPushed = YES;
-                        [self.navigationController pushViewController:vc animated:YES];
-                    }else{//调用购买接口
-                        [NetWorkTool buyActWithaccessToken:AvatarAccessToken act_id:self.classModel.ID money:rewardMoney sccess:^(NSDictionary *responseObject) {
-                            if ([responseObject[status] integerValue] == 1) {
-                                //购买成功，退出课堂购买界面，刷新列表
-//                                XWAlerLoginView *xw = [[XWAlerLoginView alloc]initWithTitle:@"课程购买成功"];
+//- (void)tingbiBtnClicked
+//{
+//    [_alertView coverClick];
+//    [NetWorkTool get_orderWithaccessToken:AvatarAccessToken act_id:self.classModel.act_id sccess:^(NSDictionary *responseObject) {
+//        if ([responseObject[status] intValue] == 1) {
+//            //获取听币余额
+//            PayOnlineViewController *vc = [PayOnlineViewController new];
+//            
+//            [NetWorkTool getListenMoneyWithaccessToken:AvatarAccessToken sccess:^(NSDictionary *responseObject) {
+//                NSLog(@"%@",responseObject);
+//                if ([responseObject[status] integerValue] == 1) {
+//                    if ([responseObject[results][@"listen_money"] doubleValue] < [rewardMoney floatValue]) {//余额不足，前往充值
+//                        vc.balanceCount = [responseObject[results][@"listen_money"] doubleValue];
+//                        vc.rewardCount = [rewardMoney floatValue];
+//                        vc.uid = self.classModel.act_id;
+//                        vc.post_id = self.classModel.ID;
+//                        vc.isPayClass = NO;
+//                        self.hidesBottomBarWhenPushed = YES;
+//                        [self.navigationController pushViewController:vc animated:YES];
+//                    }else{//调用购买接口
+//                        [NetWorkTool buyActWithaccessToken:AvatarAccessToken act_id:self.classModel.ID money:rewardMoney sccess:^(NSDictionary *responseObject) {
+//                            if ([responseObject[status] integerValue] == 1) {
+//                                //购买成功，退出课堂购买界面，刷新列表
+////                                XWAlerLoginView *xw = [[XWAlerLoginView alloc]initWithTitle:@"课程购买成功"];
+////                                [xw show];
+//                                zhuboXiangQingVCNewController *faxianzhuboVC = [[zhuboXiangQingVCNewController alloc]init];
+//                                faxianzhuboVC.jiemuDescription = self.jiemuDescription;
+//                                faxianzhuboVC.jiemuFan_num = self.jiemuFan_num;
+//                                faxianzhuboVC.jiemuID = self.jiemuID;
+//                                faxianzhuboVC.jiemuImages = self.jiemuImages;
+//                                faxianzhuboVC.jiemuIs_fan = self.jiemuIs_fan;
+//                                faxianzhuboVC.jiemuMessage_num = self.jiemuMessage_num;
+//                                faxianzhuboVC.jiemuName = self.jiemuName;
+//                                faxianzhuboVC.isfaxian = YES;
+//                                faxianzhuboVC.isClass = YES;
+//                                faxianzhuboVC.listVC = self.listVC;
+//                                [self.navigationController pushViewController:faxianzhuboVC animated:YES];
+//                                //刷新课堂列表
+//                                [[NSNotificationCenter defaultCenter] postNotificationName:ReloadClassList object:nil];
+//                                
+//                                //充值成功 --》 获取用户信息
+//                                [[NSNotificationCenter defaultCenter] postNotificationName:@"updateUserInfo" object:nil];
+//   
+//                                //上传订单
+//                                [NetWorkTool order_notifyWithaccessToken:AvatarAccessToken order_num:orderNum sccess:^(NSDictionary *responseObject) {
+//                                    if ([responseObject[status] integerValue] == 1) {
+//                                        //                                APPDELEGATE.isClassPay = NO;
+//                                        APPDELEGATE.payType = PayTypeTingCoinPay;
+//                                        [CommonCode writeToUserD:nil andKey:@"orderNumber"];
+//                                        [[NSNotificationCenter defaultCenter] postNotificationName:ReloadClassList object:nil];
+//                                        [self.navigationController popViewControllerAnimated:YES];
+//                                    }
+//                                } failure:^(NSError *error) {
+//                                    
+//                                }];
+//                            }else{
+//                                XWAlerLoginView *xw = [[XWAlerLoginView alloc]initWithTitle:responseObject[msg]];
 //                                [xw show];
-                                zhuboXiangQingVCNewController *faxianzhuboVC = [[zhuboXiangQingVCNewController alloc]init];
-                                faxianzhuboVC.jiemuDescription = self.jiemuDescription;
-                                faxianzhuboVC.jiemuFan_num = self.jiemuFan_num;
-                                faxianzhuboVC.jiemuID = self.jiemuID;
-                                faxianzhuboVC.jiemuImages = self.jiemuImages;
-                                faxianzhuboVC.jiemuIs_fan = self.jiemuIs_fan;
-                                faxianzhuboVC.jiemuMessage_num = self.jiemuMessage_num;
-                                faxianzhuboVC.jiemuName = self.jiemuName;
-                                faxianzhuboVC.isfaxian = YES;
-                                faxianzhuboVC.isClass = YES;
-                                faxianzhuboVC.listVC = self.listVC;
-                                [self.navigationController pushViewController:faxianzhuboVC animated:YES];
-                                //刷新课堂列表
-                                [[NSNotificationCenter defaultCenter] postNotificationName:ReloadClassList object:nil];
-                                
-                                //充值成功 --》 获取用户信息
-                                [[NSNotificationCenter defaultCenter] postNotificationName:@"updateUserInfo" object:nil];
-   
-                                //上传订单
-                                [NetWorkTool order_notifyWithaccessToken:AvatarAccessToken order_num:orderNum sccess:^(NSDictionary *responseObject) {
-                                    if ([responseObject[status] integerValue] == 1) {
-                                        //                                APPDELEGATE.isClassPay = NO;
-                                        APPDELEGATE.payType = PayTypeTingCoinPay;
-                                        [CommonCode writeToUserD:nil andKey:@"orderNumber"];
-                                        [[NSNotificationCenter defaultCenter] postNotificationName:ReloadClassList object:nil];
-                                        [self.navigationController popViewControllerAnimated:YES];
-                                    }
-                                } failure:^(NSError *error) {
-                                    
-                                }];
-                            }else{
-                                XWAlerLoginView *xw = [[XWAlerLoginView alloc]initWithTitle:responseObject[msg]];
-                                [xw show];
-                            }
-                        } failure:^(NSError *error) {
-                            RTLog(@"%@",error);
-                        }];
-                    }
-                }else{
-                    XWAlerLoginView *xw = [[XWAlerLoginView alloc]initWithTitle:responseObject[msg]];
-                    [xw show];
-                }
-            } failure:^(NSError *error) {
-                
-            }];
-
-        }else{
-            XWAlerLoginView *xw = [[XWAlerLoginView alloc]initWithTitle:responseObject[msg]];
-            [xw show];
-        }
-    } failure:^(NSError *error) {
-    }];
-    
-}
+//                            }
+//                        } failure:^(NSError *error) {
+//                            RTLog(@"%@",error);
+//                        }];
+//                    }
+//                }else{
+//                    XWAlerLoginView *xw = [[XWAlerLoginView alloc]initWithTitle:responseObject[msg]];
+//                    [xw show];
+//                }
+//            } failure:^(NSError *error) {
+//                
+//            }];
+//
+//        }else{
+//            XWAlerLoginView *xw = [[XWAlerLoginView alloc]initWithTitle:responseObject[msg]];
+//            [xw show];
+//        }
+//    } failure:^(NSError *error) {
+//    }];
+//    
+//}
 //取消支付弹窗
 - (void)cancelAlert
 {
@@ -1614,10 +1616,9 @@ static AVPlayer *_instancePlay = nil;
         
     }
     else
-    {//当前为支付宝，微信，听币支付路线
+    {//当前为支付宝，微信，支付路线
         if ([[CommonCode readFromUserD:@"isLogin"]boolValue] == YES){
             if ([VipSelected.accessibilityIdentifier isEqualToString:@"vip"]) {
-                
                 APPDELEGATE.payType = PayTypeMembers;
                 _alertView = [[CustomAlertView alloc] initWithCustomView:[self setupPayAlertWithIAP:NO]];
                 _alertView.alertHeight = 155;
@@ -1628,7 +1629,7 @@ static AVPlayer *_instancePlay = nil;
             }else{
                 APPDELEGATE.payType = PayTypeClassPay;
                 _alertView = [[CustomAlertView alloc] initWithCustomView:[self setupPayAlertWithIAP:NO]];
-                _alertView.alertHeight = 205;
+                _alertView.alertHeight = 155;
                 _alertView.alertDuration = 0.25;
                 _alertView.coverAlpha = 0.6;
                 [_alertView show];
@@ -1681,7 +1682,20 @@ static AVPlayer *_instancePlay = nil;
         
         UIAlertController *qingshuruyonghuming = [UIAlertController alertControllerWithTitle:title message:msg preferredStyle:UIAlertControllerStyleAlert];
         [qingshuruyonghuming addAction:[UIAlertAction actionWithTitle:sureTitle style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-            [self setUpData];
+            zhuboXiangQingVCNewController *faxianzhuboVC = [[zhuboXiangQingVCNewController alloc]init];
+            faxianzhuboVC.jiemuDescription = self.jiemuDescription;
+            faxianzhuboVC.jiemuFan_num = self.jiemuFan_num;
+            faxianzhuboVC.jiemuID = self.jiemuID;
+            faxianzhuboVC.jiemuImages = self.jiemuImages;
+            faxianzhuboVC.jiemuIs_fan = self.jiemuIs_fan;
+            faxianzhuboVC.jiemuMessage_num = self.jiemuMessage_num;
+            faxianzhuboVC.jiemuName = self.jiemuName;
+            faxianzhuboVC.isfaxian = YES;
+            faxianzhuboVC.isClass = YES;
+            faxianzhuboVC.listVC = self.listVC;
+            [self.navigationController pushViewController:faxianzhuboVC animated:YES];
+            [[NSNotificationCenter defaultCenter] postNotificationName:ReloadClassList object:nil];
+
         }]];
         [self presentViewController:qingshuruyonghuming animated:YES completion:nil];
         
@@ -1736,7 +1750,19 @@ static AVPlayer *_instancePlay = nil;
     if ([notification.object integerValue] == 0) {
         UIAlertController *qingshuruyonghuming = [UIAlertController alertControllerWithTitle:title message:msg preferredStyle:UIAlertControllerStyleAlert];
         [qingshuruyonghuming addAction:[UIAlertAction actionWithTitle:sureTitle style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-            [self setUpData];
+            zhuboXiangQingVCNewController *faxianzhuboVC = [[zhuboXiangQingVCNewController alloc]init];
+            faxianzhuboVC.jiemuDescription = self.jiemuDescription;
+            faxianzhuboVC.jiemuFan_num = self.jiemuFan_num;
+            faxianzhuboVC.jiemuID = self.jiemuID;
+            faxianzhuboVC.jiemuImages = self.jiemuImages;
+            faxianzhuboVC.jiemuIs_fan = self.jiemuIs_fan;
+            faxianzhuboVC.jiemuMessage_num = self.jiemuMessage_num;
+            faxianzhuboVC.jiemuName = self.jiemuName;
+            faxianzhuboVC.isfaxian = YES;
+            faxianzhuboVC.isClass = YES;
+            faxianzhuboVC.listVC = self.listVC;
+            [self.navigationController pushViewController:faxianzhuboVC animated:YES];
+            [[NSNotificationCenter defaultCenter] postNotificationName:ReloadClassList object:nil];
         }]];
         [self presentViewController:qingshuruyonghuming animated:YES completion:nil];
     }

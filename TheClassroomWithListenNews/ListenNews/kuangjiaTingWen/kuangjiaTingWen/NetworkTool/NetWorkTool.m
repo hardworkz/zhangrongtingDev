@@ -2064,10 +2064,14 @@ NSMutableDictionary *dic = [[NSMutableDictionary alloc]initWithCapacity:1
 }
 
 + (void)get_collectionWithaccessToken:(NSString *)accessToken
+                              andPage:(NSString *)page
+                             andLimit:(NSString *)limit
                                sccess:(void (^)(NSDictionary *responseObject))success
                               failure:(void(^)(NSError *error))failure{
     NSMutableDictionary *dic = [[NSMutableDictionary alloc]initWithCapacity:1];
     dic[@"accessToken"] = accessToken;
+    dic[@"page"] = page;
+    dic[@"limit"] = limit;
     [self asyncNetworkingUrl:@"/interfaceNew/get_collection" andDict:dic success:success failure:failure];
 }
 + (void)listBuyWithaccessToken:(NSString *)accessToken

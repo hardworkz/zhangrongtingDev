@@ -100,7 +100,7 @@
         }else{
             if (self.dataSourceArr.count == 0) {
 //                [self.tableView.mj_footer endRefreshingWithNoMoreData];
-                self.tableView.mj_footer = nil;
+                self.tableView.mj_footer.hidden = YES;
                 [[BJNoDataView shareNoDataView] showCenterWithSuperView:self.tableView icon:nil iconClicked:^{
                     //图片点击回调
                     [self setUpData];//刷新数据

@@ -67,7 +67,7 @@
     _model = model;
     monthLabel.text = [NSString stringWithFormat:@"%@个月",model.monthes];
     priceLabel.text = [NSString stringWithFormat:@"¥%@",model.price];
-    if ([_is_member isEqualToString:@"1"]) {
+    if ([_is_member isEqualToString:@"1"] || [_is_member isEqualToString:@"2"]) {
         [payBtn setTitle:@"续费"];
     }else{
         [payBtn setTitle:@"购买"];

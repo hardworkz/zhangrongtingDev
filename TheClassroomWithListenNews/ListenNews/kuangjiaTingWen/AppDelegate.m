@@ -247,7 +247,7 @@
 {
     //请求是否为内购的接口
     [NetWorkTool getAppVersionSccess:^(NSDictionary *responseObject) {
-        NSLog(@"%@",responseObject);
+        RTLog(@"%@",responseObject);
         //听闻电台
         if ([APPBUNDLEIDENTIFIER isEqualToString:@"com.popwcn.ListenNewsExploreVersion"]) {
             //当前版本号与提交审核时后台配置的一样说明正在审核

@@ -19,20 +19,23 @@
 
 @property (nonatomic, strong) UILabel *label;
 
+@property (assign, nonatomic) NSInteger page;
 @end
 
 @implementation MyCollectionViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    self.page = 1;
     DefineWeakSelf
-    self.helpTableView.mj_header = [MJRefreshNormalHeader headerWithRefreshingBlock:^{
+//    self.helpTableView.mj_header = [MJRefreshNormalHeader headerWithRefreshingBlock:^{
+//        [weakSelf setUpData];
+//    }];
+    self.helpTableView.mj_footer = [MJRefreshAutoNormalFooter footerWithRefreshingBlock:^{
         [weakSelf setUpData];
     }];
     [self setUpData];
-//    [self.helpTableView.mj_header beginRefreshing];
     [self setUpView];
-//    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(gaibianyanse:) name:@"gaibianyanse" object:nil];
 }
 //- (void)gaibianyanse:(NSNotification *)notification
 //{
@@ -45,18 +48,30 @@
 }
 
 - (void)setUpData{
-    [NetWorkTool get_collectionWithaccessToken:AvatarAccessToken sccess:^(NSDictionary *responseObject) {
-        [self.helpTableView.mj_header endRefreshing];
+    [NetWorkTool get_collectionWithaccessToken:AvatarAccessToken andPage:[NSString stringWithFormat:@"%ld",self.page] andLimit:@"10" sccess:^(NSDictionary *responseObject) {
+        [self.helpTableView.mj_footer endRefreshing];
         if ([responseObject[@"results"] isKindOfClass:[NSArray class]]) {
-            self.dataSourceArr = [responseObject[@"results"] mutableCopy];
+            NSMutableArray *dataArray = [responseObject[@"results"] mutableCopy];
+            if (dataArray.count == 10) {
+                self.page++;
+            }
             //替换id为当前新闻ID
             for (int i = 0; i<self.dataSourceArr.count; i++) {
                 NSDictionary *dict = self.dataSourceArr[i];
                 [dict setValue:dict[@"post_id"] forKey:@"id"];
             }
+            [self.dataSourceArr addObjectsFromArray:dataArray];
             [self.helpTableView reloadData];
+            
+            if (dataArray.count != 0) {
+                self.helpTableView.mj_footer.hidden = NO;
+            }
+            if (dataArray.count < 10) {
+                [self.helpTableView.mj_footer endRefreshingWithNoMoreData];
+            }
         }else{
             if (self.dataSourceArr.count == 0) {
+                self.helpTableView.mj_footer.hidden = YES;
                 [[BJNoDataView shareNoDataView] showCenterWithSuperView:self.helpTableView icon:nil iconClicked:^{
                     //图片点击回调
                     [self setUpData];//刷新数据
@@ -68,7 +83,7 @@
         }
 
     } failure:^(NSError *error) {
-        [self.helpTableView.mj_header endRefreshing];
+        [self.helpTableView.mj_footer endRefreshing];
         RTLog(@"error:%@",error);
     }];
 }

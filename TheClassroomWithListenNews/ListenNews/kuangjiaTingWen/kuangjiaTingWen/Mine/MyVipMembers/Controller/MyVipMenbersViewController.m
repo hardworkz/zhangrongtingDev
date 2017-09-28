@@ -100,7 +100,7 @@ static NSString *const VIPContent = @"普通会员:\n1.每日可收听新闻数�
         RTLog(@"%@",responseObject);
         if ([responseObject[status] intValue] == 1) {
             _end_date = responseObject[results][@"end_date"];
-            _is_member = responseObject[results][@"is_member"];
+            _is_member = responseObject[results][@"member_type"];
             _user = responseObject[results][@"user"];
             NSArray *monthArray = [MembersDataModel mj_objectArrayWithKeyValuesArray:responseObject[results][@"memprcie"]];
             self.dataSourceArr = [monthArray mutableCopy];
@@ -162,6 +162,14 @@ static NSString *const VIPContent = @"普通会员:\n1.每日可收听新闻数�
         MembersDataModel *model = self.dataSourceArr[indexPath.row - 2];
         DefineWeakSelf
         cell.payBlock = ^(MyVipMonthTableViewCell *cell) {
+            if ([_is_member isEqualToString:@"2"]) {
+                UIAlertController *qingshuruyonghuming = [UIAlertController alertControllerWithTitle:@"温馨提示" message:@"您已购买超级会员，享有所有特权，无需在购买普通会员" preferredStyle:UIAlertControllerStyleAlert];
+                [qingshuruyonghuming addAction:[UIAlertAction actionWithTitle:@"我知道了" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+                }]];
+                [self presentViewController:qingshuruyonghuming animated:YES completion:nil];
+
+                return;
+            }
             _currenPayMonth = [cell.model.monthes intValue];
             APPDELEGATE.payType = PayTypeMembers;
             _alertView = [[CustomAlertView alloc] initWithCustomView:[weakSelf setupPayAlert]];

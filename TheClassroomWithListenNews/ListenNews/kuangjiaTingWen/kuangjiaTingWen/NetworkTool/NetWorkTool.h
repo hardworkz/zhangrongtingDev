@@ -1415,6 +1415,8 @@
  *  @param failure          错误
  */
 + (void)get_collectionWithaccessToken:(NSString *)accessToken
+                              andPage:(NSString *)page
+                             andLimit:(NSString *)limit
                                sccess:(void (^)(NSDictionary *responseObject))success
                               failure:(void(^)(NSError *error))failure;
 
