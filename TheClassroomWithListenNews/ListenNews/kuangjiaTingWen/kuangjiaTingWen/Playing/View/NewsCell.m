@@ -164,7 +164,7 @@
     }
     UIViewController *alertVC = (UIViewController *)object;
 
-    UIAlertController *qingshuruyonghuming = [UIAlertController alertControllerWithTitle:@"温馨提示" message:[NSString stringWithFormat:@"您还不是会员，每日可收听(或下载)%@条已听完，是否前往开通会员，收听更多资讯",[CommonCode readFromUserD:[NSString stringWithFormat:@"%@",limit_num]]] preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertController *qingshuruyonghuming = [UIAlertController alertControllerWithTitle:@"温馨提示" message:[NSString stringWithFormat:@"您还不是会员，每日可收听(或下载)的%@条已听完，是否前往开通会员，收听更多资讯",[CommonCode readFromUserD:[NSString stringWithFormat:@"%@",limit_num]]] preferredStyle:UIAlertControllerStyleAlert];
     [qingshuruyonghuming addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
     }]];
     [qingshuruyonghuming addAction:[UIAlertAction actionWithTitle:@"前往开通会员" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
