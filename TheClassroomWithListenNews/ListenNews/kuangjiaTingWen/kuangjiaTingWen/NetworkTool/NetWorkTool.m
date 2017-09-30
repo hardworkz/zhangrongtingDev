@@ -9,7 +9,7 @@
 #import "NetWorkTool.h"
 #import "AFNetworking.h"
 
-#define TimeOutSecond 30
+#define TimeOutSecond 8
 
 @implementation NetWorkTool
 

@@ -28,19 +28,16 @@
     [super viewDidLoad];
     self.page = 1;
     DefineWeakSelf
-//    self.helpTableView.mj_header = [MJRefreshNormalHeader headerWithRefreshingBlock:^{
-//        [weakSelf setUpData];
-//    }];
+    self.helpTableView.mj_header = [MJRefreshNormalHeader headerWithRefreshingBlock:^{
+        self.page = 1;
+        [weakSelf setUpData];
+    }];
     self.helpTableView.mj_footer = [MJRefreshAutoNormalFooter footerWithRefreshingBlock:^{
         [weakSelf setUpData];
     }];
     [self setUpData];
     [self setUpView];
 }
-//- (void)gaibianyanse:(NSNotification *)notification
-//{
-//    [self.helpTableView reloadData];
-//}
 - (void)viewWillAppear:(BOOL)animated{
     [super viewWillAppear:animated];
     self.hidesBottomBarWhenPushed = YES;
@@ -50,6 +47,7 @@
 - (void)setUpData{
     [NetWorkTool get_collectionWithaccessToken:AvatarAccessToken andPage:[NSString stringWithFormat:@"%ld",self.page] andLimit:@"10" sccess:^(NSDictionary *responseObject) {
         [self.helpTableView.mj_footer endRefreshing];
+        [self.helpTableView.mj_header endRefreshing];
         if ([responseObject[@"results"] isKindOfClass:[NSArray class]]) {
             NSMutableArray *dataArray = [responseObject[@"results"] mutableCopy];
             if (dataArray.count == 10) {
@@ -69,7 +67,8 @@
             if (dataArray.count < 10) {
                 [self.helpTableView.mj_footer endRefreshingWithNoMoreData];
             }
-        }else{
+        }
+        else{
             if (self.dataSourceArr.count == 0) {
                 self.helpTableView.mj_footer.hidden = YES;
                 [[BJNoDataView shareNoDataView] showCenterWithSuperView:self.helpTableView icon:nil iconClicked:^{
@@ -84,6 +83,7 @@
 
     } failure:^(NSError *error) {
         [self.helpTableView.mj_footer endRefreshing];
+        [self.helpTableView.mj_header endRefreshing];
         RTLog(@"error:%@",error);
     }];
 }
