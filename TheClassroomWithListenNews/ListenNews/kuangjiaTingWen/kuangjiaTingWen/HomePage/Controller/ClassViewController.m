@@ -815,85 +815,12 @@ static AVPlayer *_instancePlay = nil;
     }
 }
 //听币支付
-//- (void)tingbiBtnClicked
-//{
-//    [_alertView coverClick];
-//    [NetWorkTool get_orderWithaccessToken:AvatarAccessToken act_id:self.classModel.act_id sccess:^(NSDictionary *responseObject) {
-//        if ([responseObject[status] intValue] == 1) {
-//            //获取听币余额
-//            PayOnlineViewController *vc = [PayOnlineViewController new];
-//            
-//            [NetWorkTool getListenMoneyWithaccessToken:AvatarAccessToken sccess:^(NSDictionary *responseObject) {
-//                NSLog(@"%@",responseObject);
-//                if ([responseObject[status] integerValue] == 1) {
-//                    if ([responseObject[results][@"listen_money"] doubleValue] < [rewardMoney floatValue]) {//余额不足，前往充值
-//                        vc.balanceCount = [responseObject[results][@"listen_money"] doubleValue];
-//                        vc.rewardCount = [rewardMoney floatValue];
-//                        vc.uid = self.classModel.act_id;
-//                        vc.post_id = self.classModel.ID;
-//                        vc.isPayClass = NO;
-//                        self.hidesBottomBarWhenPushed = YES;
-//                        [self.navigationController pushViewController:vc animated:YES];
-//                    }else{//调用购买接口
-//                        [NetWorkTool buyActWithaccessToken:AvatarAccessToken act_id:self.classModel.ID money:rewardMoney sccess:^(NSDictionary *responseObject) {
-//                            if ([responseObject[status] integerValue] == 1) {
-//                                //购买成功，退出课堂购买界面，刷新列表
-////                                XWAlerLoginView *xw = [[XWAlerLoginView alloc]initWithTitle:@"课程购买成功"];
-////                                [xw show];
-//                                zhuboXiangQingVCNewController *faxianzhuboVC = [[zhuboXiangQingVCNewController alloc]init];
-//                                faxianzhuboVC.jiemuDescription = self.jiemuDescription;
-//                                faxianzhuboVC.jiemuFan_num = self.jiemuFan_num;
-//                                faxianzhuboVC.jiemuID = self.jiemuID;
-//                                faxianzhuboVC.jiemuImages = self.jiemuImages;
-//                                faxianzhuboVC.jiemuIs_fan = self.jiemuIs_fan;
-//                                faxianzhuboVC.jiemuMessage_num = self.jiemuMessage_num;
-//                                faxianzhuboVC.jiemuName = self.jiemuName;
-//                                faxianzhuboVC.isfaxian = YES;
-//                                faxianzhuboVC.isClass = YES;
-//                                faxianzhuboVC.listVC = self.listVC;
-//                                [self.navigationController pushViewController:faxianzhuboVC animated:YES];
-//                                //刷新课堂列表
-//                                [[NSNotificationCenter defaultCenter] postNotificationName:ReloadClassList object:nil];
-//                                
-//                                //充值成功 --》 获取用户信息
-//                                [[NSNotificationCenter defaultCenter] postNotificationName:@"updateUserInfo" object:nil];
-//   
-//                                //上传订单
-//                                [NetWorkTool order_notifyWithaccessToken:AvatarAccessToken order_num:orderNum sccess:^(NSDictionary *responseObject) {
-//                                    if ([responseObject[status] integerValue] == 1) {
-//                                        //                                APPDELEGATE.isClassPay = NO;
-//                                        APPDELEGATE.payType = PayTypeTingCoinPay;
-//                                        [CommonCode writeToUserD:nil andKey:@"orderNumber"];
-//                                        [[NSNotificationCenter defaultCenter] postNotificationName:ReloadClassList object:nil];
-//                                        [self.navigationController popViewControllerAnimated:YES];
-//                                    }
-//                                } failure:^(NSError *error) {
-//                                    
-//                                }];
-//                            }else{
-//                                XWAlerLoginView *xw = [[XWAlerLoginView alloc]initWithTitle:responseObject[msg]];
-//                                [xw show];
-//                            }
-//                        } failure:^(NSError *error) {
-//                            RTLog(@"%@",error);
-//                        }];
-//                    }
-//                }else{
-//                    XWAlerLoginView *xw = [[XWAlerLoginView alloc]initWithTitle:responseObject[msg]];
-//                    [xw show];
-//                }
-//            } failure:^(NSError *error) {
-//                
-//            }];
-//
-//        }else{
-//            XWAlerLoginView *xw = [[XWAlerLoginView alloc]initWithTitle:responseObject[msg]];
-//            [xw show];
-//        }
-//    } failure:^(NSError *error) {
-//    }];
-//    
-//}
+- (void)tingbiBtnClicked
+{
+    XWAlerLoginView *alert = [[XWAlerLoginView alloc] initWithTitle:@"您的听币不足，请先前往充值"];
+    [alert show];
+    [_alertView coverClick];
+}
 //取消支付弹窗
 - (void)cancelAlert
 {
