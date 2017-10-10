@@ -11,7 +11,6 @@
 #import "SDImageCache.h"
 #import "FontViewController.h"
 #import "TimerViewController.h"
-#import "bofangVC.h"
 #import "BlogViewController.h"
 #import "VoteViewController.h"
 @interface SheZhiVC ()<UITableViewDataSource,UITableViewDelegate,UIActionSheetDelegate>

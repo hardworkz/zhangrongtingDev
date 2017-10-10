@@ -7,7 +7,6 @@
 //
 
 #import "AppDelegate.h"
-#import "bofangVC.h"
 #import <UMSocialCore/UMSocialCore.h>
 //#import "UMSocialWechatHandler.h"
 #import "UMSocialSinaHandler.h"

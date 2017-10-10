@@ -10,7 +10,6 @@
 #import "UIView+tap.h"
 #import "gerenzhuyeVC.h"
 #import "UIActionSheet+MKBlockAdditions.h"
-#import "bofangVC.h"
 #import "YJImageBrowserView.h"
 #import "LoginVC.h"
 #import "LoginNavC.h"

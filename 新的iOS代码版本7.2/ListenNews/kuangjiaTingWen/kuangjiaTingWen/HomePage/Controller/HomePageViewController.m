@@ -13,9 +13,7 @@
 #import "ProjiectDownLoadManager.h"
 #import "WHC_Download.h"
 #import "AppDelegate.h"
-#import "bofangVC.h"
 #import "guanggaoVC.h"
-//#import "lunboxiangqingVC.h"
 #import "NewReportViewController.h"
 #import "ClassViewController.h"
 

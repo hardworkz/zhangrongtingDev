@@ -8,7 +8,6 @@
 
 #import "jiemuLieBiaoVC.h"
 #import "UIImageView+WebCache.h"
-#import "zhuboxiangqingVCNew.h"
 @interface jiemuLieBiaoVC ()<UITableViewDataSource,UITableViewDelegate>
 {
     NSString *selfGuanZhuId;

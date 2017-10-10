@@ -15,7 +15,6 @@
 #import "SDPhotoBrowser.h"
 #import "NSDate+TimeFormat.h"
 #import "BlobNewTableViewCell.h"
-#import "bofangVC.h"
 #import "LoginNavC.h"
 #import "LoginVC.h"
 #import "UIAlertView+MKBlockAdditions.h"

@@ -7,11 +7,9 @@
 //
 
 #import "TabBarController.h"
-#import "shouyeVC.h"
 #import "dingyueVC.h"
 #import "faxianVC.h"
 #import "mineVC.h"
-#import "bofangVC.h"
 #import "navigationC.h"
 #import "LoginNavC.h"
 #import "LoginVC.h"

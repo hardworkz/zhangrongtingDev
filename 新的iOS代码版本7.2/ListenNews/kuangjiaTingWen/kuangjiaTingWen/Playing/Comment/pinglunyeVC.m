@@ -7,7 +7,6 @@
 //
 
 #import "pinglunyeVC.h"
-#import "bofangVC.h"
 @interface pinglunyeVC ()<UITextViewDelegate>
 {
     UITextView *pinglunNeiRongTV;

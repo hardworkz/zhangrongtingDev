@@ -8,7 +8,6 @@
 
 #import "NewReportViewController.h"
 #import "MJRefresh.h"
-#import "bofangVC.h"
 #import "NSDate+TimeFormat.h"
 #import "ProjiectDownLoadManager.h"
 #import "WHC_Download.h"

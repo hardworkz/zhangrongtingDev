@@ -12,7 +12,6 @@
 #import "zhuboxiangqingBtn.h"
 #import "LoginNavC.h"
 #import "LoginVC.h"
-#import "bofangVC.h"
 #import "ShareAlertView.h"
 #import "AppDelegate.h"
 #import "UIImage+compress.h"
@@ -442,11 +441,11 @@
 //    self.navBarBgAlpha = @"1.0";
     [self.navigationController setNavigationBarHidden:NO animated:YES];
     
-    if (![bofangVC shareInstance].isPlay) {
-        [[NSNotificationCenter defaultCenter] postNotificationName:@"stopAnimate" object:nil];
-    }else {
-        [[NSNotificationCenter defaultCenter] postNotificationName:@"startAnimate" object:nil];
-    }
+//    if (![bofangVC shareInstance].isPlay) {
+//        [[NSNotificationCenter defaultCenter] postNotificationName:@"stopAnimate" object:nil];
+//    }else {
+//        [[NSNotificationCenter defaultCenter] postNotificationName:@"startAnimate" object:nil];
+//    }
 }
 
 #pragma mark --- 评论框UI

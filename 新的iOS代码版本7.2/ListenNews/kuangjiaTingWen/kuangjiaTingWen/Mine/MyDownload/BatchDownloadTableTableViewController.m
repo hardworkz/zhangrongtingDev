@@ -9,7 +9,6 @@
 #import "BatchDownloadTableTableViewController.h"
 #import "DownloadTableViewCell.h"
 #import "AppDelegate.h"
-#import "bofangVC.h"
 #import "ProjiectDownLoadManager.h"
 #import "WHC_Download.h"
 #import "MJRefresh.h"

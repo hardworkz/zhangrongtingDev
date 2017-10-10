@@ -12,7 +12,6 @@
 #import "jiemuLieBiaoVC.h"
 //#import "UMSocialSnsService.h"
 //#import "UMSocialSnsPlatformManager.h"
-#import "bofangVC.h"
 #import "cellRightBtn.h"
 //#import "UMSocial.h"
 //#import <WeiboSDK.h>

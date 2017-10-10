@@ -9,7 +9,6 @@
 #import "faxianGengDuoVC.h"
 #import "UIImageView+WebCache.h"
 #import "MJRefresh.h"
-#import "zhuboxiangqingVCNew.h"
 #import "HMSegmentedControl.h"
 #import "NSDate+TimeFormat.h"
 #import "UIView+tap.h"

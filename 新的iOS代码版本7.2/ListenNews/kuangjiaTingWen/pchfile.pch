@@ -8,7 +8,6 @@
 
 #ifndef pchfile_pch
 
-#import "bofangVC.h"
 #import "RootViewController.h"
 #import "NetWorkTool.h"
 #import "CommonCode.h"

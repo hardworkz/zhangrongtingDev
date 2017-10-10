@@ -8,7 +8,6 @@
 
 #import "MyCollectionViewController.h"
 #import "NSDate+TimeFormat.h"
-#import "bofangVC.h"
 #import "ProjiectDownLoadManager.h"
 #import "WHC_Download.h"
 

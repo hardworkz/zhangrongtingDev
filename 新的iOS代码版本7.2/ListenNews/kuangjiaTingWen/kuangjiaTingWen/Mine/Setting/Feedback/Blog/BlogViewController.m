@@ -23,7 +23,6 @@
 #import "UIActionSheet+MKBlockAdditions.h"
 #import "TTTAttributedLabel.h"
 #import "gerenzhuyeVC.h"
-#import "bofangVC.h"
 #import "FMActionSheet.h"
 #import "UIColor+HexString.h"
 #import "pinglunyeVC.h"

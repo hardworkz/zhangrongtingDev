@@ -9,7 +9,6 @@
 #ifndef HomePageHeader_h
 #define HomePageHeader_h
 
-#import "zhuboxiangqingVCNew.h"
 #import "ClassViewController.h"
 #import "HomePageViewController.h"
 #import "dingyueVC.h"

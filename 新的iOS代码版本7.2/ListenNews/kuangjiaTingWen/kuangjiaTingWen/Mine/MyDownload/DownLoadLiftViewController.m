@@ -17,7 +17,6 @@
 
 #import "CommonCode.h"
 
-#import "bofangVC.h"
 
 
 static NSInteger selectIndex2 = -1;

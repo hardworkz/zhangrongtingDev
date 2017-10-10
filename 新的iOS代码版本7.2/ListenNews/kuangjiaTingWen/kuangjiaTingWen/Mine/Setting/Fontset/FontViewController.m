@@ -7,7 +7,6 @@
 //
 
 #import "FontViewController.h"
-#import "bofangVC.h"
 #import "CommonCode.h"
 
 @interface FontViewController ()

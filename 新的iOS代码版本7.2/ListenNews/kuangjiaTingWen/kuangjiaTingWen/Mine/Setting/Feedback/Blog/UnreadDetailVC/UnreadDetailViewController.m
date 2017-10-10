@@ -9,7 +9,6 @@
 #import "UnreadDetailViewController.h"
 
 #import "BlogTableViewCell.h"
-#import "bofangVC.h"
 #import "UIAlertView+MKBlockAdditions.h"
 #import "PhotoBrowserController.h"
 #import "UIView+AnimationOptionsForCurve.h"
