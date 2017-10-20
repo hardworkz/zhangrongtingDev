@@ -320,6 +320,7 @@
     if ([photos count]) {
         _photosImageView.images = photos;
         _photosImageView.hidden = NO;
+//        _photosImageView.backgroundColor = [UIColor grayColor];
         CGSize size = [_photosImageView sizeForContent:photos];
         _photosImageView.height = size.height;
     }
@@ -473,9 +474,7 @@
     _commentIndexRow = indexPath.row;
     if ([frameModel.model.uid isEqualToString:ExdangqianUserUid]) {//判断点击评论是否为当前用户
         if (_frameModel.isFeedbackVC) {//判断是否为意见反馈页面，意见反馈页面无法删除
-//            if (self.addReview) {
-//                self.addReview(self,frameModel.model);
-//            }
+            
         }else{
             _alertView = [[CustomAlertView alloc] initWithCustomView:[self setupDeleteAlertView]];
             _alertView.alertHeight = 105;

@@ -204,7 +204,7 @@
             [self.selectedNewsArr enumerateObjectsUsingBlock:^(id object, NSUInteger idx, BOOL *stop)
              {
                  NSMutableDictionary *downObj = self.selectedNewsArr[idx];
-                 WHC_Download *op = [[WHC_Download alloc]initStartDownloadWithURL:[NSURL URLWithString:downObj[@"post_mp"]] savePath:manager.userDownLoadPath savefileName:[downObj[@"post_mp"] stringByReplacingOccurrencesOfString:@"/" withString:@""] withObj:downObj withCell:nil isSingleDownload:NO delegate:nil];
+                 WHC_Download *op = [[WHC_Download alloc]initStartDownloadWithURL:[NSURL URLWithString:downObj[@"post_mp"]] savePath:manager.userDownLoadPath savefileName:[downObj[@"post_mp"] stringByReplacingOccurrencesOfString:@"/" withString:@""] withObj:downObj isSingleDownload:NO delegate:nil];
                  if (op) {
                      dispatch_async(dispatch_get_main_queue(), ^{
                          [manager.downLoadQueue addOperation:op];

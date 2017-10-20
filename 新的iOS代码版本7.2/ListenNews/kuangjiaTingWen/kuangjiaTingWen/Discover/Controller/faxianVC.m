@@ -171,7 +171,7 @@
         }else {
             if ([self.SearchActResultsArrM count] != 0) {
                 if (indexPath.section == 0) {
-                    //搜索的节目分区内容
+                    //搜索的节目，主播，课堂分区内容
                     UIImageView *imgV = [[UIImageView alloc]initWithFrame:CGRectMake(10.0 / 375 * IPHONE_W, 11, 45, 45)];
                     if([self.SearchActResultsArrM[indexPath.row][@"images"] rangeOfString:@"/data/upload/"].location !=NSNotFound)
                     {
@@ -216,10 +216,12 @@
                     neirongLab.alpha = 0.7f;
                     [cell.contentView addSubview:neirongLab];
                     
-                    UIButton *isSelectBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-                    isSelectBtn.frame = CGRectMake(IPHONE_W - 45.0 / 375 * IPHONE_W, 18.5, 24, 24);
-                    isSelectBtn.contentMode = UIViewContentModeScaleAspectFit;
-                    NSString *is_fan = [NSString stringWithFormat:@"%@",self.SearchActResultsArrM[indexPath.row][@"is_fan"]];
+                    //是否关注按钮（节目，主播）
+                    if ([self.SearchActResultsArrM[indexPath.row][@"price"] intValue] == 0) {
+                        UIButton *isSelectBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+                        isSelectBtn.frame = CGRectMake(IPHONE_W - 45.0 / 375 * IPHONE_W, 18.5, 24, 24);
+                        isSelectBtn.contentMode = UIViewContentModeScaleAspectFit;
+                        NSString *is_fan = [NSString stringWithFormat:@"%@",self.SearchActResultsArrM[indexPath.row][@"is_fan"]];
                         if ([is_fan isEqualToString:@"0"]) {
                             
                             [isSelectBtn setBackgroundImage:[UIImage imageNamed:@"card_icon_addattention"] forState:UIControlStateNormal];
@@ -229,8 +231,9 @@
                             [isSelectBtn setBackgroundImage:[UIImage imageNamed:@"card_icon_unfollow"] forState:UIControlStateNormal];
                             isSelectBtn.selected = NO;
                         }
-                    [isSelectBtn addTarget:self action:@selector(tapAction:) forControlEvents:UIControlEventTouchUpInside];
-                    [cell.contentView addSubview:isSelectBtn];
+                        [isSelectBtn addTarget:self action:@selector(tapAction:) forControlEvents:UIControlEventTouchUpInside];
+                        [cell.contentView addSubview:isSelectBtn];
+                    }
                     
                     cell.selectionStyle = UITableViewCellSelectionStyleNone;
                     return cell;
@@ -430,10 +433,18 @@
         //TODO:发现课堂模块
         faxianModel *model = [self.faxianArrM firstObject];
         if (indexPath.row == 0){
-            return  167.5 / 667 * IPHONE_H;
+            if (IS_IPAD) {
+                return  172.5 ;
+            }else{
+                return  167.5 / 667 * IPHONE_H;
+            }
         }
         else if(indexPath.row < [model.data count]){
-            return  135.0 / 667 * IPHONE_H;
+            if (IS_IPAD) {
+                return  172.5;
+            }else{
+                return  135.0 / 667 * IPHONE_H;
+            }
         }
         else if (indexPath.row == [model.data  count]){
             return 161.0 / 667 * IPHONE_H;
@@ -472,46 +483,48 @@
             if (indexPath.section == 0) {
                 //TODO:搜索结果，主播或者频道详情页判断跳转
                 NSDictionary *dic = [[NSDictionary alloc]initWithDictionary:self.SearchActResultsArrM[indexPath.row]];
-                zhuboXiangQingVCNewController *faxianzhuboVC = [[zhuboXiangQingVCNewController alloc]init];
-                faxianzhuboVC.jiemuDescription = dic[@"description"];
-                faxianzhuboVC.jiemuFan_num = dic[@"fan_num"];
-                faxianzhuboVC.jiemuID = dic[@"id"];
-                faxianzhuboVC.jiemuImages = dic[@"images"];
-                faxianzhuboVC.jiemuIs_fan = dic[@"is_fan"];
-                faxianzhuboVC.jiemuMessage_num = dic[@"message_num"];
-                faxianzhuboVC.jiemuName = dic[@"name"];
-                faxianzhuboVC.isfaxian = YES;
-                faxianzhuboVC.isClass = YES;
-                [self.navigationController pushViewController:faxianzhuboVC animated:YES];
-//                NSDictionary *userInfoDict = [CommonCode readFromUserD:@"dangqianUserInfo"];
-//                if ([dic[@"is_free"] isEqualToString:@"1"]||[userInfoDict[results][member_type] intValue] == 2) {
-//                    zhuboXiangQingVCNewController *faxianzhuboVC = [[zhuboXiangQingVCNewController alloc]init];
-//                    faxianzhuboVC.jiemuDescription = dic[@"description"];
-//                    faxianzhuboVC.jiemuFan_num = dic[@"fan_num"];
-//                    faxianzhuboVC.jiemuID = dic[@"id"];
-//                    faxianzhuboVC.jiemuImages = dic[@"images"];
-//                    faxianzhuboVC.jiemuIs_fan = dic[@"is_fan"];
-//                    faxianzhuboVC.jiemuMessage_num = dic[@"message_num"];
-//                    faxianzhuboVC.jiemuName = dic[@"name"];
-//                    faxianzhuboVC.isfaxian = YES;
-//                    faxianzhuboVC.isClass = NO;
-//                    [self.navigationController pushViewController:faxianzhuboVC animated:YES];
-//                    
-//                }
-//                //跳转未购买课堂界面
-//                else if ([dic[@"is_free"] isEqualToString:@"0"]){
-//                    ClassViewController *vc = [ClassViewController shareInstance];
-//                    vc.jiemuDescription = dic[@"description"];
-//                    vc.jiemuFan_num = dic[@"fan_num"];
-//                    vc.jiemuID = dic[@"id"];
-//                    vc.jiemuImages = dic[@"images"];
-//                    vc.jiemuIs_fan = dic[@"is_fan"];
-//                    vc.jiemuMessage_num = dic[@"message_num"];
-//                    vc.jiemuName = dic[@"name"];
-//                    vc.listVC = self;
-//                    [self.navigationController.navigationBar setHidden:YES];
-//                    [self.navigationController pushViewController:vc animated:YES];
-//                }
+                if ([dic[@"price"] intValue] == 0) {
+                    zhuboXiangQingVCNewController *faxianzhuboVC = [[zhuboXiangQingVCNewController alloc]init];
+                    faxianzhuboVC.jiemuDescription = dic[@"description"];
+                    faxianzhuboVC.jiemuFan_num = dic[@"fan_num"];
+                    faxianzhuboVC.jiemuID = dic[@"id"];
+                    faxianzhuboVC.jiemuImages = dic[@"images"];
+                    faxianzhuboVC.jiemuIs_fan = dic[@"is_fan"];
+                    faxianzhuboVC.jiemuMessage_num = dic[@"message_num"];
+                    faxianzhuboVC.jiemuName = dic[@"name"];
+                    faxianzhuboVC.isfaxian = YES;
+                    faxianzhuboVC.isClass = NO;
+                    [self.navigationController pushViewController:faxianzhuboVC animated:YES];
+                }else{
+                    NSDictionary *userInfoDict = [CommonCode readFromUserD:@"dangqianUserInfo"];
+                    if ([dic[@"is_free"] isEqualToString:@"1"]||[userInfoDict[results][member_type] intValue] == 2) {
+                        zhuboXiangQingVCNewController *faxianzhuboVC = [[zhuboXiangQingVCNewController alloc]init];
+                        faxianzhuboVC.jiemuDescription = dic[@"description"];
+                        faxianzhuboVC.jiemuFan_num = dic[@"fan_num"];
+                        faxianzhuboVC.jiemuID = dic[@"id"];
+                        faxianzhuboVC.jiemuImages = dic[@"images"];
+                        faxianzhuboVC.jiemuIs_fan = dic[@"is_fan"];
+                        faxianzhuboVC.jiemuMessage_num = dic[@"message_num"];
+                        faxianzhuboVC.jiemuName = dic[@"name"];
+                        faxianzhuboVC.isfaxian = YES;
+                        faxianzhuboVC.isClass = YES;
+                        [self.navigationController pushViewController:faxianzhuboVC animated:YES];
+                    }else{
+                        //跳转未购买课堂界面
+                        ClassViewController *vc = [ClassViewController shareInstance];
+                        vc.jiemuDescription = dic[@"description"];
+                        vc.jiemuFan_num = dic[@"fan_num"];
+                        vc.jiemuID = dic[@"id"];
+                        vc.act_id = dic[@"id"];
+                        vc.jiemuImages = dic[@"images"];
+                        vc.jiemuIs_fan = dic[@"is_fan"];
+                        vc.jiemuMessage_num = dic[@"message_num"];
+                        vc.jiemuName = dic[@"name"];
+                        vc.listVC = self;
+                        [self.navigationController.navigationBar setHidden:YES];
+                        [self.navigationController pushViewController:vc animated:YES];
+                    }
+                }
             }
             else{
                 if (SouSuoquanjvIndexPath){
@@ -868,9 +881,17 @@
                                               andPage:@"1"
                                              andLimit:@"10"
                                                sccess:^(NSDictionary *responseObject) {
-                                                   if ([responseObject[@"results"] isKindOfClass:[NSArray class]])
+                                                   if ([responseObject[status] intValue] == 1)
                                                    {
-                                                       self.SearchActResultsArrM = responseObject[@"results"];
+//                                                       self.SearchActResultsArrM = responseObject[@"results"];
+                                                       
+                                                       //主播，节目
+                                                       NSArray *actArray = responseObject[results][@"act"];
+                                                       //课程
+                                                       NSArray *lessonArray = responseObject[results][@"lesson"];
+                                                       self.SearchActResultsArrM = [NSMutableArray arrayWithArray:lessonArray];
+                                                       //拼接搜索结果
+                                                       [self.SearchActResultsArrM addObjectsFromArray:actArray];
                                                    }
                                                    else{
                                                        NSLog(@"没有相关信息");
@@ -883,6 +904,7 @@
                                                    [self.SouSuotableView.mj_header endRefreshing];
                                                }];
     }
+    //搜索新闻
     [NetWorkTool getPaoguoSearchNewsWithaccessToken:AvatarAccessToken
                                             term_id:nil
                                             keyword:self.SouSuosearchBar.text
@@ -979,16 +1001,23 @@
     else{
         accessToken = nil;
     }
-    //搜索主播、节目
+    //搜索主播、节目,课堂
     [NetWorkTool getAllActInfoListWithAccessToken:AvatarAccessToken
                                             ac_id:nil
                                           keyword:kewwords
                                           andPage:@"1"
                                          andLimit:@"10"
                                            sccess:^(NSDictionary *responseObject) {
-                                               if ([responseObject[@"results"] isKindOfClass:[NSArray class]])
+                                               if ([responseObject[status] intValue] == 1)
                                                {
-                                                   self.SearchActResultsArrM = responseObject[@"results"];
+                                                   //                                                   self.SearchActResultsArrM = responseObject[results];
+                                                   //主播，节目
+                                                   NSArray *actArray = responseObject[results][@"act"];
+                                                   //课程
+                                                   NSArray *lessonArray = responseObject[results][@"lesson"];
+                                                   self.SearchActResultsArrM = [NSMutableArray arrayWithArray:lessonArray];
+                                                   //拼接搜索结果
+                                                   [self.SearchActResultsArrM addObjectsFromArray:actArray];
                                                }
                                                else{
                                                    NSLog(@"没有相关信息");
@@ -1025,11 +1054,11 @@
 - (void)getPushNewsDetail{
     DefineWeakSelf;
     [NetWorkTool getpostinfoWithpost_id:[[NSUserDefaults standardUserDefaults]valueForKey:@"pushNews"] andpage:nil andlimit:nil sccess:^(NSDictionary *responseObject) {
-        if ([responseObject[@"status"] integerValue] == 1) {
-            weakSelf.pushNewsInfo = [responseObject[@"results"] mutableCopy];
+        if ([responseObject[status] integerValue] == 1) {
+            weakSelf.pushNewsInfo = [responseObject[results] mutableCopy];
             [NetWorkTool getAllActInfoListWithAccessToken:nil ac_id:weakSelf.pushNewsInfo[@"post_news"] keyword:nil andPage:nil andLimit:nil sccess:^(NSDictionary *responseObject) {
-                if ([responseObject[@"status"] integerValue] == 1){
-                    [weakSelf.pushNewsInfo setObject:[responseObject[@"results"] firstObject] forKey:@"post_act"];
+                if ([responseObject[status] integerValue] == 1){
+                    [weakSelf.pushNewsInfo setObject:[responseObject[results] firstObject] forKey:@"post_act"];
                     [weakSelf presentPushNews];
                 }
                 else{
@@ -1174,7 +1203,7 @@
     if (!_SouSuosearchBar) {
         _SouSuosearchBar = [[UISearchBar alloc]initWithFrame:CGRectMake(20 , 26, IPHONE_W - 40, 44)];
         _SouSuosearchBar.delegate = self;
-        _SouSuosearchBar.placeholder = @"搜索新闻、主播、节目";
+        _SouSuosearchBar.placeholder = @"搜索新闻、主播、节目、课堂";
         _SouSuosearchBar.showsCancelButton = NO;
         _SouSuosearchBar.searchBarStyle = UISearchBarStyleMinimal;
         //        _SouSuosearchBar.userInteractionEnabled = YES;

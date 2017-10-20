@@ -17,11 +17,7 @@
 {
     NSString *serverDate = [CommonCode readFromUserD:server_date];
     if (![dateString isEqualToString:serverDate]) {//判断本地缓存时间和服务器返回时间是否一致，不一致则清空新闻播放限制次数
-//        if ([[CommonCode readFromUserD:@"isLogin"] boolValue] == YES) {
-//            [CommonCode writeToUserD:[NSString stringWithFormat:@"0"] andKey:[NSString stringWithFormat:@"%@_%@",limit_time,AvatarAccessToken]];
-//        }else{
-        [CommonCode writeToUserD:[NSString stringWithFormat:@"0"] andKey:limit_time];
-//        }
+        
         [CommonCode writeToUserD:dateString andKey:server_date];
         //更新用户信息
         [[NSNotificationCenter defaultCenter] postNotificationName:@"updateUserInfo" object:nil];
@@ -289,7 +285,7 @@
     }else{
         urlStr = [NSString stringWithFormat:@"%@%@",APPHostURL,url];
     }
-    if ([[CommonCode readFromUserD:@"isLogin"] boolValue] == NO && ![url isEqualToString:@"/interfaceNew/login"] && ![url isEqualToString:@"/interfaceNew/oauthLogin"]) {//拦截判断当前是否登录，未登录则清空accessToken
+    if ([[CommonCode readFromUserD:@"isLogin"] boolValue] == NO && ![url isEqualToString:@"/interfaceNew/login"] && ![url isEqualToString:@"/interfaceNew/oauthLogin"] && ![url isEqualToString:@"/interface/sendVcode"] && ![url isEqualToString:@"/interfaceNew/register"]) {//拦截判断当前是否登录，未登录则清空accessToken
         [param setValue:@"" forKey:@"accessToken"];
     }
     //发送请求
@@ -1055,13 +1051,7 @@ NSMutableDictionary *dic = [[NSMutableDictionary alloc]initWithCapacity:1
     dic[@"limit"] = limit;
     [self asyncNetworkingUrl:@"/interface/attentionList" andDict:dic success:success failure:failure];
 }
-///根据用户user_login获取到用户信息
-+ (void)getPaoGuoUserInfoWithuser_login:(NSString *)user_login sccess:(void (^)(NSDictionary *responseObject2))success failure:(void (^)(NSError *error))failure
-{
-    NSMutableDictionary *dic = [[NSMutableDictionary alloc]initWithCapacity:1];
-    dic[@"accessToken"] = user_login;
-    [self asyncNetworkingUrl:@"/interface/userinfo" andDict:dic success:success failure:failure];
-}
+
 ///根据用户user_login获取到用户更多信息
 + (void)getPaoGuoMoreUserInfoWithuser_login:(NSString *)user_login sccess:(void (^)(NSDictionary *responseObject2))success failure:(void (^)(NSError *error2))failure
 {
@@ -1200,11 +1190,11 @@ NSMutableDictionary *dic = [[NSMutableDictionary alloc]initWithCapacity:1
                                  failure:(void (^)(NSError *error))failure{
     NSMutableDictionary *dic = [[NSMutableDictionary alloc]initWithCapacity:1];
     dic[@"accessToken"] = accessToken;
-    dic[@"ac_id"] = ac_id;
+//    dic[@"ac_id"] = ac_id;
     dic[@"keyword"] = keyword;
     dic[@"page"] = page;
     dic[@"limit"] = limit;
-    [self asyncNetworkingUrl:@"/interface/Act"
+    [self asyncNetworkingUrl:@"/interfaceNew/searchActLesson"
                      andDict:dic
                      success:success
                      failure:failure];

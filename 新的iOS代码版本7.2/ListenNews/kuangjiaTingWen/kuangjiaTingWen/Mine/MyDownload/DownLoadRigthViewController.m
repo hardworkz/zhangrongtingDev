@@ -78,7 +78,7 @@
                 @autoreleasepool {
                     NSDictionary *dic = (NSDictionary *)sevaArray[i];
                     NSMutableDictionary *newObj = [dic mutableCopy];
-                    WHC_Download *op = [[WHC_Download alloc]initStartDownloadWithURL:[NSURL URLWithString:newObj[@"post_mp"]] savePath:manager.userDownLoadPath savefileName:[newObj[@"post_mp"] stringByReplacingOccurrencesOfString:@"/" withString:@""] withObj:newObj withCell:nil isSingleDownload:NO delegate:nil];
+                    WHC_Download *op = [[WHC_Download alloc]initStartDownloadWithURL:[NSURL URLWithString:newObj[@"post_mp"]] savePath:manager.userDownLoadPath savefileName:[newObj[@"post_mp"] stringByReplacingOccurrencesOfString:@"/" withString:@""] withObj:newObj isSingleDownload:NO delegate:nil];
                     if (op) {
                         UIAlertView *al = [[UIAlertView alloc]initWithTitle:nil message:@"是否恢复上次未完成的下载" delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"恢复", nil];
                         al.tag = 300;
@@ -221,7 +221,7 @@
                 @autoreleasepool {
                     NSDictionary *dic = (NSDictionary *)obj;
                     NSMutableDictionary *newObj = [dic mutableCopy];
-                    WHC_Download *op = [[WHC_Download alloc]initStartDownloadWithURL:[NSURL URLWithString:newObj[@"post_mp"]] savePath:manager.userDownLoadPath savefileName:[newObj[@"post_mp"] stringByReplacingOccurrencesOfString:@"/" withString:@""] withObj:newObj withCell:nil isSingleDownload:NO delegate:nil];
+                    WHC_Download *op = [[WHC_Download alloc]initStartDownloadWithURL:[NSURL URLWithString:newObj[@"post_mp"]] savePath:manager.userDownLoadPath savefileName:[newObj[@"post_mp"] stringByReplacingOccurrencesOfString:@"/" withString:@""] withObj:newObj isSingleDownload:NO delegate:nil];
                     if (op) {
                         [manager.downLoadQueue addOperation:op];
                     }

@@ -99,6 +99,7 @@
     }
     else{
         if (phoneF.text.length == 11){
+            RTLog(@"%@",phoneF.text);
             [NetWorkTool postPaoGuoZhuCeYanZhengMaWithphoneFNumber:[DSE encryptUseDES:phoneF.text] anduseType:@"1" sccess:^(NSDictionary *responseObject) {
                 if ([responseObject[@"status"] integerValue] == 1) {
                     ExyanzhengmaStr = [NSString stringWithFormat:@"%@",responseObject[@"results"]];
@@ -133,15 +134,5 @@
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
-
-/*
-#pragma mark - Navigation
-
-// In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
-}
-*/
 
 @end

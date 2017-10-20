@@ -477,7 +477,7 @@
 - (UIButton *)newSettingMessageButton {
     if (!_newSettingMessageButton ) {
         _newSettingMessageButton  = [UIButton buttonWithType:UIButtonTypeCustom];
-        [_newSettingMessageButton setFrame:CGRectMake(110, 15.0 / 667 * IPHONE_H, 20, 20)];
+        [_newSettingMessageButton setFrame:CGRectMake(IS_IPAD?150:110, IS_IPAD?11.0 / 667 * IPHONE_H:19.0 / 667 * IPHONE_H, 20, 20)];
         [_newSettingMessageButton.layer setMasksToBounds:YES];
         [_newSettingMessageButton.layer setCornerRadius:10.0];
         [_newSettingMessageButton setBackgroundColor:UIColorFromHex(0xf23131)];

@@ -412,17 +412,13 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
                 break;
         }
     }
-    //播放index设置
-    //上一首<0则回到最后一首
-//    if (self.currentSongIndex < 0) {
-//        self.currentSongIndex = self.songList.count - 1;
-//    }
-//    //播放到最后一首则回到第一首
-//    if (self.currentSongIndex >= self.songList.count) {
-//        self.currentSongIndex = 0;
-//    }
+    
     //更新当前歌曲信息
-    self.currentSong = self.songList[self.currentSongIndex];
+    if (self.songList) {//防止空数组引发崩溃
+        self.currentSong = self.songList[self.currentSongIndex];
+    }else{
+        return;
+    }
     
     //刷新封面图片
     switch (self.playType) {
@@ -787,53 +783,4 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
     return post_mp;
 }
 
-/**
- 判断是否该音频路径是否下载成功
-
- @param post_mp 音频网络路径
- @return 返回YES下载成功,返回NO未下载成功
- */
-//- (BOOL)isDownloadingWithPost_mp:(NSString *)post_mp
-//{
-//    BOOL isDownloading = NO;
-//    //判断是否下载完成
-////    for (NSMutableDictionary *d in [[ProjiectDownLoadManager defaultProjiectDownLoadManager] downloadAllNewObjArrar]) {
-////        if ([d[@"post_mp"] rangeOfString:[post_mp stringByReplacingOccurrencesOfString:@"/" withString:@""]].location != NSNotFound) {
-////            RTLog(@"存在");
-////            isDownloading = YES;
-////        }
-////    }
-//    //判断是否是正在下载中的音频文件
-//    NSString * fielName = nil;
-//    NSURL *post_mp_url = [NSURL URLWithString:post_mp];
-//    if(post_mp_url){
-//        NSString * format = [self fileFormat:post_mp_url.absoluteString];
-//        if([format isEqualToString:[NSString stringWithFormat:@".%@",[[post_mp componentsSeparatedByString:@"."] lastObject]]]){
-//            fielName = post_mp;
-//        }else{
-//            fielName = [NSString stringWithFormat:@"%@%@",post_mp,format];
-//        }
-//    }
-//    for (WHC_Download * tempDownload in [ProjiectDownLoadManager defaultProjiectDownLoadManager].downLoadQueue.operations) {
-//        if ([fielName isEqualToString:tempDownload.saveFileName]){
-//            //下载文件中存在该路径，下载完成
-//            isDownloading = YES;
-//            break;
-//        }
-//    }
-//    return isDownloading;
-//}
-
-/**
- 获取要下载的文件格式
- */
-//- (NSString *)fileFormat:(NSString *)downloadUrl{
-//    NSArray  * strArr = [downloadUrl componentsSeparatedByString:@"."];
-//    if(strArr && strArr.count > 0){
-//        NSString *s = [NSString stringWithFormat:@".%@",strArr.lastObject];
-//        return s;
-//    }else{
-//        return nil;
-//    }
-//}
 @end

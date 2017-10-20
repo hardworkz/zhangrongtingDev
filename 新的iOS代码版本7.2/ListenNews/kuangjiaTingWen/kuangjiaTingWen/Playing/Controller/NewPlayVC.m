@@ -1142,11 +1142,11 @@ static NewPlayVC *_instance = nil;
     //TODO:下载单条新闻
     if ([ZRT_PlayerManager manager].currentSong) {
         NSMutableDictionary *dic = [[ZRT_PlayerManager manager].currentSong mutableCopy];
-        dispatch_async(dispatch_get_main_queue(), ^{
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
             ProjiectDownLoadManager *manager = [ProjiectDownLoadManager defaultProjiectDownLoadManager];
             [manager insertSevaDownLoadArray:dic];
             
-            WHC_Download *op = [[WHC_Download alloc]initStartDownloadWithURL:[NSURL URLWithString:dic[@"post_mp"]] savePath:manager.userDownLoadPath savefileName:[dic[@"post_mp"] stringByReplacingOccurrencesOfString:@"/" withString:@""] withObj:dic withCell:nil isSingleDownload:YES delegate:nil];
+            WHC_Download *op = [[WHC_Download alloc]initStartDownloadWithURL:[NSURL URLWithString:dic[@"post_mp"]] savePath:manager.userDownLoadPath savefileName:[dic[@"post_mp"] stringByReplacingOccurrencesOfString:@"/" withString:@""] withObj:dic isSingleDownload:YES delegate:nil];
             [manager.downLoadQueue addOperation:op];
         });
     }else{
@@ -1899,24 +1899,29 @@ static NSInteger touchCount = 0;
 /**
  拖拽播放进度
  */
-- (void)doChangeProgress:(UISlider *)sender{
-    
-    //显示快进后退按钮
-    if (!isShowfastBackView) {
-        [self showForwardBackView];
-        
-        isShowfastBackView = YES;
-        [self attAction];
-    }
-    
+- (void)doChangeProgress:(UISlider *)sender
+{
     //调到指定时间去播放
-    [[ZRT_PlayerManager manager].player seekToTime:CMTimeMake(self.sliderProgress.value, [ZRT_PlayerManager manager].playRate) completionHandler:^(BOOL finished) {
-        RTLog(@"拖拽结果：%d",finished);
-        if (finished == YES){
-            [[ZRT_PlayerManager manager] startPlay];
+    if ([ZRT_PlayerManager manager].player.status == AVPlayerStatusReadyToPlay) {//防止未缓冲完成进行拖拽报错：AVPlayerItem cannot service a seek request with a completion handler until its status is AVPlayerItemStatusReadyToPlay
+        
+        //显示快进后退按钮
+        if (!isShowfastBackView) {
+            [self showForwardBackView];
+            
+            isShowfastBackView = YES;
+            [self attAction];
         }
-    }];
-    [[UIDevice currentDevice] setProximityMonitoringEnabled:[[NSUserDefaults standardUserDefaults] boolForKey:@"shoushi"]];
+        [[ZRT_PlayerManager manager].player seekToTime:CMTimeMake(self.sliderProgress.value, [ZRT_PlayerManager manager].playRate) completionHandler:^(BOOL finished) {
+            RTLog(@"拖拽结果：%d",finished);
+            if (finished == YES){
+                [[ZRT_PlayerManager manager] startPlay];
+            }
+        }];
+        [[UIDevice currentDevice] setProximityMonitoringEnabled:[[NSUserDefaults standardUserDefaults] boolForKey:@"shoushi"]];
+    }else{
+        XWAlerLoginView *alert = [XWAlerLoginView alertWithTitle:@"请等待音频缓冲完成"];
+        [alert show];
+    }
 }
 /**
  开始拖拽进度条调用

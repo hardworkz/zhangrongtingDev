@@ -8,14 +8,14 @@
 
 #import "NewsCell.h"
 
-@interface NewsCell ()
+@interface NewsCell ()<WHCDownloadDelegate>
 {
     UIImageView *imgLeft;
     UILabel *titleLab;
     UILabel *detailNews;
     UILabel *riqiLab;
     UILabel *dataLab;
-    UIButton *download;
+    UIButton *downloadBtn;
     UIView *line;
 }
 @end
@@ -54,12 +54,15 @@
         titleLab.font = [UIFont boldSystemFontOfSize:17.0f];
         titleLab.lineBreakMode = NSLineBreakByWordWrapping;
         [titleLab setNumberOfLines:3];
+//        titleLab.backgroundColor = [UIColor blueColor];
         [self.contentView addSubview:titleLab];
         
         if (IS_IPAD) {
             //正文
-            detailNews = [[UILabel alloc]initWithFrame:CGRectMake(15.0 / 375 * IPHONE_W, titleLab.frame.origin.y + titleLab.frame.size.height + 20.0 / 667 * SCREEN_HEIGHT, titleLab.frame.size.width, 21.0 / 667 *IPHONE_H)];
+            detailNews = [[UILabel alloc]initWithFrame:CGRectMake(15.0 / 375 * IPHONE_W, titleLab.frame.origin.y + titleLab.frame.size.height + 20.0 , titleLab.frame.size.width, 40.0)];
+            detailNews.numberOfLines = 0;
             detailNews.textColor = gTextColorSub;
+//            detailNews.backgroundColor = [UIColor redColor];
             detailNews.font = [UIFont systemFontOfSize:15.0f];
             [self.contentView addSubview:detailNews];
         }
@@ -76,20 +79,19 @@
         dataLab.textAlignment = NSTextAlignmentCenter;
         [self.contentView addSubview:dataLab];
         //下载
-        download = [UIButton buttonWithType:UIButtonTypeCustom];
-        [download setFrame:CGRectMake(CGRectGetMaxX(dataLab.frame), 86.0 / 667 *IPHONE_H + offsetY, 30.0 / 667 *IPHONE_H, 30.0 / 667 *IPHONE_H)];
-        [download setImage:[UIImage imageNamed:@"download_grey"] forState:UIControlStateNormal];
-        [download setImage:[UIImage imageNamed:@"download_finish"] forState:UIControlStateDisabled];
-        [download setImageEdgeInsets:UIEdgeInsetsMake(0, 0, 10, 10)];
-        [download addTarget:self action:@selector(downloadColumnNewsAction:) forControlEvents:UIControlEventTouchUpInside];
-        download.accessibilityLabel = @"下载";
-        [self.contentView addSubview:download];
+        downloadBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+        [downloadBtn setFrame:CGRectMake(CGRectGetMaxX(dataLab.frame), 86.0 / 667 *IPHONE_H + offsetY, 30.0 / 667 *IPHONE_H, 30.0 / 667 *IPHONE_H)];
+        [downloadBtn setImage:[UIImage imageNamed:@"download_grey"] forState:UIControlStateNormal];
+        [downloadBtn setImage:[UIImage imageNamed:@"download_finish"] forState:UIControlStateDisabled];
+        [downloadBtn setImageEdgeInsets:UIEdgeInsetsMake(0, 0, 10, 10)];
+        [downloadBtn addTarget:self action:@selector(downloadColumnNewsAction:) forControlEvents:UIControlEventTouchUpInside];
+        downloadBtn.accessibilityLabel = @"下载";
+        [self.contentView addSubview:downloadBtn];
         
         line = [[UIView alloc]initWithFrame:CGRectMake(15.0 / 375 * SCREEN_WIDTH, CGRectGetMaxY(dataLab.frame) + 12.0 / 667 * SCREEN_HEIGHT, SCREEN_WIDTH - 30.0 / 375 * SCREEN_WIDTH, 0.5)];
         [line setBackgroundColor:nMineNameColor];
         [self.contentView addSubview:line];
         
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(addDownloadSuccess:) name:DownloadNewsSuccessNotification object:nil];
     }
     return self;
 }
@@ -121,9 +123,9 @@
     dataLab.text = [NSString stringWithFormat:@"%.1lf%@",[dataDict[@"post_size"] intValue] / 1024.0 / 1024.0,@"M"];
     //是否已下载
     if ([[ZRT_PlayerManager manager] post_mpWithDownloadNewsID:dataDict[@"id"]] != nil) {
-        download.enabled = NO;
+        downloadBtn.enabled = NO;
     }else{
-        download.enabled = YES;
+        downloadBtn.enabled = YES;
     }
 }
 - (void)downloadColumnNewsAction:(UIButton *)button
@@ -140,10 +142,11 @@
     [SVProgressHUD showInfoWithStatus:@"开始下载"];
     [self performSelector:@selector(SVPDismiss) withObject:nil afterDelay:1.0];
     NSMutableDictionary *dic = (NSMutableDictionary *)_dataDict;
-    dispatch_async(dispatch_get_main_queue(), ^{
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         ProjiectDownLoadManager *manager = [ProjiectDownLoadManager defaultProjiectDownLoadManager];
         [manager insertSevaDownLoadArray:dic];
-        WHC_Download *op = [[WHC_Download alloc]initStartDownloadWithURL:[NSURL URLWithString:dic[@"post_mp"]] savePath:manager.userDownLoadPath savefileName:[dic[@"post_mp"] stringByReplacingOccurrencesOfString:@"/" withString:@""] withObj:dic withCell:self isSingleDownload:YES delegate:nil];
+        WHC_Download *op = [[WHC_Download alloc]initStartDownloadWithURL:[NSURL URLWithString:dic[@"post_mp"]] savePath:manager.userDownLoadPath savefileName:[dic[@"post_mp"] stringByReplacingOccurrencesOfString:@"/" withString:@""] withObj:dic  isSingleDownload:YES delegate:nil];
+        op.delegate = self;
         [manager.downLoadQueue addOperation:op];
     });
 }
@@ -183,10 +186,11 @@
     
     [alertVC presentViewController:qingshuruyonghuming animated:YES completion:nil];
 }
-- (void)addDownloadSuccess:(NSNotification *)note
+- (void)WHCDownload:(WHC_Download *)download filePath:(NSString *)filePath isSuccess:(BOOL)success
 {
-    if ([note.userInfo[@"id"] isEqualToString:_dataDict[@"id"]]) {
-        download.enabled = NO;
+    RTLog(@"%@",_dataDict[@"post_mp"]);
+    if ([_dataDict[@"post_mp"] isEqualToString:download.downUrl.absoluteString]) {
+        downloadBtn.enabled = NO;
     }
 }
 @end

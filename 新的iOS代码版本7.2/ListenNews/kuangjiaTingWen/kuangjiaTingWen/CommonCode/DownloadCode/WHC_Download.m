@@ -83,7 +83,6 @@ typedef enum : NSUInteger {
                       savePath:(NSString *)savePath
                   savefileName:(NSString*)savefileName
                        withObj:(NSMutableDictionary *)obj
-                      withCell:(NSObject *)cell
               isSingleDownload:(BOOL)isSingleDownload
                       delegate:(id<WHCDownloadDelegate>)delegate {
     
@@ -146,11 +145,11 @@ typedef enum : NSUInteger {
         
         self.isSingleDownload = isSingleDownload;
         
-        if (cell != nil) {
-            self.notificationObject = cell;
-        }else{
-            self.notificationObject = nil;
-        }
+//        if (cell != nil) {
+//            self.notificationObject = cell;
+//        }else{
+//            self.notificationObject = nil;
+//        }
     }
     return self;
 }
@@ -582,9 +581,10 @@ typedef enum : NSUInteger {
         [[NSNotificationCenter defaultCenter] postNotificationName:@"addDownload" object:objDic];
         
         //下载完成通知新闻列表cell设置按钮状态
-        if (self.notificationObject) {
-            [[NSNotificationCenter defaultCenter] postNotificationName:DownloadNewsSuccessNotification object:self.notificationObject userInfo:objDic];
-        }
+//        if (self.notificationObject) {
+//            RTLog(@"下载对应cell%@",self.notificationObject);
+//            [[NSNotificationCenter defaultCenter] postNotificationName:DownloadNewsSuccessNotification object:self.notificationObject userInfo:objDic];
+//        }
         
         [[NSNotificationCenter defaultCenter]postNotificationName:@"changeNumber" object:nil];
         

@@ -564,7 +564,7 @@
             NSArray *newsItemTitle = @[@"财经",@"文娱",@"国际",@"科技",@"时政"];
             for (int i = 0 ; i < 5; i ++) {
                 UIButton *newsItem = [UIButton buttonWithType:UIButtonTypeCustom];
-                [newsItem setFrame:CGRectMake(newsItem_width * i + 5.0 / 375 * IPHONE_W + 5.0, 5, newsItem_width - 5, 25)];
+                [newsItem setFrame:CGRectMake(newsItem_width * i + 5.0 / 375 * IPHONE_W + 5.0, 5, newsItem_width - 5,IS_IPAD?40:25)];
                 [newsItem.layer setMasksToBounds:YES];
                 [newsItem.layer setCornerRadius:12.5];
                 [newsItem.layer setBorderWidth:0.5];

@@ -653,6 +653,9 @@ typedef void(^animateBlock)();
         [cell.contentView addSubview:lvView];
         
         UILabel *lvLab = [[UILabel alloc]initWithFrame:CGRectMake(lvView.frame.size.width - 20, 0, 25, 16)];
+        [lvLab setFont:gFontMain12];
+        [lvLab setTextAlignment:NSTextAlignmentCenter];
+        [lvLab setTextColor:[UIColor whiteColor]];
         if (TARGETED_DEVICE_IS_IPHONE_480) {
             [lvLab setFrame:CGRectMake(lvView.frame.size.width - 25, 0, 25, 16)];
         }
@@ -664,10 +667,10 @@ typedef void(^animateBlock)();
         }
         else if (TARGETED_DEVICE_IS_IPHONE_736){
             [lvLab setFrame:CGRectMake(lvView.frame.size.width - 20, 0, 25, 16)];
+        }else if(IS_IPAD){
+            [lvLab setFrame:CGRectMake(lvView.frame.size.width, 5, 25, 16)];
+            [lvLab setFont:gFontMajor17];
         }
-        [lvLab setFont:gFontMain12];
-        [lvLab setTextAlignment:NSTextAlignmentCenter];
-        [lvLab setTextColor:[UIColor whiteColor]];
         [lvView addSubview:lvLab];
         
         TTTAttributedLabel *signtureLab = [[TTTAttributedLabel alloc]initWithFrame:CGRectMake(lab.frame.origin.x, 230.0 / 667 * IPHONE_H, SCREEN_WIDTH - 150, 20.0 / 667 * IPHONE_H)];
@@ -1001,7 +1004,7 @@ typedef void(^animateBlock)();
 - (UIButton *)newFriendMessageButton {
     if (!_newFriendMessageButton ) {
         _newFriendMessageButton  = [UIButton buttonWithType:UIButtonTypeCustom];
-        [_newFriendMessageButton setFrame:CGRectMake(110, 19.0 / 667 * IPHONE_H, 20, 20)];
+        [_newFriendMessageButton setFrame:CGRectMake(IS_IPAD?150:110,IS_IPAD?23.0 / 667 * IPHONE_H:19.0 / 667 * IPHONE_H, 20, 20)];
         [_newFriendMessageButton.layer setMasksToBounds:YES];
         [_newFriendMessageButton.layer setCornerRadius:10.0];
         [_newFriendMessageButton setBackgroundColor:UIColorFromHex(0xf23131)];
@@ -1013,7 +1016,7 @@ typedef void(^animateBlock)();
 - (UIButton *)newSettingMessageButton {
     if (!_newSettingMessageButton ) {
         _newSettingMessageButton  = [UIButton buttonWithType:UIButtonTypeCustom];
-        [_newSettingMessageButton setFrame:CGRectMake(110, 19.0 / 667 * IPHONE_H, 20, 20)];
+        [_newSettingMessageButton setFrame:CGRectMake(IS_IPAD?140:110, IS_IPAD?23.0 / 667 * IPHONE_H:19.0 / 667 * IPHONE_H, 20, 20)];
         [_newSettingMessageButton.layer setMasksToBounds:YES];
         [_newSettingMessageButton.layer setCornerRadius:10.0];
         [_newSettingMessageButton setBackgroundColor:UIColorFromHex(0xf23131)];

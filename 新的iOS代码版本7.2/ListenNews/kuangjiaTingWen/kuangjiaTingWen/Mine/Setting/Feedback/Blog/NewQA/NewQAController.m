@@ -97,7 +97,16 @@
 -(void)setupUI{
 //    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"返回" style:UIBarButtonItemStylePlain target:self action:@selector(actionCancel)];
     self.title = self.isFeedbackVC ? @"意见反馈" : @"听友圈";
-    [self enableAutoBack];
+//    [self enableAutoBack];
+    UIButton *leftBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+    leftBtn.frame = CGRectMake(10, 25, 35, 35);
+    [leftBtn setImageEdgeInsets:UIEdgeInsetsMake(5, 0, 5, 10)];
+    [leftBtn setImage:[UIImage imageNamed:@"back"] forState:UIControlStateNormal];
+    leftBtn.accessibilityLabel = @"返回";
+    [leftBtn addTarget:self action:@selector(back) forControlEvents:UIControlEventTouchUpInside];
+    UIBarButtonItem *item_left = [[UIBarButtonItem alloc] initWithCustomView:leftBtn];
+    self.navigationItem.leftBarButtonItem = item_left;
+    
     UIButton *btn = [UIButton buttonWithType:UIButtonTypeCustom];
     [btn setTitleColor:nTextColorMain forState:UIControlStateNormal];
     [btn setTitle:@"发送" forState:UIControlStateNormal];
@@ -127,7 +136,9 @@
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(huishoujianpan:) name:@"huishoujianpan" object:nil];
     
 }
-
+- (void)back {
+    [self.navigationController popViewControllerAnimated:YES];
+}
 -(void)viewWillAppear:(BOOL)animated{
     [super viewWillAppear:animated];
     [[NSNotificationCenter defaultCenter] addObserver:self

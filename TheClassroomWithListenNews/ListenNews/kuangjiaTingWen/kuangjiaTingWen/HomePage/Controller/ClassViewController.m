@@ -172,7 +172,9 @@ static AVPlayer *_instancePlay = nil;
     [ZRT_PlayerManager manager].playDidEnd = ^(NSInteger currentSongIndex) {
         if ([ZRT_PlayerManager manager].playType == ZRTPlayTypeClassroomTry) {
             weakSelf.playingIndex = currentSongIndex;
-            [weakSelf playTestMp:weakSelf.buttons[weakSelf.playingIndex]];
+            if (weakSelf.buttons) {
+                [weakSelf playTestMp:weakSelf.buttons[weakSelf.playingIndex]];
+            }
         }
     };
 }

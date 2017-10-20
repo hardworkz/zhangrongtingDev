@@ -266,14 +266,15 @@
 - (void)imgAnimate:(UIButton*)btn{
     
     _rotationAnimation = [CABasicAnimation animationWithKeyPath:@"transform.rotation.z"];
-    _rotationAnimation.toValue = [NSNumber numberWithFloat: M_PI * 2.0 ];
+    if (![_rotationAnimation isKindOfClass:[CABasicAnimation class]]) return;
+    _rotationAnimation.toValue = [NSNumber numberWithFloat:M_PI * 2.f];
+//    _rotationAnimation.toValue = [[NSNumber numberWithFloat:M_PI * 2.f] isKindOfClass:[NSNumber class]]?[NSNumber numberWithFloat:M_PI * 2.f]:[NSNumber numberWithFloat:0.f];//bug:-[__NSCFNumber setToValue:]: unrecognized selector sent to instance 0x170629f80
     _rotationAnimation.duration = 2.0;
     _rotationAnimation.cumulative = YES;
-    _rotationAnimation.repeatCount = HUGE_VALF;
+    _rotationAnimation.repeatCount = MAXFLOAT;
     _rotationAnimation.removedOnCompletion = NO;
     
     [btn.layer addAnimation:_rotationAnimation forKey:@"rotationAnimation"];
-    
 }
 
 - (void)stopAnimate {

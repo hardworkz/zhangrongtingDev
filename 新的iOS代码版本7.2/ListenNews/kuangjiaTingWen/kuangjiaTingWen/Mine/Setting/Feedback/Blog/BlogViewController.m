@@ -1563,15 +1563,15 @@
         DefineWeakSelf;
         [SVProgressHUD setDefaultMaskType:SVProgressHUDMaskTypeBlack];
         FeedBackAndListenFriendFrameModel *frameModel = self.blogArray[row];
-        if (self.isReplyComment) {
+        if (self.isReplyComment) {//回复评论
             iscomment = @"1";
-            to_comment_id = frameModel.model.ID;
-            tuid = self.replyComment_tuid;
+            tuid = self.replyComment_tuid;//被回复人的uid
+            to_comment_id = frameModel.model.ID;//被回复评论的ID
         }
         else{
             
-            tuid = frameModel.model.uid;
-            to_comment_id = frameModel.model.ID;
+            tuid = frameModel.model.uid;//发布动态人的uid
+            to_comment_id = frameModel.model.ID;//动态的ID
         }
         if (self.isFeedbackVC) {
             [NetWorkTool addfeedBackWithaccessToken:AvatarAccessToken

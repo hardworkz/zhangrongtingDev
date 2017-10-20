@@ -67,7 +67,6 @@ typedef enum:NSInteger{
                       savePath:(NSString *)savePath
                   savefileName:(NSString*)savefileName
                        withObj:(NSMutableDictionary *)obj
-                       withCell:(NSObject *)cell
                        isSingleDownload:(BOOL)isSingleDownload
                       delegate:(id<WHCDownloadDelegate>)delegate;
 

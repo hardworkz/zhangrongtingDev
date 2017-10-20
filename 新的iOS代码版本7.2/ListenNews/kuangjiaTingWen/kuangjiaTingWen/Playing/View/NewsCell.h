@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
-#define DownloadNewsSuccessNotification @"downloadNewsSuccessNotification"
+//#define DownloadNewsSuccessNotification @"downloadNewsSuccessNotification"
 
 @interface NewsCell : UITableViewCell
 @property (strong, nonatomic) NSDictionary *dataDict;

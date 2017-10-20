@@ -17,7 +17,7 @@
 // 图片之间的纵向
 #define kSpaceLines 5
 
-//每张图片的宽度
+//每张图片的宽度iphone:75 ipad:150
 #define kImageWidht 75
 //每张图片的高度
 #define kImageHeight 75
@@ -167,14 +167,27 @@
             
             imgv.contentMode = UIViewContentModeScaleAspectFit;
             if (image.size.width >= image.size.height) {
-                imgv.frame = CGRectMake(0,0, (OneImageMaxWidht * image.size.width/image.size.height) >= (SCREEN_WIDTH - 80)?(SCREEN_WIDTH - 80):(OneImageMaxWidht * image.size.width/image.size.height), OneImageMaxHeight);
+                if (IS_IPAD) {
+                    imgv.frame = CGRectMake(0,0, (300 * image.size.width/image.size.height) >= (SCREEN_WIDTH - 80)?(SCREEN_WIDTH - 80):(300 * image.size.width/image.size.height), 300);
+                }else{
+                    imgv.frame = CGRectMake(0,0, (OneImageMaxWidht * image.size.width/image.size.height) >= (SCREEN_WIDTH - 80)?(SCREEN_WIDTH - 80):(OneImageMaxWidht * image.size.width/image.size.height), OneImageMaxHeight);
+                }
                 //主线程刷新UI
                 dispatch_sync(dispatch_get_main_queue(), ^{
                     //Update UI in UI thread here
                     [imgv setImage:image];
                 });
             }else if(image.size.width < image.size.height){
-                imgv.frame = CGRectMake(0,0, OneImageMaxWidht * image.size.width / image.size.height, OneImageMaxHeight);
+                if (IS_IPAD) {
+                    
+                }else{
+                    
+                }
+                if (IS_IPAD) {
+                    imgv.frame = CGRectMake(0,0, 300 * image.size.width / image.size.height, 300);
+                }else{
+                    imgv.frame = CGRectMake(0,0, OneImageMaxWidht * image.size.width / image.size.height, OneImageMaxHeight);
+                }
                 //主线程刷新UI
                 dispatch_sync(dispatch_get_main_queue(), ^{
                     //Update UI in UI thread here
@@ -192,7 +205,11 @@
             UIImageView * imgv = [self dequeueImageView:i];
             imgv.contentMode = UIViewContentModeScaleAspectFill;
             imgv.hidden = NO;
-            imgv.frame = CGRectMake(lineIdx * (kImageWidht + kSpaceCells),lineNo* (kImageHeight + kSpaceLines), kImageWidht, kImageHeight);
+            if (IS_IPAD) {
+                imgv.frame = CGRectMake(lineIdx * (150 + kSpaceCells),lineNo* (150 + kSpaceLines), 150, 150);
+            }else{
+                imgv.frame = CGRectMake(lineIdx * (kImageWidht + kSpaceCells),lineNo* (kImageHeight + kSpaceLines), kImageWidht, kImageHeight);
+            }
 
             if (!_isDataLoaded ){
                 NSString *pat = [NSString stringWithFormat:@"%@", _images[i]];
@@ -234,23 +251,45 @@
     _width = 0;
     _height = 0;
     if (count == 1) {
-        _width = SCREEN_WIDTH - 80 ;
-        _height = OneImageMaxHeight;
+        if (IS_IPAD) {
+            _width = SCREEN_WIDTH - 80 ;
+            _height = 300;
+        }else{
+            _width = SCREEN_WIDTH - 80 ;
+            _height = OneImageMaxHeight;
+        }
     }
     else if (1 < count && count <= 3){
         // 此时布局只需要一行
-        _width = kImageWidht * count + kSpaceCells * (count-1);
-        _height = kImageHeight;
+        if (IS_IPAD) {
+            _width = 150 * count + kSpaceCells * (count-1);
+            _height = 150;
+        }else{
+            _width = kImageWidht * count + kSpaceCells * (count-1);
+            _height = kImageHeight;
+        }
     }
     else if (3<count && count <= 6){
         //  此时布局需要两行
-        _width = kImageWidht * 3 + kSpaceCells *2;
-        _height = kImageHeight * 2 + kSpaceLines;
+        if (IS_IPAD) {
+            _width = 150 * 3 + kSpaceCells *2;
+            _height = 150 * 2 + kSpaceLines;
+        }else{
+            _width = kImageWidht * 3 + kSpaceCells *2;
+            _height = kImageHeight * 2 + kSpaceLines;
+        }
     }
     else if (6 < count && count <= 9){
         // 此时布局需要三行
         _width = kImageWidht * 3 + kSpaceCells *2;
         _height = kImageHeight * 3 + kSpaceLines * 2;
+        if (IS_IPAD) {
+            _width = 150 * 3 + kSpaceCells *2;
+            _height = 150 * 3 + kSpaceLines * 2;
+        }else{
+            _width = kImageWidht * 3 + kSpaceCells *2;
+            _height = kImageHeight * 3 + kSpaceLines * 2;
+        }
     }
     return CGSizeMake(_width, _height);
 }

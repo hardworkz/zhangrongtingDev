@@ -459,8 +459,6 @@
 ///获取关注列表列表
 + (void)getPaoGuoGuanZhuLieBiaoWithaccessToken:(NSString *)accessToken andPage:(NSString *)page andLimit:(NSString *)limit sccess:(void (^)(NSDictionary *responseObject))success failure:(void (^)(NSError *error))failure;
 
-///根据用户user_login获取到用户信息
-+ (void)getPaoGuoUserInfoWithuser_login:(NSString *)user_login sccess:(void (^)(NSDictionary *responseObject2))success failure:(void (^)(NSError *error))failure;
 
 ///根据用户user_login获取到用户更多信息
 + (void)getPaoGuoMoreUserInfoWithuser_login:(NSString *)user_login sccess:(void (^)(NSDictionary *responseObject2))success failure:(void (^)(NSError *error2))failure;

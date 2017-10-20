@@ -247,7 +247,7 @@
             }
         }
         //详情页移动导航栏主框架
-    pagingView = [CustomPageView pagingViewWithHeaderView:headerView headerHeight:self.isClass?238.0 / 667 * SCREEN_HEIGHT:273.0 / 667 * SCREEN_HEIGHT segmentButtons:buttonArray segmentHeight:52.0 / 667 * SCREEN_HEIGHT contentViews:@[xinwenshuaxinTableView, fansWallTableView, pinglunhoushuaxinTableView,ImageTableView]];
+    pagingView = [CustomPageView pagingViewWithHeaderView:headerView headerHeight:self.isClass?(SCREEN_WIDTH == 320?238.0 / 667 * SCREEN_HEIGHT + 10:238.0 / 667 * SCREEN_HEIGHT):273.0 / 667 * SCREEN_HEIGHT segmentButtons:buttonArray segmentHeight:52.0 / 667 * SCREEN_HEIGHT contentViews:@[xinwenshuaxinTableView, fansWallTableView, pinglunhoushuaxinTableView,ImageTableView]];
 //    }
     
     UIView *picView = [[UIView alloc]initWithFrame:CGRectMake(IPHONE_W * 3, 0, IPHONE_W, IPHONE_H - 50.0 / 667 * SCREEN_HEIGHT - 50.0 / 667 * IPHONE_H)];
@@ -379,9 +379,7 @@
     else{
         [self pinglunkuang];
     }
-    
-//    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(gaibianyanse:) name:@"gaibianyanse" object:nil];
-//    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(zhuboxiangqingbofangJiaZai:) name:@"zhuboxiangqingbofang" object:nil];
+
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(back) name:@"isBackfromPersonalPage" object:nil];
     
     UISwipeGestureRecognizer *rightSwipe = [[UISwipeGestureRecognizer alloc]initWithTarget:self action:@selector(back)];
@@ -394,7 +392,6 @@
 }
 - (void)viewWillAppear:(BOOL)animated{
     [super viewWillAppear:animated];
-//    self.navBarBgAlpha = @"0.0";
     
     [self.navigationController setNavigationBarHidden:YES animated:YES];
     if (_isRewardLoginBack) {
@@ -438,14 +435,7 @@
 - (void)viewWillDisappear:(BOOL)animated{
     [super viewWillDisappear:animated];
     
-//    self.navBarBgAlpha = @"1.0";
     [self.navigationController setNavigationBarHidden:NO animated:YES];
-    
-//    if (![bofangVC shareInstance].isPlay) {
-//        [[NSNotificationCenter defaultCenter] postNotificationName:@"stopAnimate" object:nil];
-//    }else {
-//        [[NSNotificationCenter defaultCenter] postNotificationName:@"startAnimate" object:nil];
-//    }
 }
 
 #pragma mark --- 评论框UI

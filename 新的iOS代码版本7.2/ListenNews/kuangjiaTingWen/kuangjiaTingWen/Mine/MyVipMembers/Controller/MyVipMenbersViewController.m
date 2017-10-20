@@ -43,6 +43,7 @@ static NSString *const VIPContent = @"普通会员:\n1.每日可收听新闻数�
     [topView setUserInteractionEnabled:YES];
     topView.backgroundColor = [UIColor whiteColor];
     [self.view addSubview:topView];
+    
     UIButton *leftBtn = [UIButton buttonWithType:UIButtonTypeCustom];
     leftBtn.frame = CGRectMake(10, 25, 35, 35);
     [leftBtn setImageEdgeInsets:UIEdgeInsetsMake(5, 0, 5, 10)];

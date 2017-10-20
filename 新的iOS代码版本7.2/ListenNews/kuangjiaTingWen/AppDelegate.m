@@ -157,8 +157,15 @@
     
     //获取app版本
     [self getAppVersion];
+    
     //获取VIP限制
     [self getVipLimitData];
+    
+    //设置播放限制初始值
+    if ([CommonCode readFromUserD:limit_num] == nil) {
+        [CommonCode writeToUserD:@"10" andKey:limit_num];
+    }
+    
     //启动时获取已登录用户的信息、未读消息
     [self getUserLoginInfoWithLoginStatus:[[CommonCode readFromUserD:@"isLogin"] boolValue]];
     
@@ -239,7 +246,14 @@
             [CommonCode writeToUserD:responseObject[results][@"num"] andKey:limit_num];
         }
     } failure:^(NSError *error) {
-        
+        //请求失败调用本地时间
+        NSDate *date = [NSDate date];
+        NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
+        [formatter setDateStyle:NSDateFormatterMediumStyle];
+        [formatter setTimeStyle:NSDateFormatterShortStyle];
+        [formatter setDateFormat:@"yyyy-MM-dd"];
+        NSString *dateTime = [formatter stringFromDate:date];
+        [NetWorkTool isNewDayWithServer_date:dateTime];
     }];
 }
 - (void)getAppVersion
