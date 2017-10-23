@@ -121,20 +121,6 @@
     }
 }
 
-//- (UIView *)tableView:(UITableView *)tableView viewForFooterInSection:(NSInteger)section
-//{
-//
-//    UIView *footerV = [[UIView alloc]initWithFrame:CGRectMake(0, 0, IPHONE_W, 10)];
-//    footerV.backgroundColor = [UIColor whiteColor];
-//    return footerV;
-//}
-//- (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
-//{
-//    UIView *footerV = [[UIView alloc]initWithFrame:CGRectMake(0, 0, IPHONE_W, 10)];
-//    footerV.backgroundColor = [UIColor whiteColor];
-//    return footerV;
-//}
-
 - (CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section {
     if (section == 2){
         return 0;
@@ -477,7 +463,7 @@
 - (UIButton *)newSettingMessageButton {
     if (!_newSettingMessageButton ) {
         _newSettingMessageButton  = [UIButton buttonWithType:UIButtonTypeCustom];
-        [_newSettingMessageButton setFrame:CGRectMake(IS_IPAD?150:110, IS_IPAD?11.0 / 667 * IPHONE_H:19.0 / 667 * IPHONE_H, 20, 20)];
+        [_newSettingMessageButton setFrame:CGRectMake(IS_IPAD?150:110, IS_IPAD?11.0 / 667 * IPHONE_H:12.0 / 667 * IPHONE_H, 20, 20)];
         [_newSettingMessageButton.layer setMasksToBounds:YES];
         [_newSettingMessageButton.layer setCornerRadius:10.0];
         [_newSettingMessageButton setBackgroundColor:UIColorFromHex(0xf23131)];
@@ -485,20 +471,5 @@
     }
     return _newSettingMessageButton;
 }
-
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
-}
-
-/*
- #pragma mark - Navigation
- 
- // In a storyboard-based application, you will often want to do a little preparation before navigation
- - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
- // Get the new view controller using [segue destinationViewController].
- // Pass the selected object to the new view controller.
- }
- */
 
 @end

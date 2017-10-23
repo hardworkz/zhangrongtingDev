@@ -841,11 +841,15 @@
                                            andLimit:@"10"
                                              sccess:^(NSDictionary *responseObject) {
                                                  [self.SouSuotableView.mj_footer endRefreshing];
-                                                 if ([responseObject[@"results"] isKindOfClass:[NSArray class]]){
-                                                     [self.SouSuodataArrM addObjectsFromArray:responseObject[@"results"]];
+                                                 if ([responseObject[results] isKindOfClass:[NSArray class]]){
+                                                     NSArray *array = responseObject[results];
+                                                     [self.SouSuodataArrM addObjectsFromArray:array];
                                                      [self.SouSuotableView reloadData];
                                                      if ([ZRT_PlayerManager manager].channelType == ChannelTypeDiscoverSearchNewsResult) {
                                                          [ZRT_PlayerManager manager].songList = self.SouSuodataArrM;
+                                                     }
+                                                     if (array.count!= 0) {
+                                                         self.SouSuotableView.mj_footer.state = MJRefreshStateIdle;
                                                      }
             
                                                  }
@@ -894,7 +898,7 @@
                                                        [self.SearchActResultsArrM addObjectsFromArray:actArray];
                                                    }
                                                    else{
-                                                       NSLog(@"没有相关信息");
+                                                       RTLog(@"没有相关信息");
                                                    }
                                                    [self.SouSuotableView reloadData];
                                                    [self.SouSuotableView.mj_header endRefreshing];
@@ -911,14 +915,19 @@
                                             andPage:@"1"
                                            andLimit:@"10"
                                              sccess:^(NSDictionary *responseObject) {
-        if ([responseObject[@"results"] isKindOfClass:[NSArray class]]){
-            self.SouSuodataArrM = responseObject[@"results"];
+        if ([responseObject[results] isKindOfClass:[NSArray class]]){
+            NSArray *array = responseObject[results];
+            self.SouSuodataArrM = [NSMutableArray arrayWithArray:array];
             if ([ZRT_PlayerManager manager].channelType == ChannelTypeDiscoverSearchNewsResult) {
                 [ZRT_PlayerManager manager].songList = self.SouSuodataArrM;
             }
+            if (array.count!= 0) {
+                self.SouSuotableView.mj_footer.state = MJRefreshStateIdle;
+            }
         }
         else{
-            NSLog(@"没有相关信息");
+            RTLog(@"没有相关信息");
+            self.SouSuotableView.mj_footer.state = MJRefreshStateNoMoreData;
         }
         [self.SouSuotableView reloadData];
         [self.SouSuotableView.mj_header endRefreshing];
