@@ -75,10 +75,6 @@
     [self.view addSubview:self.SouSuosousuoTableView];
     [self.view insertSubview:self.faxianTableView atIndex:0];
     
-    //播放下一条自动加载更多新闻信息通知
-//    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(zidongjiazai:) name:@"faxianbofangyaojiazaishujv" object:nil];
-//    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(gaibianyanse:) name:@"gaibianyanse" object:nil];
-    
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(reloadClassList) name:ReloadClassList object:nil];
     RegisterNotify(@"loginSccess", @selector(reloadClassList))
 }
@@ -98,6 +94,10 @@
 - (void)reloadClassList
 {
     [self loadData];
+    
+    if (self.SearchActResultsArrM.count != 0) {
+        [self SouSuorefreshData];
+    }
 }
 #pragma mark - UITableViewDataSource
 
@@ -171,53 +171,53 @@
         }else {
             if ([self.SearchActResultsArrM count] != 0) {
                 if (indexPath.section == 0) {
-                    //搜索的节目，主播，课堂分区内容
-                    UIImageView *imgV = [[UIImageView alloc]initWithFrame:CGRectMake(10.0 / 375 * IPHONE_W, 11, 45, 45)];
-                    if([self.SearchActResultsArrM[indexPath.row][@"images"] rangeOfString:@"/data/upload/"].location !=NSNotFound)
-                    {
-                        [imgV sd_setImageWithURL:[NSURL URLWithString:USERPHOTOHTTPSTRINGZhuBo(self.SearchActResultsArrM[indexPath.row][@"images"])] placeholderImage:[UIImage imageNamed:@"user-5"]];
-                    }
-                    else
-                    {
-                        [imgV sd_setImageWithURL:[NSURL URLWithString:USERPOTOAD( self.SearchActResultsArrM[indexPath.row][@"images"])] placeholderImage:[UIImage imageNamed:@"user-5"]];
-                    }
-
-                    imgV.layer.cornerRadius = 22.5f;
-                    imgV.layer.masksToBounds = YES;
-                    imgV.contentMode = UIViewContentModeScaleAspectFit;
-                    [cell.contentView addSubview:imgV];
-                
-                    UILabel *nameLab = [[UILabel alloc]initWithFrame:CGRectMake(5.0 / 375 * IPHONE_W + 57 + 10.0 / 375 * IPHONE_W, 15, 200.0 / 375 * IPHONE_W, 15)];
-                    if ([self.SearchActResultsArrM isKindOfClass:[NSArray class]])
-                    {
-                        nameLab.text = self.SearchActResultsArrM[indexPath.row ][@"name"];
-                    }
-                    
-                    nameLab.textColor = [UIColor blackColor];
-                    nameLab.textAlignment = NSTextAlignmentLeft;
-                    nameLab.font = [UIFont systemFontOfSize:16.0f];
-                    [cell.contentView addSubview:nameLab];
-                    
-                    UILabel *neirongLab = [[UILabel alloc]initWithFrame:CGRectMake(nameLab.frame.origin.x, 37.0 / 667 * SCREEN_HEIGHT, 250.0 / 375 * IPHONE_W, 15.0 / 667 * SCREEN_HEIGHT)];
-                    
-                    NSString *sigtStr = self.SearchActResultsArrM[indexPath.row][@"description"];
-                    
-                    if (sigtStr.length == 0)
-                    {
-                        neirongLab.text = @"该用户没有什么想说的";
-                    }else
-                    {
-                        neirongLab.text = sigtStr;
-                    }
-                    
-                    neirongLab.textColor = [UIColor grayColor];
-                    neirongLab.font = [UIFont systemFontOfSize:13.0f];
-                    neirongLab.textAlignment = NSTextAlignmentLeft;
-                    neirongLab.alpha = 0.7f;
-                    [cell.contentView addSubview:neirongLab];
-                    
-                    //是否关注按钮（节目，主播）
                     if ([self.SearchActResultsArrM[indexPath.row][@"price"] intValue] == 0) {
+                        //搜索的节目，主播cell
+                        UIImageView *imgV = [[UIImageView alloc]initWithFrame:CGRectMake(10.0 / 375 * IPHONE_W, 11, 45, 45)];
+                        if([self.SearchActResultsArrM[indexPath.row][@"images"] rangeOfString:@"/data/upload/"].location !=NSNotFound)
+                        {
+                            [imgV sd_setImageWithURL:[NSURL URLWithString:USERPHOTOHTTPSTRINGZhuBo(self.SearchActResultsArrM[indexPath.row][@"images"])] placeholderImage:[UIImage imageNamed:@"user-5"]];
+                        }
+                        else
+                        {
+                            [imgV sd_setImageWithURL:[NSURL URLWithString:USERPOTOAD( self.SearchActResultsArrM[indexPath.row][@"images"])] placeholderImage:[UIImage imageNamed:@"user-5"]];
+                        }
+                        
+                        imgV.layer.cornerRadius = 22.5f;
+                        imgV.layer.masksToBounds = YES;
+                        imgV.contentMode = UIViewContentModeScaleAspectFit;
+                        [cell.contentView addSubview:imgV];
+                        
+                        UILabel *nameLab = [[UILabel alloc]initWithFrame:CGRectMake(5.0 / 375 * IPHONE_W + 57 + 10.0 / 375 * IPHONE_W, 15, 200.0 / 375 * IPHONE_W, 15)];
+                        if ([self.SearchActResultsArrM isKindOfClass:[NSArray class]])
+                        {
+                            nameLab.text = self.SearchActResultsArrM[indexPath.row ][@"name"];
+                        }
+                        
+                        nameLab.textColor = [UIColor blackColor];
+                        nameLab.textAlignment = NSTextAlignmentLeft;
+                        nameLab.font = [UIFont systemFontOfSize:16.0f];
+                        [cell.contentView addSubview:nameLab];
+                        
+                        UILabel *neirongLab = [[UILabel alloc]initWithFrame:CGRectMake(nameLab.frame.origin.x, 37.0 / 667 * SCREEN_HEIGHT, 250.0 / 375 * IPHONE_W, 15.0 / 667 * SCREEN_HEIGHT)];
+                        
+                        NSString *sigtStr = self.SearchActResultsArrM[indexPath.row][@"description"];
+                        
+                        if (sigtStr.length == 0)
+                        {
+                            neirongLab.text = @"该用户没有什么想说的";
+                        }else
+                        {
+                            neirongLab.text = sigtStr;
+                        }
+                        
+                        neirongLab.textColor = [UIColor grayColor];
+                        neirongLab.font = [UIFont systemFontOfSize:13.0f];
+                        neirongLab.textAlignment = NSTextAlignmentLeft;
+                        neirongLab.alpha = 0.7f;
+                        [cell.contentView addSubview:neirongLab];
+                        
+                        //是否关注按钮（节目，主播）
                         UIButton *isSelectBtn = [UIButton buttonWithType:UIButtonTypeCustom];
                         isSelectBtn.frame = CGRectMake(IPHONE_W - 45.0 / 375 * IPHONE_W, 18.5, 24, 24);
                         isSelectBtn.contentMode = UIViewContentModeScaleAspectFit;
@@ -233,10 +233,17 @@
                         }
                         [isSelectBtn addTarget:self action:@selector(tapAction:) forControlEvents:UIControlEventTouchUpInside];
                         [cell.contentView addSubview:isSelectBtn];
+                        
+                        cell.selectionStyle = UITableViewCellSelectionStyleNone;
+                        return cell;
+
+                    }else{
+                        //课堂cell
+                        SearchLessonListTableViewCell *cell = [SearchLessonListTableViewCell cellWithTableView:tableView];
+                        cell.dataDict = self.SearchActResultsArrM[indexPath.row];
+                        cell.selectionStyle = UITableViewCellSelectionStyleNone;
+                        return cell;
                     }
-                    
-                    cell.selectionStyle = UITableViewCellSelectionStyleNone;
-                    return cell;
                 }
                 else {
                     

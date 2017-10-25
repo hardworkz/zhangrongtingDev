@@ -302,58 +302,30 @@
             }
         }
        
-//        if ([self.newsType isEqualToString:@"头条"]) {
-//            [NetWorkTool getToutiaoDownloadNewsListWithkeyword:@"头条"
-//                                                    start_time:self.startDate
-//                                                      end_time:self.endDate
-//                                                        sccess:^(NSDictionary *response) {
-//                                                            if ([response[@"results"] isKindOfClass:[NSArray class]]) {
-//                                                                
-//                                                                self.hidesBottomBarWhenPushed=YES;
-//                                                                BatchDownloadTableTableViewController *vc = [BatchDownloadTableTableViewController new];
-//                                                                vc.downloadSource = @"0";
-//                                                                
-//                                                                vc.newsListArr = [response[@"results"] mutableCopy];
-//                                                                vc.headTitleStr = [NSString stringWithFormat:@"%@ %@至%@",self.newsType,[self.startDate stringWithFormat:@"yyyy-MM-dd"],[self.endDate stringWithFormat:@"yyyy-MM-dd"]];
-//                                                                [self.navigationController pushViewController:vc animated:YES];
-//                                                                [SVProgressHUD dismiss];
-//                                                                self.hidesBottomBarWhenPushed=YES;
-//                                                            }
-//                                                            else{
-//                                                                [SVProgressHUD showErrorWithStatus:@"无搜索内容"];
-//                                                                [self performSelector:@selector(SVPDismiss) withObject:nil afterDelay:1.0];
-//                                                            }
-//                                                            
-//                                                        } failure:^(NSError *error) {
-//                                                            NSLog(@"%@",error);
-//                                                        }];
-//        }
-//        else{
-            [NetWorkTool getDownloadNewsListWithterm_id:numberkey
-                                             start_time:finalStartStr
-                                               end_time:finalEndStr
-                                                 sccess:^(NSDictionary *response) {
+        [NetWorkTool getDownloadNewsListWithterm_id:numberkey
+                                         start_time:finalStartStr
+                                           end_time:finalEndStr
+                                             sccess:^(NSDictionary *response) {
+                                                 
+                                                 if ([response[@"results"] isKindOfClass:[NSArray class] ]) {
                                                      
-                                                     if ([response[@"results"] isKindOfClass:[NSArray class] ]) {
-                                                         
-                                                         self.hidesBottomBarWhenPushed=YES;
-                                                         BatchDownloadTableTableViewController *vc = [BatchDownloadTableTableViewController new];
-                                                         vc.newsListArr = [response[@"results"] mutableCopy];
-                                                         vc.headTitleStr = [NSString stringWithFormat:@"%@(%@至%@",self.newsType,[self.startDate stringWithFormat:@"yyyy-MM-dd"],[self.endDate stringWithFormat:@"yyyy-MM-dd"]];
-                                                         [self.navigationController pushViewController:vc animated:YES];
-                                                         [SVProgressHUD dismiss];
-                                                         self.hidesBottomBarWhenPushed=YES;
-                                                     }
-                                                     else{
-                                                         [SVProgressHUD showErrorWithStatus:@"无搜索内容"];
-                                                         [self performSelector:@selector(SVPDismiss) withObject:nil afterDelay:1.0];
-                                                     }
-                                                     
-                                                 } failure:^(NSError *error) {
-                                                     NSLog(@"%@",error);
-                                                 }];
-//        }
-        
+                                                     self.hidesBottomBarWhenPushed=YES;
+                                                     BatchDownloadTableTableViewController *vc = [BatchDownloadTableTableViewController new];
+                                                     vc.newsListArr = [response[@"results"] mutableCopy];
+                                                     vc.headTitleStr = [NSString stringWithFormat:@"%@(%@至%@",self.newsType,[self.startDate stringWithFormat:@"yyyy-MM-dd"],[self.endDate stringWithFormat:@"yyyy-MM-dd"]];
+                                                     [self.navigationController pushViewController:vc animated:YES];
+                                                     [SVProgressHUD dismiss];
+                                                     self.hidesBottomBarWhenPushed=YES;
+                                                 }
+                                                 else{
+                                                     [SVProgressHUD showErrorWithStatus:@"无搜索内容"];
+                                                     [self performSelector:@selector(SVPDismiss) withObject:nil afterDelay:1.0];
+                                                 }
+                                                 
+                                             } failure:^(NSError *error) {
+                                                 NSLog(@"%@",error);
+                                             }];
+    
     }
     
 }

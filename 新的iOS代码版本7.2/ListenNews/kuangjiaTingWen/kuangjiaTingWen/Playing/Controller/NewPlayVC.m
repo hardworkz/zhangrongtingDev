@@ -40,6 +40,8 @@
     UIView *xiangqingView;
     //打赏动画按钮
     OJLAnimationButton *rewardAnimationBtn;
+    //是否点击自定义打赏金额按钮
+    BOOL isCustomPay;
 }
 /**
  主页面tableView
@@ -1283,7 +1285,7 @@ static NewPlayVC *_instance = nil;
             RTLog(@"%@",responseObject);
             if ([responseObject[@"status"] integerValue] == 1) {
                 vc.balanceCount = [responseObject[@"results"][@"listen_money"] doubleValue];
-                vc.rewardCount = _customRewardTextField.text.floatValue;
+                vc.rewardCount = isCustomPay? _customRewardTextField.text.floatValue : self.rewardCount;
                 vc.uid = (self.postDetailModel.post_news != nil) ? self.postDetailModel.post_news : self.postDetailModel.act.act_id;
                 vc.post_id = self.post_id;
                 vc.act_id = self.postDetailModel.act.act_id;
@@ -1298,11 +1300,6 @@ static NewPlayVC *_instance = nil;
     else{
         accesstoken = nil;
         vc.balanceCount = 0.00;
-//        vc.rewardCount = self.rewardCount;
-//        vc.uid = (self.newsModel.post_news != nil) ? self.newsModel.post_news : self.newsModel.jiemuID;
-//        vc.post_id = self.newsModel.jiemuID;
-//        vc.isPayClass = NO;
-//        [self.navigationController pushViewController:vc animated:YES];
     }
     
 }
@@ -1335,14 +1332,18 @@ static NewPlayVC *_instance = nil;
             continue;
         }
     }
+    isCustomPay = NO;
     DefineWeakSelf;
     switch (sender.tag - 100) {
-        case 0:self.rewardCount = 1;break;
+        case 0:self.rewardCount = 1; break;
         case 1:self.rewardCount = 5;break;
         case 2:self.rewardCount = 10;break;
         case 3:self.rewardCount = 50;break;
         case 4:self.rewardCount = 100;break;
-        case 5:[weakSelf customRewardCount];break;
+        case 5:
+                isCustomPay = YES;
+                [weakSelf customRewardCount];
+            break;
         default:break;
     }
 }

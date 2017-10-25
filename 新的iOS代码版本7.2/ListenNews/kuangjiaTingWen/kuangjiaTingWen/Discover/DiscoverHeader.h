@@ -12,4 +12,6 @@
 #import "faxianModel.h"
 #import "faxianSubModel.h"
 
+#import "SearchLessonListTableViewCell.h"
+
 #endif /* DiscoverHeader_h */

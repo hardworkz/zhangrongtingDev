@@ -190,6 +190,7 @@
 		69AF4FD61F1378C30097893F /* ContentOffsetYDataModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 69AF4FD11F1378C30097893F /* ContentOffsetYDataModel.m */; };
 		69AF4FD71F1378C30097893F /* CustomPageScrollView.m in Sources */ = {isa = PBXBuildFile; fileRef = 69AF4FD31F1378C30097893F /* CustomPageScrollView.m */; };
 		69AF4FD81F1378C30097893F /* CustomPageView.m in Sources */ = {isa = PBXBuildFile; fileRef = 69AF4FD51F1378C30097893F /* CustomPageView.m */; };
+		69C671AF1F9EC9E200570027 /* SearchLessonListTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 69C671AE1F9EC9E200570027 /* SearchLessonListTableViewCell.m */; };
 		69C713341EC0740F00F2729E /* CommonCode.m in Sources */ = {isa = PBXBuildFile; fileRef = 69C711E51EC0740E00F2729E /* CommonCode.m */; };
 		69C713351EC0740F00F2729E /* CommonEnums.m in Sources */ = {isa = PBXBuildFile; fileRef = 69C711E71EC0740E00F2729E /* CommonEnums.m */; };
 		69C713361EC0740F00F2729E /* ProjiectDownLoadManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 69C711EA1EC0740E00F2729E /* ProjiectDownLoadManager.m */; };
@@ -841,6 +842,8 @@
 		69AF4FD31F1378C30097893F /* CustomPageScrollView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CustomPageScrollView.m; sourceTree = "<group>"; };
 		69AF4FD41F1378C30097893F /* CustomPageView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CustomPageView.h; sourceTree = "<group>"; };
 		69AF4FD51F1378C30097893F /* CustomPageView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CustomPageView.m; sourceTree = "<group>"; };
+		69C671AD1F9EC9E200570027 /* SearchLessonListTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SearchLessonListTableViewCell.h; sourceTree = "<group>"; };
+		69C671AE1F9EC9E200570027 /* SearchLessonListTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SearchLessonListTableViewCell.m; sourceTree = "<group>"; };
 		69C711E41EC0740E00F2729E /* CommonCode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CommonCode.h; sourceTree = "<group>"; };
 		69C711E51EC0740E00F2729E /* CommonCode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CommonCode.m; sourceTree = "<group>"; };
 		69C711E61EC0740E00F2729E /* CommonEnums.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CommonEnums.h; sourceTree = "<group>"; };
@@ -2114,6 +2117,8 @@
 			children = (
 				69C7120D1EC0740E00F2729E /* faxianBtn.h */,
 				69C7120E1EC0740E00F2729E /* faxianBtn.m */,
+				69C671AD1F9EC9E200570027 /* SearchLessonListTableViewCell.h */,
+				69C671AE1F9EC9E200570027 /* SearchLessonListTableViewCell.m */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -3477,6 +3482,7 @@
 				69C713981EC0740F00F2729E /* RewardCustomView.m in Sources */,
 				633C2BEE1D2CA58000476CBD /* PinyinHelper.m in Sources */,
 				695745991D5C7384001022AD /* NSObject+DeallocBlock.m in Sources */,
+				69C671AF1F9EC9E200570027 /* SearchLessonListTableViewCell.m in Sources */,
 				698B67FA1F28813B00E1FFE0 /* PlayVCThreeBtnTableViewCell.m in Sources */,
 				636B58A71D34D87600290681 /* IQNSArray+Sort.m in Sources */,
 				6957459C1D5C7384001022AD /* UIImageView+Night.m in Sources */,
