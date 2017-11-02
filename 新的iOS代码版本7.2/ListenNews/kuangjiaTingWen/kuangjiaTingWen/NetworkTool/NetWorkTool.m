@@ -17,8 +17,8 @@
 {
     NSString *serverDate = [CommonCode readFromUserD:server_date];
     if (![dateString isEqualToString:serverDate]) {//判断本地缓存时间和服务器返回时间是否一致，不一致则清空新闻播放限制次数
-        
         [CommonCode writeToUserD:dateString andKey:server_date];
+        [CommonCode writeToUserD:@"0" andKey:limit_time];
         //更新用户信息
         [[NSNotificationCenter defaultCenter] postNotificationName:@"updateUserInfo" object:nil];
     }
@@ -2272,5 +2272,18 @@ NSMutableDictionary *dic = [[NSMutableDictionary alloc]initWithCapacity:1
                            failure:(void(^)(NSError *error))failure{
     NSMutableDictionary *dic = [[NSMutableDictionary alloc]initWithCapacity:1];
     [self asyncNetworkingUrl:@"/interfaceNew/quantitys" andDict:dic success:success failure:failure];
+}
+//发现界面搜索热词
++ (void)getHotWordWithSccess:(void (^)(NSDictionary *responseObject))success
+                             failure:(void(^)(NSError *error))failure{
+    NSMutableDictionary *dic = [[NSMutableDictionary alloc]initWithCapacity:1];
+    [self asyncNetworkingUrl:@"/interfaceYou/getHotWord" andDict:dic success:success failure:failure];
+}
+//上传搜索热词
++ (void)sendHotWordWithHotWord:(NSString *)hotWord
+                            sccess:(void (^)(NSDictionary *responseObject))success
+                     failure:(void(^)(NSError *error))failure{
+    NSMutableDictionary *dic = [[NSMutableDictionary alloc]initWithCapacity:1];
+    [self asyncNetworkingUrl:@"/interfaceYou/addHotWord" andDict:dic success:success failure:failure];
 }
 @end

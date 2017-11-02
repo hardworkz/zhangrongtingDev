@@ -21,16 +21,14 @@
             UIButton *btn = [UIButton buttonWithType:UIButtonTypeCustom];
             //            btn.backgroundColor = [UIColor orangeColor];
             if (num - 1 == 0) {
-                btn.frame = CGRectMake(i%num*(20 * AdaptiveScale_W + (self.frame.size.width - 40 * AdaptiveScale_W - 20 * num * AdaptiveScale_W)),
-                                       i/num*(20 * AdaptiveScale_W + 10 * AdaptiveScale_W) + 10 * AdaptiveScale_W ,
-                                       20 * AdaptiveScale_W,
-                                       20 * AdaptiveScale_W);
+                btn.frame = CGRectMake(i%num*(20 * AdaptiveScale_W + (self.frame.size.width - 40 * AdaptiveScale_W - 20 * num * AdaptiveScale_W)),IS_IPAD?5:i/num*(20 * AdaptiveScale_W + 10 * AdaptiveScale_W) + 10 * AdaptiveScale_W ,
+                                       IS_IPAD?30:20*AdaptiveScale_W ,
+                                       IS_IPAD?30:20*AdaptiveScale_W );
             }
             else{
-                btn.frame = CGRectMake(i%num*(20 * AdaptiveScale_W + (self.frame.size.width - 40 * AdaptiveScale_W - 20 * num * AdaptiveScale_W)/(num - 1)),
-                                       i/num*(20 * AdaptiveScale_W + 10 * AdaptiveScale_W) + 10 * AdaptiveScale_W ,
-                                       20 * AdaptiveScale_W,
-                                       20 * AdaptiveScale_W);
+                btn.frame = CGRectMake(i%num*(20 * AdaptiveScale_W + (self.frame.size.width - 40 * AdaptiveScale_W - 20 * num * AdaptiveScale_W)/(num - 1)),IS_IPAD?5:i/num*(20 * AdaptiveScale_W + 10 * AdaptiveScale_W) + 10 * AdaptiveScale_W ,
+                                       IS_IPAD?30:20*AdaptiveScale_W  ,
+                                       IS_IPAD?30:20*AdaptiveScale_W );
             }
             
             if ([imgArr[i]  rangeOfString:@"http"].location != NSNotFound){
@@ -40,13 +38,8 @@
                 [btn sd_setImageWithURL:[NSURL URLWithString:USERPHOTOHTTPSTRING(imgArr[i]) ]forState:UIControlStateNormal placeholderImage:AvatarPlaceHolderImage];
             }
             [btn.layer setMasksToBounds:YES];
-            [btn.layer setCornerRadius:20 * AdaptiveScale_W / 2 ];
-//            [btn setImageEdgeInsets:UIEdgeInsetsMake(8 * AdaptiveScale_W, 8 * AdaptiveScale_W, 8 * AdaptiveScale_W, 8 * AdaptiveScale_W)];
-//            [btn setTitle:titleArr[i] forState:UIControlStateNormal];
-//            [btn setTitleColor:[UIColor colorWithWhite:0.400 alpha:1.000] forState:UIControlStateNormal];
-//            [btn.titleLabel setFont:[UIFont systemFontOfSize:9.0]];
+            [btn.layer setCornerRadius:IS_IPAD?30/2:20*AdaptiveScale_W/2];
             btn.tag = 10+i;
-//            [btn addTarget:self action:@selector(btnAction:) forControlEvents:UIControlEventTouchUpInside];
             [self addSubview:btn];
             
             UIButton *tipbtn = [UIButton buttonWithType:UIButtonTypeCustom];

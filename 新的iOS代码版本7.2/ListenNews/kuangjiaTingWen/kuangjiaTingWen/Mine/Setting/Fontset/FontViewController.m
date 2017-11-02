@@ -134,6 +134,7 @@ static UITableViewCell *cell1;
     
     [NewPlayVC shareInstance].titleFontSize = titleFontSize;
     [NewPlayVC shareInstance].dateFont = dateFont;
+    [[NewPlayVC shareInstance] setFrameModel];
     [[NewPlayVC shareInstance] reloadInterface];
     
     [ClassViewController shareInstance].titleFontSize = titleFontSize;
@@ -146,8 +147,6 @@ static UITableViewCell *cell1;
 
     [[NSUserDefaults standardUserDefaults] setValue:cell.textLabel.text forKey:@"fontSize"];
     [[NSUserDefaults standardUserDefaults]synchronize];
-    
-//    [[NSNotificationCenter defaultCenter] postNotificationName:@"changeSheZhi" object:@"font"];
     
     [self.navigationController popViewControllerAnimated:YES];
 }

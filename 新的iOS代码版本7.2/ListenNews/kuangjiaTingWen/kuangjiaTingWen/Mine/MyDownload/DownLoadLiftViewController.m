@@ -151,7 +151,7 @@ static NSInteger selectIndex2 = -1;
             
             //设置播放器播放数组
             [ZRT_PlayerManager manager].songList = downloadArr;
-            [[NewPlayVC shareInstance] reloadInterface];
+//            [[NewPlayVC shareInstance] reloadInterface];
             [self.navigationController.navigationBar setHidden:YES];
             [self.navigationController pushViewController:[NewPlayVC shareInstance] animated:YES];
         }
@@ -330,7 +330,7 @@ static NSInteger selectIndex2 = -1;
         
         //设置播放器播放数组
         [ZRT_PlayerManager manager].songList = downloadArr;
-        [[NewPlayVC shareInstance] reloadInterface];
+//        [[NewPlayVC shareInstance] reloadInterface];
         [self.navigationController.navigationBar setHidden:YES];
         [self.navigationController pushViewController:[NewPlayVC shareInstance] animated:YES];
     }
@@ -429,8 +429,8 @@ static NSInteger selectIndex2 = -1;
         [manager removeDownloadPlist:@[cell.obj]];
         [manager removeDownloadImageArray:@[cell.obj.smeta]];
         [manager removeDownloadMP3Array:@[cell.obj.post_mp]];
-        [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
-        [self.tableView reloadData];
+        [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationTop];
+//        [self.tableView reloadData];
     } else if (editingStyle == UITableViewCellEditingStyleInsert) {
         // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
     }

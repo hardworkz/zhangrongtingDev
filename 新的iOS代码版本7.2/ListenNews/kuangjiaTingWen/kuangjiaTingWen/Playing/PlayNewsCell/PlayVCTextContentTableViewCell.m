@@ -71,6 +71,7 @@
 - (void)setFrameModel:(PlayVCTextContentCellFramesModel *)frameModel
 {
     _frameModel = frameModel;
+    
     titleLab.frame = frameModel.titleLabelF;
     riqiLab.frame = frameModel.timeLabelF;
     

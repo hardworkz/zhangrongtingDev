@@ -139,7 +139,6 @@ typedef void(^animateBlock)();
     else if ([[CommonCode readFromUserD:@"isWhatLogin"] isEqualToString:@"weixin"]){
         ExdangqianUser = [CommonCode readFromUserD:@"user_login"];
     }
-//    ExdangqianUser = [CommonCode readFromUserD:userInfo[results][@"user_login"]];
     [NetWorkTool getMyuserinfoWithaccessToken:AvatarAccessToken user_id:userInfo[results][@"id"]  sccess:^(NSDictionary *responseObject) {
         RTLog(@"%@",responseObject);
         if ([responseObject[@"msg"] isEqualToString:@"获取成功!"]) {
@@ -155,7 +154,6 @@ typedef void(^animateBlock)();
             else if ([[CommonCode readFromUserD:@"isWhatLogin"] isEqualToString:@"weixin"]){
                 ExdangqianUser = responseObject[results][@"user_login"];
             }
-//            ExdangqianUser = responseObject[results][@"user_login"];
             [CommonCode writeToUserD:ExdangqianUser andKey:@"dangqianUser"];
             [CommonCode writeToUserD:responseObject[results][@"id"] andKey:@"dangqianUserUid"];
             [CommonCode writeToUserD:@(YES) andKey:@"isLogin"];
@@ -193,16 +191,14 @@ typedef void(^animateBlock)();
         LoginVC *loginFriVC = [LoginVC new];
         LoginNavC *loginNavC = [[LoginNavC alloc]initWithRootViewController:loginFriVC];
         [loginNavC.navigationBar setBackgroundColor:[UIColor whiteColor]];
-        //        [loginNavC.navigationBar setBackgroundImage:[UIImage imageNamed:@"mian-1"] forBarMetrics:UIBarMetricsDefault];
         loginNavC.navigationBar.tintColor = [UIColor blackColor];
         [self presentViewController:loginNavC animated:YES completion:nil];
     }
 }
 
-- (void)payButtonAction:(UIButton *)sender{
-//    self.hidesBottomBarWhenPushed=YES;
+- (void)payButtonAction:(UIButton *)sender
+{
     [self.navigationController pushViewController:[PayViewController new] animated:YES];
-//    self.hidesBottomBarWhenPushed=NO;
 }
 
 - (void)loginFirst {
@@ -215,7 +211,6 @@ typedef void(^animateBlock)();
         LoginVC *loginFriVC = [LoginVC new];
         LoginNavC *loginNavC = [[LoginNavC alloc]initWithRootViewController:loginFriVC];
         [loginNavC.navigationBar setBackgroundColor:[UIColor whiteColor]];
-//        [loginNavC.navigationBar setBackgroundImage:[UIImage imageNamed:@"mian-1"] forBarMetrics:UIBarMetricsDefault];
         loginNavC.navigationBar.tintColor = [UIColor blackColor];
         [self presentViewController:loginNavC animated:YES completion:nil];
     }]];

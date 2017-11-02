@@ -891,7 +891,7 @@ didSelectLinkWithTransitInformation:(NSDictionary *)components {
             
             //设置播放器播放数组
             [ZRT_PlayerManager manager].songList = @[self.infoArr[indexPath.row][@"post"]];
-            [[NewPlayVC shareInstance] reloadInterface];
+//            [[NewPlayVC shareInstance] reloadInterface];
             [self.navigationController.navigationBar setHidden:YES];
             [self.navigationController pushViewController:[NewPlayVC shareInstance] animated:YES];
         }

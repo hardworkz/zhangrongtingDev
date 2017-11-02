@@ -179,8 +179,10 @@
             weakSelf.pushNewsInfo = [responseObject[results] mutableCopy];
             [NetWorkTool getAllActInfoListWithAccessToken:nil ac_id:weakSelf.pushNewsInfo[@"post_news"] keyword:nil andPage:nil andLimit:nil sccess:^(NSDictionary *responseObject) {
                 if ([responseObject[status] integerValue] == 1){
-                    [weakSelf.pushNewsInfo setObject:[responseObject[results] firstObject] forKey:@"post_act"];
-                    [weakSelf presentPushNews];
+                    if ([responseObject[results] isKindOfClass:[NSArray class]]) {//防止因为调用firstObject，但是不是数组，导致unrecognized selector sent to instance
+                        [weakSelf.pushNewsInfo setObject:[responseObject[results] firstObject] forKey:@"post_act"];
+                        [weakSelf presentPushNews];
+                    }
                 }
                 else{
                     [SVProgressHUD showErrorWithStatus:responseObject[msg]];

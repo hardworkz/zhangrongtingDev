@@ -56,7 +56,7 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     
     self.window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+//    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         //开屏广告初始化并展示代码
         GDTSplashAd *splashAd;
         if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)
@@ -85,11 +85,11 @@
         }
         /* 使用GCD返回主线程 进行UI层面的赋值 */
         
-        dispatch_async(dispatch_get_main_queue(), ^{
+//        dispatch_async(dispatch_get_main_queue(), ^{
             //添加开屏广告空间到窗口
             [self.splash loadAdAndShowInWindow:self.window withBottomView:_bottomView];
-        });
-    });
+//        });
+//    });
     
     
     self.window.backgroundColor = [UIColor whiteColor];

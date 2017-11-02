@@ -171,7 +171,7 @@ static AVPlayer *_instancePlay = nil;
     [ZRT_PlayerManager manager].playDidEnd = ^(NSInteger currentSongIndex) {
         if ([ZRT_PlayerManager manager].playType == ZRTPlayTypeClassroomTry) {
             weakSelf.playingIndex = currentSongIndex;
-            if (weakSelf.buttons) {//防止按钮数组为空引发崩溃
+            if (weakSelf.buttons && weakSelf.buttons.count > weakSelf.playingIndex) {//防止按钮数组为空引发崩溃
                 [weakSelf playTestMp:weakSelf.buttons[weakSelf.playingIndex]];
             }
         }

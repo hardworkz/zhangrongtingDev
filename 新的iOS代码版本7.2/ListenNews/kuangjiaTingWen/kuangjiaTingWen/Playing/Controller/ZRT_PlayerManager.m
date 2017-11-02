@@ -55,7 +55,7 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
         if ([userInfoDict[results][member_type] intValue] == 0) {
             int limitTime = [[CommonCode readFromUserD:limit_time] intValue];
             int limitNum = [[CommonCode readFromUserD:limit_num] intValue];
-            RTLog(@"limitTime--:%d  is_stop---:%d",limitTime,[userInfoDict[results][is_stop] intValue]);
+//            RTLog(@"limitTime--:%d  is_stop---:%d",limitTime,[userInfoDict[results][is_stop] intValue]);
             if (limitTime >= limitNum||[userInfoDict[results][is_stop] intValue] == 1) {
                 switch (self.playType) {
                     case ZRTPlayTypeNews:
@@ -139,7 +139,7 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
     NSMutableArray *downloadingArray = [NSMutableArray array];
     ProjiectDownLoadManager *manager = [ProjiectDownLoadManager defaultProjiectDownLoadManager];
     NSArray *arr = [manager sevaDownloadArray];
-    RTLog(@"%@",arr[0]);
+//    RTLog(@"%@",arr[0]);
     __weak __typeof(downloadingArray) weakDownloadArray = downloadingArray;
     [arr enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
         @autoreleasepool {
@@ -461,6 +461,11 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
 - (void)loadSongInfoFromIndex:(NSInteger)index
 {
     [self endPlay];
+    
+    //判断是否会数组越界
+    if (self.songList.count == 0 || self.songList.count < index) {
+        return;
+    }
     //更新当前歌曲信息
     self.currentSong = self.songList[index];
     
@@ -488,7 +493,6 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
             
             //判断该新闻ID是否已经离线下载了
             //获取播放器播放对象
-            RTLog(@"post_mp:%@",self.currentSong[@"post_mp"]);
             if ([self post_mpWithDownloadNewsID:self.currentSong[@"id"]] != nil) {
                 self.playerItem = [[AVPlayerItem alloc] initWithURL:[NSURL fileURLWithPath:[self post_mpWithDownloadNewsID:self.currentSong[@"id"]]]];
             }else{
@@ -499,7 +503,6 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
             //刷新封面图片
             self.currentCoverImage = NEWSSEMTPHOTOURL(self.currentSong[@"smeta"]);
             
-            RTLog(@"post_mp:%@",self.currentSong[@"post_mp"]);
             self.playerItem = [[AVPlayerItem alloc] initWithURL:[NSURL fileURLWithPath:self.currentSong[@"post_mp"]]];
             break;
         case ZRTPlayTypeClassroom:

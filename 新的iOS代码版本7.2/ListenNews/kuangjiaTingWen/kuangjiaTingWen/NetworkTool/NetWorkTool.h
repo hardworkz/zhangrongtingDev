@@ -1649,5 +1649,12 @@
 + (void)sendLimitDataWithaccessToken:(NSString *)accessToken
                               sccess:(void (^)(NSDictionary *responseObject))success
                              failure:(void(^)(NSError *error))failure;
+//发现界面搜索热词
++ (void)getHotWordWithSccess:(void (^)(NSDictionary *responseObject))success
+                     failure:(void(^)(NSError *error))failure;
+//上传搜索热词
++ (void)sendHotWordWithHotWord:(NSString *)hotWord
+                        sccess:(void (^)(NSDictionary *responseObject))success
+                       failure:(void(^)(NSError *error))failure;
 @end
 

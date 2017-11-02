@@ -587,11 +587,15 @@ typedef enum : NSUInteger {
 //        }
         
         [[NSNotificationCenter defaultCenter]postNotificationName:@"changeNumber" object:nil];
-        
-        //判断是否是单次下载新闻，记录次数限制
-        if (_isSingleDownload) {
-            [[ZRT_PlayerManager manager] limitPlayStatusWithAdd:YES];
+        //判断只有当前不是vip才进行记录
+        NSDictionary *userInfoDict = [CommonCode readFromUserD:@"dangqianUserInfo"];
+        if ([userInfoDict[results][member_type] intValue] == 0) {
+            //判断是否是单次下载新闻，记录次数限制
+            if (_isSingleDownload) {
+                [[ZRT_PlayerManager manager] limitPlayStatusWithAdd:YES];
+            }
         }
+        
     }];
     [self.lock unlock];
 }

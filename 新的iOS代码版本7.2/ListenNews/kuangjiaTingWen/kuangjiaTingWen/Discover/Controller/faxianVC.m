@@ -117,9 +117,14 @@
 
 -(UIView *)tableView:(UITableView *)tableView viewForFooterInSection:(NSInteger)section {
     
-    UIView *SearchTableViewSectionFootView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, 10)];
-    [SearchTableViewSectionFootView setBackgroundColor:gSubColor];
-    return SearchTableViewSectionFootView;
+//    if (tableView == self.SouSuotableView) {
+        
+        UIView *SearchTableViewSectionFootView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, 10)];
+        [SearchTableViewSectionFootView setBackgroundColor:gSubColor];
+        return SearchTableViewSectionFootView;
+//    }else{
+//        return nil;
+//    }
 }
 
 #pragma mark - UITableViewDelegate
@@ -563,7 +568,7 @@
                     
                     //设置播放器播放数组
                     [ZRT_PlayerManager manager].songList = self.SouSuodataArrM;
-                    [[NewPlayVC shareInstance] reloadInterface];
+//                    [[NewPlayVC shareInstance] reloadInterface];
                     [self.navigationController.navigationBar setHidden:YES];
                     [self.navigationController pushViewController:[NewPlayVC shareInstance] animated:YES];
                 }
@@ -616,7 +621,7 @@
                     
                     //设置播放器播放数组
                     [ZRT_PlayerManager manager].songList = self.SouSuodataArrM;
-                    [[NewPlayVC shareInstance] reloadInterface];
+//                    [[NewPlayVC shareInstance] reloadInterface];
                     [self.navigationController.navigationBar setHidden:YES];
                     [self.navigationController pushViewController:[NewPlayVC shareInstance] animated:YES];
                 }
@@ -1183,11 +1188,21 @@
         _SouSuosousuoTableView.dataSource = self;
         _SouSuosousuoTableView.tag = 2;
         _SouSuosousuoTableView.hidden = YES;
+        
+//        UIButton *cleanBtn = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, 49)];
+//        [cleanBtn setTitle:@"清空搜索历史" forState:UIControlStateNormal];
+//        [cleanBtn addTarget:self action:@selector(cleanHistorySearchWord)];
+        
         _SouSuosousuoTableView.tableFooterView = [UIView new];
     }
     return _SouSuosousuoTableView;
 }
-
+//- (void)cleanHistorySearchWord
+//{
+//    [self.SouSuosousuoArrM removeAllObjects];
+//    [CommonCode writeToUserD:self.SouSuosousuoArrM andKey:@"lishisousuoci"];
+//    [self.SouSuosousuoTableView reloadData];
+//}
 - (NSMutableArray *)SouSuosousuoArrM {
     if (!_SouSuosousuoArrM) {
         
@@ -1219,7 +1234,7 @@
     if (!_SouSuosearchBar) {
         _SouSuosearchBar = [[UISearchBar alloc]initWithFrame:CGRectMake(20 , 26, IPHONE_W - 40, 44)];
         _SouSuosearchBar.delegate = self;
-        _SouSuosearchBar.placeholder = @"搜索新闻、主播、节目、课堂";
+        _SouSuosearchBar.placeholder = @"搜索新闻、主播、专栏、课堂";
         _SouSuosearchBar.showsCancelButton = NO;
         _SouSuosearchBar.searchBarStyle = UISearchBarStyleMinimal;
         //        _SouSuosearchBar.userInteractionEnabled = YES;

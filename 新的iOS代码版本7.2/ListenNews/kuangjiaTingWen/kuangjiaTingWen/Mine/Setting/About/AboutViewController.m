@@ -32,7 +32,7 @@
     self.labelOne.preferredMaxLayoutWidth = IPHONE_W - 80;
     self.labelTwo.preferredMaxLayoutWidth = IPHONE_W - 80;
     self.labelThree.preferredMaxLayoutWidth = IPHONE_W - 80;
-    self.labelThree.text = @"开发团队：泡果网络 \n商务合作：popwcn@163.com \n商务合作QQ：800100043";
+    self.labelThree.text = @"开发团队：泡果网络 \n合作邮箱：popwcn@163.com \n商务洽谈：QQ242111144 \n听闻QQ群：262732230";
     
     UIButton *bs = [UIButton buttonWithType:UIButtonTypeCustom];
     [bs setImage:[UIImage imageNamed:@"back"] forState:UIControlStateNormal];

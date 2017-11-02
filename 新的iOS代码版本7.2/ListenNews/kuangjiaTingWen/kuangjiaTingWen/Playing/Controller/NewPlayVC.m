@@ -46,7 +46,7 @@
 /**
  主页面tableView
  */
-@property(strong,nonatomic)UITableView *tableView;
+@property(strong,nonatomic) UITableView *tableView;
 /**
  新闻详情模型数据
  */
@@ -292,10 +292,14 @@ static NewPlayVC *_instance = nil;
     [NetWorkTool getPostDetailWithaccessToken:AvatarAccessToken post_id:self.post_id sccess:^(NSDictionary *responseObject) {
         [self.tableView.mj_header endRefreshing];
         if ([responseObject[status] intValue] == 1){
-            //判断当前播放内容为新闻播放，新闻播放限制数+1
-            if ([ZRT_PlayerManager manager].playType == ZRTPlayTypeNews) {
-                //判断限制状态，记录次数限制
-                [[ZRT_PlayerManager manager] limitPlayStatusWithAdd:YES];
+            //判断只有当前不是vip才进行记录
+            NSDictionary *userInfoDict = [CommonCode readFromUserD:@"dangqianUserInfo"];
+            if ([userInfoDict[results][member_type] intValue] == 0) {
+                //判断当前播放内容为新闻播放，新闻播放限制数+1
+                if ([ZRT_PlayerManager manager].playType == ZRTPlayTypeNews) {
+                    //判断限制状态，记录次数限制
+                    [[ZRT_PlayerManager manager] limitPlayStatusWithAdd:YES];
+                }
             }
             //刷新新闻详情模型数据
             _postDetailModel = [newsDetailModel mj_objectWithKeyValues:responseObject[results]];
@@ -1823,10 +1827,10 @@ static NSInteger touchCount = 0;
     self.sliderProgress.value = 0.;
     //缓冲进度条清空
     [self.prgBufferProgress setProgress:0. animated:NO];
-    
-    [self.tableView reloadData];
     //滚动到顶部
     [self.tableView setContentOffset:CGPointZero animated:NO];
+    
+    [self.tableView reloadData];
     
     //设置音乐锁屏界面
     [[AppDelegate delegate] configNowPlayingCenter];

@@ -205,21 +205,6 @@
         [self.view addSubview:weiboLab];
     }
     
-    
-//    UIView *downLeftLine =[[UIView alloc]initWithFrame:CGRectMake(IPHONE_W / 2 - 60.0 / 375 * IPHONE_W, weiBoBtn.frame.origin.y + weiBoBtn.frame.size.height / 2, 40.0 / 375 * IPHONE_W, 1)];
-//    downLeftLine.backgroundColor = gMainColor;
-//    [self.view addSubview:downLeftLine];
-//    
-//    UIView *downRightLine =[[UIView alloc]initWithFrame:CGRectMake(IPHONE_W / 2 + 20.0 / 375 * IPHONE_W, weiBoBtn.frame.origin.y + weiBoBtn.frame.size.height / 2, 40.0 / 375 * IPHONE_W, 1)];
-//    downRightLine.backgroundColor = gMainColor;
-//    [self.view addSubview:downRightLine];
-//    
-//    UILabel *ORLab = [[UILabel alloc]initWithFrame:CGRectMake(IPHONE_W / 2 - 10.0 / 375 * IPHONE_W, weiBoBtn.frame.origin.y + weiBoBtn.frame.size.height / 2 - 15.0 / 667 * IPHONE_H, 30.0 / 375 * IPHONE_W, 30.0 / 667 * IPHONE_H)];
-//    ORLab.textColor = gMainColor;
-//    ORLab.text = @"OR";
-//    ORLab.font = [UIFont systemFontOfSize:15.0f];
-//    [self.view addSubview:ORLab];
-    
     UISwipeGestureRecognizer *rightSwipe = [[UISwipeGestureRecognizer alloc]initWithTarget:self action:@selector(rightSwipeAction)];
     [rightSwipe setDirection:UISwipeGestureRecognizerDirectionRight];
     [self.view addGestureRecognizer:rightSwipe];
@@ -319,8 +304,9 @@
         [CommonCode writeToUserD:@"QQ" andKey:@"isWhatLogin"];
         ExdangqianUser = responseObject[@"results"][@"user_login"];
         [CommonCode writeToUserD:ExdangqianUser andKey:@"user_login"];
-        
-//                                                       [self performSelector:@selector(updateUserInfo) withObject:nil afterDelay:1.0];
+                                                      //获取播放限制状态
+                                                      [APPDELEGATE getVipLimitData];
+                                                      
     } failure:^(NSError *error) {
         NSLog(@"error = %@",error);
     }];
@@ -384,37 +370,6 @@
                         access_token:access_token
                           expires_in:expires_in
                          isWhatLogin:@"WeiBo"];
-//            [NetWorkTool postPaoGuoDiSanFangDengLuJieKouwithname:name
-//                                                         andhead:head
-//                                                         andtype:type
-//                                                       andopenid:openid
-//                                                 andaccess_token:access_token
-//                                                   andexpires_in:expires_in
-//                                                          sccess:^(NSDictionary *responseObject) {
-//                        
-//                ExdangqianUser = responseObject[@"results"][@"user_login"];
-//                [CommonCode writeToUserD:[NSString stringWithFormat:@"%@",ExdangqianUser] andKey:@"dangqianUser"];
-//                [CommonCode writeToUserD:responseObject[@"results"][@"id"] andKey:@"dangqianUserUid"];
-//                [self dismissViewControllerAnimated:YES completion:nil];
-//                [CommonCode writeToUserD:@(YES) andKey:@"isLogin"];
-//                [CommonCode writeToUserD:responseObject andKey:@"dangqianUserInfo"];
-//                //拿到图片
-//                                                              //拿到图片
-//              UIImage *userAvatar = [UIImage imageWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:USERPHOTOHTTPSTRING(responseObject[@"results"][@"avatar"])]]];
-//                                                              
-//                NSString *path_sandox = NSHomeDirectory();
-//                //设置一个图片的存储路径
-//                NSString *avatarPath = [path_sandox stringByAppendingString:@"/Documents/userAvatar.png"];
-//                //把图片直接保存到指定的路径（同时应该把图片的路径imagePath存起来，下次就可以直接用来取）
-//                [UIImagePNGRepresentation(userAvatar) writeToFile:avatarPath atomically:YES];
-//                [[NSNotificationCenter defaultCenter] postNotificationName:@"loginSccess" object:responseObject];
-//                [CommonCode writeToUserD:@"WeiBo" andKey:@"isWhatLogin"];
-//                ExdangqianUser = responseObject[@"results"][@"user_login"];
-//                [CommonCode writeToUserD:ExdangqianUser andKey:@"user_login"];
-//                [self dismissViewControllerAnimated:YES completion:nil];
-//            } failure:^(NSError *error) {
-//                NSLog(@"error = %@",error);
-//            }];
         }];
         [self getIAPInfomation];
     }
@@ -580,10 +535,6 @@
     }
     [self dismissViewControllerAnimated:YES completion:nil];
 }
-
-//- (void)updateUserInfo{
-//    [[NSNotificationCenter defaultCenter] postNotificationName:@"updateUserInfo" object:nil];
-//}
 
 - (void)getIAPInfomation{
     //请求是否为内购的接口

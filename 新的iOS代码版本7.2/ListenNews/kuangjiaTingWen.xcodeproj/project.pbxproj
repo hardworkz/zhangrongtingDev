@@ -2190,16 +2190,13 @@
 				695873161EF118A20011B174 /* MyClassroom */,
 				69C7122B1EC0740E00F2729E /* APPReference */,
 				69C712341EC0740E00F2729E /* HelpAndFeedback */,
-				69C712391EC0740E00F2729E /* ListeningFriends */,
 				69C7123A1EC0740E00F2729E /* Login */,
-				69C7124B1EC0740E00F2729E /* Model */,
 				69C7124C1EC0740E00F2729E /* MyAttention */,
 				69C7125C1EC0740E00F2729E /* MyCollection */,
 				69C7125F1EC0740E00F2729E /* MyDownload */,
 				69C712771EC0740E00F2729E /* Pay */,
 				69C712861EC0740E00F2729E /* PersonalPage */,
 				69C712971EC0740E00F2729E /* Setting */,
-				69C712BC1EC0740E00F2729E /* View */,
 				699582071EC55A630037E9A4 /* MineHeader.h */,
 			);
 			path = Mine;
@@ -2234,13 +2231,6 @@
 			path = HelpAndFeedback;
 			sourceTree = "<group>";
 		};
-		69C712391EC0740E00F2729E /* ListeningFriends */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = ListeningFriends;
-			sourceTree = "<group>";
-		};
 		69C7123A1EC0740E00F2729E /* Login */ = {
 			isa = PBXGroup;
 			children = (
@@ -2262,13 +2252,6 @@
 				69C7124A1EC0740E00F2729E /* zhuceVC.m */,
 			);
 			path = Login;
-			sourceTree = "<group>";
-		};
-		69C7124B1EC0740E00F2729E /* Model */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Model;
 			sourceTree = "<group>";
 		};
 		69C7124C1EC0740E00F2729E /* MyAttention */ = {
@@ -2517,13 +2500,6 @@
 				69C712BB1EC0740E00F2729E /* VoteViewController.m */,
 			);
 			path = Vote;
-			sourceTree = "<group>";
-		};
-		69C712BC1EC0740E00F2729E /* View */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = View;
 			sourceTree = "<group>";
 		};
 		69C712BD1EC0740E00F2729E /* Model */ = {

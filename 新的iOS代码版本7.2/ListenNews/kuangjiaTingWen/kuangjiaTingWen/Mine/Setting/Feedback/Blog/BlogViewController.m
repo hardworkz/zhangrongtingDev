@@ -446,7 +446,7 @@
             
             //设置播放器播放数组
             [ZRT_PlayerManager manager].songList = @[dict];
-            [[NewPlayVC shareInstance] reloadInterface];
+//            [[NewPlayVC shareInstance] reloadInterface];
             [self.navigationController.navigationBar setHidden:YES];
             [self.navigationController pushViewController:[NewPlayVC shareInstance] animated:YES];
         }

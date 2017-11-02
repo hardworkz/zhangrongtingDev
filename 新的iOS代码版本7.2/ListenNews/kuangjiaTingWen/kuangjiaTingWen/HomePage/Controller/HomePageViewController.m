@@ -566,7 +566,7 @@
                 UIButton *newsItem = [UIButton buttonWithType:UIButtonTypeCustom];
                 [newsItem setFrame:CGRectMake(newsItem_width * i + 5.0 / 375 * IPHONE_W + 5.0, 5, newsItem_width - 5,IS_IPAD?40:25)];
                 [newsItem.layer setMasksToBounds:YES];
-                [newsItem.layer setCornerRadius:12.5];
+                [newsItem.layer setCornerRadius:IS_IPAD?20:12.5];
                 [newsItem.layer setBorderWidth:0.5];
                 [newsItem.layer setBorderColor:gTextColorSub.CGColor];
                 [newsItem setTitle:newsItemTitle[i] forState:UIControlStateNormal];
@@ -663,7 +663,7 @@
             
             //设置播放器播放数组
             [ZRT_PlayerManager manager].songList = arr;
-            [[NewPlayVC shareInstance] reloadInterface];
+//            [[NewPlayVC shareInstance] reloadInterface];
             [self.navigationController.navigationBar setHidden:YES];
             [self.navigationController pushViewController:[NewPlayVC shareInstance] animated:YES];
         }

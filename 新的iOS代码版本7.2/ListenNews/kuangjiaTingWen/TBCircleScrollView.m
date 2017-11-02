@@ -289,7 +289,7 @@
         {
             //设置播放器播放数组
             [ZRT_PlayerManager manager].songList = newsArr;
-            [[NewPlayVC shareInstance] reloadInterface];
+//            [[NewPlayVC shareInstance] reloadInterface];
             [nav.navigationBar setHidden:YES];
             [nav pushViewController:[NewPlayVC shareInstance] animated:YES];
         }

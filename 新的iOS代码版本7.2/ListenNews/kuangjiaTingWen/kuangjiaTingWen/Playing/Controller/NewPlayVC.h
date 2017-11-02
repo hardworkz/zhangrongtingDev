@@ -69,4 +69,8 @@ typedef NS_ENUM(NSInteger, RewardViewType) {
  主播详情页面点击列表播放按钮调用
  */
 - (void)achorVCDidClickedListPlayBtn;
+/**
+ 设置新闻内容详情frame模型数据
+ */
+- (void)setFrameModel;
 @end

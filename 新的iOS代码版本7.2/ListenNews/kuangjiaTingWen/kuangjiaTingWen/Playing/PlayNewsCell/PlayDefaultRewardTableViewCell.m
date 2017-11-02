@@ -99,8 +99,9 @@
         [rewardButton addTarget:self action:@selector(rewardButtonAciton:) forControlEvents:UIControlEventTouchUpInside];
         [rewardBorderViewNormal addSubview:rewardButton];
         
+        RTLog(@"%f",rewardBorderViewNormal.frame.size.height);
         //分割线
-        midleLine = [[UIView alloc]initWithFrame:CGRectMake(0, rewardBorderViewNormal.frame.size.height / 2, rewardBorderViewNormal.frame.size.width, 0.5)];
+        midleLine = [[UIView alloc]initWithFrame:CGRectMake(0, rewardBorderViewNormal.frame.size.height * 0.5, rewardBorderViewNormal.frame.size.width, 0.5)];
         midleLine.backgroundColor = [UIColor lightGrayColor];
         midleLine.alpha = 0.5f;
         [rewardBorderViewNormal addSubview:midleLine];
@@ -134,6 +135,7 @@
         [rewardView setFrame:CGRectMake(rewardView.frame.origin.x, rewardView.frame.origin.y, rewardView.frame.size.width, CGRectGetMaxY(rewardBorderViewNormal.frame) + 20)];
         
         [self.contentView addSubview:rewardView];
+        
     }
     return self;
 }
@@ -159,7 +161,7 @@
         }
         [paidView removeFromSuperview];
         
-        paidView = [[MenuItemV alloc] initWithFrame:CGRectMake(15, CGRectGetMaxY(midleLine.frame),32 * AdaptiveScale_W * [titleArr count] + 20,36) andTitleArr:titleArr andImgArr:imageArr andLineNum:[titleArr count]];
+        paidView = [[MenuItemV alloc] initWithFrame:CGRectMake(15, CGRectGetMaxY(midleLine.frame),32 * AdaptiveScale_W * [titleArr count] + 20,36* AdaptiveScale_W) andTitleArr:titleArr andImgArr:imageArr andLineNum:[titleArr count]];
         [rewardBorderViewNormal insertSubview:paidView belowSubview:paidLabel];
         //设置点击人数
         [paidLabel setText:[NSString stringWithFormat:@"等%lu人赞过",(unsigned long)[self.rewardArray count]]];
