@@ -306,6 +306,7 @@
         [CommonCode writeToUserD:ExdangqianUser andKey:@"user_login"];
                                                       //获取播放限制状态
                                                       [APPDELEGATE getVipLimitData];
+                                                      [APPDELEGATE getAppVersion];
                                                       
     } failure:^(NSError *error) {
         NSLog(@"error = %@",error);
@@ -463,6 +464,7 @@
         
         //获取播放限制状态
         [APPDELEGATE getVipLimitData];
+        [APPDELEGATE getAppVersion];
     } failure:^(NSError *error) {
         //
     }];
@@ -510,6 +512,7 @@
                     
                     //获取播放限制状态
                     [APPDELEGATE getVipLimitData];
+                    [APPDELEGATE getAppVersion];
                 }else{
                     XWAlerLoginView *alert = [[XWAlerLoginView alloc] initWithTitle:responseObject[msg]];
                     [alert show];
@@ -525,7 +528,7 @@
 
 - (void)zhuce:(UIBarButtonItem *)sender{
 
-    [self.navigationController pushViewController:[zhuceVC new] animated:YES];
+    [self.navigationController pushViewController:[NewRegisterController new] animated:YES];
 }
 
 - (void)back{

@@ -40,9 +40,11 @@
         
         CGFloat offsetY = 0;
         //图片
-        imgLeft = [[UIImageView alloc]initWithFrame:CGRectMake(SCREEN_WIDTH - 120.0 / 375 * IPHONE_W, 19 + offsetY, 105.0 / 375 * IPHONE_W,   84.72 / 375 *IPHONE_W)];
+        imgLeft = [[UIImageView alloc]initWithFrame:CGRectMake(SCREEN_WIDTH - 120.0 / 375 * IPHONE_W, 19 + offsetY, 105.0 / 375 * IPHONE_W, 84.72 / 375 *IPHONE_W)];
         if (IS_IPAD) {
             [imgLeft setFrame:CGRectMake(SCREEN_WIDTH - 125.0 / 375 * IPHONE_W, 19 + offsetY, 105.0 / 375 * IPHONE_W, 70.0 / 375 *IPHONE_W)];
+        }else if (IS_IPHONEX){
+            [imgLeft setFrame:CGRectMake(SCREEN_WIDTH - 125.0, 19 + offsetY, 105.0, 84.72)];
         }
         imgLeft.contentMode = UIViewContentModeScaleAspectFill;
         imgLeft.clipsToBounds = YES;
@@ -50,6 +52,9 @@
         
         //标题
         titleLab = [[UILabel alloc]initWithFrame:CGRectMake(15.0 / 375 * IPHONE_W, 16.0 / 667 * IPHONE_H + offsetY,  SCREEN_WIDTH - 155.0 / 375 * IPHONE_W, 21.0 / 667 *IPHONE_H)];
+        if (IS_IPHONEX){
+            [titleLab setFrame:CGRectMake(15.0, 16.0 + offsetY, SCREEN_WIDTH - 155.0, 21.0)];
+        }
         titleLab.textAlignment = NSTextAlignmentLeft;
         titleLab.font = [UIFont boldSystemFontOfSize:17.0f];
         titleLab.lineBreakMode = NSLineBreakByWordWrapping;
@@ -69,11 +74,17 @@
         
         //日期
         riqiLab = [[UILabel alloc]initWithFrame:CGRectMake(15.0 / 375 * IPHONE_W, 86.0 / 667 *IPHONE_H + offsetY, 135.0 / 375 * IPHONE_W, 21.0 / 667 *IPHONE_H)];
+        if (IS_IPHONEX){
+            [riqiLab setFrame:CGRectMake(15.0, 86.0 + offsetY, 135.0, 21.0)];
+        }
         riqiLab.textColor = nSubColor;
         riqiLab.font = [UIFont systemFontOfSize:13.0f];
         [self.contentView addSubview:riqiLab];
         //大小
         dataLab = [[UILabel alloc]initWithFrame:CGRectMake(SCREEN_WIDTH - 213.0 / 375 * IPHONE_W, 86.0 / 667 *IPHONE_H + offsetY, 45.0 / 375 * IPHONE_W, 21.0 / 667 *IPHONE_H)];
+        if (IS_IPHONEX){
+            [dataLab setFrame:CGRectMake(SCREEN_WIDTH - 213.0, 86.0 + offsetY, 45.0, 21.0)];
+        }
         dataLab.textColor = nSubColor;
         dataLab.font = [UIFont systemFontOfSize:13.0f];
         dataLab.textAlignment = NSTextAlignmentCenter;
@@ -81,6 +92,9 @@
         //下载
         downloadBtn = [UIButton buttonWithType:UIButtonTypeCustom];
         [downloadBtn setFrame:CGRectMake(CGRectGetMaxX(dataLab.frame), 86.0 / 667 *IPHONE_H + offsetY, 30.0 / 667 *IPHONE_H, 30.0 / 667 *IPHONE_H)];
+        if (IS_IPHONEX){
+            [downloadBtn setFrame:CGRectMake(CGRectGetMaxX(dataLab.frame), 86.0 + offsetY, 30.0, 30.0)];
+        }
         [downloadBtn setImage:[UIImage imageNamed:@"download_grey"] forState:UIControlStateNormal];
         [downloadBtn setImage:[UIImage imageNamed:@"download_finish"] forState:UIControlStateDisabled];
         [downloadBtn setImageEdgeInsets:UIEdgeInsetsMake(0, 0, 10, 10)];
@@ -89,6 +103,9 @@
         [self.contentView addSubview:downloadBtn];
         
         line = [[UIView alloc]initWithFrame:CGRectMake(15.0 / 375 * SCREEN_WIDTH, CGRectGetMaxY(dataLab.frame) + 12.0 / 667 * SCREEN_HEIGHT, SCREEN_WIDTH - 30.0 / 375 * SCREEN_WIDTH, 0.5)];
+        if (IS_IPHONEX){
+            [line setFrame:CGRectMake(15.0, CGRectGetMaxY(dataLab.frame) + 12.0, SCREEN_WIDTH - 30.0, 0.5)];
+        }
         [line setBackgroundColor:nMineNameColor];
         [self.contentView addSubview:line];
         
@@ -188,7 +205,6 @@
 }
 - (void)WHCDownload:(WHC_Download *)download filePath:(NSString *)filePath isSuccess:(BOOL)success
 {
-    RTLog(@"%@",_dataDict[@"post_mp"]);
     if ([_dataDict[@"post_mp"] isEqualToString:download.downUrl.absoluteString]) {
         downloadBtn.enabled = NO;
     }

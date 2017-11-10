@@ -289,6 +289,7 @@ static NewPlayVC *_instance = nil;
 #pragma mark - 加载新闻详情数据
 - (void)loadData
 {
+    if (!self.post_id) return;
     [NetWorkTool getPostDetailWithaccessToken:AvatarAccessToken post_id:self.post_id sccess:^(NSDictionary *responseObject) {
         [self.tableView.mj_header endRefreshing];
         if ([responseObject[status] intValue] == 1){
@@ -335,6 +336,7 @@ static NewPlayVC *_instance = nil;
 }
 #pragma mark - 获取评论列表
 - (void)getCommentList{
+    if (!self.post_id) return;
     //获取评论列表
     [NetWorkTool getPaoGuoJieMuPingLunLieBiaoWithJieMuID:self.post_id anduid:ExdangqianUserUid andPage:[NSString stringWithFormat:@"%ld",self.commentPage] andLimit:[NSString stringWithFormat:@"%ld",self.commentPageSize] sccess:^(NSDictionary *responseObject) {
         if ([responseObject[status] intValue] == 1) {
@@ -402,7 +404,11 @@ static NewPlayVC *_instance = nil;
     [_topView addSubview:_topCenterView];
     
     //关注、取消
-    self.guanzhuBtnNav.frame = CGRectMake(_topCenterView.width - 60.0 / 375 * IPHONE_W, 7, 55.0 / 375 * IPHONE_W, 30.0 / 667 * IPHONE_H);
+    if (IS_IPAD||IS_IPHONEX) {
+        self.guanzhuBtnNav.frame = CGRectMake(_topCenterView.width - 60.0 / 375 * IPHONE_W, 7, 55.0 / 375 * IPHONE_W, 30.0);
+    }else{
+        self.guanzhuBtnNav.frame = CGRectMake(_topCenterView.width - 60.0 / 375 * IPHONE_W, 7, 55.0 / 375 * IPHONE_W, 30.0 / 667 * IPHONE_H);
+    }
     [_topCenterView addSubview:_guanzhuBtnNav];
     
     //主播麦克风图标
@@ -535,7 +541,11 @@ static NewPlayVC *_instance = nil;
     [xiangqingView addSubview:_achorTouch];
     
     //关注、取消
-    self.guanzhuBtn.frame = CGRectMake(SCREEN_WIDTH - 80.0 / 375 * IPHONE_W, CGRectGetMaxY(_zhengwenImg.frame) + 9.0 / 375 * IPHONE_W, 60.0 / 375 * IPHONE_W, 30.0 / 667 * IPHONE_H);
+    if (IS_IPAD||IS_IPHONEX) {
+        self.guanzhuBtn.frame = CGRectMake(SCREEN_WIDTH - 80.0 / 375 * IPHONE_W, CGRectGetMaxY(_zhengwenImg.frame) + 9.0 / 375 * IPHONE_W, 60.0 / 375 * IPHONE_W, 30.0);
+    }else{
+        self.guanzhuBtn.frame = CGRectMake(SCREEN_WIDTH - 80.0 / 375 * IPHONE_W, CGRectGetMaxY(_zhengwenImg.frame) + 9.0 / 375 * IPHONE_W, 60.0 / 375 * IPHONE_W, 30.0 / 667 * IPHONE_H);
+    }
     [xiangqingView addSubview:_guanzhuBtn];
     
     
@@ -839,7 +849,7 @@ static NewPlayVC *_instance = nil;
 {
     if (!_tableView)
     {
-        _tableView = [[UITableView alloc]initWithFrame:CGRectMake(0, 0, IPHONE_W, IPHONE_H - 109.0 / 667 * IPHONE_H) style:UITableViewStylePlain];
+        _tableView = [[UITableView alloc]initWithFrame:CGRectMake(0,IS_IPHONEX?-25:0, IPHONE_W, IPHONE_H - 109.0 / 667 * IPHONE_H) style:UITableViewStylePlain];
         _tableView.delegate = self;
         _tableView.scrollsToTop = YES;
         _tableView.dataSource = self;

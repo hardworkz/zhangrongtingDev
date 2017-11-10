@@ -73,5 +73,9 @@ typedef void (^WechatdidReceiveCode)(NSString *);
  获取每日免费收听数以及当前系统时间
  */
 - (void)getVipLimitData;
+/**
+ 请求是否为内购的接口
+ */
+- (void)getAppVersion;
 @end
 

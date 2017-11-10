@@ -109,6 +109,9 @@
 //判断是否是iPhone
 #define IS_IPHONE UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone
 
+//判断是否是iPhoneX
+#define IS_IPHONEX  SCREEN_HEIGHT == 812
+
 // 当前系统版本
 #define CurrentSystemVersion [CommonCode getCurrentSystemVersion]
 

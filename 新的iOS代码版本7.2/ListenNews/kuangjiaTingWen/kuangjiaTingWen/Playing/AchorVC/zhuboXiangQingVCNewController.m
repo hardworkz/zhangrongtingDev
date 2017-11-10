@@ -122,9 +122,6 @@
     [super viewDidLoad];
     touchCount = 0;
     [self.navigationController setNavigationBarHidden:YES animated:YES];
-//    self.edgesForExtendedLayout = UIRectEdgeNone;
-//    self.automaticallyAdjustsScrollViewInsets = NO;
-//    self.extendedLayoutIncludesOpaqueBars = NO;
     [self setTitle:@"详情"];
     self.view.backgroundColor = [UIColor whiteColor];
     _isRewardLoginBack = NO;
@@ -199,12 +196,16 @@
                 btn.accessibilityLabel = @"下载";
             }
             btn.frame = CGRectMake((75.0 / 375 * SCREEN_WIDTH) * i, 0, 75.0 / 375 * SCREEN_WIDTH, 52.0 / 667 * SCREEN_HEIGHT);
+            if (IS_IPHONEX) {
+                btn.frame = CGRectMake((75.0) * i, 0, 75.0 , 82.0);
+                btn.titleEdgeInsets = UIEdgeInsetsMake(30, 10, 0, 0);
+            }
             [buttonArray addObject:btn];
         }
         
         //分页tableView
         for (int i = 0; i < 4; i ++ ){
-            CustomPageScrollView *tableView = [[CustomPageScrollView alloc] initWithFrame:CGRectMake(IPHONE_W * i, 0, IPHONE_W , IPHONE_H - 24.0/ 667 * SCREEN_HEIGHT) style:UITableViewStyleGrouped];
+            CustomPageScrollView *tableView = [[CustomPageScrollView alloc] initWithFrame:CGRectMake(IPHONE_W * i, 0, IPHONE_W ,IS_IPHONEX?IPHONE_H - 24.0: IPHONE_H - 24.0/ 667 * SCREEN_HEIGHT) style:UITableViewStyleGrouped];
             tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
             tableView.backgroundColor = [UIColor whiteColor];
             
@@ -212,16 +213,16 @@
                 xinwenshuaxinTableView = tableView;
             }
             else if (i == 1){
-                tableView = [[CustomPageScrollView alloc]initWithFrame:CGRectMake(IPHONE_W * i + 1, 0, IPHONE_W , IPHONE_H - 20.0/ 667 * SCREEN_HEIGHT) style:UITableViewStyleGrouped];
+                tableView = [[CustomPageScrollView alloc]initWithFrame:CGRectMake(IPHONE_W * i + 1, 0, IPHONE_W , IS_IPHONEX?IPHONE_H - 20.0:IPHONE_H - 20.0/ 667 * SCREEN_HEIGHT) style:UITableViewStyleGrouped];
                 tableView.backgroundColor = [UIColor whiteColor];
                 fansWallTableView = tableView;
                 tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
             }
             else if (i == 2){
-                tableView.frame = CGRectMake(IPHONE_W * i + 2, 0, IPHONE_W, IPHONE_H - 20.0 / 667 * SCREEN_HEIGHT);
+                tableView.frame = CGRectMake(IPHONE_W * i + 2, 0, IPHONE_W, IS_IPHONEX?IPHONE_H - 20.0:IPHONE_H - 20.0 / 667 * SCREEN_HEIGHT);
                 pinglunhoushuaxinTableView = tableView;
             }else if (i == 3){
-                tableView.frame = CGRectMake(IPHONE_W * i + 3, 0, IPHONE_W, IPHONE_H - 20.0 / 667 * SCREEN_HEIGHT);
+                tableView.frame = CGRectMake(IPHONE_W * i + 3, 0, IPHONE_W, IS_IPHONEX?IPHONE_H - 20.0:IPHONE_H - 20.0 / 667 * SCREEN_HEIGHT);
                 tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
                 ImageTableView = tableView;
             }
@@ -247,10 +248,23 @@
             }
         }
         //详情页移动导航栏主框架
-    pagingView = [CustomPageView pagingViewWithHeaderView:headerView headerHeight:self.isClass?(SCREEN_WIDTH == 320?238.0 / 667 * SCREEN_HEIGHT + 10:238.0 / 667 * SCREEN_HEIGHT):273.0 / 667 * SCREEN_HEIGHT segmentButtons:buttonArray segmentHeight:52.0 / 667 * SCREEN_HEIGHT contentViews:@[xinwenshuaxinTableView, fansWallTableView, pinglunhoushuaxinTableView,ImageTableView]];
-//    }
+    //适配iPhoneX
+    CGFloat headerH = 0;
+    if (self.isClass) {
+        if (SCREEN_WIDTH == 320) {
+            headerH = 238.0/ 667 * SCREEN_HEIGHT + 10;
+        }else{
+            headerH = IS_IPHONEX?238.0: 238.0 / 667 * SCREEN_HEIGHT;
+        }
+    }else{
+        headerH = IS_IPHONEX?273.0:273.0 / 667 * SCREEN_HEIGHT;
+    }
+    pagingView = [CustomPageView pagingViewWithHeaderView:headerView headerHeight:headerH segmentButtons:buttonArray segmentHeight:IS_IPHONEX?82.0: 52.0 / 667 * SCREEN_HEIGHT contentViews:@[xinwenshuaxinTableView, fansWallTableView, pinglunhoushuaxinTableView,ImageTableView]];
     
     UIView *picView = [[UIView alloc]initWithFrame:CGRectMake(IPHONE_W * 3, 0, IPHONE_W, IPHONE_H - 50.0 / 667 * SCREEN_HEIGHT - 50.0 / 667 * IPHONE_H)];
+    if (IS_IPHONEX) {
+        [picView setFrame:CGRectMake(IPHONE_W * 3, 0, IPHONE_W, IPHONE_H - 50.0 - 50.0)];
+    }
     [picView setBackgroundColor:[UIColor whiteColor]];
     
     self.pagingView = pagingView;
@@ -783,14 +797,14 @@
     [downHeaderV setBackgroundColor:[UIColor whiteColor]];
     //返回按钮
     UIButton *leftBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    leftBtn.frame = CGRectMake(10, 25, 35, 35);
+    leftBtn.frame = CGRectMake(10,IS_IPHONEX?40:25, 35, 35);
     [leftBtn setImageEdgeInsets:UIEdgeInsetsMake(5, 0, 5, 10)];
     [leftBtn setImage:[UIImage imageNamed:@"back"] forState:UIControlStateNormal];
     [leftBtn addTarget:self action:@selector(backAction:) forControlEvents:UIControlEventTouchUpInside];
     leftBtn.accessibilityLabel = @"返回";
     [headerView addSubview:leftBtn];
     //title
-    UILabel *topLab = [[UILabel alloc]initWithFrame:CGRectMake(50, 30, IPHONE_W - 100, 30)];
+    UILabel *topLab = [[UILabel alloc]initWithFrame:CGRectMake(50, IS_IPHONEX?40:25, IPHONE_W - 100, 30)];
     topLab.textColor = nTextColorMain;
     topLab.font = [UIFont boldSystemFontOfSize:17.0f];
     topLab.text = @"详情";
@@ -800,7 +814,7 @@
     
     //分享按钮
     UIButton *shareBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    shareBtn.frame = CGRectMake(SCREEN_WIDTH - 45, 25, 35, 35);
+    shareBtn.frame = CGRectMake(SCREEN_WIDTH - 45, IS_IPHONEX?40:25, 35, 35);
     [shareBtn setImageEdgeInsets:UIEdgeInsetsMake(7.5, 0, 7.5, 15)];
     [shareBtn setImage:[UIImage imageNamed:@"title_ic_share"] forState:UIControlStateNormal];
     [shareBtn addTarget:self action:@selector(shareAction:) forControlEvents:UIControlEventTouchUpInside];
@@ -835,7 +849,7 @@
     //姓名,课程名称
     UILabel *name = [[UILabel alloc]init];
     if (!self.isClass) {
-        name.frame = CGRectMake(CGRectGetMaxX(imgBorderView.frame) + 12, imgBorderView.frame.origin.y + 20.0 / 667 * IPHONE_H, 150, 20.0 / 667 * IPHONE_H);
+        name.frame = CGRectMake(CGRectGetMaxX(imgBorderView.frame) + 12, imgBorderView.frame.origin.y + 15.0 / 667 * IPHONE_H, 150, 20.0 / 667 * IPHONE_H);
     }else{//课堂
         CGSize nameSize = [self.jiemuName boundingRectWithSize:CGSizeMake(SCREEN_WIDTH - CGRectGetMaxX(imgBorderView.frame) - 12 - 20, MAXFLOAT) options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:[UIFont boldSystemFontOfSize:17.0]} context:nil].size;
         name.frame = CGRectMake(CGRectGetMaxX(imgBorderView.frame) + 12, imgBorderView.frame.origin.y + 5.0 / 667 * IPHONE_H, SCREEN_WIDTH - CGRectGetMaxX(imgBorderView.frame) - 12 - 20, nameSize.height);
@@ -850,8 +864,8 @@
     //简介
     UILabel *fensiliuyan = [[UILabel alloc]init];
     if (!self.isClass) {
-        fensiliuyan.frame = CGRectMake(name.frame.origin.x,CGRectGetMaxY(imgBorderView.frame) - 30.0 / 667 *SCREEN_HEIGHT, SCREEN_WIDTH - name.frame.origin.x - 80.0 / 375 * SCREEN_WIDTH, 40.0 / 667 * IPHONE_H);
-        fensiliuyan.numberOfLines = 2;
+        fensiliuyan.frame = CGRectMake(name.frame.origin.x,CGRectGetMaxY(imgBorderView.frame) - 50.0 / 667 *SCREEN_HEIGHT, SCREEN_WIDTH - name.frame.origin.x - 80.0 / 375 * SCREEN_WIDTH, 60.0 / 667 * IPHONE_H);
+        fensiliuyan.numberOfLines = 3;
     }else{//课堂
         CGSize fensiliuyanSize = [self.jiemuDescription boundingRectWithSize:CGSizeMake(MAXFLOAT, MAXFLOAT) options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:[UIFont boldSystemFontOfSize:17.0]} context:nil].size;
         fensiliuyan.frame = CGRectMake(name.frame.origin.x,CGRectGetMaxY(name.frame) + 15.0 / 667 *SCREEN_HEIGHT, SCREEN_WIDTH - name.frame.origin.x - 30.0 / 375 * SCREEN_WIDTH, fensiliuyanSize.height);
@@ -865,7 +879,7 @@
     
     if (!self.isClass) {//课堂详情隐藏控件
         UIButton *guanzhuBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-        guanzhuBtn.frame = CGRectMake(SCREEN_WIDTH - 80.0 / 375 * IPHONE_W,161.0 / 667 * IPHONE_H, 80.0 / 375 * IPHONE_W, 20.0 / 667 * IPHONE_H);
+        guanzhuBtn.frame = CGRectMake(SCREEN_WIDTH - 80.0 / 375 * IPHONE_W,151.0 / 667 * IPHONE_H, 80.0 / 375 * IPHONE_W, 20.0 / 667 * IPHONE_H);
         if (isGuanZhu == YES)
         {
             [guanzhuBtn setTitle:@"取消" forState:UIControlStateNormal];
@@ -1674,6 +1688,9 @@
         zhuboxiangqingNewVCPlayBtn *playBtn = [[zhuboxiangqingNewVCPlayBtn alloc] init];
         if (self.isClass) {
             titleLab.frame = CGRectMake(20.0 / 375 * IPHONE_W, 12.0 / 667 * IPHONE_H, SCREEN_WIDTH - 80.0 / 375 * IPHONE_W, 21 * 3);
+            if (IS_IPHONEX) {
+                titleLab.frame = CGRectMake(20.0, 12.0, SCREEN_WIDTH - 80.0, 21 * 3);
+            }
             //播放按钮
             playBtn.titleLab = titleLab;
             playBtn.frame = CGRectMake(SCREEN_WIDTH - 50 - 10, 10, 50, 50);
@@ -1685,6 +1702,9 @@
             [cell.contentView addSubview:playBtn];
         }else{
             titleLab.frame = CGRectMake(72.0 / 375 * IPHONE_W, 12.0 / 667 * IPHONE_H, SCREEN_WIDTH - 87.0 / 375 * IPHONE_W, 21 * 3);
+            if (IS_IPHONEX) {
+                titleLab.frame = CGRectMake(72.0, 12.0, SCREEN_WIDTH - 87.0, 21 * 3);
+            }
         }
         titleLab.text = xinwenArr[indexPath.row][@"post_title"];
         
@@ -1692,11 +1712,7 @@
         
         if ([[CommonCode readFromUserD:@"dangqianbofangxinwenID"] isEqualToString:xinwenArr[indexPath.row][@"id"]])
         {
-//            if (![ZRT_PlayerManager manager].isPlaying){
-//                playBtn.selected = NO;
-//            }else{
-                playBtn.selected = YES;
-//            }
+            playBtn.selected = YES;
         }else{
             playBtn.selected = NO;
         }
@@ -1724,6 +1740,9 @@
         if (!self.isClass) {
             UIButton *dataLab = [UIButton buttonWithType:UIButtonTypeCustom];
             [dataLab setFrame:CGRectMake(SCREEN_WIDTH -  55.0 / 375 * IPHONE_W, 64.0 / 667 * SCREEN_HEIGHT, 35.0 / 375 * IPHONE_W, 15.0 / 667 * SCREEN_HEIGHT)];
+            if (IS_IPHONEX) {
+                dataLab.frame = CGRectMake(SCREEN_WIDTH -  55.0 , 64.0, 35.0, 15.0 );
+            }
             [dataLab setTitle:[NSString stringWithFormat:@"%.1lf%@",[xinwenArr[indexPath.row][@"post_size"] intValue] / 1024.0 / 1024.0,@"M"] forState:UIControlStateNormal];
             dataLab.backgroundColor = [UIColor whiteColor];
             [dataLab.layer setBorderWidth:0.5f];
@@ -1737,6 +1756,9 @@
         
         if (!self.isClass) {
             TTTAttributedLabel *riqiLab = [[TTTAttributedLabel alloc]initWithFrame:CGRectMake(20.0 / 375 * IPHONE_W, 12.0 / 667 * SCREEN_HEIGHT, 52.0 / 375 * IPHONE_W, 30.0 / 667 * SCREEN_HEIGHT)];
+            if (IS_IPHONEX) {
+                riqiLab.frame = CGRectMake(20.0, 12.0, 52.0, 30.0);
+            }
             riqiLab.text = xinwenArr[indexPath.row][@"post_modified"];
             NSDate *date = [NSDate dateFromString:xinwenArr[indexPath.row][@"post_modified"]];
             riqiLab.text = [date showTimeFormatD];
@@ -1754,10 +1776,16 @@
         
         if (self.isClass) {
             UIView *devider = [[UIView alloc] initWithFrame:CGRectMake(10.0 / 375 * IPHONE_W, 70.0 / 667 * SCREEN_HEIGHT - 0.5, SCREEN_WIDTH, 0.5)];
+            if (IS_IPHONEX) {
+                devider.frame = CGRectMake(10.0, 70.0 - 0.5, SCREEN_WIDTH, 0.5);
+            }
             devider.backgroundColor = [UIColor lightGrayColor];
             [cell.contentView addSubview:devider];
         }else{
             UIView *devider = [[UIView alloc] initWithFrame:CGRectMake(10.0 / 375 * IPHONE_W, 99.0 / 667 * SCREEN_HEIGHT - 0.5, SCREEN_WIDTH, 0.5)];
+            if (IS_IPHONEX) {
+                devider.frame = CGRectMake(10.0, 99.0 - 0.5, SCREEN_WIDTH, 0.5);
+            }
             devider.backgroundColor = [UIColor lightGrayColor];
             [cell.contentView addSubview:devider];
         }
@@ -1808,9 +1836,9 @@
 {
     if ([tableView isEqual:xinwenshuaxinTableView]){
         if (self.isClass) {
-            return 70.0 / 667 * SCREEN_HEIGHT;
+            return IS_IPHONEX?70.0: 70.0 / 667 * SCREEN_HEIGHT;
         }else{
-            return 99.0 / 667 * SCREEN_HEIGHT;
+            return IS_IPHONEX?99.0: 99.0 / 667 * SCREEN_HEIGHT;
         }
     }
     else if ([tableView isEqual:fansWallTableView]){
@@ -1828,10 +1856,6 @@
     else{
         PlayVCCommentFrameModel *frameModel = liuyanArr[indexPath.row];
         return frameModel.cellHeight;
-//        UITableViewCell *cell = (UITableViewCell *)[tableView viewWithTag:indexPath.row + 1000];
-//        UILabel *lab = (UILabel *)[cell viewWithTag:indexPath.row + 3000];
-//        
-//        return (CGRectGetMaxY(lab.frame) + 20.0) / 667 * IPHONE_H;
     }
 }
 
@@ -1882,12 +1906,8 @@
             [[NewPlayVC shareInstance] playFromIndex:ExcurrentNumber];
             //跳转播放界面
             [self.navigationController.navigationBar setHidden:YES];
-//            if (self.isbofangye) {
-//                [self.navigationController popViewControllerAnimated:YES];
-//            }else{
-                [self.navigationController pushViewController:[NewPlayVC shareInstance] animated:YES];
-                [tableView reloadData];
-//            }
+            [self.navigationController pushViewController:[NewPlayVC shareInstance] animated:YES];
+            [tableView reloadData];
         }
     }
     else if ([tableView isEqual:fansWallTableView]){

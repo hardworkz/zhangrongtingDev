@@ -27,6 +27,7 @@
 
 @property (strong, nonatomic) navigationC *navigationVC;
 
+@property (strong, nonatomic) TabbarView *customTabBar;
 @end
 
 @implementation TabBarController
@@ -46,11 +47,12 @@
 - (void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
+    
+//    [self getPushNewsDetail];
 }
 - (void)viewDidLoad{
     [super viewDidLoad];
     _itemArray = [NSMutableArray array];
-//    shouyeVC *shouye = [[shouyeVC alloc]init];
     HomePageViewController *shouye =  [[HomePageViewController alloc]init];
     dingyueVC *dingyue = [[dingyueVC alloc]init];
     faxianVC *faxian = [[faxianVC alloc]init];
@@ -63,10 +65,7 @@
     
     // 自定义TatBar
     [self setTatBar];
-    
 }
-
-
 - (UIImage *)changColorXuanRan:(NSString *)img{
     UIImage *imgName = [[UIImage imageNamed:img] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
     return imgName;
@@ -77,8 +76,10 @@
     TabbarView *tabBar = [[TabbarView alloc] init];
     tabBar.backgroundColor = [UIColor whiteColor];
     tabBar.frame = self.tabBar.bounds;
+//    tabBar.frame = CGRectMake(0, 0, SCREEN_WIDTH, 49);
     tabBar.items = self.itemArray;
     tabBar.delegate = self;
+    _customTabBar = tabBar;
     //点击中心圆按钮调用block
     DefineWeakSelf
     tabBar.rotationBarBtnAction = ^(UIButton *sender,NSInteger selectedIndex) {
@@ -142,10 +143,6 @@
                 }
             }
         }
-        
-        
-        
-        
     };
     [self.tabBar addSubview:tabBar];
 }
@@ -165,7 +162,9 @@
     [ZRT_PlayerManager manager].channelType = [[CommonCode readFromUserD:NewPlayVC_PLAY_CHANNEL] intValue];
     [[NewPlayVC shareInstance] playFromIndex:[[CommonCode readFromUserD:NewPlayVC_PLAY_INDEX] integerValue]];
     [_navigationVC.navigationBar setHidden:YES];
-    [_navigationVC pushViewController:[NewPlayVC shareInstance] animated:YES];
+    if (_customTabBar.rotationBarBtnAction) {
+        _customTabBar.rotationBarBtnAction(_customTabBar.rotationBarBtn, _customTabBar.currentIdx);
+    }
 }
 
 /**
@@ -174,23 +173,12 @@
 - (void)getPushNewsDetail{
     _pushNewsInfo = [NSMutableDictionary new];
     DefineWeakSelf;
-    [NetWorkTool getpostinfoWithpost_id:[CommonCode readFromUserD:pushNews] andpage:nil andlimit:nil sccess:^(NSDictionary *responseObject) {
+    RTLog(@"%@",[CommonCode readFromUserD:pushNews]);
+    [NetWorkTool getpostinfoWithpost_id:@"70520" andpage:nil andlimit:nil sccess:^(NSDictionary *responseObject) {
         if ([responseObject[status] integerValue] == 1) {
             weakSelf.pushNewsInfo = [responseObject[results] mutableCopy];
-            [NetWorkTool getAllActInfoListWithAccessToken:nil ac_id:weakSelf.pushNewsInfo[@"post_news"] keyword:nil andPage:nil andLimit:nil sccess:^(NSDictionary *responseObject) {
-                if ([responseObject[status] integerValue] == 1){
-                    if ([responseObject[results] isKindOfClass:[NSArray class]]) {//防止因为调用firstObject，但是不是数组，导致unrecognized selector sent to instance
-                        [weakSelf.pushNewsInfo setObject:[responseObject[results] firstObject] forKey:@"post_act"];
-                        [weakSelf presentPushNews];
-                    }
-                }
-                else{
-                    [SVProgressHUD showErrorWithStatus:responseObject[msg]];
-                }
-            } failure:^(NSError *error) {
-                //
-                [SVProgressHUD showErrorWithStatus:@"网络请求失败"];
-            }];
+            [weakSelf.pushNewsInfo setObject:weakSelf.pushNewsInfo[@"act"] forKey:@"post_act"];
+            [weakSelf presentPushNews];
         }
         else{
             [SVProgressHUD showErrorWithStatus:responseObject[msg]];
@@ -208,13 +196,17 @@
 {
     [ZRT_PlayerManager manager].songList = @[self.pushNewsInfo];
     [ZRT_PlayerManager manager].currentSong = self.pushNewsInfo;
+    //设置新闻ID
+    [NewPlayVC shareInstance].post_id = self.pushNewsInfo[@"post_id"];
     //设置播放器播放内容类型
     [ZRT_PlayerManager manager].playType = ZRTPlayTypeNews;
     [NewPlayVC shareInstance].rewardType = RewardViewTypeNone;
     [ZRT_PlayerManager manager].channelType = ChannelTypeChannelNone;
     [[NewPlayVC shareInstance] playFromIndex:0];
     [_navigationVC.navigationBar setHidden:YES];
-    [_navigationVC pushViewController:[NewPlayVC shareInstance] animated:YES];
+    if (_customTabBar.rotationBarBtnAction) {
+        _customTabBar.rotationBarBtnAction(_customTabBar.rotationBarBtn, _customTabBar.currentIdx);
+    }
     //清空获取的推送新闻数据
     self.pushNewsInfo = nil;
 }

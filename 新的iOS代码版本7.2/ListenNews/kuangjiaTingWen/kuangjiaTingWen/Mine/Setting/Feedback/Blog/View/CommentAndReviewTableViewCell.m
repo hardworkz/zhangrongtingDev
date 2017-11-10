@@ -80,7 +80,7 @@
         self.commenter.frame = frameModel.beReplyManF;
         self.content.frame = frameModel.contentLabelF;
         self.content.text = frameModel.content;
-        [self.reviewer setTitle:frameModel.model.user.user_nicename forState:UIControlStateNormal];
+        [self.reviewer setTitle:frameModel.model.user.user_nicename == nil?@"匿名用户":frameModel.model.user.user_nicename forState:UIControlStateNormal];
         [self.commenter setTitle:frameModel.model.to_user.user_nicename forState:UIControlStateNormal];
         self.review.text = @"回复";
     }
@@ -132,8 +132,6 @@
     }
     //跳转个人主页
     UINavigationController *vc = (UINavigationController *)object;
-    gerenzhuye.hidesBottomBarWhenPushed=YES;
     [vc.navigationController pushViewController:gerenzhuye animated:YES];
-    gerenzhuye.hidesBottomBarWhenPushed=YES;
 }
 @end

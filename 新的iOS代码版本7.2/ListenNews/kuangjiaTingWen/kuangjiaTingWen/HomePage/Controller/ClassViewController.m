@@ -194,19 +194,6 @@ static AVPlayer *_instancePlay = nil;
     [self loadData];
     
     _playingIndex = -1;
-    
-//    _isPlaying = NO;
-//    ExisRigester = NO;
-    //AudioSession负责应用音频的设置，比如支不支持后台，打断等等
-//    NSError *error;
-    //设置音频会话
-//    self.session = [AVAudioSession sharedInstance];
-    //AVAudioSessionCategoryPlayback一般用于支持后台播放
-//    [self.session setCategory:AVAudioSessionCategoryPlayback error:&error];
-    //激活会话
-//    [self.session setActive:YES error:&error];
-    //接收播放完毕后发出的通知
-//    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(voicePlayEnd:) name:AVPlayerItemDidPlayToEndTimeNotification object:ExclassPlayer.currentItem];
 }
 
 - (void)setUpView{
@@ -233,10 +220,6 @@ static AVPlayer *_instancePlay = nil;
     [seperatorLine setBackgroundColor:gThickLineColor];
     [self.view addSubview:seperatorLine];
     
-//    UIView *verticalLine = [[UIView alloc]initWithFrame:CGRectMake(SCREEN_WIDTH/4, CGRectGetMaxY(self.helpTableView.frame) + 8, 1.0, 33)];
-//    [verticalLine setBackgroundColor:gThickLineColor];
-//    [self.view addSubview:verticalLine];
-//    [self.view addSubview:self.collectBtn];
     [self.view addSubview:self.auditionnBtn];
     [self.purchaseBtn addSubview:self.priceLabel];
     [self.purchaseBtn addSubview:self.spriceLabel];
@@ -1086,7 +1069,7 @@ static AVPlayer *_instancePlay = nil;
 
 - (UITableView *)helpTableView{
     if (_helpTableView == nil) {
-        _helpTableView = [[UITableView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT - 49) style:UITableViewStylePlain];
+        _helpTableView = [[UITableView alloc]initWithFrame:CGRectMake(0,IS_IPHONEX?-25:0, SCREEN_WIDTH,SCREEN_HEIGHT - 49) style:UITableViewStylePlain];
         [_helpTableView setDelegate:self];
         [_helpTableView setDataSource:self];
         _helpTableView.separatorStyle = UITableViewCellSeparatorStyleNone;
@@ -1115,12 +1098,13 @@ static AVPlayer *_instancePlay = nil;
 - (UIButton *)auditionnBtn{
     if (!_auditionnBtn) {
         _auditionnBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-        [_auditionnBtn setFrame:CGRectMake(0, SCREEN_HEIGHT - 49, SCREEN_WIDTH / 4 *2, 49)];
+        [_auditionnBtn setFrame:CGRectMake(0,IS_IPHONEX?SCREEN_HEIGHT - 49 - 25: SCREEN_HEIGHT - 49, SCREEN_WIDTH / 4 *2, 49)];
+//        _auditionnBtn.backgroundColor = [UIColor greenColor];
         [_auditionnBtn setImage:[UIImage imageNamed:@"play"] forState:UIControlStateNormal];
         [_auditionnBtn setImage:[UIImage imageNamed:@"pause"] forState:UIControlStateSelected];
-        _auditionnBtn.imageEdgeInsets = UIEdgeInsetsMake(0, 0, 0, 0);
+//        _auditionnBtn.imageEdgeInsets = UIEdgeInsetsMake(0, 0, 0, 0);
         [_auditionnBtn setTitle:@"试听" forState:UIControlStateNormal];
-        _auditionnBtn.titleEdgeInsets = UIEdgeInsetsMake(0, 15, 0, 0);
+//        _auditionnBtn.titleEdgeInsets = UIEdgeInsetsMake(0, 15, 0, 0);
         [_auditionnBtn setTitleColor:nTextColorMain forState:UIControlStateNormal];
         [_auditionnBtn addTarget:self action:@selector(auditionnBtnAction:) forControlEvents:UIControlEventTouchUpInside];
     }
@@ -1143,7 +1127,7 @@ static AVPlayer *_instancePlay = nil;
         [_spriceLabel setBackgroundColor:[UIColor clearColor]];
         [_spriceLabel setTextColor:[UIColor whiteColor]];
         _spriceLabel.font = gFontMain14;
-        UIView *line = [[UIView alloc] initWithFrame:CGRectMake(5, 12, SCREEN_WIDTH / 4 - 45, 1)];
+        UIView *line = [[UIView alloc] initWithFrame:CGRectMake(5, 12, SCREEN_WIDTH / 4 - 45, 0.5)];
         line.backgroundColor = [UIColor whiteColor];
         [_spriceLabel addSubview:line];
     }
@@ -1153,7 +1137,7 @@ static AVPlayer *_instancePlay = nil;
 - (UIButton *)purchaseBtn{
     if (!_purchaseBtn) {
         _purchaseBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-        [_purchaseBtn setFrame:CGRectMake(SCREEN_WIDTH / 2, SCREEN_HEIGHT - 49, SCREEN_WIDTH / 2, 49)];
+        [_purchaseBtn setFrame:CGRectMake(SCREEN_WIDTH / 2,IS_IPHONEX?SCREEN_HEIGHT - 49 - 25: SCREEN_HEIGHT - 49, SCREEN_WIDTH / 2, 49)];
         [_purchaseBtn setBackgroundColor:purchaseButtonColor];
         [_purchaseBtn setTitleEdgeInsets:UIEdgeInsetsMake(0, 0, 0, SCREEN_WIDTH / 4)];
         [_purchaseBtn setTitle:@"购买" forState:UIControlStateNormal];

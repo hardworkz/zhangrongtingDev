@@ -190,6 +190,8 @@
 		69AF4FD61F1378C30097893F /* ContentOffsetYDataModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 69AF4FD11F1378C30097893F /* ContentOffsetYDataModel.m */; };
 		69AF4FD71F1378C30097893F /* CustomPageScrollView.m in Sources */ = {isa = PBXBuildFile; fileRef = 69AF4FD31F1378C30097893F /* CustomPageScrollView.m */; };
 		69AF4FD81F1378C30097893F /* CustomPageView.m in Sources */ = {isa = PBXBuildFile; fileRef = 69AF4FD51F1378C30097893F /* CustomPageView.m */; };
+		69C1D5CD1FAFFCA30092A290 /* NewRegisterController.m in Sources */ = {isa = PBXBuildFile; fileRef = 69C1D5CC1FAFFCA30092A290 /* NewRegisterController.m */; };
+		69C1D5D11FB0036D0092A290 /* Xzb_CountDownButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 69C1D5D01FB0036C0092A290 /* Xzb_CountDownButton.m */; };
 		69C671AF1F9EC9E200570027 /* SearchLessonListTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 69C671AE1F9EC9E200570027 /* SearchLessonListTableViewCell.m */; };
 		69C713341EC0740F00F2729E /* CommonCode.m in Sources */ = {isa = PBXBuildFile; fileRef = 69C711E51EC0740E00F2729E /* CommonCode.m */; };
 		69C713351EC0740F00F2729E /* CommonEnums.m in Sources */ = {isa = PBXBuildFile; fileRef = 69C711E71EC0740E00F2729E /* CommonEnums.m */; };
@@ -842,6 +844,10 @@
 		69AF4FD31F1378C30097893F /* CustomPageScrollView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CustomPageScrollView.m; sourceTree = "<group>"; };
 		69AF4FD41F1378C30097893F /* CustomPageView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CustomPageView.h; sourceTree = "<group>"; };
 		69AF4FD51F1378C30097893F /* CustomPageView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CustomPageView.m; sourceTree = "<group>"; };
+		69C1D5CB1FAFFCA30092A290 /* NewRegisterController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NewRegisterController.h; sourceTree = "<group>"; };
+		69C1D5CC1FAFFCA30092A290 /* NewRegisterController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NewRegisterController.m; sourceTree = "<group>"; };
+		69C1D5CF1FB0036C0092A290 /* Xzb_CountDownButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Xzb_CountDownButton.h; sourceTree = "<group>"; };
+		69C1D5D01FB0036C0092A290 /* Xzb_CountDownButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Xzb_CountDownButton.m; sourceTree = "<group>"; };
 		69C671AD1F9EC9E200570027 /* SearchLessonListTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SearchLessonListTableViewCell.h; sourceTree = "<group>"; };
 		69C671AE1F9EC9E200570027 /* SearchLessonListTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SearchLessonListTableViewCell.m; sourceTree = "<group>"; };
 		69C711E41EC0740E00F2729E /* CommonCode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CommonCode.h; sourceTree = "<group>"; };
@@ -1333,6 +1339,7 @@
 		6300DB141D05647F00B82C42 /* External */ = {
 			isa = PBXGroup;
 			children = (
+				69C1D5CE1FB0036C0092A290 /* verifyCodeCountDown */,
 				69AF4FCF1F1378C30097893F /* ZRTHorizontalPagingView */,
 				698E60C81F0CD60C006D7EC0 /* GDTMobSDKlibs */,
 				697E3B321EF8EB9500D5151D /* BJNoDataView */,
@@ -1994,6 +2001,15 @@
 			path = ZRTHorizontalPagingView;
 			sourceTree = "<group>";
 		};
+		69C1D5CE1FB0036C0092A290 /* verifyCodeCountDown */ = {
+			isa = PBXGroup;
+			children = (
+				69C1D5CF1FB0036C0092A290 /* Xzb_CountDownButton.h */,
+				69C1D5D01FB0036C0092A290 /* Xzb_CountDownButton.m */,
+			);
+			path = verifyCodeCountDown;
+			sourceTree = "<group>";
+		};
 		69C711E21EC0740E00F2729E /* kuangjiaTingWen */ = {
 			isa = PBXGroup;
 			children = (
@@ -2250,6 +2266,8 @@
 				69C712481EC0740E00F2729E /* zhaohuiyanzhengmaVC.m */,
 				69C712491EC0740E00F2729E /* zhuceVC.h */,
 				69C7124A1EC0740E00F2729E /* zhuceVC.m */,
+				69C1D5CB1FAFFCA30092A290 /* NewRegisterController.h */,
+				69C1D5CC1FAFFCA30092A290 /* NewRegisterController.m */,
 			);
 			path = Login;
 			sourceTree = "<group>";
@@ -2695,7 +2713,6 @@
 			isa = PBXGroup;
 			children = (
 				69C713091EC0740F00F2729E /* Controller */,
-				69C7130E1EC0740F00F2729E /* Model */,
 				69C7130F1EC0740F00F2729E /* View */,
 			);
 			path = Subscription;
@@ -2710,13 +2727,6 @@
 				69C7130D1EC0740F00F2729E /* jiemuLieBiaoVC.m */,
 			);
 			path = Controller;
-			sourceTree = "<group>";
-		};
-		69C7130E1EC0740F00F2729E /* Model */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Model;
 			sourceTree = "<group>";
 		};
 		69C7130F1EC0740F00F2729E /* View */ = {
@@ -3572,6 +3582,7 @@
 				69C713381EC0740F00F2729E /* EXtern.m in Sources */,
 				633C2BEA1D2CA58000476CBD /* HanyuPinyinOutputFormat.m in Sources */,
 				69C713901EC0740F00F2729E /* AddBookManager.m in Sources */,
+				69C1D5CD1FAFFCA30092A290 /* NewRegisterController.m in Sources */,
 				6958731F1EF11AAB0011B174 /* MyClassroomTableViewCell.m in Sources */,
 				E91D53AC1D93719A008B8564 /* MJRefreshBackNormalFooter.m in Sources */,
 				69C713931EC0740F00F2729E /* UserClass.m in Sources */,
@@ -3600,6 +3611,7 @@
 				69C713A31EC0740F00F2729E /* bofangBtn.m in Sources */,
 				E91D53AB1D93719A008B8564 /* MJRefreshBackGifFooter.m in Sources */,
 				69C7138F1EC0740F00F2729E /* AddBookClass.m in Sources */,
+				69C1D5D11FB0036D0092A290 /* Xzb_CountDownButton.m in Sources */,
 				69C713AA1EC0740F00F2729E /* ShareAlertView.m in Sources */,
 				693DA8D11ECC399B00EAB6C6 /* PlayVCCommentModel.m in Sources */,
 				69C713A61EC0740F00F2729E /* MenuItemV.m in Sources */,

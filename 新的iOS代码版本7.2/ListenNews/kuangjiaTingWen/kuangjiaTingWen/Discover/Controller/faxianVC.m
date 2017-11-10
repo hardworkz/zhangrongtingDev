@@ -77,6 +77,7 @@
     
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(reloadClassList) name:ReloadClassList object:nil];
     RegisterNotify(@"loginSccess", @selector(reloadClassList))
+    RegisterNotify(@"tuichuLoginSeccess", @selector(reloadClassList))
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -334,7 +335,7 @@
                 tempHeight = 0;
             }
             //图片
-            UIImageView *imgLeft = [[UIImageView alloc]initWithFrame:CGRectMake(20.0 / 375 * IPHONE_W, 15 + tempHeight, 105.0 / 375 * IPHONE_W, 105.0 / 375 *IPHONE_W)];
+            UIImageView *imgLeft = [[UIImageView alloc]initWithFrame:CGRectMake(IS_IPHONEX?20.0: 20.0 / 375 * IPHONE_W, 15 + tempHeight,IS_IPHONEX?105.0: 105.0 / 375 * IPHONE_W, 105.0 / 375 *IPHONE_W)];
             if (IS_IPAD) {
                 [imgLeft setFrame:CGRectMake(20.0 / 375 * IPHONE_W, 15, 105.0 / 375 * IPHONE_W, 70.0 / 375 *IPHONE_W)];
             }
@@ -355,7 +356,7 @@
             
             faxianSubModel *subModel2 = firstModel.data[indexPath.row];
             //标题
-            UILabel *classTitle = [[UILabel alloc]initWithFrame:CGRectMake(CGRectGetMaxX(imgLeft.frame) + 5.0 / 375 * IPHONE_W, imgLeft.frame.origin.y,  SCREEN_WIDTH - CGRectGetMaxX(imgLeft.frame) - 70.0 / 375 * IPHONE_W, 21.0 / 667 *IPHONE_H)];
+            UILabel *classTitle = [[UILabel alloc]initWithFrame:CGRectMake(IS_IPHONEX?CGRectGetMaxX(imgLeft.frame) +5.0 / 375 * 375: CGRectGetMaxX(imgLeft.frame) +5.0 / 375 * IPHONE_W, imgLeft.frame.origin.y,IS_IPHONEX?SCREEN_WIDTH - CGRectGetMaxX(imgLeft.frame) - 70.0 / 375 * 375:SCREEN_WIDTH - CGRectGetMaxX(imgLeft.frame) - 70.0 / 375 * IPHONE_W, IS_IPHONEX?21.0:21.0 / 667 *IPHONE_H)];
             classTitle.text = subModel2.name;
             classTitle.textColor = [UIColor blackColor];
             classTitle.textAlignment = NSTextAlignmentLeft;
@@ -366,19 +367,19 @@
             CGSize size = [classTitle sizeThatFits:CGSizeMake(classTitle.frame.size.width, MAXFLOAT)];
             classTitle.frame = CGRectMake(classTitle.frame.origin.x, classTitle.frame.origin.y, classTitle.frame.size.width, size.height);
             //价钱
-            UILabel *price = [[UILabel alloc]initWithFrame:CGRectMake(CGRectGetMaxX(classTitle.frame) + 10, classTitle.frame.origin.y,40.0 / 375 * IPHONE_W, 21.0 / 667 *IPHONE_H)];
+            UILabel *price = [[UILabel alloc]initWithFrame:CGRectMake(CGRectGetMaxX(classTitle.frame) + 10, classTitle.frame.origin.y,IS_IPHONEX?40.0:40.0 / 375 * IPHONE_W, IS_IPHONEX?21.0:21.0 / 667 *IPHONE_H)];
             price.text = [NSString stringWithFormat:@"¥%@",[NetWorkTool formatFloat:[subModel2.price floatValue]]];
             price.font = gFontMain14;
             price.textColor = gMainColor;
             [cell.contentView addSubview:price];
             
             //简介
-            UILabel *describe = [[UILabel alloc]initWithFrame:CGRectMake(classTitle.frame.origin.x, 60.0 * 667.0/SCREEN_HEIGHT + tempHeight, SCREEN_WIDTH - CGRectGetMaxX(imgLeft.frame) - 20.0 / 375 * IPHONE_W, 21.0 / 667 *IPHONE_H)];
+            UILabel *describe = [[UILabel alloc]initWithFrame:CGRectMake(classTitle.frame.origin.x,IS_IPHONEX?60.0: 60.0 * 667.0/SCREEN_HEIGHT + tempHeight,IS_IPHONEX?SCREEN_WIDTH - CGRectGetMaxX(imgLeft.frame) - 20.0 / 375 * 375:  SCREEN_WIDTH - CGRectGetMaxX(imgLeft.frame) - 20.0 / 375 * IPHONE_W,IS_IPHONEX?21.0: 21.0 / 667 *IPHONE_H)];
             if (TARGETED_DEVICE_IS_IPHONE_568){
                 [describe setFrame:CGRectMake(classTitle.frame.origin.x, CGRectGetMaxY(classTitle.frame), SCREEN_WIDTH - CGRectGetMaxX(imgLeft.frame) - 20.0 / 375 * IPHONE_W, 21.0 / 667 *IPHONE_H)];
             }
             else{
-                [describe setFrame:CGRectMake(classTitle.frame.origin.x, 60.0 * 667.0/SCREEN_HEIGHT + tempHeight, SCREEN_WIDTH - CGRectGetMaxX(imgLeft.frame) - 20.0 / 375 * IPHONE_W, 21.0 / 667 *IPHONE_H)];
+                [describe setFrame:CGRectMake(classTitle.frame.origin.x,IS_IPHONEX?60.0 + tempHeight: 60.0 * 667.0/SCREEN_HEIGHT + tempHeight,IS_IPHONEX?SCREEN_WIDTH - CGRectGetMaxX(imgLeft.frame) - 20.0 / 375 * 375:  SCREEN_WIDTH - CGRectGetMaxX(imgLeft.frame) - 20.0 / 375 * IPHONE_W,IS_IPHONEX?21.0: 21.0 / 667 *IPHONE_H)];
             }
             describe.text = subModel2.Description;
             describe.textColor = [[UIColor grayColor]colorWithAlphaComponent:0.7f];
@@ -398,7 +399,11 @@
             for (int i = 0; i < arr.count; i ++ ){
                 faxianSubModel *currenSubModel = model2.data[i];
                 faxianBtn *zhuboBtn = [[faxianBtn alloc]initWithImageUrlStr:currenSubModel.images andTitle:currenSubModel.name andIndex_row:(NSInteger *)indexPath.row forzhubo:YES];
-                zhuboBtn.frame = CGRectMake(25.0 / 375 * IPHONE_W + (87.5 / 375 * IPHONE_W * i), 40.0 / 667 * IPHONE_H, 82.5 / 667 * IPHONE_H, 82.5 / 667 * IPHONE_H);
+                if (IS_IPHONEX) {
+                    zhuboBtn.frame = CGRectMake(25.0 + (87.5 * i),40.0,82.5, 82.5);
+                }else{
+                    zhuboBtn.frame = CGRectMake(25.0 / 375 * IPHONE_W + (87.5 / 375 * IPHONE_W * i), 40.0 / 667 * IPHONE_H, 82.5 / 667 * IPHONE_H,82.5 / 667 * IPHONE_H);
+                }
                 zhuboBtn.tag = i;
                 [zhuboBtn addTarget:self action:@selector(zhuboBtnAction:) forControlEvents:UIControlEventTouchUpInside];
                 [cell.contentView addSubview:zhuboBtn];
@@ -412,7 +417,11 @@
                 for (int i = 0; i < arr.count; i ++ ){
                     faxianSubModel *currenSubModel = model2.data[i];
                     faxianBtn *zhuboBtn = [[faxianBtn alloc]initWithImageUrlStr:currenSubModel.images andTitle:currenSubModel.name andIndex_row:(NSInteger *)indexPath.row forzhubo:NO];
-                    zhuboBtn.frame = CGRectMake((120.0 / 375 * IPHONE_W) * i, 40.0 / 667 * IPHONE_H, 120.0 / 667 * SCREEN_HEIGHT, 120.0 / 667 * SCREEN_HEIGHT);
+                    if (IS_IPHONEX) {
+                        zhuboBtn.frame = CGRectMake((120.0) * i, 40.0, 120.0, 120.0);
+                    }else{
+                        zhuboBtn.frame = CGRectMake((120.0 / 375 * IPHONE_W) * i, 40.0 / 667 * IPHONE_H, 120.0 / 667 * SCREEN_HEIGHT, 120.0 / 667 * SCREEN_HEIGHT);
+                    }
                     zhuboBtn.tag = i;
                     [zhuboBtn addTarget:self action:@selector(zhuboBtnAction:) forControlEvents:UIControlEventTouchUpInside];
                     [cell.contentView addSubview:zhuboBtn];
@@ -448,28 +457,22 @@
             if (IS_IPAD) {
                 return  172.5 ;
             }else{
-                return  167.5 / 667 * IPHONE_H;
+                return IS_IPHONEX?167.5 / 667 * 667: 167.5 / 667 * IPHONE_H;
             }
         }
         else if(indexPath.row < [model.data count]){
             if (IS_IPAD) {
                 return  172.5;
             }else{
-                return  135.0 / 667 * IPHONE_H;
+                return IS_IPHONEX?135.0 / 667 * 667: 135.0 / 667 * IPHONE_H;
             }
         }
         else if (indexPath.row == [model.data  count]){
-            return 161.0 / 667 * IPHONE_H;
+            return IS_IPHONEX?161.0 / 667 * 667: 161.0 / 667 * IPHONE_H;
         }
         else{
-            return 200.0 / 667 * IPHONE_H;
+            return IS_IPHONEX?200.0 / 667 * 667:200.0 / 667 * IPHONE_H;
         }
-//        if (indexPath.row == 0){
-//            return  161.0 / 667 * IPHONE_H;
-//        }
-//        else{
-//            return 200.0 / 667 * IPHONE_H;
-//        }
     }
 }
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
@@ -509,7 +512,7 @@
                     [self.navigationController pushViewController:faxianzhuboVC animated:YES];
                 }else{
                     NSDictionary *userInfoDict = [CommonCode readFromUserD:@"dangqianUserInfo"];
-                    if ([dic[@"is_free"] isEqualToString:@"1"]||[userInfoDict[results][member_type] intValue] == 2) {
+                    if ([dic[@"is_free"] isEqualToString:@"1"]||[userInfoDict[results][member_type] intValue] == 2||[[CommonCode readFromUserD:@"isIAP"] boolValue] == YES) {
                         zhuboXiangQingVCNewController *faxianzhuboVC = [[zhuboXiangQingVCNewController alloc]init];
                         faxianzhuboVC.jiemuDescription = dic[@"description"];
                         faxianzhuboVC.jiemuFan_num = dic[@"fan_num"];
@@ -650,7 +653,7 @@
         if (indexPath.row < [model.data count]) {
             faxianSubModel *dic = model.data[indexPath.row];
             NSDictionary *userInfoDict = [CommonCode readFromUserD:@"dangqianUserInfo"];
-            if ([dic.is_free isEqualToString:@"1"]||[userInfoDict[results][member_type] intValue] == 2) {
+            if ([dic.is_free isEqualToString:@"1"]||[userInfoDict[results][member_type] intValue] == 2||[[CommonCode readFromUserD:@"isIAP"] boolValue] == YES) {
                 zhuboXiangQingVCNewController *faxianzhuboVC = [[zhuboXiangQingVCNewController alloc]init];
                 faxianzhuboVC.jiemuDescription = dic.Description;
                 faxianzhuboVC.jiemuFan_num = dic.fan_num;
@@ -661,9 +664,7 @@
                 faxianzhuboVC.jiemuName = dic.name;
                 faxianzhuboVC.isfaxian = YES;
                 faxianzhuboVC.isClass = YES;
-//                self.hidesBottomBarWhenPushed=YES;
                 [self.navigationController pushViewController:faxianzhuboVC animated:YES];
-//                self.hidesBottomBarWhenPushed=NO;
                 
             }
             //跳转未购买课堂界面
@@ -683,7 +684,6 @@
             }
         }
     }
-    
 }
 
 #pragma mark - UISearchBarDelegate
@@ -1232,7 +1232,7 @@
 
 - (UISearchBar *)SouSuosearchBar {
     if (!_SouSuosearchBar) {
-        _SouSuosearchBar = [[UISearchBar alloc]initWithFrame:CGRectMake(20 , 26, IPHONE_W - 40, 44)];
+        _SouSuosearchBar = [[UISearchBar alloc]initWithFrame:CGRectMake(20 , 46, IPHONE_W - 40, 44)];
         _SouSuosearchBar.delegate = self;
         _SouSuosearchBar.placeholder = @"搜索新闻、主播、专栏、课堂";
         _SouSuosearchBar.showsCancelButton = NO;

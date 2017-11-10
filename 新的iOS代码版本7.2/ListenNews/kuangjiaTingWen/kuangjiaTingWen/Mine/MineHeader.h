@@ -11,6 +11,8 @@
 
 #import "MyClassroomController.h"
 #import "MyVipMenbersViewController.h"
+#import "NewRegisterController.h"
+#import "shezhimimaVC.h"
 
 #import "UIAlertView+MKBlockAdditions.h"
 
@@ -35,6 +37,7 @@
 #import "MultiImageView.h"
 #import "UIView+tap.h"
 #import "CustomAlertView.h"
+#import "Xzb_CountDownButton.h"
 
 #import "gerenzhuyeVC.h"
 

@@ -36,12 +36,9 @@
 }
 
 - (void)setupData{
-//    [self.consumeRecordTableView registerNib:[UINib nibWithNibName:@"TradingRecordTableViewCell" bundle:nil] forCellReuseIdentifier:TradingRecordTableViewCellID];
-//    [self.reChargeRecordTableView registerNib:[UINib nibWithNibName:@"TradingRecordTableViewCell" bundle:nil] forCellReuseIdentifier:TradingRecordTableViewCellID];
     self.consumeDataArr = nil;
     self.reChargeDataArr = nil;
     [self loadData];
-    
 }
 
 - (void)setupView{
@@ -55,7 +52,7 @@
     
     self.segmentedControl = [[HMSegmentedControl alloc] initWithSectionTitles:@[@"消费记录", @"充值记录"]];
     self.segmentedControl.autoresizingMask = UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleWidth;
-    self.segmentedControl.frame = CGRectMake(0, 64, SCREEN_WIDTH, 40);
+    self.segmentedControl.frame = CGRectMake(0,IS_IPHONEX?88:64, SCREEN_WIDTH, 40);
     self.segmentedControl.backgroundColor = gSubColor;
     self.segmentedControl.segmentEdgeInset = UIEdgeInsetsMake(0, 10, 0, 10);
     self.segmentedControl.selectionStyle = HMSegmentedControlSelectionStyleFullWidthStripe;
@@ -80,11 +77,11 @@
     [self.segmentedControl addTarget:self action:@selector(segmentedControlChangedValue:) forControlEvents:UIControlEventValueChanged];
     DefineWeakSelf;
     [self.segmentedControl setIndexChangeBlock:^(NSInteger index) {
-        [weakSelf.scrollView scrollRectToVisible:CGRectMake(SCREEN_HEIGHT * index, 0, SCREEN_HEIGHT, 200) animated:YES];
+        [weakSelf.scrollView scrollRectToVisible:CGRectMake(SCREEN_WIDTH * index, 0, SCREEN_WIDTH,SCREEN_HEIGHT) animated:YES];
     }];
     [self.view addSubview:self.segmentedControl];
     
-    self.scrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 104, SCREEN_WIDTH, SCREEN_HEIGHT - 104)];
+    self.scrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0,IS_IPHONEX?128:104, SCREEN_WIDTH, SCREEN_HEIGHT - 104)];
     self.scrollView.backgroundColor = [UIColor whiteColor];
     self.scrollView.pagingEnabled = YES;
     self.scrollView.showsHorizontalScrollIndicator = NO;

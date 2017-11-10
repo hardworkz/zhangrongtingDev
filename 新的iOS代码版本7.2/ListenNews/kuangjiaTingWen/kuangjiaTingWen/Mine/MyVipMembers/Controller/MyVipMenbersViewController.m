@@ -112,7 +112,20 @@ static NSString *const VIPContent = @"普通会员:\n1.每日可收听新闻数�
     }];
 }
 
-
+- (void)loginFirst {
+    UIAlertController *qingshuruyonghuming = [UIAlertController alertControllerWithTitle:@"温馨提示" message:@"您还没登录，请先登录后操作" preferredStyle:UIAlertControllerStyleAlert];
+    [qingshuruyonghuming addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+    }]];
+    [qingshuruyonghuming addAction:[UIAlertAction actionWithTitle:@"登录" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        LoginVC *loginFriVC = [LoginVC new];
+        LoginNavC *loginNavC = [[LoginNavC alloc]initWithRootViewController:loginFriVC];
+        [loginNavC.navigationBar setBackgroundColor:[UIColor whiteColor]];
+        loginNavC.navigationBar.tintColor = [UIColor blackColor];
+        [self presentViewController:loginNavC animated:YES completion:nil];
+    }]];
+    
+    [self presentViewController:qingshuruyonghuming animated:YES completion:nil];
+}
 - (void)back
 {
     [self.navigationController popViewControllerAnimated:YES];
@@ -173,11 +186,28 @@ static NSString *const VIPContent = @"普通会员:\n1.每日可收听新闻数�
             }
             _currenPayMonth = [cell.model.monthes intValue];
             APPDELEGATE.payType = PayTypeMembers;
-            _alertView = [[CustomAlertView alloc] initWithCustomView:[weakSelf setupPayAlert]];
-            _alertView.alertHeight = 155;
-            _alertView.alertDuration = 0.25;
-            _alertView.coverAlpha = 0.6;
-            [_alertView show];
+            if ([[CommonCode readFromUserD:@"isIAP"] boolValue] == YES)
+            {//当前为内购路线
+                _alertView = [[CustomAlertView alloc] initWithCustomView:[self setupPayAlertWithIAP:YES]];
+                _alertView.alertHeight = 105;
+                _alertView.alertDuration = 0.25;
+                _alertView.coverAlpha = 0.6;
+                [_alertView show];
+            }
+            else
+            {//当前为支付宝，微信，支付路线
+                if ([[CommonCode readFromUserD:@"isLogin"]boolValue] == YES){
+                    APPDELEGATE.payType = PayTypeMembers;
+                    _alertView = [[CustomAlertView alloc] initWithCustomView:[self setupPayAlertWithIAP:NO]];
+                    _alertView.alertHeight = 155;
+                    _alertView.alertDuration = 0.25;
+                    _alertView.coverAlpha = 0.6;
+                    [_alertView show];
+                }
+                else{
+                    [self loginFirst];
+                }
+            }
         };
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
         cell.is_member = _is_member;
@@ -196,11 +226,28 @@ static NSString *const VIPContent = @"普通会员:\n1.每日可收听新闻数�
         cell.payBlock = ^(MyVipMonthTableViewCell *cell) {
             _currenPayMonth = 20;
             APPDELEGATE.payType = PayTypeMembers;
-            _alertView = [[CustomAlertView alloc] initWithCustomView:[weakSelf setupPayAlert]];
-            _alertView.alertHeight = 155;
-            _alertView.alertDuration = 0.25;
-            _alertView.coverAlpha = 0.6;
-            [_alertView show];
+            if ([[CommonCode readFromUserD:@"isIAP"] boolValue] == YES)
+            {//当前为内购路线
+                _alertView = [[CustomAlertView alloc] initWithCustomView:[self setupPayAlertWithIAP:YES]];
+                _alertView.alertHeight = 105;
+                _alertView.alertDuration = 0.25;
+                _alertView.coverAlpha = 0.6;
+                [_alertView show];
+            }
+            else
+            {//当前为支付宝，微信，支付路线
+                if ([[CommonCode readFromUserD:@"isLogin"]boolValue] == YES){
+                    APPDELEGATE.payType = PayTypeMembers;
+                    _alertView = [[CustomAlertView alloc] initWithCustomView:[self setupPayAlertWithIAP:NO]];
+                    _alertView.alertHeight = 155;
+                    _alertView.alertDuration = 0.25;
+                    _alertView.coverAlpha = 0.6;
+                    [_alertView show];
+                }
+                else{
+                    [self loginFirst];
+                }
+            }
         };
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
         cell.is_member = _is_member;
@@ -233,44 +280,78 @@ static NSString *const VIPContent = @"普通会员:\n1.每日可收听新闻数�
 }
 #pragma mark - 支付弹窗模块
 //创建支付弹窗view
-- (UIView *)setupPayAlert
+- (UIView *)setupPayAlertWithIAP:(BOOL)iap
 {
-    UIView *bgView = [[UIView alloc] init];
-    bgView.backgroundColor = HEXCOLOR(0xe3e3e3);
-    bgView.frame = CGRectMake(0, 0, SCREEN_WIDTH, 155);
-    
-    UIButton *zhifubaoBtn = [[UIButton alloc] init];
-    zhifubaoBtn.frame = CGRectMake(0, 0, SCREEN_WIDTH, 50);
-    zhifubaoBtn.backgroundColor = [UIColor whiteColor];
-    [zhifubaoBtn setImage:@"pay3"];
-    zhifubaoBtn.imageEdgeInsets = UIEdgeInsetsMake(0, -20, 0, 0);
-    [zhifubaoBtn setTitle:@"支付宝支付" forState:UIControlStateNormal];
-    [zhifubaoBtn setTitleColor:gMainColor forState:UIControlStateNormal];
-    zhifubaoBtn.titleLabel.font = [UIFont systemFontOfSize:17];
-    [zhifubaoBtn addTarget:self action:@selector(zhifubaoBtnClicked)];
-    [bgView addSubview:zhifubaoBtn];
-    
-    UIButton *weixinBtn = [[UIButton alloc] init];
-    weixinBtn.frame = CGRectMake(0, 50, SCREEN_WIDTH, 50);
-    weixinBtn.backgroundColor = [UIColor whiteColor];
-    [weixinBtn setImage:@"pay4"];
-    weixinBtn.imageEdgeInsets = UIEdgeInsetsMake(0, -20, 0, 0);
-    [weixinBtn setTitle:@"微信支付" forState:UIControlStateNormal];
-    [weixinBtn setTitleColor:gMainColor forState:UIControlStateNormal];
-    weixinBtn.titleLabel.font = [UIFont systemFontOfSize:17];
-    [weixinBtn addTarget:self action:@selector(weixinBtnClicked)];
-    [bgView addSubview:weixinBtn];
-    
-    UIButton *cancelBtn = [[UIButton alloc] init];
-    cancelBtn.frame = CGRectMake(0, 105, SCREEN_WIDTH, 50);
-    cancelBtn.backgroundColor = [UIColor whiteColor];
-    [cancelBtn setTitle:@"取消" forState:UIControlStateNormal];
-    [cancelBtn setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
-    cancelBtn.titleLabel.font = [UIFont systemFontOfSize:17];
-    [cancelBtn addTarget:self action:@selector(cancelAlert)];
-    [bgView addSubview:cancelBtn];
-    
-    return bgView;
+    if (iap) {
+        UIView *bgView = [[UIView alloc] init];
+        bgView.backgroundColor = HEXCOLOR(0xe3e3e3);
+        bgView.frame = CGRectMake(0, 0, SCREEN_WIDTH, 105);
+        
+        UIButton *tingbiBtn = [[UIButton alloc] init];
+        tingbiBtn.frame = CGRectMake(0, 0, SCREEN_WIDTH, 50);
+        tingbiBtn.backgroundColor = [UIColor whiteColor];
+        [tingbiBtn setImage:@"pay2"];
+        tingbiBtn.imageEdgeInsets = UIEdgeInsetsMake(0, -20, 0, 0);
+        [tingbiBtn setTitle:@"听币支付" forState:UIControlStateNormal];
+        [tingbiBtn setTitleColor:gMainColor forState:UIControlStateNormal];
+        tingbiBtn.titleLabel.font = [UIFont systemFontOfSize:17];
+        [tingbiBtn addTarget:self action:@selector(tingbiBtnClicked)];
+        [bgView addSubview:tingbiBtn];
+        
+        UIButton *cancelBtn = [[UIButton alloc] init];
+        cancelBtn.frame = CGRectMake(0, 55, SCREEN_WIDTH, 50);
+        cancelBtn.backgroundColor = [UIColor whiteColor];
+        [cancelBtn setTitle:@"取消" forState:UIControlStateNormal];
+        [cancelBtn setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+        cancelBtn.titleLabel.font = [UIFont systemFontOfSize:17];
+        [cancelBtn addTarget:self action:@selector(cancelAlert)];
+        [bgView addSubview:cancelBtn];
+        
+        return bgView;
+    }else{
+        UIView *bgView = [[UIView alloc] init];
+        bgView.backgroundColor = HEXCOLOR(0xe3e3e3);
+        bgView.frame = CGRectMake(0, 0, SCREEN_WIDTH, 155);
+        
+        UIButton *zhifubaoBtn = [[UIButton alloc] init];
+        zhifubaoBtn.frame = CGRectMake(0, 0, SCREEN_WIDTH, 50);
+        zhifubaoBtn.backgroundColor = [UIColor whiteColor];
+        [zhifubaoBtn setImage:@"pay3"];
+        zhifubaoBtn.imageEdgeInsets = UIEdgeInsetsMake(0, -20, 0, 0);
+        [zhifubaoBtn setTitle:@"支付宝支付" forState:UIControlStateNormal];
+        [zhifubaoBtn setTitleColor:gMainColor forState:UIControlStateNormal];
+        zhifubaoBtn.titleLabel.font = [UIFont systemFontOfSize:17];
+        [zhifubaoBtn addTarget:self action:@selector(zhifubaoBtnClicked)];
+        [bgView addSubview:zhifubaoBtn];
+        
+        UIButton *weixinBtn = [[UIButton alloc] init];
+        weixinBtn.frame = CGRectMake(0, 50, SCREEN_WIDTH, 50);
+        weixinBtn.backgroundColor = [UIColor whiteColor];
+        [weixinBtn setImage:@"pay4"];
+        weixinBtn.imageEdgeInsets = UIEdgeInsetsMake(0, -20, 0, 0);
+        [weixinBtn setTitle:@"微信支付" forState:UIControlStateNormal];
+        [weixinBtn setTitleColor:gMainColor forState:UIControlStateNormal];
+        weixinBtn.titleLabel.font = [UIFont systemFontOfSize:17];
+        [weixinBtn addTarget:self action:@selector(weixinBtnClicked)];
+        [bgView addSubview:weixinBtn];
+        
+        UIButton *cancelBtn = [[UIButton alloc] init];
+        cancelBtn.frame = CGRectMake(0, 105, SCREEN_WIDTH, 50);
+        cancelBtn.backgroundColor = [UIColor whiteColor];
+        [cancelBtn setTitle:@"取消" forState:UIControlStateNormal];
+        [cancelBtn setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+        cancelBtn.titleLabel.font = [UIFont systemFontOfSize:17];
+        [cancelBtn addTarget:self action:@selector(cancelAlert)];
+        [bgView addSubview:cancelBtn];
+        
+        return bgView;
+    }
+}
+//听币支付
+- (void)tingbiBtnClicked
+{
+    [[XWAlerLoginView alertWithTitle:@"您的听币不足，请先前往充值"] show];
+    [_alertView coverClick];
 }
 //支付宝支付
 - (void)zhifubaoBtnClicked

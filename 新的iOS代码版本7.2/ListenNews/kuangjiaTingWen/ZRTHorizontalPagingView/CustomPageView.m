@@ -184,7 +184,6 @@ static NSInteger pagingButtonTag                 = 1000;
 - (void)segmentButtonEvent:(UIButton *)segmentButton {
     for(UIButton *b in self.segmentButtons) {
         [b setSelected:NO];
-        
     }
     [segmentButton setSelected:YES];
     
@@ -198,8 +197,6 @@ static NSInteger pagingButtonTag                 = 1000;
             [self.currentScrollView setContentOffset:self.currentScrollView.contentOffset animated:NO];
         }
         self.currentScrollView = self.contentViews[clickIndex];
-        
-//        [self adjustContentViewOffset];
         
     }
     
@@ -314,7 +311,7 @@ static NSInteger pagingButtonTag                 = 1000;
         
         
         RTLog(@"%f",deltaY);
-        if(deltaY >= 0 ) {//向上滚动
+        if(deltaY >= 0) {//向上滚动
             if(headerDisplayHeight - deltaY <= self.segmentTopSpace) {//判断是否到达悬停位置
                 self.headerOriginYConstraint.constant = -headerViewHeight+self.segmentTopSpace;
             }else {//上拉约束
@@ -326,7 +323,6 @@ static NSInteger pagingButtonTag                 = 1000;
             }
             
         }else {            //向下滚动
-            
             if (headerDisplayHeight+self.segmentBarHeight <= -newOffsetY) {//下拉约束
                 self.headerOriginYConstraint.constant = -self.headerViewHeight-self.segmentBarHeight-self.currentScrollView.contentOffset.y;
             }

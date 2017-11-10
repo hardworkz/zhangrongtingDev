@@ -55,11 +55,25 @@
             break;
         }
     }
-    if (isExist && [viewController isKindOfClass:[NewPlayVC class]]) {
-        [super popViewControllerAnimated:YES];
+    if (isExist) {//判断当前栈中是否存在NewPlayVC
+        if ([viewController isKindOfClass:[NewPlayVC class]]) {//判断当前栈顶控制器是否是NewPlayVC，不是则pop
+            if (![self.topViewController isKindOfClass:[NewPlayVC class]]) {
+                [super popViewControllerAnimated:YES];
+            }
+        }else{
+            [super pushViewController:viewController animated:animated];
+        }
     }else{
         [super pushViewController:viewController animated:animated];
     }
+    
+    if (IS_IPHONEX) {
+        // 修改tabBra的frame ,防止导航栏在push时候移动
+        CGRect frame = self.tabBarController.tabBar.frame;
+        frame.origin.y = [UIScreen mainScreen].bounds.size.height - frame.size.height;
+        self.tabBarController.tabBar.frame = frame;
+    }
+    
 }
 
 @end

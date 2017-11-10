@@ -115,6 +115,10 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
             }
         }
     }
+    //审核中不弹窗
+    if ([[CommonCode readFromUserD:@"isIAP"] boolValue] == YES) {
+        isStopPlay = NO;
+    }
     return isStopPlay;
 }
 - (NSMutableArray *)downloadPostIDArray

@@ -22,8 +22,6 @@
 @property (nonatomic,strong) UIImageView  *btnImgView;
 @property (nonatomic,weak) UIButton *seletBtn;
 
-@property (nonatomic,strong) UIButton *rotationBarBtn;
-@property (nonatomic,assign) NSInteger currentIdx;
 
 @property (nonatomic,strong)CABasicAnimation* rotationAnimation;
 
@@ -147,120 +145,6 @@
     if (self.rotationBarBtnAction) {
         self.rotationBarBtnAction(sender,_currentIdx);
     }
-//    return;
-    
-//    NSString *pushNewsID = @"";
-//    if (_isPushSkip) {
-//        pushNewsID = [CommonCode readFromUserD:pushNews];
-//    }
-//    else{
-//        pushNewsID = @"NO";
-//    }
-    
-//    if ([ZRT_PlayerManager manager].isPlaying == YES){
-//        switch (_currentIdx) {
-//            case 0:
-//                if (APPDELEGATE.shouyeSkipToPlayingVC) {
-//                    APPDELEGATE.shouyeSkipToPlayingVC(pushNewsID);
-//                }
-//                break;
-//            case 1:
-//                if (APPDELEGATE.dingyueSkipToPlayingVC) {
-//                    APPDELEGATE.dingyueSkipToPlayingVC(pushNewsID);
-//                }
-//                break;
-//            case 2:
-//                if (APPDELEGATE.faxianSkipToPlayingVC) {
-//                    APPDELEGATE.faxianSkipToPlayingVC(pushNewsID);
-//                }
-//                break;
-//            case 3:
-//                if (APPDELEGATE.woSkipToPlayingVC) {
-//                    APPDELEGATE.woSkipToPlayingVC(pushNewsID);
-//                }
-//                break;
-//            default:
-//                break;
-//        }
-//        [_rotationBarBtn setSelected:YES];
-//        [CommonCode writeToUserD:@"NO" andKey:@"isPlayingGray"];
-//    }
-//    else{
-//        if (YES) {
-//            //TODO:
-//            [_rotationBarBtn setSelected:YES];
-//            [CommonCode writeToUserD:@"NO" andKey:@"isPlayingGray"];
-//            switch (_currentIdx) {
-//                case 0:
-//                    
-//                    if (APPDELEGATE.shouyeSkipToPlayingVC) {
-//                        APPDELEGATE.shouyeSkipToPlayingVC(pushNewsID);
-//                    }
-//                    else{
-//                        //TODO:
-//                        [self performSelector:@selector(GoPushNews) withObject:nil afterDelay:1.0];
-//                    }
-//                    break;
-//                case 1:
-//                    if (APPDELEGATE.dingyueSkipToPlayingVC) {
-//                        APPDELEGATE.dingyueSkipToPlayingVC(pushNewsID);
-//                    }
-//                    break;
-//                case 2:
-//                    if (APPDELEGATE.faxianSkipToPlayingVC) {
-//                        APPDELEGATE.faxianSkipToPlayingVC(pushNewsID);
-//                    }
-//                    break;
-//                case 3:
-//                    if (APPDELEGATE.woSkipToPlayingVC) {
-//                        APPDELEGATE.woSkipToPlayingVC(pushNewsID);
-//                    }
-//                    break;
-//                default:
-//                    break;
-//            }
-//        }
-//        else{
-//            NSString *haveTheLastNewsData = [CommonCode readFromUserD:@"haveTheLastNewsData"];
-//            if ([haveTheLastNewsData isEqualToString:@"YES"]) {
-//                switch (_currentIdx) {
-//                    case 0:
-//                        if (APPDELEGATE.shouyeSkipToPlayingVC) {
-//                            APPDELEGATE.shouyeSkipToPlayingVC(pushNewsID);
-//                        }
-//                        break;
-//                    case 1:
-//                        if (APPDELEGATE.dingyueSkipToPlayingVC) {
-//                            APPDELEGATE.dingyueSkipToPlayingVC(pushNewsID);
-//                        }
-//                        break;
-//                    case 2:
-//                        if (APPDELEGATE.faxianSkipToPlayingVC) {
-//                            APPDELEGATE.faxianSkipToPlayingVC(pushNewsID);
-//                        }
-//                        break;
-//                    case 3:
-//                        if (APPDELEGATE.woSkipToPlayingVC) {
-//                            APPDELEGATE.woSkipToPlayingVC(pushNewsID);
-//                        }
-//                        break;
-//                    default:
-//                        break;
-//                }
-//                [_rotationBarBtn setSelected:YES];
-//                [CommonCode writeToUserD:@"NO" andKey:@"isPlayingGray"];
-//            
-//            }
-//            else{
-//                [SVProgressHUD showInfoWithStatus:@"请至少选择一条新闻或者课堂"];
-//                [self performSelector:@selector(SVPDismiss) withObject:nil afterDelay:1.0];
-//                
-//            }
-//        }
-//        
-//    }
-//    _isPushSkip = NO;
-    
 }
 
 - (void)imgAnimate:(UIButton*)btn{

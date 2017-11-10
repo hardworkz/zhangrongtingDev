@@ -100,7 +100,7 @@
     
     DefineWeakSelf;
     [self.segmentedControl setIndexChangeBlock:^(NSInteger index) {
-        [weakSelf.scrollView scrollRectToVisible:CGRectMake(SCREEN_HEIGHT * index, 0, SCREEN_HEIGHT, SCREEN_HEIGHT - 40 - 64) animated:YES];
+        [weakSelf.scrollView scrollRectToVisible:CGRectMake(SCREEN_WIDTH * index, 0, SCREEN_WIDTH, SCREEN_HEIGHT - 40 - 64) animated:YES];
     }];
     [self.scrollView addSubview:self.tableView];
     [self.scrollView addSubview:self.rankTableView];

@@ -184,7 +184,6 @@
 
 - (void)setupView {
     
-//    [self TopUI];
     [self.view addSubview:self.zhuyetableView];
     
     UISwipeGestureRecognizer *rightSwipe = [[UISwipeGestureRecognizer alloc]initWithTarget:self action:@selector(rightSwipeAction)];
@@ -265,19 +264,6 @@
 - (void)TopUI {
     
     topBgView = [[UIImageView alloc]initWithFrame:CGRectMake(0, 0, IPHONE_W, IMAGEHEIGHT / 667 * IPHONE_H)];
-//    topBgView.contentMode = UIViewContentModeScaleAspectFill;
-//    //图片高斯模糊处理
-//    CIContext *context = [CIContext contextWithOptions:nil];
-//    CIImage *inputImage = [[CIImage alloc] initWithImage:[UIImage imageNamed:@"top_bg"]];
-//    CIFilter *filter = [CIFilter filterWithName:@"CIGaussianBlur"];
-//    [filter setValue:inputImage forKey:kCIInputImageKey];
-//    [filter setValue:[NSNumber numberWithFloat:15.0] forKey:@"inputRadius"];
-//    //        CIImage *result = [filter valueForKey:kCIOutputImageKey];
-//    CIImage *result=[filter outputImage];
-//    CGImageRef cgImage = [context createCGImage:result fromRect:[inputImage extent]];
-//    UIImage *image = [UIImage imageWithCGImage:cgImage];
-//    CGImageRelease(cgImage);
-//    topBgView.image = image;
     UIImageView *shadowView = [[UIImageView alloc]initWithFrame:CGRectMake(0, 0, IPHONE_W,167.0 / 667 * IPHONE_H)];
     [shadowView setUserInteractionEnabled:YES];
     [shadowView setImage:[UIImage imageNamed:@"me_mypage_mettopbg"]];
@@ -315,14 +301,14 @@
     
     //返回按钮
     UIButton *leftBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    leftBtn.frame = CGRectMake(10, 25, 35, 35);
+    leftBtn.frame = CGRectMake(10, IS_IPHONEX?40:25, 35, 35);
     [leftBtn setImageEdgeInsets:UIEdgeInsetsMake(5, 0, 5, 10)];
     [leftBtn setImage:[UIImage imageNamed:@"title_ic_back"] forState:UIControlStateNormal];
     [leftBtn addTarget:self action:@selector(backAction:) forControlEvents:UIControlEventTouchUpInside];
     leftBtn.accessibilityLabel = @"返回";
     [markView addSubview:leftBtn];
     //title
-    UILabel *topLab = [[UILabel alloc]initWithFrame:CGRectMake(50, 30, IPHONE_W - 100, 30)];
+    UILabel *topLab = [[UILabel alloc]initWithFrame:CGRectMake(50,IS_IPHONEX?50:30, IPHONE_W - 100, 30)];
     topLab.textColor = [UIColor blackColor];
     topLab.font = [UIFont boldSystemFontOfSize:17.0f];
     topLab.text = @"个人主页";
@@ -332,8 +318,7 @@
     if (self.isMypersonalPage) {
         //编辑按钮
         UIButton *rightBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-        rightBtn.frame = CGRectMake(SCREEN_WIDTH - 45, 30, 25, 25);
-//        [rightBtn setTitle:@"编辑" forState:UIControlStateNormal];
+        rightBtn.frame = CGRectMake(SCREEN_WIDTH - 45,IS_IPHONEX?50: 30, 25, 25);
         [rightBtn setImage:[UIImage imageNamed:@"title_ic_edit"] forState:UIControlStateNormal];
         [rightBtn.titleLabel setFont:gFontMain14];
         [rightBtn addTarget:self action:@selector(rightbtnAction:) forControlEvents:UIControlEventTouchUpInside];
@@ -1427,7 +1412,7 @@ didSelectLinkWithTransitInformation:(NSDictionary *)components {
 - (UITableView *)zhuyetableView{
     if (!_zhuyetableView)
     {
-        _zhuyetableView = [[UITableView alloc]initWithFrame:CGRectMake(0, 0, IPHONE_W, IPHONE_H) style:UITableViewStylePlain];
+        _zhuyetableView = [[UITableView alloc]initWithFrame:CGRectMake(0,IS_IPHONEX?-45:-20, IPHONE_W, IPHONE_H) style:UITableViewStylePlain];
         _zhuyetableView.delegate = self;
         _zhuyetableView.dataSource = self;
         _zhuyetableView.tag = 1;

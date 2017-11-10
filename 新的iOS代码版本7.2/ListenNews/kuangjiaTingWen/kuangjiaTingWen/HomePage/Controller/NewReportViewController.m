@@ -138,7 +138,7 @@
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath{
-    return 120.0 / 667 * SCREEN_HEIGHT;
+    return IS_IPHONEX?120.0:120.0 / 667 * SCREEN_HEIGHT;
 }
 
 #pragma mark - Utilities

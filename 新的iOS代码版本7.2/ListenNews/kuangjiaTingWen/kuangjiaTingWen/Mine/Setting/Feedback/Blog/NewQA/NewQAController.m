@@ -240,7 +240,7 @@
 - (UIButton *)recordVoiceButton {
     if (_recordVoiceButton == nil) {
         _recordVoiceButton = [UIButton buttonWithType:UIButtonTypeCustom];
-        [_recordVoiceButton setFrame:CGRectMake(30, SCREEN_HEIGHT -  140, SCREEN_WIDTH - 60, 30)];
+        [_recordVoiceButton setFrame:CGRectMake(30,IS_IPHONEX?SCREEN_HEIGHT -  160:SCREEN_HEIGHT -  140, SCREEN_WIDTH - 60, 30)];
         [_recordVoiceButton setTitle:@"按住录音" forState:UIControlStateNormal];
         [_recordVoiceButton.layer setBorderWidth:0.5];
         [_recordVoiceButton.layer setMasksToBounds:YES];

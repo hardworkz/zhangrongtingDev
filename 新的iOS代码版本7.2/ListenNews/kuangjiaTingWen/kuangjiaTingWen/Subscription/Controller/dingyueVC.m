@@ -79,17 +79,16 @@
     
     [self.view addSubview:self.tableView];
     
-    //通知
-    //播放下一条自动加载更多新闻信息通知
-//    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(dingyuezidongjiazai:) name:@"dingyuebofangRightyaojiazaishujv" object:nil];
-//    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(gaibianyanse:) name:@"gaibianyanse" object:nil];
-//    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(dianjihougaibianyanse:) name:@"dianjihougaibiangezhongyanse" object:nil];
+    RegisterNotify(@"loginSccess", @selector(refreshList))
 }
-
+- (void)refreshList
+{
+    [self.tableView.mj_header beginRefreshing];
+}
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     [self.navigationController setNavigationBarHidden:NO animated:YES];
-    if (APPDELEGATE.isLogin) {
+    if ([[CommonCode readFromUserD:@"isLogin"] boolValue] == NO) {
         [self.tableView.mj_header beginRefreshing];
         APPDELEGATE.isLogin = NO;
     }
@@ -155,7 +154,7 @@
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath{
-    return 120.0 / 667 * IPHONE_H;
+    return IS_IPHONEX?120.0:120.0 / 667 * IPHONE_H;
 }
 
 #pragma mark - Utilities

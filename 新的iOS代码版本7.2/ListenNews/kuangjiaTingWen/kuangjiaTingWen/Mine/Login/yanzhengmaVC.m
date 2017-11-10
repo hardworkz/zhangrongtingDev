@@ -42,7 +42,6 @@
     phoneF.keyboardType = UIKeyboardTypeNumberPad;
     phoneF.clearButtonMode = UITextFieldViewModeWhileEditing;
     [self.view addSubview:phoneF];
-    
 }
 
 - (void)NextStep:(UIButton *)sender{
@@ -54,11 +53,6 @@
         UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"验证码输入错误" message:nil delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil, nil];
         [alertView show];
     }
-}
-
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
 }
 
 @end

@@ -25,4 +25,7 @@
 // 取消动画
 @property (nonatomic,assign) BOOL cancelAnimation;
 
+@property (nonatomic,assign) NSInteger currentIdx;
+
+@property (nonatomic,strong) UIButton *_Nonnull rotationBarBtn;
 @end

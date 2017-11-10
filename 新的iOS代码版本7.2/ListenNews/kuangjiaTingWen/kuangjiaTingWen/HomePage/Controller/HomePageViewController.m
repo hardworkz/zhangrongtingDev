@@ -111,7 +111,6 @@
     RegisterNotify(ReloadHomeSelectPageData, @selector(reloadSelectedList))
     RegisterNotify(@"loginSccess", @selector(reloadClassList))
     RegisterNotify(@"tuichuLoginSeccess", @selector(reloadClassList))
-//    RegisterNotify(@"setMyunreadMessageTips", @selector(reloadClassList))
 }
 
 - (void)setUpView{
@@ -155,7 +154,7 @@
 #pragma mark - setter
 - (UIScrollView *)scrollView{
     if (!_scrollView) {
-        _scrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 104, SCREEN_WIDTH, SCREEN_HEIGHT - 104 - 49)];
+        _scrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 128, SCREEN_WIDTH, SCREEN_HEIGHT - 104 - 49)];
         _scrollView.backgroundColor = [UIColor whiteColor];
         _scrollView.pagingEnabled = YES;
         _scrollView.showsHorizontalScrollIndicator = NO;
@@ -170,7 +169,7 @@
     if (!_segmentedControl) {
         _segmentedControl = [[HMSegmentedControl alloc] initWithSectionTitles: @[@"专栏", @"快讯",@"课堂"]];
         _segmentedControl.autoresizingMask = UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleWidth;
-        _segmentedControl.frame = CGRectMake(0, 64, SCREEN_WIDTH, 40);
+        _segmentedControl.frame = CGRectMake(0,IS_IPHONEX?88:64, SCREEN_WIDTH, 40);
         _segmentedControl.backgroundColor = [UIColor whiteColor];
         _segmentedControl.segmentEdgeInset = UIEdgeInsetsMake(0, 30, 0, 30);
         _segmentedControl.selectionStyle = HMSegmentedControlSelectionStyleTextWidthStripe;
@@ -215,6 +214,9 @@
         _columnTableView.delegate = self;
         _columnTableView.dataSource = self;
         _columnTableView.tableFooterView = [UIView new];
+//        _columnTableView.estimatedRowHeight = 0;
+//        _columnTableView.estimatedSectionHeaderHeight = 0;
+//        _columnTableView.estimatedSectionFooterHeight = 0;
     }
     return _columnTableView;
 }
@@ -226,6 +228,9 @@
         _newsTableView.delegate = self;
         _newsTableView.dataSource = self;
         _newsTableView.tableFooterView = [UIView new];
+//        _newsTableView.estimatedRowHeight = 0;
+//        _newsTableView.estimatedSectionHeaderHeight = 0;
+//        _newsTableView.estimatedSectionFooterHeight = 0;
     }
     return _newsTableView;
 }
@@ -237,6 +242,9 @@
         _classroomTableView.delegate = self;
         _classroomTableView.dataSource = self;
         _classroomTableView.tableFooterView = [UIView new];
+//        _classroomTableView.estimatedRowHeight = 0;
+//        _classroomTableView.estimatedSectionHeaderHeight = 0;
+//        _classroomTableView.estimatedSectionFooterHeight = 0;
     }
     return _classroomTableView;
 }
@@ -600,14 +608,14 @@
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath{
     CGFloat heightForRow = 44.0;
     if (tableView == self.columnTableView) {
-        heightForRow = 120.0 / 667 * IPHONE_H;
+        heightForRow = IS_IPHONEX?120.0: 120.0 / 667 * IPHONE_H;
     }
     else if (tableView == self.newsTableView){
         if (indexPath.row == 0) {
             heightForRow = 30.0;
         }
         else{
-            heightForRow =  120.0 / 667 * IPHONE_H;
+            heightForRow = IS_IPHONEX?120.0:120.0 / 667 * IPHONE_H;
         }
     }
     else if (tableView == self.classroomTableView){
@@ -688,7 +696,7 @@
         NSDictionary *userInfoDict = [CommonCode readFromUserD:@"dangqianUserInfo"];
         //跳转已购买课堂界面，超级会员可直接跳转课堂已购买界面
         MyClassroomListFrameModel *frameModel = self.classroomInfoArr[indexPath.row];
-        if ([frameModel.model.is_free isEqualToString:@"1"]||[userInfoDict[results][member_type] intValue] == 2) {
+        if ([frameModel.model.is_free isEqualToString:@"1"]||[userInfoDict[results][member_type] intValue] == 2||[[CommonCode readFromUserD:@"isIAP"] boolValue] == YES) {
             zhuboXiangQingVCNewController *faxianzhuboVC = [[zhuboXiangQingVCNewController alloc]init];
             faxianzhuboVC.jiemuDescription = frameModel.model.Description;
             faxianzhuboVC.jiemuFan_num = frameModel.model.fan_num;

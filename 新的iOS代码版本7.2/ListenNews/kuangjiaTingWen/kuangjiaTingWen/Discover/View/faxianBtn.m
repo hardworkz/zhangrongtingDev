@@ -40,7 +40,11 @@
         
         if (index_row != 0)
         {
-            imageView.frame = CGRectMake(15.0 / 375 * IPHONE_W, 0 / 667 * IPHONE_H,105.0 / 667 * IPHONE_H, 105.0 / 667 * IPHONE_H);
+            if (IS_IPHONEX) {
+                imageView.frame = CGRectMake(15.0,0,105.0 ,105.0);
+            }else{
+                imageView.frame = CGRectMake(15.0 / 375 * IPHONE_W, 0 / 667 * IPHONE_H,105.0 / 667 * IPHONE_H, 105.0 / 667 * IPHONE_H);
+            }
             imageView.layer.masksToBounds = NO;
         }
         
@@ -64,11 +68,14 @@
         
         if (isZhuBo == YES)
         {
-            imageView.frame = CGRectMake(6.25 / 375 * IPHONE_W, 6.25 / 667 * IPHONE_H, 70.0 / 667 * IPHONE_H, 70.0 / 667 * IPHONE_H);
-//            imageView.layer.cornerRadius = 4.0;
-//            imageView.layer.masksToBounds = YES;
-//            imageView.contentMode = UIViewContentModeScaleAspectFit;
-            lab.frame = CGRectMake(-15.0 / 375 * IPHONE_W, CGRectGetMaxY(imageView.frame) + 10.0 / 667 * IPHONE_H, 92.5 / 375 * IPHONE_W, 20.0 / 667 * IPHONE_H);
+            
+            if (IS_IPHONEX) {
+                imageView.frame = CGRectMake(6.25, 6.25, 70.0, 70.0);
+                lab.frame = CGRectMake(-15.0, CGRectGetMaxY(imageView.frame) + 10.0, 92.5, 20.0);
+            }else{
+                imageView.frame = CGRectMake(6.25 / 375 * IPHONE_W, 6.25 / 667 * IPHONE_H, 70.0 / 667 * IPHONE_H, 70.0 / 667 * IPHONE_H);
+                lab.frame = CGRectMake(-15.0 / 375 * IPHONE_W, CGRectGetMaxY(imageView.frame) + 10.0 / 667 * IPHONE_H, 92.5 / 375 * IPHONE_W, 20.0 / 667 * IPHONE_H);
+            }
             lab.font =[UIFont fontWithName:@"Courier" size:13.0 ];
         }
         imageView.layer.cornerRadius = 4.0;

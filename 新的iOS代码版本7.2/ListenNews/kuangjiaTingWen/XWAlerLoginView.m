@@ -40,7 +40,7 @@
 }
 
 - (void)show {
-    UIWindow *window = [UIApplication sharedApplication].windows.lastObject;
+    UIWindow *window = [UIApplication sharedApplication].keyWindow;
     for (UIView *v  in window.subviews) {
         if ([v isKindOfClass:[self class]]) {
             return;

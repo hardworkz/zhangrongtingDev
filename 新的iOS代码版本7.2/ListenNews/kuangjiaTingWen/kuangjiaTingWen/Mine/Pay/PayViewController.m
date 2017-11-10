@@ -153,7 +153,6 @@
 
 - (void)setupView{
     self.navBarBgAlpha = @"1.0";
-//    [self.navigationController setNavigationBarHidden:NO animated:YES];
     [self setTitle:@"听币充值"];
     [self enableAutoBack];
     self.extendedLayoutIncludesOpaqueBars = YES;
@@ -166,18 +165,18 @@
     [rightSwipe setDirection:UISwipeGestureRecognizerDirectionRight];
     [self.view addGestureRecognizer:rightSwipe];
     
-    UIImageView *topBgView = [[UIImageView alloc]initWithFrame:CGRectMake(0, 64, SCREEN_WIDTH, 80.0)];
+    UIImageView *topBgView = [[UIImageView alloc] initWithFrame:CGRectMake(0,IS_IPHONEX?88:64, SCREEN_WIDTH, 80.0)];
     [topBgView setImage:[UIImage imageNamed:@"pay_bg"]];
     [self.view addSubview:topBgView];
     
-    UILabel *titleLab = [[UILabel alloc]initWithFrame:CGRectMake((SCREEN_WIDTH - 72) / 2, 15, 72, 15)];
+    UILabel *titleLab = [[UILabel alloc]initWithFrame:CGRectMake((SCREEN_WIDTH - 72) / 2,15, 72, 15)];
     [titleLab setText:@"账户余额"];
     [titleLab setFont:gFontMain12];
     [titleLab setTextAlignment:NSTextAlignmentCenter];
     [titleLab setTextColor:[UIColor whiteColor]];
     [topBgView addSubview:titleLab];
     
-    UIImageView *topTitleView = [[UIImageView alloc]initWithFrame:CGRectMake((SCREEN_WIDTH - 110) / 2, 35, 30, 30)];
+    UIImageView *topTitleView = [[UIImageView alloc]initWithFrame:CGRectMake((SCREEN_WIDTH - 110) / 2,35, 30, 30)];
     [topTitleView setImage:[UIImage imageNamed:@"pay2"]];
     [topBgView addSubview:topTitleView];
     
@@ -414,9 +413,7 @@
 
 - (void)rightBarButton{
     
-//    self.hidesBottomBarWhenPushed=YES;
     [self.navigationController pushViewController:[TradingRecordViewController new] animated:YES];
-//    self.hidesBottomBarWhenPushed=YES;
 }
 
 - (void)back{
@@ -426,7 +423,6 @@
 #pragma mark - Utilities
 
 - (void)WechatAndAliPay{
-//    APPDELEGATE.isReward = NO;
     APPDELEGATE.payType = PayTypeRecharge;
     [UIActionSheet actionSheetWithTitle:nil message:nil buttons:@[@"微信支付", @"支付宝支付"] showInView:self.view onDismiss:^(int buttonIndex) {
         if (buttonIndex == 0) {
@@ -632,147 +628,6 @@
         XWAlerLoginView *alert = [[XWAlerLoginView alloc] initWithTitle:@"网络错误"];
         [alert show];
     }];
-    
-//    NSMutableDictionary *dic = [NSMutableDictionary new];
-//    [dic setObject:[NSString stringWithFormat:@"%.2f",self.rewardCount] forKey:@"listen_money"];
-////    [dic setObject:self.uid forKey:@"act_id"];
-//    [dic setObject:@"2" forKey:@"type"];
-//    [CommonCode writeToUserD:dic andKey:REWARDINFODICTKEY];
-//    
-//    //重要说明
-//    //这里只是为了方便直接向商户展示支付宝的整个支付流程；所以Demo中加签过程直接放在客户端完成；
-//    //真实App里，privateKey等数据严禁放在客户端，加签过程务必要放在服务端完成；
-//    //防止商户私密数据泄露，造成不必要的资金损失，及面临各种安全风险；
-//    
-//    //需要填写商户app申请的
-//    //听闻FM
-////    NSString *appID = @"2017010904942523";
-//    //听闻电台
-//    //    NSString *appID = @"2017010904944479";
-//    NSString *appID;
-//    //听闻电台
-//    if ([APPBUNDLEIDENTIFIER isEqualToString:@"com.popwcn.ListenNewsExploreVersion"]){
-//        appID = @"2017010904944479";
-//    }
-//    //FM
-//    else{
-//        appID = @"2017010904942523";
-//    }
-//    
-//    // 如下私钥，rsa2PrivateKey 或者 rsaPrivateKey 只需要填入一个
-//    // 如果商户两个都设置了，优先使用 rsa2PrivateKey
-//    // rsa2PrivateKey 可以保证商户交易在更加安全的环境下进行，建议使用 rsa2PrivateKey
-//    // 获取 rsa2PrivateKey，建议使用支付宝提供的公私钥生成工具生成，
-//    // 工具地址：https://doc.open.alipay.com/docs/doc.htm?treeId=291&articleId=106097&docType=1
-//    NSString *rsaPrivateKey = @"tingwenapp@163.com";
-//
-//    NSString *rsa2PrivateKey;
-//    //听闻电台
-//    if ([APPBUNDLEIDENTIFIER isEqualToString:@"com.popwcn.ListenNewsExploreVersion"]){
-//        rsa2PrivateKey = @"MIIEowIBAAKCAQEAsGRGCpQZ5TCYryINQe+UraneSTF9oCOEQ0QqmqJ70pALy3mGxDLywbty7dJiwFYo95AbhWzJSDzNUD8IjDZpJVm/LftXfm/Vssgj3rmie2xt2YDz0ixvJhiXEsU36z7X2WpI74wl+yt9HgWOBisqKzEfVSU70Nfd/6CS/pJScXWN2rvhFNpGcXwpu+GabbbnQttwjHEX3k5JydYxYNK0cX5wdlH9LGFKD1wbRfnNIk0DWyrjL8IHWxPzrVK/f//sUuVhwoJYo0dgJQVTUJpldE7dJwuyZt4GiqHST7d1mFJQIzivkj1DcMwlGDzNrqbmBpCGjMkAS1dRnlcT1DCO9QIDAQABAoIBAQCq7vElDTIu9LHxfWkljVsiE6wyd8BKsEBawzMaGP0vJqIXc1QSy2CONu1/49IImzYl+cOBv9Mqqqk3622IGq44IMlwcNHv18ZZ8zM3geMgAgpNrXYaJS8s1sWHzhCLaqHXsfSuFr0zsogT0MQ53BiINJktdOCLWLVsJBpukjNMeEcxepHAYo61SisVKCXLegfEKlYvgz5u7fBfy+iTgWkern5sZV/INyCXltfCrXLyMGGCuxrOOSjnM4cOyCqyQ9CRp9mnH1Zb/OFF5vJPgMkindHqWHsbvnLfoCpUem3kcWVg+tk7DiE09zF1ssQH9XLzUy7ZS1sNg/1BQHYIxwxdAoGBAN+7ZT6OVCr0fT/oviwALf66YqFomOlo31DFqc3PMMnEhbPHMqEyrs6/4ky0INKFIH/Jgi4a5WnWrHRiGT8dfJXIgP6unLxuv2XXn31xGJ11VMqx1Txi9J8OlBAp13028ikMqGiLI2uTCVOz4f0jgE96Ftn6VM60Qavd2Hvn//3/AoGBAMnU/CTJ/gLJkVTItqg0YpLBFPEKa3B/JYIFO33GulZp8myYFSHRoEp4CIEX3vZd6D5OHk6y3sFVpNGTa+4zm21ySh/SZPkuYxb2jPZ4J1Y4tkMBcm9vl3P66zvTrmeMvTciPHlC8lbP0QFMzA992MR1NVAd60UVkRZf/9TxGVsLAoGAciUNdmjvECtEa4K244QD813sTCUtPog+xtrR0yrN3WLiQ+JxNkTBYsILFs8fn8hD2G5aeGNIgEMCIS6batQEZ/avuUAkvw5RoAfuWvWEdXETHYa1H+Xsn+m0KLrwMfYCfmby1MOIAq41p/qyZY/jOqkzV2qcMglNJ/47IJwwwskCgYBKZHK7rKgvptQmiASrYwOiTADIB6sqP/M3RW50Ibe0+kAcvsGrQXTvfebEjmPkMyDTNj/9ifiJEmQ5yzjRB7yWTrX7nLUTE4H6iM3UWt1E7opfkDz5zgvo9+eUmaWDDWEA3WGk4IQqc1b6P7BHVX98iicobJ63TAe6U5AckPFjmQKBgDr/lv0Xby7c1GsxrJ9CKaHOao+xunGeLn3ZejpfvTihYMKfrQKFUfspbSYq+49+8RNstLbiqdb4H49VjB8gD11FIJwjxcdOd5dstGYsn760Ts7cflukWY3lZM7N+V9jFyHGpq9uZZZqFiPd5sHZbZU5tXtzDBZFtPdIvlKEI3Il";
-//    }
-//    //FM
-//    else{
-//        rsa2PrivateKey = @"MIIEpAIBAAKCAQEAweGk+FTCAJLcvPKcMEf0fJEO6UpjJfUM1RwKNJ1Q2E9cbGAmgSoJyLOV4ciro7KGrAFMCWZXXEa9pOye4xF1J+mrK4HccEt7LuGN60oXNpq5dtwLf3s9oGptnCWzlAkGzL5Db/bVEJeiOI3DkUBThqBMiv6Z15NeUXHsyso9wg/rUL/8JXkVp21e/JchSX3sCW0EUtJUhDHA/+uXAC7emGd7arWAEULIKIY0xqHaV/Ci/78PU4V/zcZZ8QPzerE8EG4iEcqNw7Xudy3b+ECDYRMDAUFcGm9m4AL+zbNWHKk8HiNAhlbNnBW5Ngsj+oO//WtBYxaMA2EBsvxKicPATwIDAQABAoIBAHN5KiFBkf53egMLWF0lLgdW+hOWW3EK/2aZ+bYWkEUVF03xAl3hpMwlsbo1I40u0ij16MycaKGr/F2TFJrXFfj8ohcalClJu4dTjYw6p5K9GoMhUbPOugil+ryKc+dSbPtawp2X3JSyS0r1nCoRru264XvTYdtUiVNm0AqD476FZRKJfVyfLLxi8zzEiJc3LwJGMByN5gupqtSpv0dstIZAO3J2PQuJ5rWWg1J9NBP0meG2s2VGv1ahV2PKU5I8vJT/2FR7EmBX4eaj5oLalm27KrR3AtEE0aDnYa6jJufu2dWQCoIX8sN9iSKKVP0jkrnvjOzpIkxEJs7D656y4TECgYEA6Qet+/dL4MJFykibo6JdYsSCIiKK6zfhc4HBkpGkg2TWkCEzW6t7UkEWrjjVJuSCDaqFIXNbLCUBbUS/Nq9PkoQY21C20YV7Pim7xZG82IEJWYy7gbWbuvRDY4ZXhnZfY3v4mTuhA01si1YOyuYz1VIsUJmywvQ2PZwFF4mCApcCgYEA1P4VK01Yiw7G+dFwN7Uf4P5QOveDvVDoE9dKg+whWqn2co2AwUeVe5ZMX1IUnkxsfgI1+vDAQFQnI4IURiIn2zzNIbxQHULTOdT6vZKxLOjUL+vJE5CHZC9tFT9++yiQBjZzI12b3y4l7OLAGP4dRbzXNHESaXxCUuVskY01vwkCgYEAh7mEWXwowqkEcxQlKoKX973SucT6upOaiWcq8o5Hjov9+IaN3jebpUXpyuGpLHTtVr5ZuijxEl4fXaAr6tLi+shbnel+AbzIEmXGSwVeQ4+sfW7di2fWY2Z/lYkak2OAnXYITl+PoVfH/8PI6952lCm/S9apaqlIqkukH5hkk9MCgYEAigXA6BeuKibAUEElbCQmbWG/0gZ1S2gzjC/2bLjHAH6lYqRJ7HYb60OBaD/DdrVllN6P5na+zrD5z+vKgYw+sbab46GpdNzKDm7ysYhu4gBbCFbOLax54DVPhfZorg8iDbSZNjDCAoVgNDrYaxm5FGkEOEqRuOO6AwgDK+sLCikCgYBXw1g4m+ixLoUmOvaWFBTCpHsTwOIm6NyZMjQcoM/U6ybKk9pQKUQ9flfFzDiESu42sp2ZvOlqAexo9BwDfg03kgNNq016Qh/UX5wVtnn6ME50c5/TRmePyp++4i4h6kla0hb00fcF4dHYAX865UJ9FZ5Eih8TEQ470S18Cr6+BA==";
-//    }
-//    
-//    //partner和seller获取失败,提示
-//    if ([appID length] == 0 ||
-//        ([rsa2PrivateKey length] == 0 && [rsaPrivateKey length] == 0))
-//    {
-//        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"提示"
-//                                                        message:@"缺少appId或者私钥。"
-//                                                       delegate:self
-//                                              cancelButtonTitle:@"确定"
-//                                              otherButtonTitles:nil];
-//        [alert show];
-//        return;
-//    }
-//    
-//    /*
-//     *生成订单信息及签名
-//     */
-//    //将商品信息赋予AlixPayOrder的成员变量
-//    Order* order = [Order new];
-//    
-//    // NOTE: app_id设置
-//    order.app_id = appID;
-//    
-//    // NOTE: 支付接口名称
-//    order.method = @"alipay.trade.app.pay";
-//    
-//    // NOTE: 参数编码格式
-//    order.charset = @"utf-8";
-//    
-//    // NOTE: 当前时间点
-//    NSDateFormatter* formatter = [NSDateFormatter new];
-//    [formatter setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
-//    order.timestamp = [formatter stringFromDate:[NSDate date]];
-//    
-//    // NOTE: 支付版本
-//    order.version = @"1.0";
-//    
-//    // NOTE: (非必填项)支付宝服务器主动通知商户服务器里指定的页面http路径
-//    order.notify_url = @"http://admin.tingwen.me/index.php/api/Alipay/notifyurl";
-//    
-//    // NOTE: sign_type 根据商户设置的私钥来决定
-//    order.sign_type = (rsa2PrivateKey.length > 1)?@"RSA2":@"RSA";
-//    
-//    // NOTE: 商品数据
-//    order.biz_content = [BizContent new];
-//    order.biz_content.body = @"0.0";
-//    order.biz_content.subject = @"听币充值";
-//    order.biz_content.out_trade_no = [self generateTradeNO]; //订单ID（由商家自行制定）
-//    order.biz_content.timeout_express = @"30m"; //超时时间设置
-//    order.biz_content.total_amount = [NSString stringWithFormat:@"%.2f", self.rewardCount]; //商品价格
-//    
-//    //将商品信息拼接成字符串
-//    NSString *orderInfo = [order orderInfoEncoded:NO];
-//    NSString *orderInfoEncoded = [order orderInfoEncoded:YES];
-//    NSLog(@"orderSpec = %@",orderInfo);
-//    
-//    // NOTE: 获取私钥并将商户信息签名，外部商户的加签过程请务必放在服务端，防止公私钥数据泄露；
-//    //       需要遵循RSA签名规范，并将签名字符串base64编码和UrlEncode
-//    NSString *signedString = nil;
-//    RSADataSigner* signer = [[RSADataSigner alloc] initWithPrivateKey:((rsa2PrivateKey.length > 1)?rsa2PrivateKey:rsaPrivateKey)];
-//    if ((rsa2PrivateKey.length > 1)) {
-//        signedString = [signer signString:orderInfo withRSA2:YES];
-//    } else {
-//        signedString = [signer signString:orderInfo withRSA2:NO];
-//    }
-//    
-//    // NOTE: 如果加签成功，则继续执行支付
-//    if (signedString != nil) {
-//        //应用注册scheme,在AliSDKDemo-Info.plist定义URL types
-//        NSString *appScheme = @"zhiFuBzo";
-//        
-//        // NOTE: 将签名成功字符串格式化为订单字符串,请严格按照该格式
-//        NSString *orderString = [NSString stringWithFormat:@"%@&sign=%@",
-//                                 orderInfoEncoded, signedString];
-//        
-//        // NOTE: 调用支付结果开始支付
-//        [[AlipaySDK defaultService] payOrder:orderString fromScheme:appScheme callback:^(NSDictionary *resultDic) {
-//            switch (APPDELEGATE.payType) {
-//                case PayTypeClassPay:
-//                    [[NSNotificationCenter defaultCenter] postNotificationName:AliPayResultsClass object:resultDic];
-//                    break;
-//                case PayTypeReward:
-//                    [[NSNotificationCenter defaultCenter] postNotificationName:AliPayResultsReward object:resultDic];
-//                    break;
-//                case PayTypeRecharge:
-//                    [[NSNotificationCenter defaultCenter] postNotificationName:AliPayResultsRecharge object:resultDic];
-//                    break;
-//                case PayTypeMembers:
-//                    [[NSNotificationCenter defaultCenter] postNotificationName:AliPayResultsMembers object:resultDic];
-//                    break;
-//                    
-//                default:
-//                    break;
-//            }
-//            //返回上一个控制器
-//            [self back];
-//        }];
-//    }
 }
 
 - (void)WechatPay{
@@ -804,39 +659,6 @@
         XWAlerLoginView *alert = [[XWAlerLoginView alloc] initWithTitle:@"网络错误"];
         [alert show];
     }];
-
-//    NSMutableDictionary *dic = [NSMutableDictionary new];
-//    [dic setObject:[NSString stringWithFormat:@"%.2f",self.rewardCount] forKey:@"listen_money"];
-////    [dic setObject:self.uid forKey:@"act_id"];
-//    [dic setObject:@"1" forKey:@"type"];
-//    [CommonCode writeToUserD:dic andKey:REWARDINFODICTKEY];
-//    //注册微信
-//    [WXApi registerApp:kAppId_WeiXin];
-//    
-//    [NetWorkTool netwokingPostZhiFu:@"http://admin.tingwen.me/weixin/example/app.php" andParameters:@{@"total_fees" : @(self.rewardCount * 100)} success:^(id obj) {
-//        //微信
-//        if(obj == nil){
-//            //错误提示
-//            //            NSString *debug = [req getDebugifo];
-//            [self alert:@"提示信息" msg:@"交易失败"];
-//        }else{
-//            NSMutableString *stamp  = [obj objectForKey:@"timestamp"];
-//            //调起微信支付
-//            PayReq *req             = [[PayReq alloc] init];
-//            req.openID              = [obj objectForKey:@"appid"];
-//            req.partnerId           = [obj objectForKey:@"partnerid"];
-//            req.prepayId            = [obj objectForKey:@"prepayid"];
-//            req.nonceStr            = [obj objectForKey:@"noncestr"];
-//            req.timeStamp           = stamp.intValue;
-//            req.package             = [obj objectForKey:@"package"];
-//            req.sign                = [obj objectForKey:@"sign"];
-//
-//            [WXApi sendReq:req];
-//        }
-//    } failure:^{
-//        [self alert:@"提示信息" msg:@"交易失败"];
-//    }];
-    
 }
 
 + (NSString *)jumpToBizPay {
@@ -942,20 +764,5 @@
     }
     return _itemArr;
 }
-
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
-}
-
-/*
-#pragma mark - Navigation
-
-// In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
-}
-*/
 
 @end

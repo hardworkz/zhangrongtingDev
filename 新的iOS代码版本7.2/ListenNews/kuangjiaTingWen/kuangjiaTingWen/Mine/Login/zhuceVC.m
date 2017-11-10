@@ -54,14 +54,14 @@
     [agreeBtn addTarget:self action:@selector(agreeAction:) forControlEvents:UIControlEventTouchUpInside];
     [self.view addSubview:agreeBtn];
     agreeBtn.contentMode = UIViewContentModeScaleToFill;
-    
+
     UILabel *agreeLab = [[UILabel alloc]initWithFrame:CGRectMake(131.0 / 375 * IPHONE_W, 144.0 / 667 * IPHONE_H, 42.0 / 375 * IPHONE_W, 21.0 / 667 * IPHONE_H)];
     agreeLab.text = @"同意";
     agreeLab.textColor = [UIColor blackColor];
     agreeLab.font = [UIFont systemFontOfSize:13.0f];
     agreeLab.textAlignment = NSTextAlignmentCenter;
     [self.view addSubview:agreeLab];
-    
+
     UIButton *xieyiBtn = [UIButton buttonWithType:UIButtonTypeCustom];
     xieyiBtn.frame = CGRectMake(165.0 / 375 * IPHONE_W, 147.0 / 667 * IPHONE_H, 108.0, 16.0 / 667 * IPHONE_H);
     [xieyiBtn setTitle:@"《听闻用户协议》" forState:UIControlStateNormal];
@@ -123,16 +123,11 @@
 }
 
 - (void)xieyiBtnAction:(UIButton *)sender{
-    [self.navigationController pushViewController:[UserXieYIViewController new] animated:YES];
+    [self.navigationController pushViewController:[NewRegisterController new] animated:YES];
 }
 
 - (void)SVPDismiss {
     [SVProgressHUD dismiss];
-}
-
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
 }
 
 @end

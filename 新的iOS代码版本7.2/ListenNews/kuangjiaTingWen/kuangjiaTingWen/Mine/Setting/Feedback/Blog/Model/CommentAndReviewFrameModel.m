@@ -32,7 +32,7 @@
         _contentLabelF = CGRectMake(0, 0, contentSize.width, contentSize.height);
         
     }else{//计算回复人的名称宽度
-        CGSize replyManSize = [user.user_nicename boundingRectWithSize:CGSizeMake(MAXFLOAT, MAXFLOAT) options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:[UIFont systemFontOfSize:15]} context:nil].size;
+        CGSize replyManSize = [user.user_nicename == nil?@"匿名用户":user.user_nicename boundingRectWithSize:CGSizeMake(MAXFLOAT, MAXFLOAT) options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:[UIFont systemFontOfSize:15]} context:nil].size;
         _replyManF = CGRectMake(0, 0, replyManSize.width, replyManSize.height);
         //计算回复名词的名称宽度
         CGSize reviewSize = [@"回复" boundingRectWithSize:CGSizeMake(MAXFLOAT, MAXFLOAT) options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:[UIFont systemFontOfSize:15]} context:nil].size;
