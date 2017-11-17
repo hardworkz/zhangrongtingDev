@@ -58,7 +58,8 @@
     if (isExist) {//判断当前栈中是否存在NewPlayVC
         if ([viewController isKindOfClass:[NewPlayVC class]]) {//判断当前栈顶控制器是否是NewPlayVC，不是则pop
             if (![self.topViewController isKindOfClass:[NewPlayVC class]]) {
-                [super popViewControllerAnimated:YES];
+//                [super popViewControllerAnimated:YES];
+                [super popToViewController:viewController animated:YES];
             }
         }else{
             [super pushViewController:viewController animated:animated];

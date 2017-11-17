@@ -30,6 +30,8 @@ static NSString *const playAct_id = @"playAct_id";/**<当前正在播放的课�
     
     UILabel *classPriceLabel;
     UIButton *VipSelected;
+    UIButton *vipSelected;
+    UIButton *classSelected;
     UILabel *vipPriceLabel;
     
     //提交信息输入框
@@ -262,10 +264,10 @@ static AVPlayer *_instancePlay = nil;
             
             //判断是否是纯数字
             NSString *textStr = [NSString stringWithFormat:@" ￥%@ ",[NetWorkTool formatFloat:[responseObject[results][@"sprice"] floatValue]]];
-            //中划线
+//            中划线
             NSDictionary *attribtDic = @{NSStrikethroughStyleAttributeName: [NSNumber numberWithInteger:NSUnderlineStyleSingle]};
             NSMutableAttributedString *attribtStr = [[NSMutableAttributedString alloc]initWithString:textStr attributes:attribtDic];
-            // 赋值
+//             赋值
             weakSelf.spriceLabel.attributedText = attribtStr;
             weakSelf.priceLabel.text = [NSString stringWithFormat:@" ￥%@",[NetWorkTool formatFloat:[responseObject[results][@"price"] floatValue]]];
             rewardMoney = responseObject[results][@"price"];
@@ -1127,9 +1129,10 @@ static AVPlayer *_instancePlay = nil;
         [_spriceLabel setBackgroundColor:[UIColor clearColor]];
         [_spriceLabel setTextColor:[UIColor whiteColor]];
         _spriceLabel.font = gFontMain14;
-        UIView *line = [[UIView alloc] initWithFrame:CGRectMake(5, 12, SCREEN_WIDTH / 4 - 45, 0.5)];
-        line.backgroundColor = [UIColor whiteColor];
-        [_spriceLabel addSubview:line];
+        
+//        UIView *line = [[UIView alloc] initWithFrame:CGRectMake(5, 12, SCREEN_WIDTH / 4 - 45, 0.5)];
+//        line.backgroundColor = [UIColor whiteColor];
+//        [_spriceLabel addSubview:line];
     }
     return _spriceLabel;
 }
@@ -1403,6 +1406,7 @@ static AVPlayer *_instancePlay = nil;
             [selected setImage:[UIImage imageNamed:@"vip_selected"] forState:UIControlStateSelected];
             [selected addTarget:self action:@selector(vipSelected:)];
             [tableView addSubview:selected];
+            vipSelected = selected;
             VipSelected = selected;
         }else if (i == 12) {
             UIButton *selected = [[UIButton alloc] initWithFrame:view.frame];
@@ -1412,6 +1416,7 @@ static AVPlayer *_instancePlay = nil;
             selected.accessibilityIdentifier = @"class";
             [selected addTarget:self action:@selector(vipSelected:)];
             [tableView addSubview:selected];
+            classSelected = selected;
         }else if (i == 1) {
             label.text = @"名称";
         }else if (i == 2) {
@@ -1425,7 +1430,7 @@ static AVPlayer *_instancePlay = nil;
         }else if (i == 7) {
             label.text = @"超级会员";
         }else if (i == 8) {
-            label.text = @"¥1980";
+            label.text = _classModel.svipPrice?[NSString stringWithFormat:@"¥%@",_classModel.svipPrice]:@"¥0";
         }else if (i == 9) {
             label.font = [UIFont systemFontOfSize:12.];
             label.text = @"有声资讯会员\n价值99元";
@@ -1448,13 +1453,22 @@ static AVPlayer *_instancePlay = nil;
         }else if (i == 17) {
             label.text = @"无";
         }
+        if (i>=7&&i<=11) {
+            label.userInteractionEnabled = YES;
+            [label addTapGesWithTarget:self action:@selector(vipSelected)];
+        }else if (i>=13&&i<=17){
+            label.userInteractionEnabled = YES;
+            [label addTapGesWithTarget:self action:@selector(classSelected)];
+        }else{
+            label.userInteractionEnabled = NO;
+        }
     }
     
     vipPriceLabel = [[UILabel alloc] initWithFrame:CGRectMake(SCREEN_WIDTH - 15 - 60, CGRectGetMaxY(tableView.frame) + 10, 60, 20)];
     vipPriceLabel.numberOfLines = 0;
-    vipPriceLabel.text = @"¥1980";
+    vipPriceLabel.text = _classModel.svipPrice?[NSString stringWithFormat:@"¥%@",_classModel.svipPrice]:@"¥0";
     vipPriceLabel.textAlignment = NSTextAlignmentCenter;
-    vipPriceLabel.textColor = gMainColor;
+    vipPriceLabel.textColor = ColorWithRGBA(19, 154, 238, 1);
     vipPriceLabel.font = [UIFont systemFontOfSize:15];
     [contentView addSubview:vipPriceLabel];
 
@@ -1506,7 +1520,20 @@ static AVPlayer *_instancePlay = nil;
     
     vipPriceLabel.text = [VipSelected.accessibilityIdentifier isEqualToString:@"vip"]?@"¥1980":_priceLabel.text;
 }
-
+- (void)classSelected
+{
+    RTLog(@"classSelected");
+    if (![VipSelected isEqual:classSelected]) {
+        [self vipSelected:classSelected];
+    }
+}
+- (void)vipSelected
+{
+    RTLog(@"vipSelected");
+    if (![VipSelected isEqual:vipSelected]) {
+        [self vipSelected:vipSelected];
+    }
+}
 /**
  提交按钮点击
  */

@@ -1862,6 +1862,7 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
     
     if ([tableView isEqual:xinwenshuaxinTableView]){
+        [NewPlayVC shareInstance].starDate = 60;
         //设置频道类型
         [ZRT_PlayerManager manager].channelType = ChannelTypeDiscoverAnchor;
         //设置播放界面内容类型

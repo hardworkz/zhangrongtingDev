@@ -418,7 +418,7 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
     }
     
     //更新当前歌曲信息
-    if (self.songList) {//防止空数组引发崩溃
+    if (self.songList&&self.currentSongIndex<self.songList.count ) {//防止空数组和数组越界引发崩溃
         self.currentSong = self.songList[self.currentSongIndex];
     }else{
         return;
@@ -691,7 +691,7 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
         self.duration = totalDuration;
         RTLog(@"共缓冲:%.2f秒",totalBufferDuration);
         if (self.reloadBufferProgress) {
-            self.reloadBufferProgress(totalBufferDuration/totalDuration);
+            self.reloadBufferProgress(totalBufferDuration/totalDuration,totalDuration);
         }
         
     }else if ([keyPath isEqualToString:kvo_playbackBufferEmpty])

@@ -923,7 +923,7 @@
  */
 - (void)miPushReceiveNotification:(NSDictionary *)data
 {
-    
+    RTLog(@"%@",data);
 }
 #pragma mark - UIApplicationDelegate 推送相关
 

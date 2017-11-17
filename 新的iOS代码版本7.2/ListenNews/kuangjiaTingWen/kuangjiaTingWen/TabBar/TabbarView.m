@@ -56,6 +56,7 @@
     }
     return self;
 }
+
 - (void)startAnimate:(NSNotification *)notification{
     [_rotationBarBtn setSelected:YES];
     [self imgAnimate:_rotationBarBtn];

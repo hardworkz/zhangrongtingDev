@@ -43,6 +43,7 @@
 @property (strong, nonatomic) NSString *name;/**< */
 @property (strong, nonatomic) NSString *price;/**< */
 @property (strong, nonatomic) NSString *sprice;/**< */
+@property (strong, nonatomic) NSString *svipPrice;/**< 超级会员价格*/
 @property (strong, nonatomic) NSArray *shiting;/**< 试听列表*/
 @property (strong, nonatomic) NSArray *comments;/**< 评论列表*/
 @property (strong, nonatomic) NSMutableArray *commentsFrameArray;/**< 图片frame数组*/

@@ -162,9 +162,7 @@
     [ZRT_PlayerManager manager].channelType = [[CommonCode readFromUserD:NewPlayVC_PLAY_CHANNEL] intValue];
     [[NewPlayVC shareInstance] playFromIndex:[[CommonCode readFromUserD:NewPlayVC_PLAY_INDEX] integerValue]];
     [_navigationVC.navigationBar setHidden:YES];
-    if (_customTabBar.rotationBarBtnAction) {
-        _customTabBar.rotationBarBtnAction(_customTabBar.rotationBarBtn, _customTabBar.currentIdx);
-    }
+    [_navigationVC pushViewController:[NewPlayVC shareInstance] animated:YES];
 }
 
 /**
@@ -204,9 +202,7 @@
     [ZRT_PlayerManager manager].channelType = ChannelTypeChannelNone;
     [[NewPlayVC shareInstance] playFromIndex:0];
     [_navigationVC.navigationBar setHidden:YES];
-    if (_customTabBar.rotationBarBtnAction) {
-        _customTabBar.rotationBarBtnAction(_customTabBar.rotationBarBtn, _customTabBar.currentIdx);
-    }
+    [_navigationVC pushViewController:[NewPlayVC shareInstance] animated:YES];
     //清空获取的推送新闻数据
     self.pushNewsInfo = nil;
 }

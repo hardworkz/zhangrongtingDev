@@ -379,12 +379,13 @@ static NewPlayVC *_instance = nil;
 #pragma mark - 设置导航栏控件
 - (void)setupNavigation
 {
-    _topView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, IPHONE_W, 64)];
+    _topView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, IPHONE_W,IS_IPHONEX?88: 64)];
     _topView.backgroundColor = [UIColor clearColor];
     _topView.hidden = NO;
     [self.view addSubview:_topView];
+    
     _leftBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    _leftBtn.frame = CGRectMake(10, 25, 35, 35);
+    _leftBtn.frame = CGRectMake(10,IS_IPHONEX?25+24:25, 35, 35);
     [_leftBtn setImageEdgeInsets:UIEdgeInsetsMake(5, 0, 5, 10)];
     [_leftBtn setImage:[UIImage imageNamed:@"title_ic_white"] forState:UIControlStateNormal];
     _leftBtn.accessibilityLabel = @"返回";
@@ -392,41 +393,39 @@ static NewPlayVC *_instance = nil;
     [_topView addSubview:_leftBtn];
     
     _rightBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    _rightBtn.frame = CGRectMake(SCREEN_WIDTH - 55, 25, 35, 35);
+    _rightBtn.frame = CGRectMake(SCREEN_WIDTH - 55, IS_IPHONEX?25+24:25, 35, 35);
     [_rightBtn setImageEdgeInsets:UIEdgeInsetsMake(5, 10, 5, 0)];
     [_rightBtn setImage:[UIImage imageNamed:@"title_ic_share_white"] forState:UIControlStateNormal];
     _rightBtn.accessibilityLabel = @"分享";
     [_rightBtn addTarget:self action:@selector(shareNewsBtnAction) forControlEvents:UIControlEventTouchUpInside];
     [_topView addSubview:_rightBtn];
     
-    _topCenterView = [[UIView alloc] initWithFrame:CGRectMake(CGRectGetMaxX(_leftBtn.frame), 20, SCREEN_WIDTH - CGRectGetMaxX(_leftBtn.frame) - 55, 44)];
+    _topCenterView = [[UIView alloc] initWithFrame:CGRectMake(CGRectGetMaxX(_leftBtn.frame),IS_IPHONEX?20+24: 20, SCREEN_WIDTH - CGRectGetMaxX(_leftBtn.frame) - 55, 44)];
     _topCenterView.backgroundColor = [UIColor clearColor];
     [_topView addSubview:_topCenterView];
     
     //关注、取消
     if (IS_IPAD||IS_IPHONEX) {
-        self.guanzhuBtnNav.frame = CGRectMake(_topCenterView.width - 60.0 / 375 * IPHONE_W, 7, 55.0 / 375 * IPHONE_W, 30.0);
+        self.guanzhuBtnNav.frame = CGRectMake(_topCenterView.width - 60.0 / 375 * IPHONE_W, 7, 55.0 / 375 * IPHONE_W, IS_IPHONEX?30: 30.0);
     }else{
-        self.guanzhuBtnNav.frame = CGRectMake(_topCenterView.width - 60.0 / 375 * IPHONE_W, 7, 55.0 / 375 * IPHONE_W, 30.0 / 667 * IPHONE_H);
+        self.guanzhuBtnNav.frame = CGRectMake(_topCenterView.width - 60.0 / 375 * IPHONE_W, 7, 55.0 / 375 * IPHONE_W,IS_IPHONEX?30: 30.0 / 667 * IPHONE_H);
     }
     [_topCenterView addSubview:_guanzhuBtnNav];
     
+    //主播头像
+    self.zhuboImgNav.frame = CGRectMake(0, (44 - 27)/2.0,  27.0, 27.0);
+    UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(zhuboBtnVAction:)];
+    [_zhuboImgNav addGestureRecognizer:tap];
+    [_topCenterView addSubview:_zhuboImgNav];
+    //主播名字
+    self.zhuboTitleLabNav.frame = CGRectMake(CGRectGetMaxX(_zhuboImgNav.frame)+5, (44 - 15)/2.0, 88.0 / 375 * IPHONE_W, 15.0);
+    [_zhuboTitleLabNav addTapGesWithTarget:self action:@selector(zhuboBtnVAction:)];
+    [_topCenterView addSubview:_zhuboTitleLabNav];
     //主播麦克风图标
-    self.micNav.frame = CGRectMake(_guanzhuBtnNav.x - 8.0 / 375 * SCREEN_WIDTH - 10, (44 - 15)/2.0 , 8.0 /375 * SCREEN_WIDTH, 14.0 / 667 * SCREEN_HEIGHT);
+    self.micNav.frame = CGRectMake(CGRectGetMaxX(_zhuboTitleLabNav.frame), (44 - 20)/2.0 , 8.0 /375 * SCREEN_WIDTH, 14.0 / 667 * SCREEN_HEIGHT);
     [_micNav addTapGesWithTarget:self action:@selector(zhuboBtnVAction:)];
     [_topCenterView addSubview:_micNav];
     
-    //主播名字
-    self.zhuboTitleLabNav.frame = CGRectMake(_micNav.x - 88.0 / 375 * IPHONE_W - 10, (44 - 15)/2.0, 88.0 / 375 * IPHONE_W, 15.0 );
-    [_zhuboTitleLabNav addTapGesWithTarget:self action:@selector(zhuboBtnVAction:)];
-    [_topCenterView addSubview:_zhuboTitleLabNav];
-    
-    //主播头像
-    self.zhuboImgNav.frame = CGRectMake(_zhuboTitleLabNav.x - 27.0 - 5, (44 - 27)/2.0,  27.0, 27.0);
-    UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(zhuboBtnVAction:)];
-    [_zhuboImgNav addGestureRecognizer:tap];
-    
-    [_topCenterView addSubview:_zhuboImgNav];
 }
 #pragma mark - 设置详情控件数据
 - (void)setupTableViewHeaderData
@@ -467,9 +466,9 @@ static NewPlayVC *_instance = nil;
     self.mic.frame = CGRectMake(CGRectGetMaxX(_zhuboTitleLab.frame) + 6.0 / 375 * SCREEN_WIDTH, _zhuboTitleLab.frame.origin.y + 1.0 / 667 * SCREEN_HEIGHT, 8.0 /375 * SCREEN_WIDTH, 14.0 / 667 * SCREEN_HEIGHT);
     
     //导航栏主播信息控件frame
-    self.micNav.frame = CGRectMake(_guanzhuBtnNav.x - 8.0 / 375 * SCREEN_WIDTH - 10, (44 - 15)/2.0 , 8.0 /375 * SCREEN_WIDTH, 14.0 / 667 * SCREEN_HEIGHT);
-    self.zhuboTitleLabNav.frame = CGRectMake(_micNav.x - contentSize.width - 10, (44 - 15)/2.0, contentSize.width, 15.0 );
-    self.zhuboImgNav.frame = CGRectMake(_zhuboTitleLabNav.x - 27.0 - 5, (44 - 27)/2.0,  27.0, 27.0);
+//    self.micNav.frame = CGRectMake(_guanzhuBtnNav.x - 8.0 / 375 * SCREEN_WIDTH - 10, (44 - 15)/2.0 , 8.0 /375 * SCREEN_WIDTH, 14.0 / 667 * SCREEN_HEIGHT);
+//    self.zhuboTitleLabNav.frame = CGRectMake(_micNav.x - contentSize.width - 10, (44 - 15)/2.0, contentSize.width, 15.0 );
+//    self.zhuboImgNav.frame = CGRectMake(_zhuboTitleLabNav.x - 27.0 - 5, (44 - 27)/2.0,  27.0, 27.0);
 
     
     //是否关注
@@ -491,7 +490,11 @@ static NewPlayVC *_instance = nil;
     _zhuboTitleLabNav.frame = CGRectMake(_zhuboTitleLabNav.frame.origin.x, _zhuboTitleLabNav.frame.origin.y,contentSize.width, _zhuboTitleLabNav.frame.size.height);
     //主播麦克风图标frame
     self.mic.frame = CGRectMake(CGRectGetMaxX(_zhuboTitleLab.frame) + 6.0 / 375 * SCREEN_WIDTH, _zhuboTitleLab.frame.origin.y + 1.0 / 667 * SCREEN_HEIGHT, 8.0 /375 * SCREEN_WIDTH, 14.0 / 667 * SCREEN_HEIGHT);
-    self.micNav.frame = CGRectMake(CGRectGetMaxX(_zhuboTitleLabNav.frame) + 6.0 / 375 * SCREEN_WIDTH, _zhuboTitleLabNav.frame.origin.y + 1.0 / 667 * SCREEN_HEIGHT, 8.0 /375 * SCREEN_WIDTH, 14.0 / 667 * SCREEN_HEIGHT);
+    if (IS_IPHONEX) {
+        self.micNav.frame = CGRectMake(CGRectGetMaxX(_zhuboTitleLabNav.frame) + 6.0 / 375 * SCREEN_WIDTH, _zhuboTitleLabNav.frame.origin.y, 8.0 /375 * SCREEN_WIDTH, 14.0 / 667 * SCREEN_HEIGHT);
+    }else{
+        self.micNav.frame = CGRectMake(CGRectGetMaxX(_zhuboTitleLabNav.frame) + 6.0 / 375 * SCREEN_WIDTH, _zhuboTitleLabNav.frame.origin.y + 1.0 / 667 * SCREEN_HEIGHT, 8.0 /375 * SCREEN_WIDTH, 14.0 / 667 * SCREEN_HEIGHT);
+    }
     //设置标题名称
     self.titleLab.text = self.postDetailModel.post_title;
     //是否关注
@@ -656,26 +659,10 @@ static NewPlayVC *_instance = nil;
     
     //播放进度条
     [self.sliderProgress setThumbImage:[UIImage imageNamed:@"slider"] forState:UIControlStateNormal];
-//    self.sliderProgress.backgroundColor = [UIColor redColor];
     self.sliderProgress.minimumTrackTintColor = gMainColor;
     self.sliderProgress.maximumTrackTintColor = [UIColor clearColor];
     [self.sliderProgress addTarget:self action:@selector(doChangeProgress:) forControlEvents:UIControlEventValueChanged];
     [self.sliderProgress addTarget:self action:@selector(sliderTouchDown:) forControlEvents:UIControlEventTouchDown];
-    
-//    self.prgBufferProgress.frame = self.sliderProgress.frame;
-//    if (IS_IPAD) {
-//        self.prgBufferProgress.frame = CGRectMake(20.0 / 375 * IPHONE_W, 22.0 / 667 * IPHONE_H, SCREEN_WIDTH - 40.0 / 375 * SCREEN_WIDTH, 2.0);
-//    }
-//    else if (TARGETED_DEVICE_IS_IPHONE_736){
-//        self.prgBufferProgress.frame = CGRectMake(20.0 / 375 * IPHONE_W, 22.0 / 667 * IPHONE_H, SCREEN_WIDTH - 40.0 / 375 * SCREEN_WIDTH, 2.0);
-//    }else if (TARGETED_DEVICE_IS_IPHONE_667){
-//        self.prgBufferProgress.frame = CGRectMake(20.0 / 375 * IPHONE_W, 22.0 / 667 * IPHONE_H, SCREEN_WIDTH - 40.0 / 375 * SCREEN_WIDTH, 2.0);
-//    }else if (TARGETED_DEVICE_IS_IPHONE_568){
-//        self.prgBufferProgress.frame = CGRectMake(20.0 / 375 * IPHONE_W, 22.0 / 667 * IPHONE_H, SCREEN_WIDTH - 40.0 / 375 * SCREEN_WIDTH, 2.0);
-//    }
-//    else{
-//        self.prgBufferProgress.frame = CGRectMake(20.0 / 375 * IPHONE_W, 22.0 / 667 * IPHONE_H, SCREEN_WIDTH - 40.0 / 375 * SCREEN_WIDTH, 2.0);
-//    }
     self.prgBufferProgress.frame = self.sliderProgress.frame;
     self.prgBufferProgress.progressTintColor = gMainColor;;
     [dibuView addSubview:self.prgBufferProgress];
@@ -691,8 +678,19 @@ static NewPlayVC *_instance = nil;
         weakSelf.sliderProgress.value = currentTime;
         weakSelf.sliderProgress.maximumValue = totalDuration;
     };
-    [ZRT_PlayerManager manager].reloadBufferProgress = ^(float bufferProgress) {
+    [ZRT_PlayerManager manager].reloadBufferProgress = ^(float bufferProgress,float totalDuration) {
         if (bufferProgress>0) {
+            //添加播放记录功能：实例60秒开始播放
+            if ((bufferProgress*totalDuration)>self.starDate && self.starDate!= 0) {
+                //调到指定时间去播放
+                [[ZRT_PlayerManager manager].player seekToTime:CMTimeMake(_starDate, 1) completionHandler:^(BOOL finished) {
+                    if (finished == YES){
+                        [[ZRT_PlayerManager manager] startPlay];
+                    }
+                }];
+                self.starDate = 0;
+            }
+            //更新播放条进度
             [weakSelf.prgBufferProgress setProgress:bufferProgress animated:YES];
         }else{
             [weakSelf.prgBufferProgress setProgress:0. animated:YES];

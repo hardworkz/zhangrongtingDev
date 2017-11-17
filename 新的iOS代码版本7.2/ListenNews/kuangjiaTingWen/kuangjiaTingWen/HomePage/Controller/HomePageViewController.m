@@ -154,7 +154,7 @@
 #pragma mark - setter
 - (UIScrollView *)scrollView{
     if (!_scrollView) {
-        _scrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 128, SCREEN_WIDTH, SCREEN_HEIGHT - 104 - 49)];
+        _scrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0,IS_IPHONEX? 128:104, SCREEN_WIDTH, SCREEN_HEIGHT - 104 - 49)];
         _scrollView.backgroundColor = [UIColor whiteColor];
         _scrollView.pagingEnabled = YES;
         _scrollView.showsHorizontalScrollIndicator = NO;
@@ -173,7 +173,7 @@
         _segmentedControl.backgroundColor = [UIColor whiteColor];
         _segmentedControl.segmentEdgeInset = UIEdgeInsetsMake(0, 30, 0, 30);
         _segmentedControl.selectionStyle = HMSegmentedControlSelectionStyleTextWidthStripe;
-        _segmentedControl.selectionIndicatorLocation = HMSegmentedControlSelectionIndicatorLocationDown;
+        _segmentedControl.selectionIndicatorLocation =   HMSegmentedControlSelectionIndicatorLocationDown;
         _segmentedControl.selectedSegmentIndex = 1;
         _segmentedControl.verticalDividerEnabled = YES;
         _segmentedControl.verticalDividerColor = [UIColor whiteColor];
@@ -194,12 +194,6 @@
         }];
         [_segmentedControl addTarget:self action:@selector(segmentedControlChangedValue:) forControlEvents:UIControlEventValueChanged];
         
-        //自定义菜单栏下方横线
-//        CGFloat w = (SCREEN_WIDTH)/3;
-//        self.lineView = [[UIView alloc]initWithFrame:CGRectMake(30, self.segmentedControl.frame.size.height - 5, w/2 , 5)];
-//        [self.lineView setBackgroundColor:gTextColorSub];
-//        [self.segmentedControl addSubview:self.lineView];
-        
         UIView *downLine = [[UIView alloc]initWithFrame:CGRectMake(15.0 / 375 * IPHONE_W, _segmentedControl.frame.size.height - 1, SCREEN_WIDTH - 30.0 / 375 * IPHONE_W, 0.8)];
         [downLine setBackgroundColor:[UIColor colorWithHue:0.00 saturation:0.00 brightness:0.85 alpha:1.00]];
         [_segmentedControl addSubview:downLine];
@@ -214,9 +208,6 @@
         _columnTableView.delegate = self;
         _columnTableView.dataSource = self;
         _columnTableView.tableFooterView = [UIView new];
-//        _columnTableView.estimatedRowHeight = 0;
-//        _columnTableView.estimatedSectionHeaderHeight = 0;
-//        _columnTableView.estimatedSectionFooterHeight = 0;
     }
     return _columnTableView;
 }
@@ -228,9 +219,6 @@
         _newsTableView.delegate = self;
         _newsTableView.dataSource = self;
         _newsTableView.tableFooterView = [UIView new];
-//        _newsTableView.estimatedRowHeight = 0;
-//        _newsTableView.estimatedSectionHeaderHeight = 0;
-//        _newsTableView.estimatedSectionFooterHeight = 0;
     }
     return _newsTableView;
 }
@@ -242,9 +230,6 @@
         _classroomTableView.delegate = self;
         _classroomTableView.dataSource = self;
         _classroomTableView.tableFooterView = [UIView new];
-//        _classroomTableView.estimatedRowHeight = 0;
-//        _classroomTableView.estimatedSectionHeaderHeight = 0;
-//        _classroomTableView.estimatedSectionFooterHeight = 0;
     }
     return _classroomTableView;
 }
@@ -746,23 +731,6 @@
     }];
 }
 - (void)setupTBCView{
-    /*
-     {
-     is_fan=0,
-     images=2017-04-13/crop_58ef1953ef484.jpg,
-     cate=3,
-     name=10步成为巴菲特式投资天才,
-     des=刘建位复旦大学国际金融硕士上海社会科学院经济学博士巴菲特价值投资研究与传播者,
-     fan_num=110,
-     picture={
-     "thumb": "http:\/\/admin.tingwen.me\/Uploads\/2017-04-13\/crop_58ef1dc74e102.jpg"
-     },
-     description=10步成为巴菲特式投资天才,
-     message_num=8,
-     is_free=0,
-     url=260
-     }
-     */
     if (self.slideADResult.count != 0) {
         TBCircleScrollView *tbScView = [[TBCircleScrollView alloc] initWithFrame:CGRectMake(15.0 / 375 * IPHONE_W, 0, IPHONE_W - 30.0 / 375 * IPHONE_W, 162.0 / 667 * SCREEN_HEIGHT) andArr:self.slideADResult];
         tbScView.scrollView.scrollsToTop = NO;
@@ -781,9 +749,5 @@
         [self.newsTableView.tableHeaderView removeFromSuperview];
         [self.newsTableView reloadData];
     }
-}
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
 }
 @end

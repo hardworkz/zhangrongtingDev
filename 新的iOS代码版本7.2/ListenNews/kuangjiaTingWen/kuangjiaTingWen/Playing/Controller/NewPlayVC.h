@@ -50,7 +50,14 @@ typedef NS_ENUM(NSInteger, RewardViewType) {
  日期字体大小
  */
 @property(assign,nonatomic)CGFloat dateFont;
-@property(nonatomic)NSString *post_id;/**<新闻ID*/
+/**
+ 播放开始时间
+ */
+@property(assign,nonatomic)CGFloat starDate;
+/**
+ 新闻ID
+ */
+@property(nonatomic)NSString *post_id;
 /**
  已经听过的新闻或者已购买课堂的ID
  */

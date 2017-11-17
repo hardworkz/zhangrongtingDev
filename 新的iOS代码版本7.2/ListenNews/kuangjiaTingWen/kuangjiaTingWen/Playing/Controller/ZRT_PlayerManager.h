@@ -62,7 +62,7 @@ typedef NS_ENUM(NSInteger, ZRTPlayStatus) {
 /**
  刷新缓冲进度
  */
-@property (copy, nonatomic) void (^reloadBufferProgress)(float bufferProgress);
+@property (copy, nonatomic) void (^reloadBufferProgress)(float bufferProgress,float totalDuration);
 /**
  播放监控进度回调
  */

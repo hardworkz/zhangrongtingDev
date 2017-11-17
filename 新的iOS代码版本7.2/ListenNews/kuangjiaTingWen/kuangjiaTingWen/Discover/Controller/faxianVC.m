@@ -1141,7 +1141,7 @@
 #pragma mark - Setter
 - (UITableView *)faxianTableView{
     if (!_faxianTableView){
-        _faxianTableView = [[UITableView alloc]initWithFrame:CGRectMake(0, CGRectGetMaxY(self.SouSuosearchBar.frame), IPHONE_W , IPHONE_H - CGRectGetMaxY(self.SouSuosearchBar.frame) - 49) style:UITableViewStylePlain];
+        _faxianTableView = [[UITableView alloc]initWithFrame:CGRectMake(0, CGRectGetMaxY(self.SouSuosearchBar.frame), IPHONE_W ,IS_IPHONEX?IPHONE_H - CGRectGetMaxY(self.SouSuosearchBar.frame) - 49 - 30: IPHONE_H - CGRectGetMaxY(self.SouSuosearchBar.frame) - 49 ) style:UITableViewStylePlain];
         _faxianTableView.delegate = self;
         _faxianTableView.dataSource = self;
         _faxianTableView.tag = 4;
@@ -1232,7 +1232,7 @@
 
 - (UISearchBar *)SouSuosearchBar {
     if (!_SouSuosearchBar) {
-        _SouSuosearchBar = [[UISearchBar alloc]initWithFrame:CGRectMake(20 , 46, IPHONE_W - 40, 44)];
+        _SouSuosearchBar = [[UISearchBar alloc]initWithFrame:CGRectMake(20 ,IS_IPHONEX? 46:26, IPHONE_W - 40, 44)];
         _SouSuosearchBar.delegate = self;
         _SouSuosearchBar.placeholder = @"搜索新闻、主播、专栏、课堂";
         _SouSuosearchBar.showsCancelButton = NO;

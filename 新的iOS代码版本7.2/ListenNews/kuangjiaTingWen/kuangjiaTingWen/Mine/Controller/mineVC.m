@@ -550,6 +550,7 @@ typedef void(^animateBlock)();
         if (indexPath.row == 0){
             static NSString *wotouxiangcellIdentify = @"wotouxiangcellIdentify";
             UITableViewCell *cell = [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:wotouxiangcellIdentify];
+//            cell.backgroundColor = [UIColor redColor];
             if (!cell){
                 
                 cell = [tableView dequeueReusableCellWithIdentifier:wotouxiangcellIdentify];
@@ -1160,7 +1161,7 @@ typedef void(^animateBlock)();
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
     if (indexPath.row == 0){
-        return 285.0 / 667 * IPHONE_H;
+        return 265.0 / 667 * IPHONE_H;
     }
     else{
         return 58.0f / 667 * IPHONE_H;
