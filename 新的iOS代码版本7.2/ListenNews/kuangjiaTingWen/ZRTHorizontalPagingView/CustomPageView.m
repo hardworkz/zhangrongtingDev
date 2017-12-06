@@ -103,13 +103,17 @@ static NSInteger pagingButtonTag                 = 1000;
     self.horizontalScrollView.contentSize = CGSizeMake(self.contentViews.count * SCREEN_WIDTH, 0);
     for(int i = 0 ;i<self.contentViews.count;i++) {
         CustomPageScrollView *v = self.contentViews[i];
-        [v  setContentInset:UIEdgeInsetsMake(self.headerViewHeight+self.segmentBarHeight, 0., v.contentInset.bottom, 0.)];
+        if (IS_IPHONEX) {
+            [v setContentInset:UIEdgeInsetsMake(self.headerViewHeight+self.segmentBarHeight -45, 0., 0., 0.)];
+        }else{
+            [v setContentInset:UIEdgeInsetsMake(self.headerViewHeight+self.segmentBarHeight , 0., 0., 0.)];
+        }
         v.alwaysBounceVertical = YES;
         v.showsVerticalScrollIndicator = NO;
         v.contentOffset = CGPointMake(0., -self.headerViewHeight-self.segmentBarHeight);
         [v.panGestureRecognizer addObserver:self forKeyPath:NSStringFromSelector(@selector(state)) options:NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld context:&CustomPageViewPanContext];
         [v addObserver:self forKeyPath:NSStringFromSelector(@selector(contentOffset)) options:NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld context:&CustomPageViewScrollContext];
-        v.frame = CGRectMake(SCREEN_WIDTH * i, 0, SCREEN_WIDTH, v.frame.size.height);
+        v.frame = CGRectMake(SCREEN_WIDTH * i, IS_IPHONEX?-45:0, SCREEN_WIDTH, IS_IPHONEX?v.frame.size.height+30:v.frame.size.height);
         [self.horizontalScrollView addSubview:v];
         
         ContentOffsetYDataModel *model = [[ContentOffsetYDataModel alloc] init];
@@ -181,29 +185,6 @@ static NSInteger pagingButtonTag                 = 1000;
     }
 }
 
-- (void)segmentButtonEvent:(UIButton *)segmentButton {
-    for(UIButton *b in self.segmentButtons) {
-        [b setSelected:NO];
-    }
-    [segmentButton setSelected:YES];
-    
-    NSInteger clickIndex = segmentButton.tag-pagingButtonTag;
-    
-    if (clickIndex <4) {
-        [self.horizontalScrollView setContentOffset:CGPointMake(clickIndex * SCREEN_WIDTH, self.horizontalScrollView.contentOffset.y) animated:NO];
-        if(self.currentScrollView.contentOffset.y<-(self.headerViewHeight+self.segmentBarHeight)) {
-            [self.currentScrollView setContentOffset:CGPointMake(self.currentScrollView.contentOffset.x, -(self.headerViewHeight+self.segmentBarHeight)) animated:NO];
-        }else {
-            [self.currentScrollView setContentOffset:self.currentScrollView.contentOffset animated:NO];
-        }
-        self.currentScrollView = self.contentViews[clickIndex];
-        
-    }
-    
-    if(self.pagingViewSwitchBlock) {
-        self.pagingViewSwitchBlock(clickIndex);
-    }
-}
 
 
 - (BOOL)pointInside:(CGPoint)point withEvent:(nullable UIEvent *)event {
@@ -258,7 +239,11 @@ static NSInteger pagingButtonTag                 = 1000;
     
     if(context == &CustomPageViewPanContext) {
         
-        self.horizontalScrollView.scrollEnabled = YES;
+        if (IS_IPHONEX) {
+            self.horizontalScrollView.scrollEnabled = NO;
+        }else{
+            self.horizontalScrollView.scrollEnabled = YES;
+        }
         UIGestureRecognizerState state = [change[NSKeyValueChangeNewKey] integerValue];
         //        RTLog(@"observeValueForKeyPath--state%ld",(long)state);
         //failed说明是点击事件
@@ -310,7 +295,6 @@ static NSInteger pagingButtonTag                 = 1000;
         view.dataModel.contentOffsetY = newOffsetY;
         
         
-        RTLog(@"%f",deltaY);
         if(deltaY >= 0) {//向上滚动
             if(headerDisplayHeight - deltaY <= self.segmentTopSpace) {//判断是否到达悬停位置
                 self.headerOriginYConstraint.constant = -headerViewHeight+self.segmentTopSpace;
@@ -322,7 +306,7 @@ static NSInteger pagingButtonTag                 = 1000;
                 self.magnifyTopConstraint.constant = -self.headerOriginYConstraint.constant;
             }
             
-        }else {            //向下滚动
+        }else {//向下滚动
             if (headerDisplayHeight+self.segmentBarHeight <= -newOffsetY) {//下拉约束
                 self.headerOriginYConstraint.constant = -self.headerViewHeight-self.segmentBarHeight-self.currentScrollView.contentOffset.y;
             }
@@ -374,7 +358,6 @@ static NSInteger pagingButtonTag                 = 1000;
     NSInteger currentPage = scrollView.contentOffset.x/[[UIScreen mainScreen] bounds].size.width;
     //判断当前是否为整数，减少回调次数
     if (currentPage == 0 ||currentPage == 1 ||currentPage == 2 ||currentPage == 3 ||currentPage == 4) {
-        
         //判断是否为当前分页，如果是则不回调block
         if (self.currenPageIndex != currentPage) {
             for(UIButton *b in self.segmentButtons) {
@@ -391,6 +374,30 @@ static NSInteger pagingButtonTag                 = 1000;
         }
     }
 }
+- (void)segmentButtonEvent:(UIButton *)segmentButton {
+    for(UIButton *b in self.segmentButtons) {
+        [b setSelected:NO];
+    }
+    [segmentButton setSelected:YES];
+    
+    NSInteger clickIndex = segmentButton.tag-pagingButtonTag;
+    
+    if (clickIndex <4) {
+        [self.horizontalScrollView setContentOffset:CGPointMake(clickIndex * SCREEN_WIDTH, self.horizontalScrollView.contentOffset.y) animated:NO];
+        if(self.currentScrollView.contentOffset.y<-(self.headerViewHeight+self.segmentBarHeight)) {
+            [self.currentScrollView setContentOffset:CGPointMake(self.currentScrollView.contentOffset.x, -(self.headerViewHeight+self.segmentBarHeight)) animated:NO];
+        }else {
+            [self.currentScrollView setContentOffset:self.currentScrollView.contentOffset animated:NO];
+        }
+        self.currentScrollView = self.contentViews[clickIndex];
+        
+    }
+    
+    if(self.pagingViewSwitchBlock) {
+        self.pagingViewSwitchBlock(clickIndex);
+    }
+}
+
 - (void)dealloc {
     for(UIScrollView *v in self.contentViews) {
         [v.panGestureRecognizer removeObserver:self forKeyPath:NSStringFromSelector(@selector(state)) context:&CustomPageViewPanContext];

@@ -625,7 +625,18 @@
 
 ///根据主播或者节目ID获取详情新闻留言照片等等列表信息
 + (void)postPaoGuoZhuBoOrJieMuMessageWithID:(NSString *)an_id andpage:(NSString *)page andlimit:(NSString *)limit sccess:(void (^)(NSDictionary *responseObject))success failure:(void(^)(NSError *error))failure;
-
+//上传播放历史记录和列表数据
++ (void)postPaoGuoUploadHistoryDataWithAct_id:(NSString *)act_id
+                                   andUser_id:(NSString *)user_id
+                                    andNumber:(NSString *)number
+                                      andTime:(NSString *)time
+                                       sccess:(void (^)(NSDictionary *responseObject))success
+                                      failure:(void(^)(NSError *error))failure;
+//获取播放历史记录和列表数据
++ (void)postPaoGuoGetLastHistoryDataWithAct_id:(NSString *)act_id
+                                    andUser_id:(NSString *)user_id
+                                        sccess:(void (^)(NSDictionary *responseObject))success
+                                       failure:(void(^)(NSError *error))failure;
 ///	根据分类获取该分类下的新闻列表
 + (void)postPaoGuoFenLeiZhuBoBoBaoXinWenWithterm_id:(NSString *)term_id
                                             andpage:(NSString *)page
@@ -1354,6 +1365,7 @@
 + (void)goldUseWithaccessToken:(NSString *)accessToken
                         act_id:(NSString *)act_id
                        post_id:(NSString *)post_id
+                       gold_num:(NSString *)gold_num
                         sccess:(void (^)(NSDictionary *responseObject))success
                        failure:(void(^)(NSError *error))failure;
 

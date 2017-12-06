@@ -75,7 +75,7 @@ static NSString *const VIPContent = @"普通会员:\n1.每日可收听新闻数�
     [call setTitle:@"客服:0592-5962072"];
     call.titleLabel.font = [UIFont systemFontOfSize:12];
     [call setTitleColor:[UIColor lightGrayColor]];
-    call.frame = CGRectMake(0, SCREEN_HEIGHT - 30, SCREEN_WIDTH, 30);
+    call.frame = CGRectMake(0,IS_IPHONEX? SCREEN_HEIGHT - 60:SCREEN_HEIGHT - 30, SCREEN_WIDTH, 30);
     [call addTarget:self action:@selector(call)];
     [self.view addSubview:call];
     

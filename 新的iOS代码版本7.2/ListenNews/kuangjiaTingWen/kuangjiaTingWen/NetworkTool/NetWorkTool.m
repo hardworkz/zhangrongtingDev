@@ -1318,6 +1318,25 @@ NSMutableDictionary *dic = [[NSMutableDictionary alloc]initWithCapacity:1
     dic[@"limit"] = limit;
     [self asyncNetworkingUrl:@"/interface/Actinfo" andDict:dic success:success failure:failure];
 }
+//上传播放历史记录和列表数据
++ (void)postPaoGuoUploadHistoryDataWithAct_id:(NSString *)act_id andUser_id:(NSString *)user_id andNumber:(NSString *)number andTime:(NSString *)time sccess:(void (^)(NSDictionary *responseObject))success failure:(void(^)(NSError *error))failure
+{
+    NSMutableDictionary *dic = [[NSMutableDictionary alloc]initWithCapacity:1];
+    dic[@"act_id"] = act_id;
+    dic[@"user_id"] = user_id;
+    dic[@"number"] = number;
+    dic[@"time"] = time;
+    [self asyncNetworkingUrl:@"/interfaceNew/insertHistory" andDict:dic success:success failure:failure];
+}
+//获取播放历史记录和列表数据
++ (void)postPaoGuoGetLastHistoryDataWithAct_id:(NSString *)act_id andUser_id:(NSString *)user_id sccess:(void (^)(NSDictionary *responseObject))success failure:(void(^)(NSError *error))failure
+{
+    NSMutableDictionary *dic = [[NSMutableDictionary alloc]initWithCapacity:1];
+    dic[@"act_id"] = act_id;
+    dic[@"user_id"] = user_id;
+    [self asyncNetworkingUrl:@"/interfaceNew/getLastPlay" andDict:dic success:success failure:failure];
+}
+
 ///	根据分类获取该分类下的新闻列表
 + (void)postPaoGuoFenLeiZhuBoBoBaoXinWenWithterm_id:(NSString *)term_id
                                             andpage:(NSString *)page
@@ -2011,13 +2030,15 @@ NSMutableDictionary *dic = [[NSMutableDictionary alloc]initWithCapacity:1
 + (void)goldUseWithaccessToken:(NSString *)accessToken
                         act_id:(NSString *)act_id
                        post_id:(NSString *)post_id
+                      gold_num:(NSString *)gold_num
                         sccess:(void (^)(NSDictionary *responseObject))success
                        failure:(void(^)(NSError *error))failure{
     NSMutableDictionary *dic = [[NSMutableDictionary alloc]initWithCapacity:1];
     dic[@"accessToken"] = accessToken;
     dic[@"act_id"] = act_id;
     dic[@"post_id"] = post_id;
-    [self asyncNetworkingUrl:@"/interfaceNew/goldUse" andDict:dic success:success failure:failure];
+    dic[@"gold_num"] = gold_num;
+    [self asyncNetworkingUrl:@"/interfaceNew/goldUseNum" andDict:dic success:success failure:failure];
 }
 
 + (void)getFan_boardWithact_id:(NSString *)act_id

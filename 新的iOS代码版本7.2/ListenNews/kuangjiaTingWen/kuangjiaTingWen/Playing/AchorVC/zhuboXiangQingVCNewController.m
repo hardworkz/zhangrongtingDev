@@ -64,6 +64,12 @@
     UITextField *cityTextField;
     UITextField *jobTextField;
     UITextField *selectedTextField;
+    
+    NSString *time;
+    NSString *number;
+    
+    //是否有播放记录，控制继续播放按钮显示隐藏
+    BOOL isContinuePlay;
 }
 
 @property (weak, nonatomic) CustomPageView *pagingView;
@@ -126,6 +132,7 @@
     self.view.backgroundColor = [UIColor whiteColor];
     _isRewardLoginBack = NO;
     _isReplyComment = NO;
+    isContinuePlay = NO;
     
     if ([[NSString stringWithFormat:@"%@",self.jiemuIs_fan] isEqualToString:@"0"]){
         isGuanZhu = NO;
@@ -208,7 +215,6 @@
             CustomPageScrollView *tableView = [[CustomPageScrollView alloc] initWithFrame:CGRectMake(IPHONE_W * i, 0, IPHONE_W ,IS_IPHONEX?IPHONE_H - 24.0: IPHONE_H - 24.0/ 667 * SCREEN_HEIGHT) style:UITableViewStyleGrouped];
             tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
             tableView.backgroundColor = [UIColor whiteColor];
-            
             if (i == 0){
                 xinwenshuaxinTableView = tableView;
             }
@@ -254,10 +260,10 @@
         if (SCREEN_WIDTH == 320) {
             headerH = 238.0/ 667 * SCREEN_HEIGHT + 10;
         }else{
-            headerH = IS_IPHONEX?238.0: 238.0 / 667 * SCREEN_HEIGHT;
+            headerH = IS_IPHONEX?258.0: 238.0 / 667 * SCREEN_HEIGHT;
         }
     }else{
-        headerH = IS_IPHONEX?273.0:273.0 / 667 * SCREEN_HEIGHT;
+        headerH = IS_IPHONEX?303.0:273.0 / 667 * SCREEN_HEIGHT;
     }
     pagingView = [CustomPageView pagingViewWithHeaderView:headerView headerHeight:headerH segmentButtons:buttonArray segmentHeight:IS_IPHONEX?82.0: 52.0 / 667 * SCREEN_HEIGHT contentViews:@[xinwenshuaxinTableView, fansWallTableView, pinglunhoushuaxinTableView,ImageTableView]];
     
@@ -528,23 +534,54 @@
 
  @param tableView 对应tableview
  */
-- (void)xinwenRefresh:(UITableView *)tableView{
-    [NetWorkTool postPaoGuoZhuBoOrJieMuMessageWithID:self.jiemuID andpage:@"1" andlimit:@"10" sccess:^(NSDictionary *responseObject) {
-        if ([responseObject[@"results"] isKindOfClass:[NSArray class]])
-        {
-            xinwenArr = [[NSMutableArray alloc]initWithArray:responseObject[@"results"]];
-            [tableView reloadData];
-            if ([ZRT_PlayerManager manager].channelType == ChannelTypeDiscoverAnchor) {
-                [ZRT_PlayerManager manager].songList = xinwenArr;
+- (void)xinwenRefresh:(UITableView *)tableView
+{
+    if (self.isClass) {
+        //获取课堂播放记录，判断是否有记录数据
+        [NetWorkTool postPaoGuoGetLastHistoryDataWithAct_id:self.jiemuID andUser_id:ExdangqianUserUid sccess:^(NSDictionary *responseObject) {
+            if ([responseObject[status] intValue] == 1) {//获取到播放记录
+                isContinuePlay = YES;
+                time = responseObject[@"time"];
+                number = responseObject[@"number"];
+                xinwenPageNumber = [responseObject[@"page"] intValue];
+                xinwenArr = [[NSMutableArray alloc]initWithArray:responseObject[results]];
+                [tableView reloadData];
+                if ([ZRT_PlayerManager manager].channelType == ChannelTypeDiscoverAnchor) {
+                    [ZRT_PlayerManager manager].songList = xinwenArr;
+                }
+            }else if ([responseObject[status] intValue] == 2){//没有获取到播放记录
+                isContinuePlay = NO;
+                xinwenArr = [[NSMutableArray alloc]initWithArray:responseObject[results]];
+                [tableView reloadData];
+                if ([ZRT_PlayerManager manager].channelType == ChannelTypeDiscoverAnchor) {
+                    [ZRT_PlayerManager manager].songList = xinwenArr;
+                }
+            }else{
+                isContinuePlay = NO;
+                [[XWAlerLoginView alertWithTitle:responseObject[msg]] show];
             }
-        }
-        [tableView.mj_header endRefreshing];
-    } failure:^(NSError *error) {
-        NSLog(@"error = %@",error);
-        [tableView.mj_header endRefreshing];
-    }];
+            [tableView.mj_header endRefreshing];
+        } failure:^(NSError *error) {
+            isContinuePlay = NO;
+            [tableView.mj_header endRefreshing];
+        }];
+    }else{
+        [NetWorkTool postPaoGuoZhuBoOrJieMuMessageWithID:self.jiemuID andpage:@"1" andlimit:@"10" sccess:^(NSDictionary *responseObject) {
+            if ([responseObject[results] isKindOfClass:[NSArray class]])
+            {
+                xinwenArr = [[NSMutableArray alloc]initWithArray:responseObject[results]];
+                [tableView reloadData];
+                if ([ZRT_PlayerManager manager].channelType == ChannelTypeDiscoverAnchor) {
+                    [ZRT_PlayerManager manager].songList = xinwenArr;
+                }
+            }
+            [tableView.mj_header endRefreshing];
+        } failure:^(NSError *error) {
+            NSLog(@"error = %@",error);
+            [tableView.mj_header endRefreshing];
+        }];
+    }
 }
-
 /**
  新闻上拉加载更多
 
@@ -552,7 +589,6 @@
  */
 - (void)xinwenshanglajiazai:(UITableView *)tableView{
     xinwenPageNumber++;
-    
     [NetWorkTool postPaoGuoZhuBoOrJieMuMessageWithID:self.jiemuID andpage:[NSString stringWithFormat:@"%d",xinwenPageNumber] andlimit:@"10" sccess:^(NSDictionary *responseObject) {
         if ([responseObject[@"results"] isKindOfClass:[NSArray class]])
         {
@@ -790,9 +826,9 @@
     [headerView addSubview:shadowView];
     
     if (!self.isClass) {
-        downHeaderV = [[UIView alloc]initWithFrame:CGRectMake(0, 223.0 / 667 *SCREEN_HEIGHT, IPHONE_W, 50.0 / 667 *SCREEN_HEIGHT)];
+        downHeaderV = [[UIView alloc]initWithFrame:CGRectMake(0,IS_IPHONEX?253:223.0 / 667 *SCREEN_HEIGHT, IPHONE_W, 50.0 / 667 *SCREEN_HEIGHT)];
     }else{
-        downHeaderV = [[UIView alloc]initWithFrame:CGRectMake(0, 223.0 / 667 *SCREEN_HEIGHT, IPHONE_W, 0.0 / 667 *SCREEN_HEIGHT)];
+        downHeaderV = [[UIView alloc]initWithFrame:CGRectMake(0,IS_IPHONEX?253:223.0 / 667 *SCREEN_HEIGHT, IPHONE_W, 0.0 / 667 *SCREEN_HEIGHT)];
     }
     [downHeaderV setBackgroundColor:[UIColor whiteColor]];
     //返回按钮
@@ -901,7 +937,7 @@
         
         //粉丝
         UIButton *fansButton = [UIButton buttonWithType:UIButtonTypeCustom];
-        [fansButton setFrame:CGRectMake(0, 25.0 / 667 * SCREEN_HEIGHT, SCREEN_WIDTH /2 , 25.0 / 667 * SCREEN_HEIGHT)];
+        [fansButton setFrame:CGRectMake(0,IS_IPHONEX?25.0:25.0 / 667 * SCREEN_HEIGHT, SCREEN_WIDTH /2 , 25.0 / 667 * SCREEN_HEIGHT)];
         [fansButton setBackgroundColor:[UIColor clearColor]];
         [fansButton.titleLabel setFont:[UIFont systemFontOfSize:16.0]];
         [fansButton setTitle:[NSString stringWithFormat:@"%@",self.jiemuFan_num] forState:UIControlStateNormal];
@@ -919,7 +955,7 @@
         
         //留言
         UIButton *messageButton = [UIButton buttonWithType:UIButtonTypeCustom];
-        [messageButton setFrame:CGRectMake(SCREEN_WIDTH /2, 25.0 / 667 * SCREEN_HEIGHT, SCREEN_WIDTH /2 , 25.0 / 667 * SCREEN_HEIGHT)];
+        [messageButton setFrame:CGRectMake(SCREEN_WIDTH /2,IS_IPHONEX?25.0:25.0 / 667 * SCREEN_HEIGHT, SCREEN_WIDTH /2 , 25.0 / 667 * SCREEN_HEIGHT)];
         [messageButton setBackgroundColor:[UIColor clearColor]];
         [messageButton.titleLabel setFont:[UIFont systemFontOfSize:16.0]];
         [messageButton setTitle:[NSString stringWithFormat:@"%@",self.jiemuMessage_num] forState:UIControlStateNormal];
@@ -937,7 +973,6 @@
     }
     
     [headerView addSubview:downHeaderV];
-//    [ZhuscrollView addSubview:headerView];
 }
 
 
@@ -1522,10 +1557,6 @@
 //点击播放按钮
 - (void)playBtnPlay:(zhuboxiangqingNewVCPlayBtn *)button
 {
-//    ExIsClassVCPlay = YES;
-//    [CommonCode writeToUserD:@(NO) andKey:@"ExIsClassVCPlay"];
-//    [CommonCode writeToUserD:nil andKey:@"Exact_id"];
-    
     //当前选中按钮为播放状态，设置为未播放状态并停止播放
     if (button.selected == YES) {
         [[ZRT_PlayerManager manager] pausePlay];
@@ -1545,6 +1576,7 @@
     [NewPlayVC shareInstance].playType = PlayTypeClass;
     //设置播放器播放内容类型
     [ZRT_PlayerManager manager].playType = ZRTPlayTypeClassroom;
+    [ZRT_PlayerManager manager].act_id = self.jiemuID;
     //设置播放器播放完成自动加载更多block
     DefineWeakSelf;
     [ZRT_PlayerManager manager].loadMoreList = ^(NSInteger currentSongIndex) {
@@ -1613,6 +1645,17 @@
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
+    if ([tableView isEqual:xinwenshuaxinTableView]) {
+        if (_isClass) {
+            if (isContinuePlay) {
+                return IS_IPHONEX?55:40;
+            }else{
+                return 0.01f;
+            }
+        }else{
+            return 0.01f;
+        }
+    }
     //粉丝榜
     if ([tableView isEqual:fansWallTableView]){
         return 40.0f;
@@ -1623,7 +1666,82 @@
     
 }
 
+/**
+ 继续播放点击跳转播放详情页面
+ */
+- (void)continuePlayAction
+{
+    //设置开始播放跳转上次记录
+    [NewPlayVC shareInstance].starDate = [time intValue]/1000;
+    //设置频道类型
+    [ZRT_PlayerManager manager].channelType = ChannelTypeDiscoverAnchor;
+    //设置播放界面内容类型
+    [NewPlayVC shareInstance].playType = PlayTypeClass;
+    //设置播放器播放内容类型
+    [ZRT_PlayerManager manager].playType = ZRTPlayTypeClassroom;
+    [ZRT_PlayerManager manager].act_id = self.jiemuID;
+    //设置播放器播放完成自动加载更多block
+    DefineWeakSelf;
+    [ZRT_PlayerManager manager].loadMoreList = ^(NSInteger currentSongIndex) {
+        [weakSelf xinwenshanglajiazai:xinwenshuaxinTableView];
+    };
+    //播放内容切换后刷新对应的播放列表
+    [ZRT_PlayerManager manager].playReloadList = ^(NSInteger currentSongIndex) {
+        [xinwenshuaxinTableView reloadData];
+    };
+    int indexPathRow = [number intValue];
+    //设置播放界面打赏view的状态
+    [NewPlayVC shareInstance].rewardType = RewardViewTypeNone;
+    //判断是否是点击当前正在播放的新闻，如果是则直接跳转
+    if ([[CommonCode readFromUserD:@"dangqianbofangxinwenID"] isEqualToString:xinwenArr[indexPathRow][@"id"]]){
+        
+        //设置播放器播放数组
+        [ZRT_PlayerManager manager].songList = xinwenArr;
+        [self.navigationController.navigationBar setHidden:YES];
+        [self.navigationController pushViewController:[NewPlayVC shareInstance] animated:YES];
+    }
+    else{
+        
+        //设置播放器播放数组
+        [ZRT_PlayerManager manager].songList = xinwenArr;
+        //设置新闻ID
+        [NewPlayVC shareInstance].post_id = xinwenArr[indexPathRow][@"id"];
+        //保存当前播放新闻Index
+        ExcurrentNumber = [number intValue];
+        //调用播放对应Index方法
+        [[NewPlayVC shareInstance] playFromIndex:ExcurrentNumber];
+        //跳转播放界面
+        [self.navigationController.navigationBar setHidden:YES];
+        [self.navigationController pushViewController:[NewPlayVC shareInstance] animated:YES];
+        [xinwenshuaxinTableView reloadData];
+    }
+}
 - (nullable UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section{
+    if ([tableView isEqual:xinwenshuaxinTableView]) {
+        UIView *sectionHeadView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH,IS_IPHONEX?55: 40)];
+        [sectionHeadView setBackgroundColor:[UIColor whiteColor]];
+        
+        UIButton *continuePlayButton = [UIButton buttonWithType:UIButtonTypeCustom];
+        [continuePlayButton setFrame:CGRectMake(0, 0, SCREEN_WIDTH,IS_IPHONEX?55: 40)];
+        [continuePlayButton setImage:[UIImage imageNamed:@"继续播放"] forState:UIControlStateNormal];
+        continuePlayButton.titleEdgeInsets = UIEdgeInsetsMake(0, 20,IS_IPHONEX?0:10, 0);
+        continuePlayButton.imageEdgeInsets = UIEdgeInsetsMake(0, 0, IS_IPHONEX?0:10, 0);
+        [continuePlayButton setTitle:@"继 续 播 放" forState:UIControlStateNormal];
+        continuePlayButton.titleLabel.font = [UIFont systemFontOfSize:15];
+        [continuePlayButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+        [continuePlayButton addTarget:self action:@selector(continuePlayAction) forControlEvents:UIControlEventTouchUpInside];
+        [sectionHeadView addSubview:continuePlayButton];
+        
+        UIView *line = [[UIView alloc] initWithFrame:CGRectMake(0,IS_IPHONEX?49.5: 39.5, SCREEN_WIDTH, 0.5)];
+        line.backgroundColor = [UIColor lightGrayColor];
+        [sectionHeadView addSubview:line];
+        
+        if (_isClass && isContinuePlay) {
+            return sectionHeadView;
+        }else{
+            return nil;
+        }
+    }else
     //粉丝榜
     if ([tableView isEqual:fansWallTableView]){
         UIView *sectionHeadView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, 40)];
@@ -1712,7 +1830,11 @@
         
         if ([[CommonCode readFromUserD:@"dangqianbofangxinwenID"] isEqualToString:xinwenArr[indexPath.row][@"id"]])
         {
-            playBtn.selected = YES;
+//            if ([ZRT_PlayerManager manager].isPlaying) {
+                playBtn.selected = YES;
+//            }else{
+//                playBtn.selected = NO;
+//            }
         }else{
             playBtn.selected = NO;
         }
@@ -1862,7 +1984,6 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
     
     if ([tableView isEqual:xinwenshuaxinTableView]){
-        [NewPlayVC shareInstance].starDate = 60;
         //设置频道类型
         [ZRT_PlayerManager manager].channelType = ChannelTypeDiscoverAnchor;
         //设置播放界面内容类型
@@ -1870,10 +1991,13 @@
             [NewPlayVC shareInstance].playType = PlayTypeClass;
             //设置播放器播放内容类型
             [ZRT_PlayerManager manager].playType = ZRTPlayTypeClassroom;
+            [ZRT_PlayerManager manager].act_id = self.jiemuID;
+            [NewPlayVC shareInstance].isFormClass = YES;
         }else{
             [NewPlayVC shareInstance].playType = PlayTypeNews;
             //设置播放器播放内容类型
             [ZRT_PlayerManager manager].playType = ZRTPlayTypeNews;
+            [NewPlayVC shareInstance].isFormClass = NO;
         }
         //设置播放器播放完成自动加载更多block
         DefineWeakSelf;
@@ -2018,11 +2142,6 @@
         }
     }
 }
-- (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate
-{
-    //适配子tableview滚动位置
-//    [self.pagingView autoContentOffsetY];
-}
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView {
     if (scrollView.tag == lastBtnTag - 7){
         if (scrollView.contentOffset.y > 0.0){
@@ -2069,14 +2188,11 @@
             }
         }
     }
-    //适配子tableview滚动位置
-//    [self.pagingView autoContentOffsetY];
 }
 -(void)timeSetting
 {
     touchCount=0;
 }
-
 #pragma mark - TTTAttributedLabelDelegate
 
 - (void)attributedLabel:(TTTAttributedLabel *)label
@@ -2096,9 +2212,7 @@ didSelectLinkWithTransitInformation:(NSDictionary *)components {
     gerenzhuye.user_login = components[@"user_login"];
     gerenzhuye.avatar = components[@"avatar"];
     gerenzhuye.user_id = components[@"id"];
-//    self.hidesBottomBarWhenPushed=YES;
     [self.navigationController pushViewController:gerenzhuye animated:YES];
-//    self.hidesBottomBarWhenPushed=YES;
 }
 
 - (UILabel *)myRanking{

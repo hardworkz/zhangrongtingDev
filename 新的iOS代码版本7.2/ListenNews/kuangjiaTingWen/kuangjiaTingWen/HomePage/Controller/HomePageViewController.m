@@ -64,7 +64,8 @@
     [super viewDidLoad];
     self.playListIndex = 1;
     //这里是启动app时广告
-    [self getStartAD];
+    RegisterNotify(@"getStartAD", @selector(getStartAD))
+//    [self getStartAD];
     [self setUpData];
     [self setUpView];
     
@@ -401,37 +402,34 @@
 }
 
 - (void)getStartAD{
-    [NetWorkTool getIntoAppGuangGaoPage:@"1" andLimit:@"15" sccess:^(NSDictionary *responseObject) {
-        if ([responseObject[@"results"] isKindOfClass:[NSArray class]]){
-            
-            if (TARGETED_DEVICE_IS_IPHONE_480 && [[responseObject[@"results"] firstObject][@"status"] isEqualToString:@"1"]){
-                [self openLaunchAD];
-            }
-            else if (TARGETED_DEVICE_IS_IPHONE_568 &&  [responseObject[@"results"][1] [@"status"] isEqualToString:@"1"]){
-                [self openLaunchAD];
-            }
-            else if (TARGETED_DEVICE_IS_IPHONE_667 &&  [responseObject[@"results"][2] [@"status"] isEqualToString:@"1"]){
-                [self openLaunchAD];
-            }
-            else if (TARGETED_DEVICE_IS_IPHONE_736 &&  [responseObject[@"results"][3] [@"status"] isEqualToString:@"1"]){
-                [self openLaunchAD];
-            }
-            else if (TARGETED_DEVICE_IS_IPAD &&  [responseObject[@"results"][3] [@"status"] isEqualToString:@"1"]){
-                [self openLaunchAD];
-            }
-            
+    //获取开屏广告数据，判断屏幕尺寸
+    NSDictionary *responseObject = [CommonCode readFromUserD:@"StartAD_Data"];
+    if ([responseObject[@"results"] isKindOfClass:[NSArray class]] && responseObject != nil){
+        if (TARGETED_DEVICE_IS_IPHONE_480 && [[responseObject[@"results"] firstObject][@"status"] isEqualToString:@"1"]){
+            [self openLaunchAD];
         }
-        
-    }failure:^(NSError *error){
-         
-     }];
+        else if (TARGETED_DEVICE_IS_IPHONE_568 &&  [responseObject[@"results"][1] [@"status"] isEqualToString:@"1"]){
+            [self openLaunchAD];
+        }
+        else if (TARGETED_DEVICE_IS_IPHONE_667 &&  [responseObject[@"results"][2] [@"status"] isEqualToString:@"1"]){
+            [self openLaunchAD];
+        }
+        else if (TARGETED_DEVICE_IS_IPHONE_736 &&  [responseObject[@"results"][3] [@"status"] isEqualToString:@"1"]){
+            [self openLaunchAD];
+        }
+        else if (TARGETED_DEVICE_IS_IPAD &&  [responseObject[@"results"][3] [@"status"] isEqualToString:@"1"]){
+            [self openLaunchAD];
+        }else if (TARGETED_DEVICE_IS_IPHONE_812 &&  [responseObject[@"results"][10][@"status"] isEqualToString:@"1"]){
+            [self openLaunchAD];
+        }
+    }
 }
 
 - (void)openLaunchAD{
     guanggaoVC *guangao = [guanggaoVC new];
-    self.hidesBottomBarWhenPushed = YES;
     [self.navigationController pushViewController:guangao animated:NO];
-    self.hidesBottomBarWhenPushed = NO;
+    //清空开屏广告本地数据
+    [CommonCode writeToUserD:nil andKey:@"StartAD_Data"];   
 }
 
 - (void)newsItemAction:(UIButton *)sender{

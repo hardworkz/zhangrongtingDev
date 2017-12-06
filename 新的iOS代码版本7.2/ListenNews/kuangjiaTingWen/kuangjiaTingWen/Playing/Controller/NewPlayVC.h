@@ -55,6 +55,10 @@ typedef NS_ENUM(NSInteger, RewardViewType) {
  */
 @property(assign,nonatomic)CGFloat starDate;
 /**
+ 点击课堂已购买界面进入，跳转到课堂详情
+ */
+@property(assign,nonatomic)BOOL isFormClass;
+/**
  新闻ID
  */
 @property(nonatomic)NSString *post_id;

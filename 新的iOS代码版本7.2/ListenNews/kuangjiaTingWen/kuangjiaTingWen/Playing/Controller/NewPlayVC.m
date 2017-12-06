@@ -42,6 +42,8 @@
     OJLAnimationButton *rewardAnimationBtn;
     //是否点击自定义打赏金额按钮
     BOOL isCustomPay;
+    //金币上传定时器
+    dispatch_source_t gcd_timer;
 }
 /**
  主页面tableView
@@ -179,6 +181,7 @@
  打赏输入框
  */
 @property (strong, nonatomic) UITextField *customRewardTextField;
+@property (strong, nonatomic) UILabel *appreciateNum;//投金币数
 @end
 static NewPlayVC *_instance = nil;
 @implementation NewPlayVC
@@ -283,8 +286,6 @@ static NewPlayVC *_instance = nil;
     RegisterNotify(NETWORKSTATUSCHANGE, @selector(networkChange))
     //评论成功通知刷新
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(pinglunchenggong:) name:@"pinglunchenggong" object:nil];
-    //跳转打赏支付页面后返回的通知
-//    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(RewardBack:) name:@"RewardBack" object:nil];
 }
 #pragma mark - 加载新闻详情数据
 - (void)loadData
@@ -568,7 +569,7 @@ static NewPlayVC *_instance = nil;
     [self.view addSubview:dibuView];
     //底部收藏按钮
     bofangfenxiangBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    bofangfenxiangBtn.frame = CGRectMake(IPHONE_W - 52.0 / 375 * IPHONE_W, 54.0 / 667 * IPHONE_H, 32.0 / 667 * IPHONE_H, 32.0 / 667 * IPHONE_H);
+    bofangfenxiangBtn.frame = CGRectMake(IPHONE_W - 52.0 / 375 * IPHONE_W, 54.0 / 667 * IPHONE_H,IS_IPHONEX?32.0: 32.0 / 667 * IPHONE_H,IS_IPHONEX?32.0: 32.0 / 667 * IPHONE_H);
     [bofangfenxiangBtn setImageEdgeInsets:UIEdgeInsetsMake(5, 5, 7, 7)];
     [bofangfenxiangBtn setImage:[UIImage imageNamed:@"home_news_collection"] forState:UIControlStateNormal];
     [bofangfenxiangBtn setImage:[UIImage imageNamed:@"home_news_collectioned"] forState:UIControlStateSelected];
@@ -932,6 +933,7 @@ static NewPlayVC *_instance = nil;
     }else if (indexPath.row == 1) {
         PlayVCThreeBtnTableViewCell *cell = [PlayVCThreeBtnTableViewCell cellWithTableView:tableView];
         cell.appreciateNum.text = self.postDetailModel.gold;
+        self.appreciateNum = cell.appreciateNum;
         cell.commentNum.text = self.postDetailModel.comment_count;
         DefineWeakSelf
         cell.selectedItem = ^(UIButton *item) {
@@ -1121,7 +1123,7 @@ static NewPlayVC *_instance = nil;
         case 1:
         {
             //投金币
-            [self appreciateGold];
+            [self startGCDTimerWithGoldUpload];
             
         }
             break;
@@ -1176,15 +1178,27 @@ static NewPlayVC *_instance = nil;
     if ([[CommonCode readFromUserD:@"isLogin"]boolValue] == YES){
         NSDictionary *userInfo = [CommonCode readFromUserD:@"dangqianUserInfo"];
         if ([userInfo[@"results"][@"gold"] floatValue] > 0) {
-            [NetWorkTool goldUseWithaccessToken:AvatarAccessToken act_id:(self.postDetailModel.post_news != nil) ? self.postDetailModel.post_news : self.post_id post_id:self.post_id sccess:^(NSDictionary *responseObject) {
-                [self loadData];
-                XWAlerLoginView *xw = [[XWAlerLoginView alloc]initWithTitle:responseObject[@"msg"]];
-                [xw show];
-                //投完金币 --》 获取用户信息
-                [[NSNotificationCenter defaultCenter] postNotificationName:@"updateUserInfo" object:nil];
-                
+            [NetWorkTool goldUseWithaccessToken:AvatarAccessToken act_id:(self.postDetailModel.post_news != nil) ? self.postDetailModel.post_news : self.post_id post_id:self.post_id gold_num:[NSString stringWithFormat:@"%ld",(long)goldTouchCount] sccess:^(NSDictionary *responseObject) {
+                goldTouchCount = 0;
+                if ([responseObject[status] intValue] == 1) {
+                    
+                    XWAlerLoginView *xw = [[XWAlerLoginView alloc]initWithTitle:responseObject[@"msg"]];
+                    [xw show];
+                    //投完金币 --》 获取用户信息
+                    [[NSNotificationCenter defaultCenter] postNotificationName:@"updateUserInfo" object:nil];
+                }else{
+                    XWAlerLoginView *xw = [[XWAlerLoginView alloc]initWithTitle:responseObject[@"msg"]];
+                    [xw show];
+                    //设置金币数值到界面，不reloadData
+                    self.appreciateNum.text = [NSString stringWithFormat:@"%ld",[self.appreciateNum.text integerValue] - goldTouchCount];
+                    //投完金币 --》 获取用户信息
+                    [[NSNotificationCenter defaultCenter] postNotificationName:@"updateUserInfo" object:nil];
+                }
             } failure:^(NSError *error) {
-                //
+                XWAlerLoginView *xw = [[XWAlerLoginView alloc]initWithTitle:@"网络错误，金币打赏失败"];
+                [xw show];
+                goldTouchCount = 0;
+                [self loadData];
             }];
         }
         else{
@@ -1196,6 +1210,44 @@ static NewPlayVC *_instance = nil;
         XWAlerLoginView *xw = [[XWAlerLoginView alloc]initWithTitle:@"登录后才可以投金币哦~"];
         [xw show];
     }
+}
+-(void)startGCDTimerWithGoldUpload
+{
+    goldTouchCount++;
+    self.appreciateNum.text = [NSString stringWithFormat:@"%d",[self.appreciateNum.text intValue] + 1];
+    [self stopTimer];
+    NSTimeInterval period = 1.0; //设置时间间隔
+    __block NSInteger uploadTime = 3.0;//上传间隔
+    dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+    gcd_timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, queue);
+    dispatch_source_set_timer(gcd_timer, dispatch_walltime(NULL, 0), period * NSEC_PER_SEC, 0); //每秒执行
+    dispatch_source_set_event_handler(gcd_timer, ^{
+        //在这里执行事件
+        RTLog(@"startGCDTimerWithGoldUpload:%ld",goldTouchCount);
+        uploadTime --;
+        if (uploadTime == 0) {
+            uploadTime = 3.0;
+            [self stopTimer];
+            //通知主线程刷新
+            dispatch_async(dispatch_get_main_queue(), ^{
+                //回调或者说是通知主线程刷新，
+                [self appreciateGold];
+                RTLog(@"上传操作--次数:%ld",goldTouchCount);
+            });
+        }
+    });
+    dispatch_resume(gcd_timer);
+}
+-(void)stopTimer{
+    if(gcd_timer){
+        dispatch_source_cancel(gcd_timer);
+        gcd_timer = nil;
+    }
+}
+- (void)goldTouchSetting
+{
+    RTLog(@"goldTouchSetting");
+    [self performSelector:@selector(appreciateGold) withObject:nil afterDelay:3.0];//3秒后点击次数清零
 }
 /**
  点击跳转评论页面
@@ -1627,8 +1679,10 @@ static NewPlayVC *_instance = nil;
     
     [self getCommentList];
 }
+
 #pragma mark - 控件事件action
 static NSInteger touchCount = 0;
+static NSInteger goldTouchCount = 0;
 /**
  播放/暂停
  */
@@ -1642,6 +1696,10 @@ static NSInteger touchCount = 0;
         return;
     }
     if ([ZRT_PlayerManager manager].isPlaying) {//点击暂停
+        //上传课堂播放数据
+        if ([ZRT_PlayerManager manager].playType == ZRTPlayTypeClassroom) {
+            [[ZRT_PlayerManager manager] uploadClassPlayHistoryData];
+        }
         [[ZRT_PlayerManager manager] pausePlay];
         sender.selected = NO;
     }else{//点击播放
@@ -1663,6 +1721,12 @@ static NSInteger touchCount = 0;
     touchCount++;
     if(touchCount==1)
     {
+        //清空跳转播放时间数据
+        self.starDate = 0;
+        //上传课堂播放数据
+        if ([ZRT_PlayerManager manager].playType == ZRTPlayTypeClassroom) {
+            [[ZRT_PlayerManager manager] uploadClassPlayHistoryData];
+        }
         //播放上一首
         BOOL isfirst = [[ZRT_PlayerManager manager] previousSong];
         //已经是第一首，则不往下执行
@@ -1700,8 +1764,19 @@ static NSInteger touchCount = 0;
     touchCount++;
     if(touchCount==1)
     {
+        //清空跳转播放时间数据
+        self.starDate = 0;
+        //上传课堂播放数据
+        if ([ZRT_PlayerManager manager].playType == ZRTPlayTypeClassroom) {
+            [[ZRT_PlayerManager manager] uploadClassPlayHistoryData];
+        }
         //播放下一首
         BOOL isLast = [[ZRT_PlayerManager manager] nextSong];
+        //设置课堂播放时长播放时长
+//        if ([ZRT_PlayerManager manager].playType == ZRTPlayTypeClassroom) {
+//            self.starDate = [[ZRT_PlayerManager manager].currentSong[@"play_time"] intValue]/1000;
+//            RTLog(@"开始播放时间：%f",self.starDate);
+//        }
         //已经是最后一首，则不往下执行
         if (isLast) {
             return;
@@ -1767,6 +1842,7 @@ static NSInteger touchCount = 0;
             });
         }
     }
+    
     //设置播放器数据
     [[ZRT_PlayerManager manager] loadSongInfoFromIndex:index];
     //设置详情模型
@@ -1889,6 +1965,7 @@ static NSInteger touchCount = 0;
     self.yinpinzongTime.text = [self convertStringWithTime:[self.postDetailModel.post_time floatValue] / 1000.0];
 }
 - (void)back{
+    self.isFormClass = NO;
     [self.navigationController popViewControllerAnimated:YES];
 }
 - (void)rightSwipeAction:(UIGestureRecognizer *)gesture {
@@ -2035,16 +2112,21 @@ static NSInteger touchCount = 0;
     if (!self.postDetailModel.act) {
         return;
     }
-    zhuboXiangQingVCNewController *zhubo = [zhuboXiangQingVCNewController new];
-    zhubo.jiemuDescription = self.postDetailModel.act.Description;
-    zhubo.jiemuFan_num = self.postDetailModel.act.fan_num;
-    zhubo.jiemuID = (self.postDetailModel.post_news != nil) ? self.postDetailModel.post_news : self.postDetailModel.act.act_id;
-    zhubo.jiemuImages = self.postDetailModel.act.images;
-    zhubo.jiemuIs_fan = self.postDetailModel.act.is_fan;
-    zhubo.jiemuMessage_num = self.postDetailModel.act.message_num;
-    zhubo.jiemuName = self.postDetailModel.act.name;
-    zhubo.isbofangye = YES;
-    [self.navigationController pushViewController:zhubo animated:YES];
+    if (self.isFormClass) {
+        [self.navigationController popViewControllerAnimated:YES];
+    }else{
+        zhuboXiangQingVCNewController *zhubo = [zhuboXiangQingVCNewController new];
+        zhubo.jiemuDescription = self.postDetailModel.act.Description;
+        zhubo.jiemuFan_num = self.postDetailModel.act.fan_num;
+        zhubo.jiemuID = (self.postDetailModel.post_news != nil) ? self.postDetailModel.post_news : self.postDetailModel.act.act_id;
+        zhubo.jiemuImages = self.postDetailModel.act.images;
+        zhubo.jiemuIs_fan = self.postDetailModel.act.is_fan;
+        zhubo.jiemuMessage_num = self.postDetailModel.act.message_num;
+        zhubo.jiemuName = self.postDetailModel.act.name;
+        zhubo.isClass = self.isFormClass;
+        zhubo.isbofangye = YES;
+        [self.navigationController pushViewController:zhubo animated:YES];
+    }
 }
 /**
  关注主播按钮点击

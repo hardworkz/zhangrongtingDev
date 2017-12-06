@@ -55,43 +55,70 @@
 }
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     
-    self.window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
-//    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        //开屏广告初始化并展示代码
-        GDTSplashAd *splashAd;
-        if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)
-        {
-            splashAd = [[GDTSplashAd alloc] initWithAppkey:GDTAppKey placementId:GDTPlacementId];
-            splashAd.delegate = self;//设置代理1ez
-            //针对不同设备尺寸设置不同的默认图片，拉取广告等待时间会展示该默认图片。
-            //        if ([[UIScreen mainScreen] bounds].size.height >= 568.0f) {
-            //            splashAd.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"LaunchImage-1-568h"]];
-            //        } else {
-            //            splashAd.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"LaunchImage-1"]];
-            //        }
-            //跳过按钮位置
-            //        splashAd.skipButtonCenter = CGPointMake(0, 0);
-            //设置开屏拉取时长限制，若超时则不再展示广告
-            splashAd.fetchDelay = 3;
-            //［可选］拉取并展示全屏开屏广告
-            //[splashAd loadAdAndShowInWindow:self.window];
-            //设置开屏底部自定义LogoView，展示半屏开屏广告
-            _bottomView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, [[UIScreen mainScreen] bounds].size.width, 100)];
-            UIImageView *logo = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"flash_slogen"]];
-            [_bottomView addSubview:logo];
-            logo.center = _bottomView.center;
-            _bottomView.backgroundColor = [UIColor whiteColor];
-            self.splash = splashAd;
-        }
-        /* 使用GCD返回主线程 进行UI层面的赋值 */
-        
-//        dispatch_async(dispatch_get_main_queue(), ^{
+    //开屏广告初始化并展示代码
+    GDTSplashAd *splashAd;
+    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)
+    {
+        splashAd = [[GDTSplashAd alloc] initWithAppkey:GDTAppKey placementId:GDTPlacementId];
+        splashAd.delegate = self;//设置代理1ez
+        //针对不同设备尺寸设置不同的默认图片，拉取广告等待时间会展示该默认图片。
+        //        if ([[UIScreen mainScreen] bounds].size.height >= 568.0f) {
+        //            splashAd.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"LaunchImage-1-568h"]];
+        //        } else {
+        //            splashAd.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"LaunchImage-1"]];
+        //        }
+        //跳过按钮位置
+        //        splashAd.skipButtonCenter = CGPointMake(0, 0);
+        //设置开屏拉取时长限制，若超时则不再展示广告
+        splashAd.fetchDelay = 3;
+        //［可选］拉取并展示全屏开屏广告
+        //[splashAd loadAdAndShowInWindow:self.window];
+        //设置开屏底部自定义LogoView，展示半屏开屏广告
+        _bottomView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, [[UIScreen mainScreen] bounds].size.width, 100)];
+        UIImageView *logo = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"flash_slogen"]];
+        [_bottomView addSubview:logo];
+        logo.center = _bottomView.center;
+        _bottomView.backgroundColor = [UIColor whiteColor];
+        self.splash = splashAd;
+    }
+    [NetWorkTool getIntoAppGuangGaoPage:@"1" andLimit:@"15" sccess:^(NSDictionary *responseObject) {
+        if ([responseObject[@"results"] isKindOfClass:[NSArray class]] && responseObject != nil){
+            if (TARGETED_DEVICE_IS_IPHONE_480 && [[responseObject[@"results"] firstObject][@"status"] isEqualToString:@"1"]){
+                [CommonCode writeToUserD:responseObject andKey:@"StartAD_Data"];
+                SendNotify(@"getStartAD", nil);
+            }
+            else if (TARGETED_DEVICE_IS_IPHONE_568 &&  [responseObject[@"results"][1] [@"status"] isEqualToString:@"1"]){
+                [CommonCode writeToUserD:responseObject andKey:@"StartAD_Data"];
+                SendNotify(@"getStartAD", nil);
+            }
+            else if (TARGETED_DEVICE_IS_IPHONE_667 &&  [responseObject[@"results"][2] [@"status"] isEqualToString:@"1"]){
+                [CommonCode writeToUserD:responseObject andKey:@"StartAD_Data"];
+                SendNotify(@"getStartAD", nil);
+            }
+            else if (TARGETED_DEVICE_IS_IPHONE_736 &&  [responseObject[@"results"][3] [@"status"] isEqualToString:@"1"]){
+                [CommonCode writeToUserD:responseObject andKey:@"StartAD_Data"];
+                SendNotify(@"getStartAD", nil);
+            }
+            else if (TARGETED_DEVICE_IS_IPAD &&  [responseObject[@"results"][3] [@"status"] isEqualToString:@"1"]){
+                [CommonCode writeToUserD:responseObject andKey:@"StartAD_Data"];
+                SendNotify(@"getStartAD", nil);
+            }else if (TARGETED_DEVICE_IS_IPHONE_812 &&  [responseObject[@"results"][10][@"status"] isEqualToString:@"1"]){
+                [CommonCode writeToUserD:responseObject andKey:@"StartAD_Data"];
+                SendNotify(@"getStartAD", nil);
+            }else{
+                //添加开屏广告空间到窗口
+                [self.splash loadAdAndShowInWindow:self.window withBottomView:_bottomView];
+            }
+        }else{
             //添加开屏广告空间到窗口
             [self.splash loadAdAndShowInWindow:self.window withBottomView:_bottomView];
-//        });
-//    });
+        }
+    }failure:^(NSError *error){
+        //添加开屏广告空间到窗口
+        [self.splash loadAdAndShowInWindow:self.window withBottomView:_bottomView];
+    }];
     
-    
+    self.window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
     self.window.backgroundColor = [UIColor whiteColor];
     self.window.rootViewController = [[TabBarController alloc] init];
     [self.window makeKeyAndVisible];
@@ -624,7 +651,10 @@
 }
 
 - (void)applicationWillTerminate:(UIApplication *)application {
-    
+    //上传课堂播放记录
+    if ([ZRT_PlayerManager manager].playType == ZRTPlayTypeClassroom && [ZRT_PlayerManager manager].isPlaying == YES) {
+        [[ZRT_PlayerManager manager] uploadClassPlayHistoryData];
+    }
     //应用退出时保存已听过新闻ID
     [CommonCode writeToUserD:[NewPlayVC shareInstance].listenedNewsIDArray andKey:yitingguoxinwenID];
     //清空当前本地缓存的播放新闻，播放新闻ID
@@ -634,6 +664,24 @@
 
 - (void)applicationDidEnterBackground:(UIApplication *)application
 {
+//    [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler
+//     :^(){
+//         //程序在10分钟内未被系统关闭或者强制关闭，则程序会调用此代码块，可以在这里做一些保存或者清理工作
+//         NSLog(
+//               @"程序关闭"
+//               );
+//         //上传课堂播放记录
+//         if ([ZRT_PlayerManager manager].playType == ZRTPlayTypeClassroom && [ZRT_PlayerManager manager].isPlaying == NO) {
+//             [[ZRT_PlayerManager manager] uploadClassPlayHistoryData];
+//         }
+//         //应用退出时保存已听过新闻ID
+//         [CommonCode writeToUserD:[NewPlayVC shareInstance].listenedNewsIDArray andKey:yitingguoxinwenID];
+//         //清空当前本地缓存的播放新闻，播放新闻ID
+//         [CommonCode writeToUserD:nil andKey:@"dangqianbofangxinwenID"];
+//         [CommonCode writeToUserD:nil andKey:@"dangqianbofangxinwen"];
+//
+//     }];
+    
     
     [[UIApplication sharedApplication] beginReceivingRemoteControlEvents];
     [self becomeFirstResponder];
@@ -671,6 +719,8 @@
             }
             [app endBackgroundTask:bgTask];
             bgTask   = UIBackgroundTaskInvalid;
+            
+            [CommonCode writeToUserD:[NewPlayVC shareInstance].listenedNewsIDArray andKey:yitingguoxinwenID];
             
             if ([TimerViewController defaultTimerViewController].sw.on) {
                 [[TimerViewController defaultTimerViewController].timer fire];

@@ -111,13 +111,20 @@
     if (phoneF.text.length == 11){
         [button attAction];
         [NetWorkTool postPaoGuoZhuCeYanZhengMaWithphoneFNumber:[DSE encryptUseDES:phoneF.text] anduseType:@"1" sccess:^(NSDictionary *responseObject) {
-            if ([responseObject[@"status"] integerValue] == 1) {
-                ExyanzhengmaStr = [NSString stringWithFormat:@"%@",responseObject[@"results"]];
+            if ([responseObject[status] integerValue] == 1) {
+                ExyanzhengmaStr = [NSString stringWithFormat:@"%@",responseObject[results]];
                 ExZhuCeAccessToken = phoneF.text;
             }
             else{
-                [SVProgressHUD showErrorWithStatus:[NSString stringWithFormat:@"%@",responseObject[@"msg"]]];
-                [self performSelector:@selector(SVPDismiss) withObject:nil afterDelay:1.0];
+                UIAlertController *alertC = [UIAlertController alertControllerWithTitle:@"温馨提示" message:responseObject[msg] preferredStyle:UIAlertControllerStyleAlert];
+                [alertC addAction:[UIAlertAction actionWithTitle:@"知道了" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action)
+                                   {
+                                   }]];
+               
+                [self presentViewController:alertC animated:YES completion:nil];
+//                [[XWAlerLoginView alertWithTitle:responseObject[msg]] show];
+//                [SVProgressHUD showErrorWithStatus:[NSString stringWithFormat:@"%@",responseObject[@"msg"]]];
+//                [self performSelector:@selector(SVPDismiss) withObject:nil afterDelay:1.0];
             }
         } failure:^(NSError *error) {
             UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"您输入的手机号码格式不正确!" message:nil delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil, nil];

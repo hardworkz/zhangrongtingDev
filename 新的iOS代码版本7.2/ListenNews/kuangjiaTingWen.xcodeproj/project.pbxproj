@@ -184,6 +184,7 @@
 		699CA1FF1EFA23DF00670704 /* rewardModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 699CA1FE1EFA23DF00670704 /* rewardModel.m */; };
 		69A0B5031F30610B0028D5A0 /* PlayDefaultRewardTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 69A0B5021F30610B0028D5A0 /* PlayDefaultRewardTableViewCell.m */; };
 		69A477EB1F09D038001D8856 /* RootViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 69A477EA1F09D038001D8856 /* RootViewController.m */; };
+		69A592421FC81180003F02C9 /* ClassPlayHistoryDataModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 69A592411FC81180003F02C9 /* ClassPlayHistoryDataModel.m */; };
 		69A7BABA1ED4177C0094E0BA /* SuNetworkMonitor.m in Sources */ = {isa = PBXBuildFile; fileRef = 69A7BAB91ED4177C0094E0BA /* SuNetworkMonitor.m */; };
 		69AA54AC1EF75F3E003053DB /* AutoImageTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 69AA54A71EF75F3E003053DB /* AutoImageTableViewCell.m */; };
 		69AA54AD1EF75F3E003053DB /* AutoImageViewHeightFrameModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 69AA54A91EF75F3E003053DB /* AutoImageViewHeightFrameModel.m */; };
@@ -832,6 +833,8 @@
 		69A0B5021F30610B0028D5A0 /* PlayDefaultRewardTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PlayDefaultRewardTableViewCell.m; sourceTree = "<group>"; };
 		69A477E91F09D038001D8856 /* RootViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RootViewController.h; sourceTree = "<group>"; };
 		69A477EA1F09D038001D8856 /* RootViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RootViewController.m; sourceTree = "<group>"; };
+		69A592401FC81180003F02C9 /* ClassPlayHistoryDataModel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ClassPlayHistoryDataModel.h; sourceTree = "<group>"; };
+		69A592411FC81180003F02C9 /* ClassPlayHistoryDataModel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ClassPlayHistoryDataModel.m; sourceTree = "<group>"; };
 		69A7BAB81ED4177C0094E0BA /* SuNetworkMonitor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SuNetworkMonitor.h; sourceTree = "<group>"; };
 		69A7BAB91ED4177C0094E0BA /* SuNetworkMonitor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SuNetworkMonitor.m; sourceTree = "<group>"; };
 		69AA54A61EF75F3E003053DB /* AutoImageTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AutoImageTableViewCell.h; sourceTree = "<group>"; };
@@ -2631,6 +2634,8 @@
 				699CA1FE1EFA23DF00670704 /* rewardModel.m */,
 				6985D2D61F553782006A730E /* DownloadDataModel.h */,
 				6985D2D71F553782006A730E /* DownloadDataModel.m */,
+				69A592401FC81180003F02C9 /* ClassPlayHistoryDataModel.h */,
+				69A592411FC81180003F02C9 /* ClassPlayHistoryDataModel.m */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -3674,6 +3679,7 @@
 				E956E03D1E66B9DB00444F06 /* IAPHelper.m in Sources */,
 				69C7134F1EC0740F00F2729E /* YJImageBrowserView.m in Sources */,
 				69C713511EC0740F00F2729E /* mineVC.m in Sources */,
+				69A592421FC81180003F02C9 /* ClassPlayHistoryDataModel.m in Sources */,
 				69C7137A1EC0740F00F2729E /* gerenzhuyeVC.m in Sources */,
 				636B58AB1D34D87600290681 /* IQKeyboardReturnKeyHandler.m in Sources */,
 				695745A01D5C7384001022AD /* UITextView+Keyboard.m in Sources */,

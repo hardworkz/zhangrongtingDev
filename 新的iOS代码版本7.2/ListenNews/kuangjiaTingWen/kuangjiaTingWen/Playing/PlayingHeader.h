@@ -29,6 +29,7 @@
 #import "newsActModel.h"
 #import "rewardModel.h"
 #import "DownloadDataModel.h"
+#import "ClassPlayHistoryDataModel.h"
 
 #import "PlayVCCommentModel.h"
 #import "PlayVCCommentFrameModel.h"

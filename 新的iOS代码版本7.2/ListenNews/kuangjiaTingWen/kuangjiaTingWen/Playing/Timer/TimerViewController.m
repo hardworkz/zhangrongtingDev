@@ -11,7 +11,9 @@
 #import "CommonCode.h"
 
 @interface TimerViewController ()<UITableViewDelegate>
-
+{
+    dispatch_source_t gcd_timer;
+}
 @property (nonatomic, strong) NSArray *timerArray;
 @property (nonatomic, strong) UITableViewCell *selectCell;
 
@@ -36,29 +38,15 @@ static NSInteger timer = 0;
     self.title = @"定时页面";
     [self enableAutoBack];
     [self.navigationController.navigationBar setHidden: NO];
-//        UIView *view = [[UIView alloc]initWithFrame:CGRectMake(0, 0, IPHONE_W, 64)];
-//        view.backgroundColor = ColorWithRGBA(0, 159, 240, 1);
-//        self.tableView.tableHeaderView = view;
-//        
-//        UIButton *leftBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-//        leftBtn.frame = CGRectMake(8, 30, 25, 25);
-//        [leftBtn setImage:[UIImage imageNamed:@"back"] forState:UIControlStateNormal];
-//        [leftBtn addTarget:self action:@selector(back) forControlEvents:UIControlEventTouchUpInside];
-//        [view addSubview:leftBtn];
-//        UIView *tapView = [[UIView alloc]initWithFrame:CGRectMake(CGRectGetMaxX(leftBtn.frame), leftBtn.frame.origin.y, 40.0 / 375 * IPHONE_W, leftBtn.frame.size.height)];
-//        [view addSubview:tapView];
-//        UILabel *topLab = [[UILabel alloc]initWithFrame:CGRectMake(50, 30, IPHONE_W - 100, 30)];
-//        topLab.textColor = [UIColor whiteColor];
-//        topLab.font = [UIFont boldSystemFontOfSize:17.0f];
-//        topLab.text = @"定时页面";
-//        topLab.backgroundColor = [UIColor clearColor];
-//        topLab.textAlignment = NSTextAlignmentCenter;
-//        [view addSubview:topLab];
-//        tapView.backgroundColor = ColorWithRGBA(0, 159, 240, 1);
-//        
-//        UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(back)];
-//        [tapView addGestureRecognizer:tap];
-//    
+    
+    UIButton *leftBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+    [leftBtn setBackgroundImage:[UIImage imageNamed:@"back"] forState:UIControlStateNormal];
+    leftBtn.accessibilityLabel = @"返回";
+    leftBtn.bounds = CGRectMake(0, 0, 9, 15);
+    UIBarButtonItem *back = [[UIBarButtonItem alloc]initWithCustomView:leftBtn];
+    [leftBtn addTarget:self action:@selector(back) forControlEvents:UIControlEventTouchUpInside];
+    self.navigationItem.leftBarButtonItem = back;
+    
     UISwipeGestureRecognizer *rightSwipe = [[UISwipeGestureRecognizer alloc]initWithTarget:self action:@selector(back)];
     [rightSwipe setDirection:UISwipeGestureRecognizerDirectionRight];
     [self.view addGestureRecognizer:rightSwipe];
@@ -72,14 +60,6 @@ static NSInteger timer = 0;
 
 - (void)back {
     [self.navigationController popViewControllerAnimated:YES];
-    
-}
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
-}
-
-- (void)endUpdates {
     
 }
 
@@ -102,34 +82,19 @@ static NSInteger timer = 0;
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"cellTimer" forIndexPath:indexPath];
     if (indexPath.section == 0) {
         if (_sw == nil) {
-           
-//            if (!Greater_Than_IOS6) {
-//                _sw = [[UISwitch alloc] init];
-//                _sw.center = CGPointMake(IPHONE_W - 60, 22);
-//                [_sw addTarget:self action:@selector(swithButton:) forControlEvents:UIControlEventValueChanged];
-//                [cell.contentView insertSubview:_sw belowSubview:cell.textLabel];
-//                [cell.contentView bringSubviewToFront:_sw];
-//                _la = [[UILabel alloc]initWithFrame:CGRectMake(0, 0, 50, 20)];
-//                _la.textAlignment = NSTextAlignmentCenter;
-//                _la.center = CGPointMake(IPHONE_W - 125, 22);
-//                _la.backgroundColor = [UIColor clearColor];
-//                [cell.contentView addSubview:_la];
-//                _sw.on = NO;
-//            }else {
-                _sw = [[UISwitch alloc] init];
-                _sw.center = CGPointMake(IPHONE_W - 50, 22);
-                [_sw addTarget:self action:@selector(swithButton:) forControlEvents:UIControlEventValueChanged];
-                [cell.contentView insertSubview:_sw belowSubview:cell.textLabel];
-                [cell.contentView bringSubviewToFront:_sw];
-                _la = [[UILabel alloc]initWithFrame:CGRectMake(0, 0, 50, 20)];
-                _la.textAlignment = NSTextAlignmentCenter;
-                _la.center = CGPointMake(IPHONE_W - 125, 22);
-                _la.backgroundColor = [UIColor clearColor];
-                [cell.contentView addSubview:_la];
-                _sw.on = NO;
+            _sw = [[UISwitch alloc] init];
+            _sw.center = CGPointMake(IPHONE_W - 50, 22);
+            [_sw addTarget:self action:@selector(swithButton:) forControlEvents:UIControlEventValueChanged];
+            [cell.contentView insertSubview:_sw belowSubview:cell.textLabel];
+            [cell.contentView bringSubviewToFront:_sw];
+            
+            _la = [[UILabel alloc]initWithFrame:CGRectMake(0, 0, 50, 20)];
+            _la.textAlignment = NSTextAlignmentCenter;
+            _la.center = CGPointMake(IPHONE_W - 125, 22);
+            _la.backgroundColor = [UIColor clearColor];
+            [cell.contentView addSubview:_la];
+            _sw.on = NO;
         }
-//
-//        }
         cell.textLabel.text = @"开启定时";
     }else {
         cell.textLabel.text = _timerArray[indexPath.row];
@@ -139,7 +104,6 @@ static NSInteger timer = 0;
         cell.frame = CGRectMake(-CGRectGetWidth(cell.bounds), cell.frame.origin.y, CGRectGetWidth(cell.bounds), CGRectGetHeight(cell.bounds));
         cell.alpha = 0.f;
     }
-       // Configure the cell...
     cell.selectionStyle = UITableViewCellSelectionStyleNone;
     
     return cell;
@@ -179,20 +143,10 @@ static NSInteger timer = 0;
         [self prepareVisibleCellsForAnimation];
     }
     
-    if (_sw.on) {
-        if (_timer == nil) {
-            _timer = [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(timerLable) userInfo:nil repeats:YES];
-            [_timer setFireDate:[NSDate distantPast]];
-        }else {
-            [_timer setFireDate:[NSDate distantPast]];
-        }
+    if (_sw.on && timer != 0) {
+        [self startGCDTimer];
     }else {
-        if (_timer == nil) {
-            _timer = [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(timerLable) userInfo:nil repeats:YES];
-            [_timer setFireDate:[NSDate distantFuture]];
-        }else {
-            [_timer setFireDate:[NSDate distantFuture]];
-        }
+        [self stopTimer];
     }
 }
 
@@ -206,9 +160,8 @@ static NSInteger timer = 0;
             
             _selectCell = cell;
         }else {
-            return;
+//            return;
         }
-
     }
     
     if (indexPath.section == 1 && indexPath.row == 0) {
@@ -233,46 +186,77 @@ static NSInteger timer = 0;
     
     [_sw setOn:YES animated:YES];
     
-    if (_timer == nil) {
-        _timer = [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(timerLable) userInfo:nil repeats:YES];
-        [_timer setFireDate:[NSDate distantPast]];
-    }else {
-        [_timer setFireDate:[NSDate distantPast]];
-    }
+    //停止gcd定时器
+    [self stopTimer];
+    //开启gcd定时器
+    [self startGCDTimer];
     
 }
-
+-(void) startGCDTimer{
+    NSTimeInterval period = 1.0; //设置时间间隔
+    dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+    gcd_timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, queue);
+    dispatch_source_set_timer(gcd_timer, dispatch_walltime(NULL, 0), period * NSEC_PER_SEC, 0); //每秒执行
+    dispatch_source_set_event_handler(gcd_timer, ^{
+        //在这里执行事件
+        NSLog(@"每秒执行test%ld",timer);
+        [self timerLable];
+    });
+    
+    dispatch_resume(gcd_timer);
+}
+-(void) pauseTimer{
+    if(gcd_timer){
+        dispatch_suspend(gcd_timer);
+    }
+}
+-(void) resumeTimer{
+    if(_timer){
+        dispatch_resume(gcd_timer);
+    }
+}
+-(void) stopTimer{
+    if(gcd_timer){
+        dispatch_source_cancel(gcd_timer);
+        gcd_timer = nil;
+    }
+}
 - (void)timerLable {
-    if (!timer) {
+    if (!gcd_timer) {
         return;
     }
     NSInteger shi = timer / 60;
     NSInteger fen = timer % 60;
-    if (shi < 10) {
-        if (fen < 10) {
-            _la.text = [NSString stringWithFormat:@"0%ld:0%ld", (long)shi,(long)fen];
-
+    //通知主线程刷新
+    dispatch_async(dispatch_get_main_queue(), ^{
+        //回调或者说是通知主线程刷新，
+        if (shi < 10) {
+            if (fen < 10) {
+                _la.text = [NSString stringWithFormat:@"0%ld:0%ld", (long)shi,(long)fen];
+                
+            }else {
+                _la.text = [NSString stringWithFormat:@"0%ld:%ld", (long)shi,(long)fen];
+            }
         }else {
-            _la.text = [NSString stringWithFormat:@"0%ld:%ld", (long)shi,(long)fen];
+            if (fen < 10) {
+                _la.text = [NSString stringWithFormat:@"%ld:0%ld", (long)shi,(long)fen];
+                
+            }else {
+                _la.text = [NSString stringWithFormat:@"%ld:%ld", (long)shi,(long)fen];
+            }
         }
-    }else {
-        if (fen < 10) {
-            _la.text = [NSString stringWithFormat:@"%ld:0%ld", (long)shi,(long)fen];
-            
-        }else {
-            _la.text = [NSString stringWithFormat:@"%ld:%ld", (long)shi,(long)fen];
-        }
-    }
-    
-    [[NSNotificationCenter defaultCenter]postNotificationName:@"changeTimer" object:_la.text];
+    });
     
     timer--;
     if (timer <= 0) {
         timer = 0;
-        _la.text = @"00:00";
-        [_timer setFireDate:[NSDate distantFuture]];
-        [_sw setOn:NO];
-        [[NSNotificationCenter defaultCenter] postNotificationName:@"timerStop" object:nil];
+        [self stopTimer];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            //回调或者说是通知主线程刷新，
+            _la.text = @"00:00";
+            [[ZRT_PlayerManager manager] pausePlay];//通知主线程刷新
+            [_sw setOn:NO];
+        });
     }
 }
 
@@ -287,7 +271,7 @@ static NSInteger timer = 0;
     [super viewDidAppear:animated];
     if (_sw.on) {
 
-//        [self animateVisibleCells];
+        [self animateVisibleCells];
     }
     [self.navigationController setNavigationBarHidden:NO animated:YES];
 }

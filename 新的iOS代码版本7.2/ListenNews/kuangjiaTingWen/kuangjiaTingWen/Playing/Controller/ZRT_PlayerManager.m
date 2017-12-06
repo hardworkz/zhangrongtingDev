@@ -42,6 +42,7 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
             self.songList = [NSMutableArray array];
         }
         self.playRate = 1.0;
+        self.playHistoryDataModel = [ClassPlayHistoryDataModel new];
         //获取限制播放状态
         [self limitPlayStatusWithAdd:NO];
     }
@@ -218,6 +219,27 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
     _playDuration = playDuration;
 }
 /*
+ * 播放器播放数据类型
+ */
+- (void)setPlayType:(ZRTPlayType)playType
+{
+    //当前为课堂频道并且切换到其他频道保存数据
+    if (_playType == ZRTPlayTypeClassroom && playType != ZRTPlayTypeClassroom) {
+        [self uploadClassPlayHistoryData];
+    }
+    _playType = playType;
+}
+/*
+ * 课堂ID
+ */
+- (void)setAct_id:(NSString *)act_id
+{
+    if (_act_id != act_id) {
+        [self uploadClassPlayHistoryData];
+    }
+    _act_id = act_id;
+}
+/*
  * 当前播放时间(00:00)
  */
 - (NSString *)playTime {
@@ -263,17 +285,6 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
  */
 - (void)startPlay
 {
-//    if (self.playType == ZRTPlayTypeNews) {
-//        if (![[ZRT_PlayerManager manager] limitPlayStatusWithAdd:NO]) {
-//            _status = ZRTPlayStatusPlay;
-//            SendNotify(SONGPLAYSTATUSCHANGE, nil)
-//            [self.player play];
-//        }
-//    }else{
-//        _status = ZRTPlayStatusPlay;
-//        SendNotify(SONGPLAYSTATUSCHANGE, nil)
-//        [self.player play];
-//    }
     switch (_playType) {
         case ZRTPlayTypeNews:
             if ([self post_mpWithDownloadNewsID:self.currentSong[@"id"]] != nil) {
@@ -418,8 +429,12 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
     }
     
     //更新当前歌曲信息
-    if (self.songList&&self.currentSongIndex<self.songList.count ) {//防止空数组和数组越界引发崩溃
-        self.currentSong = self.songList[self.currentSongIndex];
+    if (self.songList) {//防止空数组和数组越界引发崩溃
+        if (self.currentSongIndex<self.songList.count) {
+            self.currentSong = self.songList[self.currentSongIndex];
+        }else{
+            return;
+        }
     }else{
         return;
     }
@@ -603,6 +618,12 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
         if (weakSelf.playTimeObserve) {
             weakSelf.playTimeObserve(weakSelf.progress,currentTime,total);
         }
+        //判断当前播放的是否是课堂
+        if (self.playType == ZRTPlayTypeClassroom) {
+            weakSelf.playHistoryDataModel.time = [NSString stringWithFormat:@"%.0f",currentTime *1000];
+            weakSelf.playHistoryDataModel.number = [NSString stringWithFormat:@"%ld",weakSelf.currentSongIndex];
+            weakSelf.playHistoryDataModel.act_id = weakSelf.act_id;
+        }
     }];
 }
 - (void)removeObserver
@@ -638,6 +659,11 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
             [alert show];
         }
         return;
+    }else{
+//        self.playHistoryDataModel.number = [NSString stringWithFormat:@"%d",[self.playHistoryDataModel.number intValue] + 1];
+//        self.playHistoryDataModel.time = @"0";
+        //上传播放记录数据
+//        [self uploadClassPlayHistoryData];
     }
     //播放列表中的下一条
     [self playNext];
@@ -669,7 +695,6 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
                 break;
             case AVPlayerStatusReadyToPlay:
                 _status = ZRTPlayStatusReadyToPlay;
-//                [self startPlay];
                 [APPDELEGATE configNowPlayingCenter];
                 RTLog(@"KVO：准备完毕");
                 break;
@@ -790,4 +815,20 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
     return post_mp;
 }
 
+/**
+ 上传课堂播放历史记录
+ */
+- (void)uploadClassPlayHistoryData
+{
+    if ([self.playHistoryDataModel.time intValue] != 0) {
+        [NetWorkTool postPaoGuoUploadHistoryDataWithAct_id:self.act_id andUser_id:ExdangqianUserUid andNumber:self.playHistoryDataModel.number andTime:self.playHistoryDataModel.time sccess:^(NSDictionary *responseObject) {
+            if ([responseObject[status] intValue] == 1) {
+                RTLog(@"上传课堂播放记录成功");
+//                [[XWAlerLoginView alertWithTitle:responseObject[msg]] show];
+            }
+        } failure:^(NSError *error) {
+            RTLog(@"error:%@",error);
+        }];
+    }
+}
 @end

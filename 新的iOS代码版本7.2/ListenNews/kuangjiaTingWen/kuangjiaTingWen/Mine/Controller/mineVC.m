@@ -556,7 +556,7 @@ typedef void(^animateBlock)();
                 cell = [tableView dequeueReusableCellWithIdentifier:wotouxiangcellIdentify];
             }
             
-            UIImageView *cellBgView = [[UIImageView alloc]initWithFrame:CGRectMake(0, -20, SCREEN_WIDTH, 240.0 / 667 * IPHONE_H)];
+            UIImageView *cellBgView = [[UIImageView alloc]initWithFrame:CGRectMake(0, -20, SCREEN_WIDTH,240.0 / 667 * IPHONE_H)];
             [cellBgView setUserInteractionEnabled:YES];
             [cell.contentView addSubview:cellBgView];
             
@@ -653,7 +653,7 @@ typedef void(^animateBlock)();
             }
             [lvView addSubview:lvLab];
             
-            TTTAttributedLabel *signtureLab = [[TTTAttributedLabel alloc]initWithFrame:CGRectMake(lab.frame.origin.x, 230.0 / 667 * IPHONE_H, SCREEN_WIDTH - 150, 20.0 / 667 * IPHONE_H)];
+            TTTAttributedLabel *signtureLab = [[TTTAttributedLabel alloc]initWithFrame:CGRectMake(lab.frame.origin.x, 230.0 / 667 * IPHONE_H, SCREEN_WIDTH - 150,20.0 / 667 * IPHONE_H)];
             [cell.contentView addSubview:signtureLab];
             
             if ([[CommonCode readFromUserD:@"isLogin"]boolValue] == YES){
@@ -762,14 +762,14 @@ typedef void(^animateBlock)();
         }
         else if (indexPath.row == 1){
             UITableViewCell *cell = [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"wotwoIdentify"];
-            UILabel *lab = [[UILabel alloc]initWithFrame:CGRectMake(40.0 / 375 * IPHONE_W, 14.0 / 667 * IPHONE_H, 100.0 / 375 * IPHONE_W, 30.0 / 667 * IPHONE_H)];
+            UILabel *lab = [[UILabel alloc]initWithFrame:CGRectMake(40.0 / 375 * IPHONE_W,IS_IPHONEX?14.0:14.0 / 667 * IPHONE_H, 100.0 / 375 * IPHONE_W, 30.0 / 667 * IPHONE_H)];
             lab.text = @"听友圈";
             //        lab.text = @"我的关注";
             lab.textAlignment = NSTextAlignmentLeft;
             lab.textColor = nTextColorMain;
             [cell.contentView addSubview:lab];
             lab.font =  [UIFont fontWithName:@"Regular" size:17.0f ];
-            UIView *line = [[UIView alloc]initWithFrame:CGRectMake(20.0 / 375 * IPHONE_W, 57.0 / 667 * IPHONE_H, SCREEN_WIDTH - 20.0 / 375 * IPHONE_W, 1)];
+            UIView *line = [[UIView alloc]initWithFrame:CGRectMake(20.0 / 375 * IPHONE_W,IS_IPHONEX?57.0: 57.0 / 667 * IPHONE_H, SCREEN_WIDTH - 20.0 / 375 * IPHONE_W, 1)];
             [line setBackgroundColor:gThinLineColor];
             [cell.contentView addSubview:line];
             [self.newFriendMessageButton setHidden:YES];
@@ -780,13 +780,13 @@ typedef void(^animateBlock)();
         }
         else if (indexPath.row == 2){
             UITableViewCell *cell = [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"wothreeIdentify"];
-            UILabel *lab = [[UILabel alloc]initWithFrame:CGRectMake(40.0 / 375 * IPHONE_W, 14.0 / 667 * IPHONE_H, 100.0 / 375 * IPHONE_W, 30.0 / 667 * IPHONE_H)];
+            UILabel *lab = [[UILabel alloc]initWithFrame:CGRectMake(40.0 / 375 * IPHONE_W, IS_IPHONEX?14.0:14.0 / 667 * IPHONE_H, 100.0 / 375 * IPHONE_W, 30.0 / 667 * IPHONE_H)];
             lab.text = @"我的下载";
             lab.textAlignment = NSTextAlignmentLeft;
             lab.textColor = nTextColorMain;
             [cell.contentView addSubview:lab];
             lab.font = gFontMajor17;
-            UIView *line = [[UIView alloc]initWithFrame:CGRectMake(20.0 / 375 * IPHONE_W, 57.0 / 667 * IPHONE_H, SCREEN_WIDTH - 20.0 / 375 * IPHONE_W, 1)];
+            UIView *line = [[UIView alloc]initWithFrame:CGRectMake(20.0 / 375 * IPHONE_W,IS_IPHONEX?57.0: 57.0 / 667 * IPHONE_H, SCREEN_WIDTH - 20.0 / 375 * IPHONE_W, 1)];
             [line setBackgroundColor:gThinLineColor];
             [cell.contentView addSubview:line];
             cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
@@ -795,13 +795,13 @@ typedef void(^animateBlock)();
         }
         else if (indexPath.row == 3){
             UITableViewCell *cell = [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"wofourIdentify"];
-            UILabel *lab = [[UILabel alloc]initWithFrame:CGRectMake(40.0 / 375 * IPHONE_W, 14.0 / 667 * IPHONE_H, 100.0 / 375 * IPHONE_W, 30.0 / 667 * IPHONE_H)];
+            UILabel *lab = [[UILabel alloc]initWithFrame:CGRectMake(40.0 / 375 * IPHONE_W, IS_IPHONEX?14.0:14.0 / 667 * IPHONE_H, 100.0 / 375 * IPHONE_W, 30.0 / 667 * IPHONE_H)];
             lab.text = @"我的收藏";
             lab.textAlignment = NSTextAlignmentLeft;
             lab.textColor = nTextColorMain;
             [cell.contentView addSubview:lab];
             lab.font = gFontMajor17;
-            UIView *line = [[UIView alloc]initWithFrame:CGRectMake(20.0 / 375 * IPHONE_W, 57.0 / 667 * IPHONE_H, SCREEN_WIDTH - 20.0 / 375 * IPHONE_W, 1)];
+            UIView *line = [[UIView alloc]initWithFrame:CGRectMake(20.0 / 375 * IPHONE_W, IS_IPHONEX?57.0:57.0 / 667 * IPHONE_H, SCREEN_WIDTH - 20.0 / 375 * IPHONE_W, 1)];
             [line setBackgroundColor:gThinLineColor];
             [cell.contentView addSubview:line];
             cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
@@ -810,13 +810,13 @@ typedef void(^animateBlock)();
         }
         else if (indexPath.row == 4){
             UITableViewCell *cell = [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"wofourIdentify"];
-            UILabel *lab = [[UILabel alloc]initWithFrame:CGRectMake(40.0 / 375 * IPHONE_W, 14.0 / 667 * IPHONE_H, 100.0 / 375 * IPHONE_W, 30.0 / 667 * IPHONE_H)];
+            UILabel *lab = [[UILabel alloc]initWithFrame:CGRectMake(40.0 / 375 * IPHONE_W, IS_IPHONEX?14.0:14.0 / 667 * IPHONE_H, 100.0 / 375 * IPHONE_W, 30.0 / 667 * IPHONE_H)];
             lab.text = @"我的课堂";
             lab.textAlignment = NSTextAlignmentLeft;
             lab.textColor = nTextColorMain;
             [cell.contentView addSubview:lab];
             lab.font = gFontMajor17;
-            UIView *line = [[UIView alloc]initWithFrame:CGRectMake(20.0 / 375 * IPHONE_W, 57.0 / 667 * IPHONE_H, SCREEN_WIDTH - 20.0 / 375 * IPHONE_W, 1)];
+            UIView *line = [[UIView alloc]initWithFrame:CGRectMake(20.0 / 375 * IPHONE_W, IS_IPHONEX?57.0:57.0 / 667 * IPHONE_H, SCREEN_WIDTH - 20.0 / 375 * IPHONE_W, 1)];
             [line setBackgroundColor:gThinLineColor];
             [cell.contentView addSubview:line];
             cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
@@ -838,7 +838,7 @@ typedef void(^animateBlock)();
             cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
             [self.newSettingMessageButton setHidden:YES];
             [cell.contentView addSubview:self.newSettingMessageButton];
-            UIView *line = [[UIView alloc]initWithFrame:CGRectMake(20.0 / 375 * IPHONE_W, 57.0 / 667 * IPHONE_H, SCREEN_WIDTH - 20.0 / 375 * IPHONE_W, 1)];
+            UIView *line = [[UIView alloc]initWithFrame:CGRectMake(20.0 / 375 * IPHONE_W, IS_IPHONEX?57.0:57.0 / 667 * IPHONE_H, SCREEN_WIDTH - 20.0 / 375 * IPHONE_W, 1)];
             [line setBackgroundColor:gThinLineColor];
             [cell.contentView addSubview:line];
             cell.selectionStyle = UITableViewCellSelectionStyleNone;
@@ -1059,14 +1059,14 @@ typedef void(^animateBlock)();
         }
         else if (indexPath.row == 1){
             UITableViewCell *cell = [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"wotwoIdentify"];
-            UILabel *lab = [[UILabel alloc]initWithFrame:CGRectMake(40.0 / 375 * IPHONE_W, 14.0 / 667 * IPHONE_H, 100.0 / 375 * IPHONE_W, 30.0 / 667 * IPHONE_H)];
+            UILabel *lab = [[UILabel alloc]initWithFrame:CGRectMake(40.0 / 375 * IPHONE_W, IS_IPHONEX?14.0:14.0 / 667 * IPHONE_H, 100.0 / 375 * IPHONE_W, 30.0 / 667 * IPHONE_H)];
             lab.text = @"听友圈";
             //        lab.text = @"我的关注";
             lab.textAlignment = NSTextAlignmentLeft;
             lab.textColor = nTextColorMain;
             [cell.contentView addSubview:lab];
             lab.font =  [UIFont fontWithName:@"Regular" size:17.0f ];
-            UIView *line = [[UIView alloc]initWithFrame:CGRectMake(20.0 / 375 * IPHONE_W, 57.0 / 667 * IPHONE_H, SCREEN_WIDTH - 20.0 / 375 * IPHONE_W, 1)];
+            UIView *line = [[UIView alloc]initWithFrame:CGRectMake(20.0 / 375 * IPHONE_W, IS_IPHONEX?57.0:57.0 / 667 * IPHONE_H, SCREEN_WIDTH - 20.0 / 375 * IPHONE_W, 1)];
             [line setBackgroundColor:gThinLineColor];
             [cell.contentView addSubview:line];
             [self.newFriendMessageButton setHidden:YES];
@@ -1077,13 +1077,13 @@ typedef void(^animateBlock)();
         }
         else  if (indexPath.row == 2){
             UITableViewCell *cell = [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"wofourIdentify"];
-            UILabel *lab = [[UILabel alloc]initWithFrame:CGRectMake(40.0 / 375 * IPHONE_W, 14.0 / 667 * IPHONE_H, 100.0 / 375 * IPHONE_W, 30.0 / 667 * IPHONE_H)];
+            UILabel *lab = [[UILabel alloc]initWithFrame:CGRectMake(40.0 / 375 * IPHONE_W, IS_IPHONEX?14.0:14.0 / 667 * IPHONE_H, 100.0 / 375 * IPHONE_W, 30.0 / 667 * IPHONE_H)];
             lab.text = @"我的会员";
             lab.textAlignment = NSTextAlignmentLeft;
             lab.textColor = nTextColorMain;
             [cell.contentView addSubview:lab];
             lab.font = gFontMajor17;
-            UIView *line = [[UIView alloc]initWithFrame:CGRectMake(20.0 / 375 * IPHONE_W, 57.0 / 667 * IPHONE_H, SCREEN_WIDTH - 20.0 / 375 * IPHONE_W, 1)];
+            UIView *line = [[UIView alloc]initWithFrame:CGRectMake(20.0 / 375 * IPHONE_W, IS_IPHONEX?57.0:57.0 / 667 * IPHONE_H, SCREEN_WIDTH - 20.0 / 375 * IPHONE_W, 1)];
             [line setBackgroundColor:gThinLineColor];
             [cell.contentView addSubview:line];
             cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
@@ -1092,13 +1092,13 @@ typedef void(^animateBlock)();
         }
         else if (indexPath.row == 3){
             UITableViewCell *cell = [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"wothreeIdentify"];
-            UILabel *lab = [[UILabel alloc]initWithFrame:CGRectMake(40.0 / 375 * IPHONE_W, 14.0 / 667 * IPHONE_H, 100.0 / 375 * IPHONE_W, 30.0 / 667 * IPHONE_H)];
+            UILabel *lab = [[UILabel alloc]initWithFrame:CGRectMake(40.0 / 375 * IPHONE_W, IS_IPHONEX?14.0:14.0 / 667 * IPHONE_H, 100.0 / 375 * IPHONE_W, 30.0 / 667 * IPHONE_H)];
             lab.text = @"我的下载";
             lab.textAlignment = NSTextAlignmentLeft;
             lab.textColor = nTextColorMain;
             [cell.contentView addSubview:lab];
             lab.font = gFontMajor17;
-            UIView *line = [[UIView alloc]initWithFrame:CGRectMake(20.0 / 375 * IPHONE_W, 57.0 / 667 * IPHONE_H, SCREEN_WIDTH - 20.0 / 375 * IPHONE_W, 1)];
+            UIView *line = [[UIView alloc]initWithFrame:CGRectMake(20.0 / 375 * IPHONE_W, IS_IPHONEX?57.0:57.0 / 667 * IPHONE_H, SCREEN_WIDTH - 20.0 / 375 * IPHONE_W, 1)];
             [line setBackgroundColor:gThinLineColor];
             [cell.contentView addSubview:line];
             cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
@@ -1107,13 +1107,13 @@ typedef void(^animateBlock)();
         }
         else if (indexPath.row == 4){
             UITableViewCell *cell = [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"wofourIdentify"];
-            UILabel *lab = [[UILabel alloc]initWithFrame:CGRectMake(40.0 / 375 * IPHONE_W, 14.0 / 667 * IPHONE_H, 100.0 / 375 * IPHONE_W, 30.0 / 667 * IPHONE_H)];
+            UILabel *lab = [[UILabel alloc]initWithFrame:CGRectMake(40.0 / 375 * IPHONE_W, IS_IPHONEX?14.0:14.0 / 667 * IPHONE_H, 100.0 / 375 * IPHONE_W, 30.0 / 667 * IPHONE_H)];
             lab.text = @"我的收藏";
             lab.textAlignment = NSTextAlignmentLeft;
             lab.textColor = nTextColorMain;
             [cell.contentView addSubview:lab];
             lab.font = gFontMajor17;
-            UIView *line = [[UIView alloc]initWithFrame:CGRectMake(20.0 / 375 * IPHONE_W, 57.0 / 667 * IPHONE_H, SCREEN_WIDTH - 20.0 / 375 * IPHONE_W, 1)];
+            UIView *line = [[UIView alloc]initWithFrame:CGRectMake(20.0 / 375 * IPHONE_W, IS_IPHONEX?57.0:57.0 / 667 * IPHONE_H, SCREEN_WIDTH - 20.0 / 375 * IPHONE_W, 1)];
             [line setBackgroundColor:gThinLineColor];
             [cell.contentView addSubview:line];
             cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
@@ -1122,13 +1122,13 @@ typedef void(^animateBlock)();
         }
         else if (indexPath.row == 5){
             UITableViewCell *cell = [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"wofourIdentify"];
-            UILabel *lab = [[UILabel alloc]initWithFrame:CGRectMake(40.0 / 375 * IPHONE_W, 14.0 / 667 * IPHONE_H, 100.0 / 375 * IPHONE_W, 30.0 / 667 * IPHONE_H)];
+            UILabel *lab = [[UILabel alloc]initWithFrame:CGRectMake(40.0 / 375 * IPHONE_W, IS_IPHONEX?14.0:14.0 / 667 * IPHONE_H, 100.0 / 375 * IPHONE_W, 30.0 / 667 * IPHONE_H)];
             lab.text = @"我的课堂";
             lab.textAlignment = NSTextAlignmentLeft;
             lab.textColor = nTextColorMain;
             [cell.contentView addSubview:lab];
             lab.font = gFontMajor17;
-            UIView *line = [[UIView alloc]initWithFrame:CGRectMake(20.0 / 375 * IPHONE_W, 57.0 / 667 * IPHONE_H, SCREEN_WIDTH - 20.0 / 375 * IPHONE_W, 1)];
+            UIView *line = [[UIView alloc]initWithFrame:CGRectMake(20.0 / 375 * IPHONE_W, IS_IPHONEX?57.0:57.0 / 667 * IPHONE_H, SCREEN_WIDTH - 20.0 / 375 * IPHONE_W, 1)];
             [line setBackgroundColor:gThinLineColor];
             [cell.contentView addSubview:line];
             cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
@@ -1141,7 +1141,7 @@ typedef void(^animateBlock)();
             if (!cell){
                 cell = [tableView dequeueReusableCellWithIdentifier:wosixIdentify];
             }
-            UILabel *lab = [[UILabel alloc]initWithFrame:CGRectMake(40.0 / 375 * IPHONE_W, 14.0 / 667 * IPHONE_H, 100.0 / 375 * IPHONE_W, 30.0 / 667 * IPHONE_H)];
+            UILabel *lab = [[UILabel alloc]initWithFrame:CGRectMake(40.0 / 375 * IPHONE_W, IS_IPHONEX?14.0:14.0 / 667 * IPHONE_H, 100.0 / 375 * IPHONE_W, 30.0 / 667 * IPHONE_H)];
             lab.text = @"设置";
             lab.textAlignment = NSTextAlignmentLeft;
             lab.textColor = nTextColorMain;
@@ -1150,7 +1150,7 @@ typedef void(^animateBlock)();
             cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
             [self.newSettingMessageButton setHidden:YES];
             [cell.contentView addSubview:self.newSettingMessageButton];
-            UIView *line = [[UIView alloc]initWithFrame:CGRectMake(20.0 / 375 * IPHONE_W, 57.0 / 667 * IPHONE_H, SCREEN_WIDTH - 20.0 / 375 * IPHONE_W, 1)];
+            UIView *line = [[UIView alloc]initWithFrame:CGRectMake(20.0 / 375 * IPHONE_W, IS_IPHONEX?57.0:57.0 / 667 * IPHONE_H, SCREEN_WIDTH - 20.0 / 375 * IPHONE_W, 1)];
             [line setBackgroundColor:gThinLineColor];
             [cell.contentView addSubview:line];
             cell.selectionStyle = UITableViewCellSelectionStyleNone;
@@ -1164,7 +1164,7 @@ typedef void(^animateBlock)();
         return 265.0 / 667 * IPHONE_H;
     }
     else{
-        return 58.0f / 667 * IPHONE_H;
+        return IS_IPHONEX?58.0:58.0f / 667 * IPHONE_H;
     }
     
 }
@@ -1315,7 +1315,11 @@ typedef void(^animateBlock)();
 - (UIButton *)newFriendMessageButton {
     if (!_newFriendMessageButton ) {
         _newFriendMessageButton  = [UIButton buttonWithType:UIButtonTypeCustom];
-        [_newFriendMessageButton setFrame:CGRectMake(IS_IPAD?150:110,IS_IPAD?23.0 / 667 * IPHONE_H:19.0 / 667 * IPHONE_H, 20, 20)];
+        if (IS_IPHONEX) {
+            [_newFriendMessageButton setFrame:CGRectMake(IS_IPAD?150:110,24.0, 20, 20)];
+        }else{
+            [_newFriendMessageButton setFrame:CGRectMake(IS_IPAD?150:110,IS_IPAD?23.0 / 667 * IPHONE_H:19.0 / 667 * IPHONE_H, 20, 20)];
+        }
         [_newFriendMessageButton.layer setMasksToBounds:YES];
         [_newFriendMessageButton.layer setCornerRadius:10.0];
         [_newFriendMessageButton setBackgroundColor:UIColorFromHex(0xf23131)];
@@ -1327,7 +1331,12 @@ typedef void(^animateBlock)();
 - (UIButton *)newSettingMessageButton {
     if (!_newSettingMessageButton ) {
         _newSettingMessageButton  = [UIButton buttonWithType:UIButtonTypeCustom];
-        [_newSettingMessageButton setFrame:CGRectMake(IS_IPAD?140:110, IS_IPAD?23.0 / 667 * IPHONE_H:19.0 / 667 * IPHONE_H, 20, 20)];
+        if (IS_IPHONEX) {
+            [_newSettingMessageButton setFrame:CGRectMake(IS_IPAD?140:110, 19.0, 20, 20)];
+        }else{
+            [_newSettingMessageButton setFrame:CGRectMake(IS_IPAD?140:110, IS_IPAD?23.0 / 667 * IPHONE_H:19.0 / 667 * IPHONE_H, 20, 20)];
+        }
+        [_newSettingMessageButton setFrame:CGRectMake(IS_IPAD?140:110, IS_IPAD?23.0 / 667 * IPHONE_H:IS_IPHONEX?24.0:19.0 / 667 * IPHONE_H, 20, 20)];
         [_newSettingMessageButton.layer setMasksToBounds:YES];
         [_newSettingMessageButton.layer setCornerRadius:10.0];
         [_newSettingMessageButton setBackgroundColor:UIColorFromHex(0xf23131)];

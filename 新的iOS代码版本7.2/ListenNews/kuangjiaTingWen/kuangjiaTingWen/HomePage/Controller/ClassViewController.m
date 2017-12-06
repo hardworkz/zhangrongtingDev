@@ -585,9 +585,20 @@ static AVPlayer *_instancePlay = nil;
     XWAlerLoginView *xw = [[XWAlerLoginView alloc]initWithTitle:@"购买了才能订阅哦~"];
     [xw show];
 }
-- (void)purchaseBtnAction:(UIButton *)sender{
-    
-    [self show];
+- (void)purchaseBtnAction:(UIButton *)sender
+{
+    if ([[CommonCode readFromUserD:@"isLogin"]boolValue] == YES){
+        [self show];
+    }
+    else{
+        //跳转登录界面，提示弹窗
+        LoginVC *loginFriVC = [LoginVC new];
+        loginFriVC.isTipClassBuy = YES;
+        LoginNavC *loginNavC = [[LoginNavC alloc]initWithRootViewController:loginFriVC];
+        [loginNavC.navigationBar setBackgroundColor:[UIColor whiteColor]];
+        loginNavC.navigationBar.tintColor = [UIColor blackColor];
+        [self presentViewController:loginNavC animated:YES completion:nil];
+    }
 }
 //创建支付弹窗view
 - (UIView *)setupPayAlertWithIAP:(BOOL)iap
@@ -645,20 +656,6 @@ static AVPlayer *_instancePlay = nil;
         weixinBtn.titleLabel.font = [UIFont systemFontOfSize:17];
         [weixinBtn addTarget:self action:@selector(weixinBtnClicked)];
         [bgView addSubview:weixinBtn];
-        
-        //购买会员不用听币
-//        if (![VipSelected.accessibilityIdentifier isEqualToString:@"vip"]) {
-//            UIButton *tingbiBtn = [[UIButton alloc] init];
-//            tingbiBtn.frame = CGRectMake(0, 100, SCREEN_WIDTH, 50);
-//            tingbiBtn.backgroundColor = [UIColor whiteColor];
-//            [tingbiBtn setImage:@"pay2"];
-//            tingbiBtn.imageEdgeInsets = UIEdgeInsetsMake(0, -20, 0, 0);
-//            [tingbiBtn setTitle:@"听币支付" forState:UIControlStateNormal];
-//            [tingbiBtn setTitleColor:gMainColor forState:UIControlStateNormal];
-//            tingbiBtn.titleLabel.font = [UIFont systemFontOfSize:17];
-//            [tingbiBtn addTarget:self action:@selector(tingbiBtnClicked)];
-//            [bgView addSubview:tingbiBtn];
-//        }
         
         UIButton *cancelBtn = [[UIButton alloc] init];
         cancelBtn.frame = CGRectMake(0,105, SCREEN_WIDTH, 50);

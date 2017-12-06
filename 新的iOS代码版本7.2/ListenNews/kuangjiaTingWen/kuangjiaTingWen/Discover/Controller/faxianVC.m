@@ -443,11 +443,11 @@
                 return 67.0 / 667 * SCREEN_HEIGHT;
             }
             else{
-                return 120.0 / 667 * SCREEN_HEIGHT;
+                return IS_IPHONEX?120.0:120.0 / 667 * IPHONE_H;
             }
         }
         else{
-           return 120.0 / 667 * SCREEN_HEIGHT;
+           return IS_IPHONEX?120.0:120.0 / 667 * IPHONE_H;
         }
     }
     else{

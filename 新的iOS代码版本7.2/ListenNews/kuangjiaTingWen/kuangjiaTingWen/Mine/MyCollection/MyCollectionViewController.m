@@ -32,7 +32,7 @@
         [weakSelf setUpData];
     }];
     self.helpTableView.mj_footer = [MJRefreshAutoNormalFooter footerWithRefreshingBlock:^{
-        [weakSelf setUpData];
+        [weakSelf getMoreData];
     }];
     [self setUpData];
     [self setUpView];
@@ -43,10 +43,54 @@
     [self.navigationController setNavigationBarHidden:YES animated:YES];
 }
 
-- (void)setUpData{
+- (void)setUpData
+{
+    [NetWorkTool get_collectionWithaccessToken:AvatarAccessToken andPage:@"1" andLimit:@"10" sccess:^(NSDictionary *responseObject) {
+        [self.helpTableView.mj_header endRefreshing];
+        if ([responseObject[@"results"] isKindOfClass:[NSArray class]]) {
+            NSMutableArray *dataArray = [responseObject[@"results"] mutableCopy];
+            if (dataArray.count == 10) {
+                self.page++;
+            }
+            //替换id为当前新闻ID
+            for (int i = 0; i<self.dataSourceArr.count; i++) {
+                NSDictionary *dict = self.dataSourceArr[i];
+                [dict setValue:dict[@"post_id"] forKey:@"id"];
+            }
+            self.dataSourceArr = dataArray;
+            [self.helpTableView reloadData];
+            
+            if (dataArray.count != 0) {
+                self.helpTableView.mj_footer.hidden = NO;
+            }
+            if (dataArray.count < 10) {
+                [self.helpTableView.mj_footer endRefreshingWithNoMoreData];
+            }else{
+                [self.helpTableView.mj_footer resetNoMoreData];
+            }
+        }
+        else{
+            if (self.dataSourceArr.count == 0) {
+                self.helpTableView.mj_footer.hidden = YES;
+                [[BJNoDataView shareNoDataView] showCenterWithSuperView:self.helpTableView icon:nil iconClicked:^{
+                    //图片点击回调
+                    [self setUpData];//刷新数据
+                }];
+            }else{
+                //有数据
+                [[BJNoDataView shareNoDataView] clear];
+            }
+        }
+
+    } failure:^(NSError *error) {
+        [self.helpTableView.mj_header endRefreshing];
+        RTLog(@"error:%@",error);
+    }];
+}
+- (void)getMoreData
+{
     [NetWorkTool get_collectionWithaccessToken:AvatarAccessToken andPage:[NSString stringWithFormat:@"%ld",self.page] andLimit:@"10" sccess:^(NSDictionary *responseObject) {
         [self.helpTableView.mj_footer endRefreshing];
-        [self.helpTableView.mj_header endRefreshing];
         if ([responseObject[@"results"] isKindOfClass:[NSArray class]]) {
             NSMutableArray *dataArray = [responseObject[@"results"] mutableCopy];
             if (dataArray.count == 10) {
@@ -66,27 +110,16 @@
             if (dataArray.count < 10) {
                 [self.helpTableView.mj_footer endRefreshingWithNoMoreData];
             }
+        }else
+        {
+            [self.helpTableView.mj_footer endRefreshingWithNoMoreData];
         }
-        else{
-            if (self.dataSourceArr.count == 0) {
-                self.helpTableView.mj_footer.hidden = YES;
-                [[BJNoDataView shareNoDataView] showCenterWithSuperView:self.helpTableView icon:nil iconClicked:^{
-                    //图片点击回调
-                    [self setUpData];//刷新数据
-                }];
-            }else{
-                //有数据
-                [[BJNoDataView shareNoDataView] clear];
-            }
-        }
-
+        
     } failure:^(NSError *error) {
         [self.helpTableView.mj_footer endRefreshing];
-        [self.helpTableView.mj_header endRefreshing];
         RTLog(@"error:%@",error);
     }];
 }
-
 - (void)setUpView{
     
     [self setTitle:@"我的收藏"];

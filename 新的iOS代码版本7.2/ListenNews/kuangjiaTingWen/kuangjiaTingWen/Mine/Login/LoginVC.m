@@ -48,6 +48,11 @@
         [qingshuruyonghuming addAction:[UIAlertAction actionWithTitle:@"知道了" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
         }]];
         [self presentViewController:qingshuruyonghuming animated:YES completion:nil];
+    }else if (_isTipClassBuy){
+        UIAlertController *qingshuruyonghuming = [UIAlertController alertControllerWithTitle:@"温馨提醒" message:@"登录后才可以购买哦~" preferredStyle:UIAlertControllerStyleAlert];
+        [qingshuruyonghuming addAction:[UIAlertAction actionWithTitle:@"知道了" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        }]];
+        [self presentViewController:qingshuruyonghuming animated:YES completion:nil];
     }
 }
 - (void)viewDidLoad {

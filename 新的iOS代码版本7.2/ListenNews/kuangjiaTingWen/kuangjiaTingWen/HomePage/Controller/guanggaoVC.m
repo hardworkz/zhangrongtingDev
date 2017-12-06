@@ -69,6 +69,11 @@
             self.tapUrlStr = responseObject[@"results"][3][@"ad_name"];
             [imgV sd_setImageWithURL:[NSURL URLWithString:self.urlStr]];
             [self performSelector:@selector(afterAction) withObject:nil afterDelay:3.0f];
+        }else if (TARGETED_DEVICE_IS_IPHONE_812 &&  [responseObject[@"results"][10][@"status"] isEqualToString:@"1"]){
+            self.urlStr = [NSString stringWithFormat:@"%@%@",APPHostAds,responseObject[@"results"][3][@"ad_content"]];
+            self.tapUrlStr = responseObject[@"results"][3][@"ad_name"];
+            [imgV sd_setImageWithURL:[NSURL URLWithString:self.urlStr]];
+            [self performSelector:@selector(afterAction) withObject:nil afterDelay:3.0f];
         }
         
     } failure:^(NSError *error)
@@ -77,8 +82,6 @@
          [self performSelector:@selector(afterAction) withObject:nil];
 
      }];
-    
-    
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -87,39 +90,17 @@
 }
 
 - (void)tapAction {
-//    [[UIApplication sharedApplication]openURL:[NSURL URLWithString:self.tapUrlStr]];
-    [[UIApplication sharedApplication]openURL:[NSURL URLWithString:@"http://tingwen.me"]];
-
+    [[UIApplication sharedApplication]openURL:[NSURL URLWithString:self.tapUrlStr]];
+//    [[UIApplication sharedApplication]openURL:[NSURL URLWithString:@"http://tingwen.me"]];
 }
 
 - (void)afterAction {
-//    [self dismissViewControllerAnimated:YES completion:nil];
-//    AppDelegate *app = (AppDelegate *)[[UIApplication sharedApplication]delegate];
     [self.navigationController popViewControllerAnimated:NO];
     
 }
 
 - (void)tiaoguo {
-//    [self dismissViewControllerAnimated:YES completion:nil];
-//    AppDelegate *app = (AppDelegate *)[[UIApplication sharedApplication]delegate];
-    
     [self.navigationController popViewControllerAnimated:NO];
     NSLog(@"跳过");
 }
-
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
-}
-
-/*
-#pragma mark - Navigation
-
-// In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
-}
-*/
-
 @end
