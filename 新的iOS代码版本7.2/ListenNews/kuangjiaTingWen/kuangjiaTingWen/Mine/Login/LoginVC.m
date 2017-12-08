@@ -292,6 +292,7 @@
                                            andexpires_in:expires_in
                                                   sccess:^(NSDictionary *responseObject) {
         ExdangqianUser = responseObject[@"results"][@"user_login"];
+        ExdangqianUserUid = responseObject[@"results"][@"id"];
         [CommonCode writeToUserD:[NSString stringWithFormat:@"%@",ExdangqianUser] andKey:@"dangqianUser"];
         [CommonCode writeToUserD:responseObject[@"results"][@"id"] andKey:@"dangqianUserUid"];
         [self dismissViewControllerAnimated:YES completion:nil];
@@ -447,6 +448,7 @@
     
     [NetWorkTool postPaoGuoDiSanFangDengLuJieKouwithname:userName andhead:userHhead andtype:LoginType andopenid:userOpenid andaccess_token:userAccess_token andexpires_in:userExpires_in sccess:^(NSDictionary *responseObject) {
         ExdangqianUser = responseObject[@"results"][@"user_login"];
+        ExdangqianUserUid = responseObject[@"results"][@"id"];
         [CommonCode writeToUserD:[NSString stringWithFormat:@"%@",ExdangqianUser] andKey:@"dangqianUser"];
         [CommonCode writeToUserD:responseObject[@"results"][@"id"] andKey:@"dangqianUserUid"];
         [self dismissViewControllerAnimated:YES completion:nil];
@@ -500,6 +502,7 @@
             [NetWorkTool getPaoGuoUserInfoWithUserName:[DSE encryptUseDES:userTF.text] andPassWord:[DSE encryptUseDES:passWTF.text] sccess:^(NSDictionary *responseObject) {
                 if ([responseObject[status] intValue] == 1) {
                     ExdangqianUser = responseObject[@"results"][@"user_phone"];
+                    ExdangqianUserUid = responseObject[@"results"][@"id"];
                     [CommonCode writeToUserD:[NSString stringWithFormat:@"%@",ExdangqianUser] andKey:@"dangqianUser"];
                     [CommonCode writeToUserD:responseObject[@"results"][@"id"] andKey:@"dangqianUserUid"];
                     [self dismissViewControllerAnimated:YES completion:nil];

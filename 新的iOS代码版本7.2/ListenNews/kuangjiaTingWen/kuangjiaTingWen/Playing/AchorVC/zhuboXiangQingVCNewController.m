@@ -70,6 +70,7 @@
     
     //是否有播放记录，控制继续播放按钮显示隐藏
     BOOL isContinuePlay;
+    BOOL isCurrenVCShow;
 }
 
 @property (weak, nonatomic) CustomPageView *pagingView;
@@ -146,6 +147,18 @@
     liuyanPageNumber = 1;
     
     [self addHeaderView];
+    
+    if (IS_IPHONEX) {
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(handleWillShowKeyboard:)
+                                                     name:UIKeyboardWillShowNotification
+                                                   object:nil];
+        
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(handleWillHideKeyboard:)
+                                                     name:UIKeyboardWillHideNotification
+                                                   object:nil];
+    }
     
     NSMutableArray *buttonArray = [NSMutableArray array];
     CustomPageView *pagingView;
@@ -413,6 +426,7 @@
 - (void)viewWillAppear:(BOOL)animated{
     [super viewWillAppear:animated];
     
+    isCurrenVCShow = YES;
     [self.navigationController setNavigationBarHidden:YES animated:YES];
     if (_isRewardLoginBack) {
         _isRewardLoginBack = NO;
@@ -438,7 +452,7 @@
     [super viewDidAppear:animated];
     
     IQKeyboardManager *manager = [IQKeyboardManager sharedManager];
-    manager.enable = YES;
+    manager.enable = IS_IPHONEX?NO:YES;
     manager.shouldToolbarUsesTextFieldTintColor = YES;
     [manager setKeyboardDistanceFromTextField:0];
     
@@ -455,6 +469,7 @@
 - (void)viewWillDisappear:(BOOL)animated{
     [super viewWillDisappear:animated];
     
+    isCurrenVCShow = NO;
     [self.navigationController setNavigationBarHidden:NO animated:YES];
 }
 
@@ -537,6 +552,17 @@
 - (void)xinwenRefresh:(UITableView *)tableView
 {
     if (self.isClass) {
+        //设置本地播放记录数据
+        if (xinwenArr.count != 0) {
+            for (NSMutableDictionary *dict in xinwenArr) {
+                NSString *playTime = [CommonCode readFromUserD:[NSString stringWithFormat:@"playHistory_%@_%@",self.jiemuID,dict[@"id"]]];
+                if (playTime != nil && [playTime intValue] > 0) {
+                    [dict setObject:playTime forKey:@"play_time"];
+                }else{
+                    [dict setObject:@"0" forKey:@"play_time"];
+                }
+            }
+        }
         //获取课堂播放记录，判断是否有记录数据
         [NetWorkTool postPaoGuoGetLastHistoryDataWithAct_id:self.jiemuID andUser_id:ExdangqianUserUid sccess:^(NSDictionary *responseObject) {
             if ([responseObject[status] intValue] == 1) {//获取到播放记录
@@ -545,6 +571,14 @@
                 number = responseObject[@"number"];
                 xinwenPageNumber = [responseObject[@"page"] intValue];
                 xinwenArr = [[NSMutableArray alloc]initWithArray:responseObject[results]];
+                for (NSMutableDictionary *dict in xinwenArr) {
+                    NSString *playTime = [CommonCode readFromUserD:[NSString stringWithFormat:@"playHistory_%@_%@",self.jiemuID,dict[@"id"]]];
+                    if (playTime != nil && [playTime intValue] > 0) {
+                        [dict setObject:playTime forKey:@"play_time"];
+                    }else{
+                        [dict setObject:@"0" forKey:@"play_time"];
+                    }
+                }
                 [tableView reloadData];
                 if ([ZRT_PlayerManager manager].channelType == ChannelTypeDiscoverAnchor) {
                     [ZRT_PlayerManager manager].songList = xinwenArr;
@@ -562,8 +596,12 @@
             }
             [tableView.mj_header endRefreshing];
         } failure:^(NSError *error) {
+            RTLog(@"%@",error);
             isContinuePlay = NO;
             [tableView.mj_header endRefreshing];
+            if (isCurrenVCShow) {
+                [self xinwenRefresh:tableView];
+            }
         }];
     }else{
         [NetWorkTool postPaoGuoZhuBoOrJieMuMessageWithID:self.jiemuID andpage:@"1" andlimit:@"10" sccess:^(NSDictionary *responseObject) {
@@ -593,6 +631,16 @@
         if ([responseObject[@"results"] isKindOfClass:[NSArray class]])
         {
             [xinwenArr addObjectsFromArray:responseObject[@"results"]];
+            if (self.isClass) {
+                for (NSMutableDictionary *dict in xinwenArr) {
+                    NSString *playTime = [CommonCode readFromUserD:[NSString stringWithFormat:@"playHistory_%@_%@",self.jiemuID,dict[@"id"]]];
+                    if ([playTime intValue] > 0) {
+                        [dict setObject:playTime forKey:@"playTime"];
+                    }else{
+                        [dict setObject:@"0" forKey:@"playTime"];
+                    }
+                }
+            }
             [tableView reloadData];
             [tableView.mj_footer endRefreshing];
             if ([ZRT_PlayerManager manager].channelType == ChannelTypeDiscoverAnchor) {
@@ -736,8 +784,8 @@
     }];
 }
 
-- (void)fasongpinglunAction:(UIButton *)sender {
-    
+- (void)fasongpinglunAction:(UIButton *)sender
+{
     if ([[CommonCode readFromUserD:@"isLogin"]boolValue] == YES){
         [SVProgressHUD setDefaultMaskType:SVProgressHUDMaskTypeBlack];
         [SVProgressHUD showWithStatus:@"发送中..."];
@@ -757,6 +805,7 @@
                 [pinglunhoushuaxinTableView.mj_header beginRefreshing];
                 [self.view endEditing:YES];
                 pinglunTextF.text = @"";
+                [self liuyanRefresh:pinglunhoushuaxinTableView];
                 
             } failure:^(NSError *error) {
                 [SVProgressHUD dismiss];
@@ -770,6 +819,7 @@
                 [pinglunhoushuaxinTableView.mj_header beginRefreshing];
                 [self.view endEditing:YES];
                 pinglunTextF.text = @"";
+                [self liuyanRefresh:pinglunhoushuaxinTableView];
             } failure:^(NSError *error) {
                 [SVProgressHUD dismiss];
                 NSLog(@"error = %@",error);
@@ -885,7 +935,7 @@
     //姓名,课程名称
     UILabel *name = [[UILabel alloc]init];
     if (!self.isClass) {
-        name.frame = CGRectMake(CGRectGetMaxX(imgBorderView.frame) + 12, imgBorderView.frame.origin.y + 15.0 / 667 * IPHONE_H, 150, 20.0 / 667 * IPHONE_H);
+        name.frame = CGRectMake(CGRectGetMaxX(imgBorderView.frame) + 12, imgBorderView.frame.origin.y + 15.0 / 667 * IPHONE_H, SCREEN_WIDTH - (CGRectGetMaxX(imgBorderView.frame) + 12 + 20), 20.0 / 667 * IPHONE_H);
     }else{//课堂
         CGSize nameSize = [self.jiemuName boundingRectWithSize:CGSizeMake(SCREEN_WIDTH - CGRectGetMaxX(imgBorderView.frame) - 12 - 20, MAXFLOAT) options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:[UIFont boldSystemFontOfSize:17.0]} context:nil].size;
         name.frame = CGRectMake(CGRectGetMaxX(imgBorderView.frame) + 12, imgBorderView.frame.origin.y + 5.0 / 667 * IPHONE_H, SCREEN_WIDTH - CGRectGetMaxX(imgBorderView.frame) - 12 - 20, nameSize.height);
@@ -1732,8 +1782,8 @@
         [continuePlayButton addTarget:self action:@selector(continuePlayAction) forControlEvents:UIControlEventTouchUpInside];
         [sectionHeadView addSubview:continuePlayButton];
         
-        UIView *line = [[UIView alloc] initWithFrame:CGRectMake(0,IS_IPHONEX?49.5: 39.5, SCREEN_WIDTH, 0.5)];
-        line.backgroundColor = [UIColor lightGrayColor];
+        UIView *line = [[UIView alloc] initWithFrame:CGRectMake(10,IS_IPHONEX?49.5: 39.5, SCREEN_WIDTH, 0.5)];
+        line.backgroundColor = [[UIColor grayColor] colorWithAlphaComponent:0.2];
         [sectionHeadView addSubview:line];
         
         if (_isClass && isContinuePlay) {
@@ -1802,10 +1852,26 @@
         if (!cell){
             cell = [tableView dequeueReusableCellWithIdentifier:zhuboxiangqingxinwenIdentify forIndexPath:indexPath];
         }
-        UILabel *titleLab = [[UILabel alloc]init];
+        UILabel *titleLab = [[UILabel alloc] init];
+        UILabel *playTimePercentLab = [[UILabel alloc] init];
         zhuboxiangqingNewVCPlayBtn *playBtn = [[zhuboxiangqingNewVCPlayBtn alloc] init];
         if (self.isClass) {
-            titleLab.frame = CGRectMake(20.0 / 375 * IPHONE_W, 12.0 / 667 * IPHONE_H, SCREEN_WIDTH - 80.0 / 375 * IPHONE_W, 21 * 3);
+            titleLab.frame = CGRectMake(20.0 / 375 * IPHONE_W, 12.0 / 667 * IPHONE_H, SCREEN_WIDTH - 80.0 / 375 * IPHONE_W, 21 * 2);
+            playTimePercentLab.frame = CGRectMake(20.0 / 375 * IPHONE_W, CGRectGetMaxY(titleLab.frame) - 3, 100, 15);
+            playTimePercentLab.textColor = [UIColor lightGrayColor];
+            playTimePercentLab.font = [UIFont systemFontOfSize:12.0];
+            if ([xinwenArr[indexPath.row][@"post_time"] intValue] > 0) {
+                int totalTime = [xinwenArr[indexPath.row][@"post_time"] intValue]/1000;
+                int playTime = [xinwenArr[indexPath.row][@"play_time"] intValue];
+                playTimePercentLab.text = [NSString stringWithFormat:@"已播放%%%d",100*playTime/totalTime];
+            }
+            if ([xinwenArr[indexPath.row][@"play_time"] intValue]>0) {
+                playTimePercentLab.hidden = NO;
+            }else{
+                playTimePercentLab.hidden = YES;
+            }
+            [cell.contentView addSubview:playTimePercentLab];
+            
             if (IS_IPHONEX) {
                 titleLab.frame = CGRectMake(20.0, 12.0, SCREEN_WIDTH - 80.0, 21 * 3);
             }
@@ -1830,11 +1896,28 @@
         
         if ([[CommonCode readFromUserD:@"dangqianbofangxinwenID"] isEqualToString:xinwenArr[indexPath.row][@"id"]])
         {
-//            if ([ZRT_PlayerManager manager].isPlaying) {
-                playBtn.selected = YES;
-//            }else{
-//                playBtn.selected = NO;
-//            }
+            switch ([ZRT_PlayerManager manager].status) {
+                case ZRTPlayStatusPlay:
+                    playBtn.selected = YES;
+                    break;
+                case ZRTPlayStatusLoadSongInfo:
+                    playBtn.selected = YES;
+                    break;
+                case ZRTPlayStatusReadyToPlay:
+                    playBtn.selected = YES;
+                    break;
+                case ZRTPlayStatusPause:
+                    playBtn.selected = NO;
+                    break;
+                case ZRTPlayStatusStop:
+                    playBtn.selected = NO;
+                    break;
+                case ZRTPlayStatusNone:
+                    playBtn.selected = NO;
+                    break;
+                default:
+                    break;
+            }
         }else{
             playBtn.selected = NO;
         }
@@ -1842,7 +1925,7 @@
         titleLab.textAlignment = NSTextAlignmentLeft;
         titleLab.font = [UIFont systemFontOfSize:16.0f];
         [cell.contentView addSubview:titleLab];
-        [titleLab setNumberOfLines:3];
+        [titleLab setNumberOfLines:2];
         titleLab.lineBreakMode = NSLineBreakByWordWrapping;
         CGSize size = [titleLab sizeThatFits:CGSizeMake(titleLab.frame.size.width, MAXFLOAT)];
         titleLab.frame = CGRectMake(titleLab.frame.origin.x, titleLab.frame.origin.y, titleLab.frame.size.width, size.height);
@@ -1897,18 +1980,18 @@
         }
         
         if (self.isClass) {
-            UIView *devider = [[UIView alloc] initWithFrame:CGRectMake(10.0 / 375 * IPHONE_W, 70.0 / 667 * SCREEN_HEIGHT - 0.5, SCREEN_WIDTH, 0.5)];
+            UIView *devider = [[UIView alloc] initWithFrame:CGRectMake(10.0 / 375 * IPHONE_W,SCREEN_WIDTH == 320?80.0 / 667 * SCREEN_HEIGHT - 0.5:70.0 / 667 * SCREEN_HEIGHT - 0.5, SCREEN_WIDTH, 0.5)];
             if (IS_IPHONEX) {
                 devider.frame = CGRectMake(10.0, 70.0 - 0.5, SCREEN_WIDTH, 0.5);
             }
-            devider.backgroundColor = [UIColor lightGrayColor];
+            devider.backgroundColor = [[UIColor grayColor] colorWithAlphaComponent:0.2];
             [cell.contentView addSubview:devider];
         }else{
             UIView *devider = [[UIView alloc] initWithFrame:CGRectMake(10.0 / 375 * IPHONE_W, 99.0 / 667 * SCREEN_HEIGHT - 0.5, SCREEN_WIDTH, 0.5)];
             if (IS_IPHONEX) {
                 devider.frame = CGRectMake(10.0, 99.0 - 0.5, SCREEN_WIDTH, 0.5);
             }
-            devider.backgroundColor = [UIColor lightGrayColor];
+            devider.backgroundColor = [[UIColor grayColor] colorWithAlphaComponent:0.2];
             [cell.contentView addSubview:devider];
         }
         
@@ -1930,6 +2013,7 @@
     else if ([tableView isEqual:pinglunhoushuaxinTableView]){
         
         PlayVCCommentTableViewCell *cell = [PlayVCCommentTableViewCell cellWithTableView:tableView];
+        cell.hideZanBtn = YES;
         cell.commentCellType = CommentCellTypeAchorCommentList;
         PlayVCCommentFrameModel *frameModel = liuyanArr[indexPath.row];
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
@@ -1958,7 +2042,11 @@
 {
     if ([tableView isEqual:xinwenshuaxinTableView]){
         if (self.isClass) {
-            return IS_IPHONEX?70.0: 70.0 / 667 * SCREEN_HEIGHT;
+            if (SCREEN_WIDTH == 320) {
+                return 80.0 / 667 * SCREEN_HEIGHT;
+            }else{
+                return IS_IPHONEX?70.0: 70.0 / 667 * SCREEN_HEIGHT;
+            }
         }else{
             return IS_IPHONEX?99.0: 99.0 / 667 * SCREEN_HEIGHT;
         }
@@ -1984,6 +2072,15 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
     
     if ([tableView isEqual:xinwenshuaxinTableView]){
+        //设置开始播放时间
+        [NewPlayVC shareInstance].starDate = [xinwenArr[indexPath.row][@"play_time"] intValue];
+        if ([xinwenArr[indexPath.row][@"post_time"] intValue] > 0) {
+            int totalTime = [xinwenArr[indexPath.row][@"post_time"] intValue]/1000;
+            int playTime = [xinwenArr[indexPath.row][@"play_time"] intValue];
+            if (playTime/totalTime == 1) {
+                [NewPlayVC shareInstance].starDate = 0.0;
+            }
+        }
         //设置频道类型
         [ZRT_PlayerManager manager].channelType = ChannelTypeDiscoverAnchor;
         //设置播放界面内容类型
@@ -1991,12 +2088,15 @@
             [NewPlayVC shareInstance].playType = PlayTypeClass;
             //设置播放器播放内容类型
             [ZRT_PlayerManager manager].playType = ZRTPlayTypeClassroom;
+            //设置课堂播放的课程ID和课程下节目ID
             [ZRT_PlayerManager manager].act_id = self.jiemuID;
+            [ZRT_PlayerManager manager].act_sub_id = xinwenArr[indexPath.row][@"id"];
             [NewPlayVC shareInstance].isFormClass = YES;
         }else{
             [NewPlayVC shareInstance].playType = PlayTypeNews;
             //设置播放器播放内容类型
             [ZRT_PlayerManager manager].playType = ZRTPlayTypeNews;
+            [ZRT_PlayerManager manager].act_sub_id = nil;
             [NewPlayVC shareInstance].isFormClass = NO;
         }
         //设置播放器播放完成自动加载更多block
@@ -2385,8 +2485,7 @@ didSelectLinkWithTransitInformation:(NSDictionary *)components {
             XWAlerLoginView *alert = [[XWAlerLoginView alloc] initWithTitle:@"恭喜您，信息提交成功"];
             [alert show];
             
-            NSMutableDictionary *userInfoDict = [[CommonCode readFromUserD:@"dangqianUserInfo"] mutableCopy];
-            RTLog(@"%@",userInfoDict);
+            NSMutableDictionary *userInfoDict = [CommonCode readFromUserD:@"dangqianUserInfo"];
             [userInfoDict setValue:@"1" forKey:@"is_record"];
             [CommonCode writeToUserD:userInfoDict andKey:@"dangqianUserInfo"];
             //提交成功 --》 获取用户信息
@@ -2451,6 +2550,40 @@ didSelectLinkWithTransitInformation:(NSDictionary *)components {
     }
     return YES;
 }
+#pragma mark - Keyboard notifications
+
+- (void)handleWillShowKeyboard:(NSNotification *)notification{
+    [self keyboardWillShowHide:notification];
+    
+}
+
+- (void)handleWillHideKeyboard:(NSNotification *)notification{
+    [self keyboardWillShowHide:notification];
+}
+
+- (void)keyboardWillShowHide:(NSNotification *)notification{
+    
+    NSDictionary *userInfo = [notification userInfo];
+    NSValue *value = [userInfo objectForKey:UIKeyboardFrameEndUserInfoKey];
+    CGFloat keyboardY = value.CGRectValue.origin.y;
+    
+    NSNumber *duration = [userInfo objectForKey:UIKeyboardAnimationDurationUserInfoKey];
+    NSNumber *curve = [userInfo objectForKey:UIKeyboardAnimationCurveUserInfoKey];
+    
+    // 添加移动动画，使视图跟随键盘移动
+    [UIView animateWithDuration:duration.doubleValue animations:^{
+        [UIView setAnimationBeginsFromCurrentState:YES];
+        [UIView setAnimationCurve:[curve intValue]];
+        // keyBoardEndY的坐标包括了状态栏的高度，要减去
+        if ([pinglunTextF isFirstResponder]) {
+            pinglunBgView.center = CGPointMake(pinglunBgView.center.x, keyboardY  - pinglunBgView.bounds.size.height/2.0);
+        }
+        if (IS_IPHONEX) {
+            _alertCommitBuyUserDataView.center = CGPointMake(_alertCommitBuyUserDataView.center.x, keyboardY  - _alertCommitBuyUserDataView.bounds.size.height/2.0);
+        }
+    }];
+}
+
 - (void)dealloc
 {
     RTLog(@"dealloc");

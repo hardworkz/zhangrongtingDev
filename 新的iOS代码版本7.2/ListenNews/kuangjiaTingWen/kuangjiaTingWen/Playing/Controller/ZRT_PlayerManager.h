@@ -117,6 +117,10 @@ typedef NS_ENUM(NSInteger, ZRTPlayStatus) {
  */
 @property (nonatomic, copy) NSString * act_id;
 /*
+ * 课堂内节目ID
+ */
+@property (nonatomic, copy) NSString * act_sub_id;
+/*
  * 播放器播放状态
  */
 @property (nonatomic, assign, readonly) BOOL isPlaying;

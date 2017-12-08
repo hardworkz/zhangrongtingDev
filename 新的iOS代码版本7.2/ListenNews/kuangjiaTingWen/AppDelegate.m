@@ -245,6 +245,10 @@
     [manager setKeyboardDistanceFromTextField:0];
     
     [self avoidCrash];
+    
+//    if (@available(iOS 11, *)) {
+//        [UIScrollView appearance].contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever; //iOS11 解决SafeArea的问题，同时能解决pop时上级页面scrollView抖动的问题
+//    }
 
     return YES;
 }
@@ -650,7 +654,8 @@
     [GDTTrack activateApp];
 }
 
-- (void)applicationWillTerminate:(UIApplication *)application {
+- (void)applicationWillTerminate:(UIApplication *)application
+{
     //上传课堂播放记录
     if ([ZRT_PlayerManager manager].playType == ZRTPlayTypeClassroom && [ZRT_PlayerManager manager].isPlaying == YES) {
         [[ZRT_PlayerManager manager] uploadClassPlayHistoryData];

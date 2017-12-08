@@ -512,7 +512,7 @@ static NewPlayVC *_instance = nil;
     xiangqingView.backgroundColor = [UIColor whiteColor];
     
     //新闻图片
-    self.zhengwenImg.frame = CGRectMake(0, -20, IPHONE_W, 209.0 / 667 * SCREEN_HEIGHT);
+    self.zhengwenImg.frame = CGRectMake(0, -20, IPHONE_W,IS_IPHONEX?209.0:209.0 / 667 * SCREEN_HEIGHT);
     
     UIBezierPath *maskPath = [UIBezierPath bezierPathWithRoundedRect:_zhengwenImg.bounds byRoundingCorners:UIRectCornerBottomRight cornerRadii:CGSizeMake(160.0 / 667 * SCREEN_HEIGHT, 160.0 / 667 * SCREEN_HEIGHT)];
     CAShapeLayer *maskLayer = [[CAShapeLayer alloc] init];
@@ -871,7 +871,7 @@ static NewPlayVC *_instance = nil;
 }
 - (void)scrollToTop
 {
-    [self.tableView setContentOffset:CGPointZero animated:YES];
+    [self.tableView setContentOffset:CGPointMake(0, IS_IPHONEX?-44:-20) animated:YES];
 }
 - (UIProgressView *)prgBufferProgress
 {
@@ -1723,12 +1723,13 @@ static NSInteger goldTouchCount = 0;
     {
         //清空跳转播放时间数据
         self.starDate = 0;
+        //播放上一首
+        BOOL isfirst = [[ZRT_PlayerManager manager] previousSong];
         //上传课堂播放数据
         if ([ZRT_PlayerManager manager].playType == ZRTPlayTypeClassroom) {
             [[ZRT_PlayerManager manager] uploadClassPlayHistoryData];
+            [ZRT_PlayerManager manager].act_sub_id = [ZRT_PlayerManager manager].currentSong[@"id"];
         }
-        //播放上一首
-        BOOL isfirst = [[ZRT_PlayerManager manager] previousSong];
         //已经是第一首，则不往下执行
         if (isfirst) {
             return;
@@ -1766,17 +1767,13 @@ static NSInteger goldTouchCount = 0;
     {
         //清空跳转播放时间数据
         self.starDate = 0;
+        //播放下一首
+        BOOL isLast = [[ZRT_PlayerManager manager] nextSong];
         //上传课堂播放数据
         if ([ZRT_PlayerManager manager].playType == ZRTPlayTypeClassroom) {
             [[ZRT_PlayerManager manager] uploadClassPlayHistoryData];
+            [ZRT_PlayerManager manager].act_sub_id = [ZRT_PlayerManager manager].currentSong[@"id"];
         }
-        //播放下一首
-        BOOL isLast = [[ZRT_PlayerManager manager] nextSong];
-        //设置课堂播放时长播放时长
-//        if ([ZRT_PlayerManager manager].playType == ZRTPlayTypeClassroom) {
-//            self.starDate = [[ZRT_PlayerManager manager].currentSong[@"play_time"] intValue]/1000;
-//            RTLog(@"开始播放时间：%f",self.starDate);
-//        }
         //已经是最后一首，则不往下执行
         if (isLast) {
             return;
@@ -1912,7 +1909,7 @@ static NSInteger goldTouchCount = 0;
     //缓冲进度条清空
     [self.prgBufferProgress setProgress:0. animated:NO];
     //滚动到顶部
-    [self.tableView setContentOffset:CGPointZero animated:NO];
+    [self.tableView setContentOffset:CGPointMake(0, IS_IPHONEX?-44:-20) animated:NO];
     
     [self.tableView reloadData];
     
@@ -1944,7 +1941,7 @@ static NSInteger goldTouchCount = 0;
 - (void)reloadInterface
 {
     //滚动到顶部
-    [self.tableView setContentOffset:CGPointZero animated:YES];
+    [self.tableView setContentOffset:CGPointMake(0, IS_IPHONEX?-44:-20) animated:YES];
     //重新刷新界面
     [self.tableView reloadData];
 }

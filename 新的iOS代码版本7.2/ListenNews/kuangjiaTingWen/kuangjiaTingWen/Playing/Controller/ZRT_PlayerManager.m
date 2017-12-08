@@ -56,7 +56,6 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
         if ([userInfoDict[results][member_type] intValue] == 0) {
             int limitTime = [[CommonCode readFromUserD:limit_time] intValue];
             int limitNum = [[CommonCode readFromUserD:limit_num] intValue];
-//            RTLog(@"limitTime--:%d  is_stop---:%d",limitTime,[userInfoDict[results][is_stop] intValue]);
             if (limitTime >= limitNum||[userInfoDict[results][is_stop] intValue] == 1) {
                 switch (self.playType) {
                     case ZRTPlayTypeNews:
@@ -623,6 +622,9 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
             weakSelf.playHistoryDataModel.time = [NSString stringWithFormat:@"%.0f",currentTime *1000];
             weakSelf.playHistoryDataModel.number = [NSString stringWithFormat:@"%ld",weakSelf.currentSongIndex];
             weakSelf.playHistoryDataModel.act_id = weakSelf.act_id;
+            //保存播放时间到本地
+            RTLog(@"保存时间key:%@---时间：%@",[NSString stringWithFormat:@"playHistory_%@_%@",weakSelf.act_id,weakSelf.act_sub_id],[NSString stringWithFormat:@"%.0f",currentTime]);
+            [CommonCode writeToUserD:[NSString stringWithFormat:@"%.0f",currentTime] andKey:[NSString stringWithFormat:@"playHistory_%@_%@",weakSelf.act_id,weakSelf.act_sub_id]];
         }
     }];
 }
@@ -820,7 +822,7 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
  */
 - (void)uploadClassPlayHistoryData
 {
-    if ([self.playHistoryDataModel.time intValue] != 0) {
+//    if ([self.playHistoryDataModel.time intValue] != 0) {
         [NetWorkTool postPaoGuoUploadHistoryDataWithAct_id:self.act_id andUser_id:ExdangqianUserUid andNumber:self.playHistoryDataModel.number andTime:self.playHistoryDataModel.time sccess:^(NSDictionary *responseObject) {
             if ([responseObject[status] intValue] == 1) {
                 RTLog(@"上传课堂播放记录成功");
@@ -829,6 +831,6 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
         } failure:^(NSError *error) {
             RTLog(@"error:%@",error);
         }];
-    }
+//    }
 }
 @end

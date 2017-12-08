@@ -142,7 +142,7 @@ static AVPlayer *_instancePlay = nil;
     if (![Exact_id isEqualToString:self.act_id]) {//当前为不同页面，需要重新初始化控件状态
         
         playIndex = -1;
-        [self.helpTableView setContentOffset:CGPointZero animated:NO];
+        [self.helpTableView setContentOffset:CGPointMake(0,IS_IPHONEX?-44:-20) animated:YES];
     }
     //清空上一个页面图片数据
     if (self.zhengwenImg) {
@@ -261,6 +261,7 @@ static AVPlayer *_instancePlay = nil;
             }
             [weakSelf setTableHeadView];
             [weakSelf.helpTableView reloadData];
+//            [self.helpTableView setContentOffset:CGPointMake(0, -44) animated:YES];
             
             //判断是否是纯数字
             NSString *textStr = [NSString stringWithFormat:@" ￥%@ ",[NetWorkTool formatFloat:[responseObject[results][@"sprice"] floatValue]]];
@@ -406,17 +407,6 @@ static AVPlayer *_instancePlay = nil;
     
     _xiangqingView.frame = CGRectMake(_xiangqingView.frame.origin.x, _xiangqingView.frame.origin.y, _xiangqingView.frame.size.width, CGRectGetMaxY(_seperatorLine.frame));
     self.helpTableView.tableHeaderView = _xiangqingView;
-    
-    //footer
-//    if (self.helpTableView.tableFooterView == nil) {
-//        UIButton *moreComment = [UIButton buttonWithType:UIButtonTypeCustom];
-//        [moreComment setFrame:CGRectMake(0, 0, SCREEN_WIDTH, 44)];
-//        [moreComment setTitle:@"查看更多评价" forState:UIControlStateNormal];
-//        [moreComment.titleLabel setFont:gFontMain14];
-//        [moreComment setTitleColor:gTextColorSub forState:UIControlStateNormal];
-//        [moreComment addTarget:self action:@selector(morecommetAction:) forControlEvents:UIControlEventTouchUpInside];
-//        self.helpTableView.tableFooterView = moreComment;
-//    }
     
     [self.helpTableView reloadData];
 }
@@ -1039,7 +1029,7 @@ static AVPlayer *_instancePlay = nil;
         return cell;
     }else{
         PlayVCCommentTableViewCell *cell = [PlayVCCommentTableViewCell cellWithTableView:tableView];
-//        cell.hideZanBtn = YES;
+        cell.hideZanBtn = YES;
         cell.commentCellType = CommentCellTypeClassroom;
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
         PlayVCCommentFrameModel *frameModel = self.pinglunArr[indexPath.row - 2 - self.classModel.imagesArray.count];
@@ -1165,10 +1155,10 @@ static AVPlayer *_instancePlay = nil;
 {
     if (_zhengwenImg == nil) {
         //新闻图片
-        _zhengwenImg = [[UIImageView alloc] initWithFrame:CGRectMake(0, -20, IPHONE_W, 209.0 / 667 * SCREEN_HEIGHT)];
+        _zhengwenImg = [[UIImageView alloc] initWithFrame:CGRectMake(0, -20, IPHONE_W,IS_IPHONEX?209.0:209.0 / 667 * SCREEN_HEIGHT)];
         [_zhengwenImg setUserInteractionEnabled:YES];
         
-        UIBezierPath *maskPath = [UIBezierPath bezierPathWithRoundedRect:_zhengwenImg.bounds byRoundingCorners:UIRectCornerBottomRight cornerRadii:CGSizeMake(160.0 / 667 * SCREEN_HEIGHT, 160.0 / 667 * SCREEN_HEIGHT)];
+        UIBezierPath *maskPath = [UIBezierPath bezierPathWithRoundedRect:_zhengwenImg.bounds byRoundingCorners:UIRectCornerBottomRight cornerRadii:CGSizeMake(160.0 / 667 * SCREEN_HEIGHT,IS_IPHONEX?160.0:160.0 / 667 * SCREEN_HEIGHT)];
         CAShapeLayer *maskLayer = [[CAShapeLayer alloc] init];
         maskLayer.frame = _zhengwenImg.bounds;
         maskLayer.path = maskPath.CGPath;
