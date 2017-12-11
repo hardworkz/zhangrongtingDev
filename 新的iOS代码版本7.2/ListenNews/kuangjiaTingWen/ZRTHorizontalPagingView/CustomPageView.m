@@ -159,7 +159,7 @@ static NSInteger pagingButtonTag                 = 1000;
             
             if(i == [self.segmentButtons count] - 1) {
                 UIView *devider = [[UIView alloc] initWithFrame:CGRectMake(0, self.segmentBarHeight - 0.5, SCREEN_WIDTH, 0.5)];
-                devider.backgroundColor = [UIColor grayColor];
+                devider.backgroundColor = [[UIColor grayColor] colorWithAlphaComponent:0.2];
                 [_segmentView addSubview:devider];
                 [segmentButton setSelected:YES];
             }

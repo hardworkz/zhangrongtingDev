@@ -419,7 +419,7 @@ static NewPlayVC *_instance = nil;
     [_zhuboImgNav addGestureRecognizer:tap];
     [_topCenterView addSubview:_zhuboImgNav];
     //主播名字
-    self.zhuboTitleLabNav.frame = CGRectMake(CGRectGetMaxX(_zhuboImgNav.frame)+5, (44 - 15)/2.0, 88.0 / 375 * IPHONE_W, 15.0);
+    self.zhuboTitleLabNav.frame = CGRectMake(CGRectGetMaxX(_zhuboImgNav.frame)+5, (44 - 32)/2.0, 88.0 / 375 * IPHONE_W, 32.0);
     [_zhuboTitleLabNav addTapGesWithTarget:self action:@selector(zhuboBtnVAction:)];
     [_topCenterView addSubview:_zhuboTitleLabNav];
     //主播麦克风图标
@@ -461,17 +461,11 @@ static NewPlayVC *_instance = nil;
     //设置主播昵称
     self.zhuboTitleLab.text = self.postDetailModel.act.name;
     self.zhuboTitleLabNav.text = self.postDetailModel.act.name;
-    CGSize contentSize = [_zhuboTitleLab sizeThatFits:CGSizeMake(_zhuboTitleLab.frame.size.width, MAXFLOAT)];
-    _zhuboTitleLab.frame = CGRectMake(_zhuboTitleLab.frame.origin.x, _zhuboTitleLab.frame.origin.y,contentSize.width, _zhuboTitleLab.frame.size.height);
+    CGSize contentSize = [_zhuboTitleLab sizeThatFits:CGSizeMake(SCREEN_WIDTH - _zhuboTitleLab.x - 100.0/375*SCREEN_WIDTH , MAXFLOAT)];
+    _zhuboTitleLab.frame = CGRectMake(_zhuboTitleLab.x, _zhuboTitleLab.y,contentSize.width,contentSize.height>20?contentSize.height:_zhuboTitleLab.height);
     //主播麦克风图标frame
-    self.mic.frame = CGRectMake(CGRectGetMaxX(_zhuboTitleLab.frame) + 6.0 / 375 * SCREEN_WIDTH, _zhuboTitleLab.frame.origin.y + 1.0 / 667 * SCREEN_HEIGHT, 8.0 /375 * SCREEN_WIDTH, 14.0 / 667 * SCREEN_HEIGHT);
-    
-    //导航栏主播信息控件frame
-//    self.micNav.frame = CGRectMake(_guanzhuBtnNav.x - 8.0 / 375 * SCREEN_WIDTH - 10, (44 - 15)/2.0 , 8.0 /375 * SCREEN_WIDTH, 14.0 / 667 * SCREEN_HEIGHT);
-//    self.zhuboTitleLabNav.frame = CGRectMake(_micNav.x - contentSize.width - 10, (44 - 15)/2.0, contentSize.width, 15.0 );
-//    self.zhuboImgNav.frame = CGRectMake(_zhuboTitleLabNav.x - 27.0 - 5, (44 - 27)/2.0,  27.0, 27.0);
+    self.mic.frame = CGRectMake(CGRectGetMaxX(_zhuboTitleLab.frame) + 6.0 / 375 * SCREEN_WIDTH, _zhuboTitleLab.center.y - 7.0 / 667 * SCREEN_HEIGHT, 8.0 /375 * SCREEN_WIDTH, 14.0 / 667 * SCREEN_HEIGHT);
 
-    
     //是否关注
     self.guanzhuBtn.selected = [self.postDetailModel.act.is_fan intValue] == 1;
     self.guanzhuBtnNav.selected = [self.postDetailModel.act.is_fan intValue] == 1;
@@ -486,15 +480,16 @@ static NewPlayVC *_instance = nil;
     //设置主播昵称
     self.zhuboTitleLab.text = self.postDetailModel.act.name;
     self.zhuboTitleLabNav.text = self.postDetailModel.act.name;
-    CGSize contentSize = [_zhuboTitleLab sizeThatFits:CGSizeMake(_zhuboTitleLab.frame.size.width, MAXFLOAT)];
-    _zhuboTitleLab.frame = CGRectMake(_zhuboTitleLab.frame.origin.x, _zhuboTitleLab.frame.origin.y,contentSize.width, _zhuboTitleLab.frame.size.height);
-    _zhuboTitleLabNav.frame = CGRectMake(_zhuboTitleLabNav.frame.origin.x, _zhuboTitleLabNav.frame.origin.y,contentSize.width, _zhuboTitleLabNav.frame.size.height);
+    CGSize contentSize = [_zhuboTitleLab sizeThatFits:CGSizeMake(SCREEN_WIDTH - _zhuboTitleLab.x - 100.0/375*SCREEN_WIDTH, MAXFLOAT)];
+    CGSize navContentSize = [_zhuboTitleLabNav sizeThatFits:CGSizeMake(_topCenterView.width - _zhuboTitleLabNav.x - 80.0 / 375 * IPHONE_W, MAXFLOAT)];
+    _zhuboTitleLab.frame = CGRectMake(_zhuboTitleLab.x, _zhuboTitleLab.y,contentSize.width, contentSize.height>20?contentSize.height:_zhuboTitleLab.height);
+    _zhuboTitleLabNav.frame = CGRectMake(_zhuboTitleLabNav.x, _zhuboTitleLabNav.y,navContentSize.width, _zhuboTitleLabNav.height);
     //主播麦克风图标frame
-    self.mic.frame = CGRectMake(CGRectGetMaxX(_zhuboTitleLab.frame) + 6.0 / 375 * SCREEN_WIDTH, _zhuboTitleLab.frame.origin.y + 1.0 / 667 * SCREEN_HEIGHT, 8.0 /375 * SCREEN_WIDTH, 14.0 / 667 * SCREEN_HEIGHT);
+    self.mic.frame = CGRectMake(CGRectGetMaxX(_zhuboTitleLab.frame) + 6.0 / 375 * SCREEN_WIDTH, _zhuboTitleLab.center.y - 7.0 / 667 * SCREEN_HEIGHT, 8.0 /375 * SCREEN_WIDTH, 14.0 / 667 * SCREEN_HEIGHT);
     if (IS_IPHONEX) {
-        self.micNav.frame = CGRectMake(CGRectGetMaxX(_zhuboTitleLabNav.frame) + 6.0 / 375 * SCREEN_WIDTH, _zhuboTitleLabNav.frame.origin.y, 8.0 /375 * SCREEN_WIDTH, 14.0 / 667 * SCREEN_HEIGHT);
+        self.micNav.frame = CGRectMake(CGRectGetMaxX(_zhuboTitleLabNav.frame) + 6.0 / 375 * SCREEN_WIDTH, _zhuboTitleLabNav.center.y - 7.0 / 667 * SCREEN_HEIGHT, 8.0 /375 * SCREEN_WIDTH, 14.0 / 667 * SCREEN_HEIGHT);
     }else{
-        self.micNav.frame = CGRectMake(CGRectGetMaxX(_zhuboTitleLabNav.frame) + 6.0 / 375 * SCREEN_WIDTH, _zhuboTitleLabNav.frame.origin.y + 1.0 / 667 * SCREEN_HEIGHT, 8.0 /375 * SCREEN_WIDTH, 14.0 / 667 * SCREEN_HEIGHT);
+        self.micNav.frame = CGRectMake(CGRectGetMaxX(_zhuboTitleLabNav.frame) + 6.0 / 375 * SCREEN_WIDTH, _zhuboTitleLabNav.center.y - 7.0 / 667 * SCREEN_HEIGHT, 8.0 /375 * SCREEN_WIDTH, 14.0 / 667 * SCREEN_HEIGHT);
     }
     //设置标题名称
     self.titleLab.text = self.postDetailModel.post_title;
@@ -531,12 +526,12 @@ static NewPlayVC *_instance = nil;
     
     [xiangqingView addSubview:_zhuboImg];
     //主播名字
-    self.zhuboTitleLab.frame = CGRectMake(CGRectGetMaxX(_zhuboImg.frame) + 4.0 / 375 * IPHONE_W, _zhuboImg.frame.origin.y +  5.0 / 667 * IPHONE_H, 88.0 / 375 * IPHONE_W, 15.0 / 667 * IPHONE_H);
+    self.zhuboTitleLab.frame = CGRectMake(CGRectGetMaxX(_zhuboImg.frame) + 4.0 / 375 * IPHONE_W, _zhuboImg.frame.origin.y, 88.0 / 375 * IPHONE_W, 30.0 / 667 * IPHONE_H);
     [_zhuboTitleLab addTapGesWithTarget:self action:@selector(zhuboBtnVAction:)];
     [xiangqingView addSubview:_zhuboTitleLab];
     
     //主播麦克风图标
-    self.mic.frame = CGRectMake(CGRectGetMaxX(_zhuboTitleLab.frame) + 6.0 / 375 * SCREEN_WIDTH, _zhuboTitleLab.frame.origin.y + 1.0 / 667 * SCREEN_HEIGHT, 8.0 /375 * SCREEN_WIDTH, 14.0 / 667 * SCREEN_HEIGHT);
+    self.mic.frame = CGRectMake(CGRectGetMaxX(_zhuboTitleLab.frame) + 6.0 / 375 * SCREEN_WIDTH, _zhuboTitleLab.frame.origin.y + 7.0 / 667 * SCREEN_HEIGHT, 8.0 /375 * SCREEN_WIDTH, 14.0 / 667 * SCREEN_HEIGHT);
     [_mic addTapGesWithTarget:self action:@selector(zhuboBtnVAction:)];
     [xiangqingView addSubview:_mic];
     //空白区域view
@@ -727,7 +722,8 @@ static NewPlayVC *_instance = nil;
     if (_zhuboTitleLab == nil) {
         _zhuboTitleLab = [[UILabel alloc] init];
         _zhuboTitleLab.textColor = nTextColorSub;
-        _zhuboTitleLab.font = gFontMain14;
+        _zhuboTitleLab.font = gFontMain13;
+        _zhuboTitleLab.numberOfLines = 2;
         _zhuboTitleLab.textAlignment = NSTextAlignmentLeft;
     }
     return _zhuboTitleLab;
@@ -756,7 +752,8 @@ static NewPlayVC *_instance = nil;
     if (_zhuboTitleLabNav == nil) {
         _zhuboTitleLabNav = [[UILabel alloc] init];
         _zhuboTitleLabNav.textColor = nTextColorSub;
-        _zhuboTitleLabNav.font = gFontMain14;
+        _zhuboTitleLabNav.font = gFontMain13;
+        _zhuboTitleLabNav.numberOfLines = 2;
         _zhuboTitleLabNav.textAlignment = NSTextAlignmentLeft;
     }
     return _zhuboTitleLabNav;

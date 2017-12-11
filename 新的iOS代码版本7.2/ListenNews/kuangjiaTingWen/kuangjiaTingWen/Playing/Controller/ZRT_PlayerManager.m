@@ -625,6 +625,10 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
             //保存播放时间到本地
             RTLog(@"保存时间key:%@---时间：%@",[NSString stringWithFormat:@"playHistory_%@_%@",weakSelf.act_id,weakSelf.act_sub_id],[NSString stringWithFormat:@"%.0f",currentTime]);
             [CommonCode writeToUserD:[NSString stringWithFormat:@"%.0f",currentTime] andKey:[NSString stringWithFormat:@"playHistory_%@_%@",weakSelf.act_id,weakSelf.act_sub_id]];
+            //播放总时长
+            if ([CommonCode readFromUserD:[NSString stringWithFormat:@"class_totalTime_%@_%@",weakSelf.act_id,weakSelf.act_sub_id]] == nil) {
+                [CommonCode writeToUserD:[NSString stringWithFormat:@"%.0f",total] andKey:[NSString stringWithFormat:@"class_totalTime_%@_%@",weakSelf.act_id,weakSelf.act_sub_id]];
+            }
         }
     }];
 }

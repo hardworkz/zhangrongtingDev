@@ -556,10 +556,16 @@
         if (xinwenArr.count != 0) {
             for (NSMutableDictionary *dict in xinwenArr) {
                 NSString *playTime = [CommonCode readFromUserD:[NSString stringWithFormat:@"playHistory_%@_%@",self.jiemuID,dict[@"id"]]];
+                NSString *totalTime = [CommonCode readFromUserD:[NSString stringWithFormat:@"class_totalTime_%@_%@",self.jiemuID,dict[@"id"]]];
                 if (playTime != nil && [playTime intValue] > 0) {
                     [dict setObject:playTime forKey:@"play_time"];
                 }else{
                     [dict setObject:@"0" forKey:@"play_time"];
+                }
+                if (totalTime != nil && [totalTime intValue] > 0) {
+                    [dict setObject:totalTime forKey:@"total_time"];
+                }else{
+                    [dict setObject:@"0" forKey:@"total_time"];
                 }
             }
         }
@@ -573,10 +579,16 @@
                 xinwenArr = [[NSMutableArray alloc]initWithArray:responseObject[results]];
                 for (NSMutableDictionary *dict in xinwenArr) {
                     NSString *playTime = [CommonCode readFromUserD:[NSString stringWithFormat:@"playHistory_%@_%@",self.jiemuID,dict[@"id"]]];
+                    NSString *totalTime = [CommonCode readFromUserD:[NSString stringWithFormat:@"class_totalTime_%@_%@",self.jiemuID,dict[@"id"]]];
                     if (playTime != nil && [playTime intValue] > 0) {
                         [dict setObject:playTime forKey:@"play_time"];
                     }else{
                         [dict setObject:@"0" forKey:@"play_time"];
+                    }
+                    if (totalTime != nil && [totalTime intValue] > 0) {
+                        [dict setObject:totalTime forKey:@"total_time"];
+                    }else{
+                        [dict setObject:@"0" forKey:@"total_time"];
                     }
                 }
                 [tableView reloadData];
@@ -1697,11 +1709,11 @@
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
     if ([tableView isEqual:xinwenshuaxinTableView]) {
         if (_isClass) {
-            if (isContinuePlay) {
+//            if (isContinuePlay) {
                 return IS_IPHONEX?55:40;
-            }else{
-                return 0.01f;
-            }
+//            }else{
+//                return 0.01f;
+//            }
         }else{
             return 0.01f;
         }
@@ -1713,7 +1725,6 @@
     else{
         return 0.01f;
     }
-    
 }
 
 /**
@@ -1721,6 +1732,10 @@
  */
 - (void)continuePlayAction
 {
+    if (!isContinuePlay) {
+        [[XWAlerLoginView alertWithTitle:@"暂无继续播放记录"] show];
+        return;
+    }
     //设置开始播放跳转上次记录
     [NewPlayVC shareInstance].starDate = [time intValue]/1000;
     //设置频道类型
@@ -1786,7 +1801,7 @@
         line.backgroundColor = [[UIColor grayColor] colorWithAlphaComponent:0.2];
         [sectionHeadView addSubview:line];
         
-        if (_isClass && isContinuePlay) {
+        if (_isClass) {
             return sectionHeadView;
         }else{
             return nil;
@@ -1861,9 +1876,12 @@
             playTimePercentLab.textColor = [UIColor lightGrayColor];
             playTimePercentLab.font = [UIFont systemFontOfSize:12.0];
             if ([xinwenArr[indexPath.row][@"post_time"] intValue] > 0) {
-                int totalTime = [xinwenArr[indexPath.row][@"post_time"] intValue]/1000;
+                int totalTime = [xinwenArr[indexPath.row][@"total_time"] intValue];
+                if (totalTime == 0) {
+                    totalTime = [xinwenArr[indexPath.row][@"post_time"] intValue]/1000;
+                }
                 int playTime = [xinwenArr[indexPath.row][@"play_time"] intValue];
-                playTimePercentLab.text = [NSString stringWithFormat:@"已播放%%%d",100*playTime/totalTime];
+                playTimePercentLab.text = [NSString stringWithFormat:@"已播放%d%%",100*playTime/totalTime];
             }
             if ([xinwenArr[indexPath.row][@"play_time"] intValue]>0) {
                 playTimePercentLab.hidden = NO;

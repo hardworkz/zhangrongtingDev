@@ -27,7 +27,8 @@
     [titleLab setFrame:CGRectMake(20.0 / 375 * IPHONE_W, 20.0 / 667 * SCREEN_HEIGHT, IPHONE_W - 40.0 / 375 * IPHONE_W, (titleHight + 25) / 667 * IPHONE_H)];
     _titleLabelF = titleLab.frame;
     //日期
-    _timeLabelF = CGRectMake(10.0 / 375 * IPHONE_W, CGRectGetMaxY(titleLab.frame) + 10.0 / 667 * IPHONE_H, IPHONE_W - 20.0 / 375 * IPHONE_W, 10.0 / 667 * IPHONE_H);
+    CGFloat timeHight = [self computeTextHeightWithString:self.timeString andWidth:(SCREEN_WIDTH-20) andFontSize:[UIFont systemFontOfSize:self.dateFont]];
+    _timeLabelF = CGRectMake(20.0 / 375 * IPHONE_W, CGRectGetMaxY(titleLab.frame) + 10.0 / 667 * IPHONE_H, IPHONE_W - 40.0 / 375 * IPHONE_W, timeHight);
     //新闻内容
     UITextView *zhengwenTextView = [[UITextView alloc]initWithFrame:CGRectMake(10.0 / 375 * IPHONE_W,CGRectGetMaxY(_timeLabelF) + 24.0 / 667 * IPHONE_H, IPHONE_W - 20.0 / 375 * IPHONE_W, 50.0 / 667 * IPHONE_H)];
     zhengwenTextView.scrollEnabled = NO;
