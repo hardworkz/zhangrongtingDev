@@ -1694,9 +1694,9 @@ static NSInteger goldTouchCount = 0;
     }
     if ([ZRT_PlayerManager manager].isPlaying) {//点击暂停
         //上传课堂播放数据
-        if ([ZRT_PlayerManager manager].playType == ZRTPlayTypeClassroom) {
-            [[ZRT_PlayerManager manager] uploadClassPlayHistoryData];
-        }
+//        if ([ZRT_PlayerManager manager].playType == ZRTPlayTypeClassroom) {
+//            [[ZRT_PlayerManager manager] uploadClassPlayHistoryData];
+//        }
         [[ZRT_PlayerManager manager] pausePlay];
         sender.selected = NO;
     }else{//点击播放
@@ -1724,7 +1724,7 @@ static NSInteger goldTouchCount = 0;
         BOOL isfirst = [[ZRT_PlayerManager manager] previousSong];
         //上传课堂播放数据
         if ([ZRT_PlayerManager manager].playType == ZRTPlayTypeClassroom) {
-            [[ZRT_PlayerManager manager] uploadClassPlayHistoryData];
+//            [[ZRT_PlayerManager manager] uploadClassPlayHistoryData];
             [ZRT_PlayerManager manager].act_sub_id = [ZRT_PlayerManager manager].currentSong[@"id"];
         }
         //已经是第一首，则不往下执行
@@ -1768,7 +1768,7 @@ static NSInteger goldTouchCount = 0;
         BOOL isLast = [[ZRT_PlayerManager manager] nextSong];
         //上传课堂播放数据
         if ([ZRT_PlayerManager manager].playType == ZRTPlayTypeClassroom) {
-            [[ZRT_PlayerManager manager] uploadClassPlayHistoryData];
+//            [[ZRT_PlayerManager manager] uploadClassPlayHistoryData];
             [ZRT_PlayerManager manager].act_sub_id = [ZRT_PlayerManager manager].currentSong[@"id"];
         }
         //已经是最后一首，则不往下执行

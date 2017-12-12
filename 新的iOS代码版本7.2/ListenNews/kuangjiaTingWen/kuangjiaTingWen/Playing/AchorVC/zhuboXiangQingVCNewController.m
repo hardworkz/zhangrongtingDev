@@ -71,6 +71,7 @@
     //是否有播放记录，控制继续播放按钮显示隐藏
     BOOL isContinuePlay;
     BOOL isCurrenVCShow;
+    BOOL isKeyboardShow;
 }
 
 @property (weak, nonatomic) CustomPageView *pagingView;
@@ -465,6 +466,25 @@
             }
         }
     }
+    
+    //设置本地播放记录数据
+    if (xinwenArr.count != 0 && self.isClass) {
+        for (NSMutableDictionary *dict in xinwenArr) {
+            NSString *playTime = [CommonCode readFromUserD:[NSString stringWithFormat:@"playHistory_%@_%@",self.jiemuID,dict[@"id"]]];
+            NSString *totalTime = [CommonCode readFromUserD:[NSString stringWithFormat:@"class_totalTime_%@_%@",self.jiemuID,dict[@"id"]]];
+            if (playTime != nil && [playTime intValue] > 0) {
+                [dict setObject:playTime forKey:@"play_time"];
+            }else{
+                [dict setObject:@"0" forKey:@"play_time"];
+            }
+            if (totalTime != nil && [totalTime intValue] > 0) {
+                [dict setObject:totalTime forKey:@"total_time"];
+            }else{
+                [dict setObject:@"0" forKey:@"total_time"];
+            }
+        }
+        [xinwenshuaxinTableView reloadData];
+    }
 }
 - (void)viewWillDisappear:(BOOL)animated{
     [super viewWillDisappear:animated];
@@ -551,75 +571,74 @@
  */
 - (void)xinwenRefresh:(UITableView *)tableView
 {
-    if (self.isClass) {
-        //设置本地播放记录数据
-        if (xinwenArr.count != 0) {
-            for (NSMutableDictionary *dict in xinwenArr) {
-                NSString *playTime = [CommonCode readFromUserD:[NSString stringWithFormat:@"playHistory_%@_%@",self.jiemuID,dict[@"id"]]];
-                NSString *totalTime = [CommonCode readFromUserD:[NSString stringWithFormat:@"class_totalTime_%@_%@",self.jiemuID,dict[@"id"]]];
-                if (playTime != nil && [playTime intValue] > 0) {
-                    [dict setObject:playTime forKey:@"play_time"];
-                }else{
-                    [dict setObject:@"0" forKey:@"play_time"];
-                }
-                if (totalTime != nil && [totalTime intValue] > 0) {
-                    [dict setObject:totalTime forKey:@"total_time"];
-                }else{
-                    [dict setObject:@"0" forKey:@"total_time"];
-                }
-            }
-        }
-        //获取课堂播放记录，判断是否有记录数据
-        [NetWorkTool postPaoGuoGetLastHistoryDataWithAct_id:self.jiemuID andUser_id:ExdangqianUserUid sccess:^(NSDictionary *responseObject) {
-            if ([responseObject[status] intValue] == 1) {//获取到播放记录
-                isContinuePlay = YES;
-                time = responseObject[@"time"];
-                number = responseObject[@"number"];
-                xinwenPageNumber = [responseObject[@"page"] intValue];
-                xinwenArr = [[NSMutableArray alloc]initWithArray:responseObject[results]];
-                for (NSMutableDictionary *dict in xinwenArr) {
-                    NSString *playTime = [CommonCode readFromUserD:[NSString stringWithFormat:@"playHistory_%@_%@",self.jiemuID,dict[@"id"]]];
-                    NSString *totalTime = [CommonCode readFromUserD:[NSString stringWithFormat:@"class_totalTime_%@_%@",self.jiemuID,dict[@"id"]]];
-                    if (playTime != nil && [playTime intValue] > 0) {
-                        [dict setObject:playTime forKey:@"play_time"];
-                    }else{
-                        [dict setObject:@"0" forKey:@"play_time"];
-                    }
-                    if (totalTime != nil && [totalTime intValue] > 0) {
-                        [dict setObject:totalTime forKey:@"total_time"];
-                    }else{
-                        [dict setObject:@"0" forKey:@"total_time"];
-                    }
-                }
-                [tableView reloadData];
-                if ([ZRT_PlayerManager manager].channelType == ChannelTypeDiscoverAnchor) {
-                    [ZRT_PlayerManager manager].songList = xinwenArr;
-                }
-            }else if ([responseObject[status] intValue] == 2){//没有获取到播放记录
-                isContinuePlay = NO;
-                xinwenArr = [[NSMutableArray alloc]initWithArray:responseObject[results]];
-                [tableView reloadData];
-                if ([ZRT_PlayerManager manager].channelType == ChannelTypeDiscoverAnchor) {
-                    [ZRT_PlayerManager manager].songList = xinwenArr;
-                }
-            }else{
-                isContinuePlay = NO;
-                [[XWAlerLoginView alertWithTitle:responseObject[msg]] show];
-            }
-            [tableView.mj_header endRefreshing];
-        } failure:^(NSError *error) {
-            RTLog(@"%@",error);
-            isContinuePlay = NO;
-            [tableView.mj_header endRefreshing];
-            if (isCurrenVCShow) {
-                [self xinwenRefresh:tableView];
-            }
-        }];
-    }else{
+//    if (self.isClass) {
+//        //获取课堂播放记录，判断是否有记录数据
+//        [NetWorkTool postPaoGuoGetLastHistoryDataWithAct_id:self.jiemuID andUser_id:ExdangqianUserUid sccess:^(NSDictionary *responseObject) {
+//            if ([responseObject[status] intValue] == 1) {//获取到播放记录
+//                isContinuePlay = YES;
+//                time = responseObject[@"time"];
+//                number = responseObject[@"number"];
+//                xinwenPageNumber = [responseObject[@"page"] intValue];
+//                xinwenArr = [[NSMutableArray alloc]initWithArray:responseObject[results]];
+//                for (NSMutableDictionary *dict in xinwenArr) {
+//                    NSString *playTime = [CommonCode readFromUserD:[NSString stringWithFormat:@"playHistory_%@_%@",self.jiemuID,dict[@"id"]]];
+//                    NSString *totalTime = [CommonCode readFromUserD:[NSString stringWithFormat:@"class_totalTime_%@_%@",self.jiemuID,dict[@"id"]]];
+//                    if (playTime != nil && [playTime intValue] > 0) {
+//                        [dict setObject:playTime forKey:@"play_time"];
+//                    }else{
+//                        [dict setObject:@"0" forKey:@"play_time"];
+//                    }
+//                    if (totalTime != nil && [totalTime intValue] > 0) {
+//                        [dict setObject:totalTime forKey:@"total_time"];
+//                    }else{
+//                        [dict setObject:@"0" forKey:@"total_time"];
+//                    }
+//                }
+//                [tableView reloadData];
+//                if ([ZRT_PlayerManager manager].channelType == ChannelTypeDiscoverAnchor) {
+//                    [ZRT_PlayerManager manager].songList = xinwenArr;
+//                }
+//            }else if ([responseObject[status] intValue] == 2){//没有获取到播放记录
+//                isContinuePlay = NO;
+//                xinwenArr = [[NSMutableArray alloc]initWithArray:responseObject[results]];
+//                [tableView reloadData];
+//                if ([ZRT_PlayerManager manager].channelType == ChannelTypeDiscoverAnchor) {
+//                    [ZRT_PlayerManager manager].songList = xinwenArr;
+//                }
+//            }else{
+//                isContinuePlay = NO;
+//                [[XWAlerLoginView alertWithTitle:responseObject[msg]] show];
+//            }
+//            [tableView.mj_header endRefreshing];
+//        } failure:^(NSError *error) {
+//            RTLog(@"%@",error);
+//            isContinuePlay = NO;
+//            [tableView.mj_header endRefreshing];
+//            if (isCurrenVCShow) {
+//                [self xinwenRefresh:tableView];
+//            }
+//        }];
+//    }else{
         [NetWorkTool postPaoGuoZhuBoOrJieMuMessageWithID:self.jiemuID andpage:@"1" andlimit:@"10" sccess:^(NSDictionary *responseObject) {
             if ([responseObject[results] isKindOfClass:[NSArray class]])
             {
                 xinwenArr = [[NSMutableArray alloc]initWithArray:responseObject[results]];
+                if (self.isClass) {
+                    for (NSMutableDictionary *dict in xinwenArr) {
+                        NSString *playTime = [CommonCode readFromUserD:[NSString stringWithFormat:@"playHistory_%@_%@",self.jiemuID,dict[@"id"]]];
+                        NSString *totalTime = [CommonCode readFromUserD:[NSString stringWithFormat:@"class_totalTime_%@_%@",self.jiemuID,dict[@"id"]]];
+                        if (playTime != nil && [playTime intValue] > 0) {
+                            [dict setObject:playTime forKey:@"play_time"];
+                        }else{
+                            [dict setObject:@"0" forKey:@"play_time"];
+                        }
+                        if (totalTime != nil && [totalTime intValue] > 0) {
+                            [dict setObject:totalTime forKey:@"total_time"];
+                        }else{
+                            [dict setObject:@"0" forKey:@"total_time"];
+                        }
+                    }
+                }
                 [tableView reloadData];
                 if ([ZRT_PlayerManager manager].channelType == ChannelTypeDiscoverAnchor) {
                     [ZRT_PlayerManager manager].songList = xinwenArr;
@@ -630,7 +649,7 @@
             NSLog(@"error = %@",error);
             [tableView.mj_header endRefreshing];
         }];
-    }
+//    }
 }
 /**
  新闻上拉加载更多
@@ -1178,6 +1197,8 @@
     }else{
         [self.navigationController popViewControllerAnimated:YES];
     }
+    //上传播放记录
+//    [[ZRT_PlayerManager manager] uploadClassPlayHistoryData];
 }
 
 - (void)shareAction:(UIButton *)sender {
@@ -1389,6 +1410,8 @@
     }else{
         [self.navigationController popViewControllerAnimated:YES];
     }
+    //上传播放记录
+//    [[ZRT_PlayerManager manager] uploadClassPlayHistoryData];
 }
 
 - (void)guanzhuBtnAction:(UIButton *)sender
@@ -1623,6 +1646,24 @@
     if (button.selected == YES) {
         [[ZRT_PlayerManager manager] pausePlay];
         button.selected = NO;
+        //设置本地播放记录数据
+        if (xinwenArr.count != 0 && self.isClass) {
+            for (NSMutableDictionary *dict in xinwenArr) {
+                NSString *playTime = [CommonCode readFromUserD:[NSString stringWithFormat:@"playHistory_%@_%@",self.jiemuID,dict[@"id"]]];
+                NSString *totalTime = [CommonCode readFromUserD:[NSString stringWithFormat:@"class_totalTime_%@_%@",self.jiemuID,dict[@"id"]]];
+                if (playTime != nil && [playTime intValue] > 0) {
+                    [dict setObject:playTime forKey:@"play_time"];
+                }else{
+                    [dict setObject:@"0" forKey:@"play_time"];
+                }
+                if (totalTime != nil && [totalTime intValue] > 0) {
+                    [dict setObject:totalTime forKey:@"total_time"];
+                }else{
+                    [dict setObject:@"0" forKey:@"total_time"];
+                }
+            }
+            [xinwenshuaxinTableView reloadData];
+        }
         return;
     }
     NSIndexPath *indexPath = button.indexPath;
@@ -1630,6 +1671,16 @@
     button.titleLab.textColor = gMainColor;
     _isTapPlayBtn = YES;
     
+    //设置开始播放时间
+    [NewPlayVC shareInstance].starDate = [xinwenArr[indexPath.row][@"play_time"] intValue];
+    //判断记录是否达到100%如果是则重置记录
+    if ([xinwenArr[indexPath.row][@"post_time"] intValue] > 0) {
+        int totalTime = [xinwenArr[indexPath.row][@"post_time"] intValue]/1000;
+        int playTime = [xinwenArr[indexPath.row][@"play_time"] intValue];
+        if (playTime/totalTime == 1) {
+            [NewPlayVC shareInstance].starDate = 0.0;
+        }
+    }
     //设置播放完成回调的block
     [[NewPlayVC shareInstance] achorVCDidClickedListPlayBtn];
     //设置频道类型
@@ -1639,6 +1690,7 @@
     //设置播放器播放内容类型
     [ZRT_PlayerManager manager].playType = ZRTPlayTypeClassroom;
     [ZRT_PlayerManager manager].act_id = self.jiemuID;
+    [ZRT_PlayerManager manager].act_sub_id = xinwenArr[indexPath.row][@"id"];
     //设置播放器播放完成自动加载更多block
     DefineWeakSelf;
     [ZRT_PlayerManager manager].loadMoreList = ^(NSInteger currentSongIndex) {
@@ -1708,15 +1760,15 @@
 
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
     if ([tableView isEqual:xinwenshuaxinTableView]) {
-        if (_isClass) {
+//        if (_isClass) {
 //            if (isContinuePlay) {
-                return IS_IPHONEX?55:40;
+//                return IS_IPHONEX?55:40;
 //            }else{
 //                return 0.01f;
 //            }
-        }else{
+//        }else{
             return 0.01f;
-        }
+//        }
     }
     //粉丝榜
     if ([tableView isEqual:fansWallTableView]){
@@ -1745,6 +1797,7 @@
     //设置播放器播放内容类型
     [ZRT_PlayerManager manager].playType = ZRTPlayTypeClassroom;
     [ZRT_PlayerManager manager].act_id = self.jiemuID;
+    [ZRT_PlayerManager manager].act_sub_id = xinwenArr[number.intValue][@"id"];
     //设置播放器播放完成自动加载更多block
     DefineWeakSelf;
     [ZRT_PlayerManager manager].loadMoreList = ^(NSInteger currentSongIndex) {
@@ -1764,6 +1817,9 @@
         [ZRT_PlayerManager manager].songList = xinwenArr;
         [self.navigationController.navigationBar setHidden:YES];
         [self.navigationController pushViewController:[NewPlayVC shareInstance] animated:YES];
+        if (![ZRT_PlayerManager manager].isPlaying) {
+            [[ZRT_PlayerManager manager] startPlay];
+        }
     }
     else{
         
@@ -1783,29 +1839,29 @@
 }
 - (nullable UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section{
     if ([tableView isEqual:xinwenshuaxinTableView]) {
-        UIView *sectionHeadView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH,IS_IPHONEX?55: 40)];
-        [sectionHeadView setBackgroundColor:[UIColor whiteColor]];
-        
-        UIButton *continuePlayButton = [UIButton buttonWithType:UIButtonTypeCustom];
-        [continuePlayButton setFrame:CGRectMake(0, 0, SCREEN_WIDTH,IS_IPHONEX?55: 40)];
-        [continuePlayButton setImage:[UIImage imageNamed:@"继续播放"] forState:UIControlStateNormal];
-        continuePlayButton.titleEdgeInsets = UIEdgeInsetsMake(0, 20,IS_IPHONEX?0:10, 0);
-        continuePlayButton.imageEdgeInsets = UIEdgeInsetsMake(0, 0, IS_IPHONEX?0:10, 0);
-        [continuePlayButton setTitle:@"继 续 播 放" forState:UIControlStateNormal];
-        continuePlayButton.titleLabel.font = [UIFont systemFontOfSize:15];
-        [continuePlayButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
-        [continuePlayButton addTarget:self action:@selector(continuePlayAction) forControlEvents:UIControlEventTouchUpInside];
-        [sectionHeadView addSubview:continuePlayButton];
-        
-        UIView *line = [[UIView alloc] initWithFrame:CGRectMake(10,IS_IPHONEX?49.5: 39.5, SCREEN_WIDTH, 0.5)];
-        line.backgroundColor = [[UIColor grayColor] colorWithAlphaComponent:0.2];
-        [sectionHeadView addSubview:line];
-        
-        if (_isClass) {
-            return sectionHeadView;
-        }else{
+//        UIView *sectionHeadView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH,IS_IPHONEX?55: 40)];
+//        [sectionHeadView setBackgroundColor:[UIColor whiteColor]];
+//
+//        UIButton *continuePlayButton = [UIButton buttonWithType:UIButtonTypeCustom];
+//        [continuePlayButton setFrame:CGRectMake(0, 0, SCREEN_WIDTH,IS_IPHONEX?55: 40)];
+//        [continuePlayButton setImage:[UIImage imageNamed:@"继续播放"] forState:UIControlStateNormal];
+//        continuePlayButton.titleEdgeInsets = UIEdgeInsetsMake(0, 20,IS_IPHONEX?0:10, 0);
+//        continuePlayButton.imageEdgeInsets = UIEdgeInsetsMake(0, 0, IS_IPHONEX?0:10, 0);
+//        [continuePlayButton setTitle:@"继 续 播 放" forState:UIControlStateNormal];
+//        continuePlayButton.titleLabel.font = [UIFont systemFontOfSize:15];
+//        [continuePlayButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+//        [continuePlayButton addTarget:self action:@selector(continuePlayAction) forControlEvents:UIControlEventTouchUpInside];
+//        [sectionHeadView addSubview:continuePlayButton];
+//
+//        UIView *line = [[UIView alloc] initWithFrame:CGRectMake(10,IS_IPHONEX?49.5: 39.5, SCREEN_WIDTH, 0.5)];
+//        line.backgroundColor = [[UIColor grayColor] colorWithAlphaComponent:0.2];
+//        [sectionHeadView addSubview:line];
+//
+//        if (_isClass) {
+//            return sectionHeadView;
+//        }else{
             return nil;
-        }
+//        }
     }else
     //粉丝榜
     if ([tableView isEqual:fansWallTableView]){
@@ -1876,12 +1932,12 @@
             playTimePercentLab.textColor = [UIColor lightGrayColor];
             playTimePercentLab.font = [UIFont systemFontOfSize:12.0];
             if ([xinwenArr[indexPath.row][@"post_time"] intValue] > 0) {
-                int totalTime = [xinwenArr[indexPath.row][@"total_time"] intValue];
+                float totalTime = [xinwenArr[indexPath.row][@"total_time"] intValue];
                 if (totalTime == 0) {
                     totalTime = [xinwenArr[indexPath.row][@"post_time"] intValue]/1000;
                 }
-                int playTime = [xinwenArr[indexPath.row][@"play_time"] intValue];
-                playTimePercentLab.text = [NSString stringWithFormat:@"已播放%d%%",100*playTime/totalTime];
+                float playTime = [xinwenArr[indexPath.row][@"play_time"] intValue];
+                playTimePercentLab.text = [NSString stringWithFormat:@"已播放%.2f%%",100*playTime/totalTime];
             }
             if ([xinwenArr[indexPath.row][@"play_time"] intValue]>0) {
                 playTimePercentLab.hidden = NO;
@@ -2092,6 +2148,7 @@
     if ([tableView isEqual:xinwenshuaxinTableView]){
         //设置开始播放时间
         [NewPlayVC shareInstance].starDate = [xinwenArr[indexPath.row][@"play_time"] intValue];
+        //判断记录是否达到100%如果是则重置记录
         if ([xinwenArr[indexPath.row][@"post_time"] intValue] > 0) {
             int totalTime = [xinwenArr[indexPath.row][@"post_time"] intValue]/1000;
             int playTime = [xinwenArr[indexPath.row][@"play_time"] intValue];
@@ -2460,16 +2517,12 @@ didSelectLinkWithTransitInformation:(NSDictionary *)components {
 }
 - (void)cancelBtnClick:(UIButton *)button
 {
-    if ([button isEqual:_cover]) {
-        [self.view resignFirstResponder];
-    }else{
-        [UIView animateWithDuration:0.5 animations:^{
-            _alertCommitBuyUserDataView.alpha = 0.;
-        }completion:^(BOOL finished) {
-            [_alertCommitBuyUserDataView removeFromSuperview];
-            [_cover removeFromSuperview];
-        }];
-    }
+    [UIView animateWithDuration:0.5 animations:^{
+        _alertCommitBuyUserDataView.alpha = 0.;
+    }completion:^(BOOL finished) {
+        [_alertCommitBuyUserDataView removeFromSuperview];
+        [_cover removeFromSuperview];
+    }];
 }
 - (void)commitClick
 {
@@ -2500,18 +2553,21 @@ didSelectLinkWithTransitInformation:(NSDictionary *)components {
     }
     [NetWorkTool get_userInfoWithaccessToken:AvatarAccessToken name:nameTextField.text phone:phoneTextField.text wx_num:wxTextField.text city:cityTextField.text job:jobTextField.text sccess:^(NSDictionary *responseObject) {
         if ([responseObject[status] intValue] == 1) {
-            XWAlerLoginView *alert = [[XWAlerLoginView alloc] initWithTitle:@"恭喜您，信息提交成功"];
+            XWAlerLoginView *alert = [[XWAlerLoginView alloc] initWithTitle:responseObject[msg]];
             [alert show];
             
-            NSMutableDictionary *userInfoDict = [CommonCode readFromUserD:@"dangqianUserInfo"];
-            [userInfoDict setValue:@"1" forKey:@"is_record"];
+            NSMutableDictionary *userInfoDict = [NSMutableDictionary dictionaryWithDictionary:[CommonCode readFromUserD:@"dangqianUserInfo"]];
+            NSMutableDictionary *result = [NSMutableDictionary dictionaryWithDictionary:userInfoDict[results]];
+            [result setValue:@"1" forKey:@"is_record"];
+            [userInfoDict setObject:result forKey:results];
             [CommonCode writeToUserD:userInfoDict andKey:@"dangqianUserInfo"];
+            
             //提交成功 --》 获取用户信息
             [[NSNotificationCenter defaultCenter] postNotificationName:@"updateUserInfo" object:nil];
             //退出提交
             [self cancelBtnClick:nil];
         }else{
-            XWAlerLoginView *alert = [[XWAlerLoginView alloc] initWithTitle:@"很抱歉，信息提交失败了"];
+            XWAlerLoginView *alert = [[XWAlerLoginView alloc] initWithTitle:responseObject[msg]];
             [alert show];
         }
     } failure:^(NSError *error) {
@@ -2571,11 +2627,11 @@ didSelectLinkWithTransitInformation:(NSDictionary *)components {
 #pragma mark - Keyboard notifications
 
 - (void)handleWillShowKeyboard:(NSNotification *)notification{
+    isKeyboardShow = YES;
     [self keyboardWillShowHide:notification];
-    
 }
-
 - (void)handleWillHideKeyboard:(NSNotification *)notification{
+    isKeyboardShow = NO;
     [self keyboardWillShowHide:notification];
 }
 
@@ -2596,8 +2652,10 @@ didSelectLinkWithTransitInformation:(NSDictionary *)components {
         if ([pinglunTextF isFirstResponder]) {
             pinglunBgView.center = CGPointMake(pinglunBgView.center.x, keyboardY  - pinglunBgView.bounds.size.height/2.0);
         }
-        if (IS_IPHONEX) {
-            _alertCommitBuyUserDataView.center = CGPointMake(_alertCommitBuyUserDataView.center.x, keyboardY  - _alertCommitBuyUserDataView.bounds.size.height/2.0);
+        if (isKeyboardShow) {
+            if (IS_IPHONEX) {
+                _alertCommitBuyUserDataView.center = CGPointMake(_alertCommitBuyUserDataView.center.x, keyboardY  - _alertCommitBuyUserDataView.bounds.size.height/2.0);
+            }
         }
     }];
 }

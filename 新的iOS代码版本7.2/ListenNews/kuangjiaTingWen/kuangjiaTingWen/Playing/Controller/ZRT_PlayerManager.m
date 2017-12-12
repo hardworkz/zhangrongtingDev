@@ -827,14 +827,14 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
 - (void)uploadClassPlayHistoryData
 {
 //    if ([self.playHistoryDataModel.time intValue] != 0) {
-        [NetWorkTool postPaoGuoUploadHistoryDataWithAct_id:self.act_id andUser_id:ExdangqianUserUid andNumber:self.playHistoryDataModel.number andTime:self.playHistoryDataModel.time sccess:^(NSDictionary *responseObject) {
-            if ([responseObject[status] intValue] == 1) {
-                RTLog(@"上传课堂播放记录成功");
+//        [NetWorkTool postPaoGuoUploadHistoryDataWithAct_id:self.act_id andUser_id:ExdangqianUserUid andNumber:self.playHistoryDataModel.number andTime:self.playHistoryDataModel.time sccess:^(NSDictionary *responseObject) {
+//            if ([responseObject[status] intValue] == 1) {
+//                RTLog(@"上传课堂播放记录成功");
 //                [[XWAlerLoginView alertWithTitle:responseObject[msg]] show];
-            }
-        } failure:^(NSError *error) {
-            RTLog(@"error:%@",error);
-        }];
+//            }
+//        } failure:^(NSError *error) {
+//            RTLog(@"error:%@",error);
+//        }];
 //    }
 }
 @end

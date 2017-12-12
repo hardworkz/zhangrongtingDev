@@ -1386,7 +1386,7 @@ static AVPlayer *_instancePlay = nil;
         
         if (i == 6) {
             UIButton *selected = [[UIButton alloc] initWithFrame:view.frame];
-            [selected setImage:[UIImage imageNamed:@"vip_noselected"] forState:UIControlStateNormal];
+            [selected setImage:[UIImage imageNamed:@"vip_deselected"] forState:UIControlStateNormal];
             selected.selected = YES;
             selected.imageView.contentMode = UIViewContentModeCenter;
             selected.accessibilityIdentifier = @"vip";
@@ -1397,7 +1397,7 @@ static AVPlayer *_instancePlay = nil;
             VipSelected = selected;
         }else if (i == 12) {
             UIButton *selected = [[UIButton alloc] initWithFrame:view.frame];
-            [selected setImage:[UIImage imageNamed:@"vip_noselected"] forState:UIControlStateNormal];
+            [selected setImage:[UIImage imageNamed:@"vip_deselected"] forState:UIControlStateNormal];
             [selected setImage:[UIImage imageNamed:@"vip_selected"] forState:UIControlStateSelected];
             selected.imageView.contentMode = UIViewContentModeCenter;
             selected.accessibilityIdentifier = @"class";
@@ -1413,7 +1413,7 @@ static AVPlayer *_instancePlay = nil;
         }else if (i == 4) {
             label.text = @"课程内容";
         }else if (i == 5) {
-            label.text = @"活动";
+            label.text = @"证书";
         }else if (i == 7) {
             label.text = @"超级会员";
         }else if (i == 8) {
@@ -1427,7 +1427,7 @@ static AVPlayer *_instancePlay = nil;
             [str setAttributes:@{NSForegroundColorAttributeName:ColorWithRGBA(229, 127, 83, 1)} range:NSMakeRange(0, 7)];
             label.attributedText = str;
         }else if (i == 11) {
-            label.text = @"VIP席位";
+            label.text = @"听闻商学院毕业证书";
         }else if (i == 13) {
             label.text = @"单个课程";
         }else if (i == 14) {
@@ -1455,7 +1455,7 @@ static AVPlayer *_instancePlay = nil;
     vipPriceLabel.numberOfLines = 0;
     vipPriceLabel.text = _classModel.svipPrice?[NSString stringWithFormat:@"¥%@",_classModel.svipPrice]:@"¥0";
     vipPriceLabel.textAlignment = NSTextAlignmentCenter;
-    vipPriceLabel.textColor = ColorWithRGBA(19, 154, 238, 1);
+    vipPriceLabel.textColor = ColorWithRGBA(162, 21, 37, 1);
     vipPriceLabel.font = [UIFont systemFontOfSize:15];
     [contentView addSubview:vipPriceLabel];
 
@@ -1469,8 +1469,13 @@ static AVPlayer *_instancePlay = nil;
     [commit addTarget:self action:@selector(commitSelected)];
     [contentView addSubview:commit];
     
+    UIButton *commitCover = [[UIButton alloc] initWithFrame:CGRectMake(SCREEN_WIDTH - 10 - 10 - 50, vipPriceLabel.y - 5, 50, 55)];
+    commitCover.backgroundColor = [UIColor clearColor];
+    [commitCover addTarget:self action:@selector(commitSelected)];
+    [contentView addSubview:commitCover];
+    
     contentView.height = CGRectGetMaxY(commit.frame) + 10;
-    contentView.y = (SCREEN_HEIGHT - contentView.height) * 0.5;
+    contentView.y = IS_IPHONEX?(SCREEN_HEIGHT - contentView.height) - 25:(SCREEN_HEIGHT - contentView.height) - 5;
     tableView.contentSize = CGSizeMake([self colXWithIndex:6], 0);
     
     return contentView;
