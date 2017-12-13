@@ -635,6 +635,7 @@
 //获取播放历史记录和列表数据
 + (void)postPaoGuoGetLastHistoryDataWithAct_id:(NSString *)act_id
                                     andUser_id:(NSString *)user_id
+                                     andNumber:(NSString *)number
                                         sccess:(void (^)(NSDictionary *responseObject))success
                                        failure:(void(^)(NSError *error))failure;
 ///	根据分类获取该分类下的新闻列表

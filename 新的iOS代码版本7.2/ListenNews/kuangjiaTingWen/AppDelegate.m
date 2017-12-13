@@ -657,9 +657,9 @@
 - (void)applicationWillTerminate:(UIApplication *)application
 {
     //上传课堂播放记录
-//    if ([ZRT_PlayerManager manager].playType == ZRTPlayTypeClassroom && [ZRT_PlayerManager manager].isPlaying == YES) {
-//        [[ZRT_PlayerManager manager] uploadClassPlayHistoryData];
-//    }
+    if ([ZRT_PlayerManager manager].playType == ZRTPlayTypeClassroom && [ZRT_PlayerManager manager].isPlaying == YES) {
+        [[ZRT_PlayerManager manager] uploadClassPlayHistoryData];
+    }
     //应用退出时保存已听过新闻ID
     [CommonCode writeToUserD:[NewPlayVC shareInstance].listenedNewsIDArray andKey:yitingguoxinwenID];
     //清空当前本地缓存的播放新闻，播放新闻ID

@@ -68,8 +68,6 @@
     NSString *time;
     NSString *number;
     
-    //是否有播放记录，控制继续播放按钮显示隐藏
-    BOOL isContinuePlay;
     BOOL isCurrenVCShow;
     BOOL isKeyboardShow;
 }
@@ -134,7 +132,6 @@
     self.view.backgroundColor = [UIColor whiteColor];
     _isRewardLoginBack = NO;
     _isReplyComment = NO;
-    isContinuePlay = NO;
     
     if ([[NSString stringWithFormat:@"%@",self.jiemuIs_fan] isEqualToString:@"0"]){
         isGuanZhu = NO;
@@ -571,54 +568,42 @@
  */
 - (void)xinwenRefresh:(UITableView *)tableView
 {
-//    if (self.isClass) {
-//        //获取课堂播放记录，判断是否有记录数据
-//        [NetWorkTool postPaoGuoGetLastHistoryDataWithAct_id:self.jiemuID andUser_id:ExdangqianUserUid sccess:^(NSDictionary *responseObject) {
-//            if ([responseObject[status] intValue] == 1) {//获取到播放记录
-//                isContinuePlay = YES;
-//                time = responseObject[@"time"];
-//                number = responseObject[@"number"];
-//                xinwenPageNumber = [responseObject[@"page"] intValue];
-//                xinwenArr = [[NSMutableArray alloc]initWithArray:responseObject[results]];
-//                for (NSMutableDictionary *dict in xinwenArr) {
-//                    NSString *playTime = [CommonCode readFromUserD:[NSString stringWithFormat:@"playHistory_%@_%@",self.jiemuID,dict[@"id"]]];
-//                    NSString *totalTime = [CommonCode readFromUserD:[NSString stringWithFormat:@"class_totalTime_%@_%@",self.jiemuID,dict[@"id"]]];
-//                    if (playTime != nil && [playTime intValue] > 0) {
-//                        [dict setObject:playTime forKey:@"play_time"];
-//                    }else{
-//                        [dict setObject:@"0" forKey:@"play_time"];
-//                    }
-//                    if (totalTime != nil && [totalTime intValue] > 0) {
-//                        [dict setObject:totalTime forKey:@"total_time"];
-//                    }else{
-//                        [dict setObject:@"0" forKey:@"total_time"];
-//                    }
-//                }
-//                [tableView reloadData];
-//                if ([ZRT_PlayerManager manager].channelType == ChannelTypeDiscoverAnchor) {
-//                    [ZRT_PlayerManager manager].songList = xinwenArr;
-//                }
-//            }else if ([responseObject[status] intValue] == 2){//没有获取到播放记录
-//                isContinuePlay = NO;
-//                xinwenArr = [[NSMutableArray alloc]initWithArray:responseObject[results]];
-//                [tableView reloadData];
-//                if ([ZRT_PlayerManager manager].channelType == ChannelTypeDiscoverAnchor) {
-//                    [ZRT_PlayerManager manager].songList = xinwenArr;
-//                }
-//            }else{
-//                isContinuePlay = NO;
-//                [[XWAlerLoginView alertWithTitle:responseObject[msg]] show];
-//            }
-//            [tableView.mj_header endRefreshing];
-//        } failure:^(NSError *error) {
-//            RTLog(@"%@",error);
-//            isContinuePlay = NO;
-//            [tableView.mj_header endRefreshing];
-//            if (isCurrenVCShow) {
-//                [self xinwenRefresh:tableView];
-//            }
-//        }];
-//    }else{
+    if (self.isClass) {
+        //获取课堂播放记录，判断是否有记录数据
+        [NetWorkTool postPaoGuoGetLastHistoryDataWithAct_id:self.jiemuID andUser_id:ExdangqianUserUid andNumber:[CommonCode readFromUserD:[NSString stringWithFormat:@"contiune_number_%@",self.jiemuID]] sccess:^(NSDictionary *responseObject) {
+            if ([responseObject[status] intValue] == 1) {
+                xinwenPageNumber = [responseObject[@"page"] intValue];
+                xinwenArr = [[NSMutableArray alloc]initWithArray:responseObject[results]];
+                for (NSMutableDictionary *dict in xinwenArr) {
+                    NSString *playTime = [CommonCode readFromUserD:[NSString stringWithFormat:@"playHistory_%@_%@",self.jiemuID,dict[@"id"]]];
+                    NSString *totalTime = [CommonCode readFromUserD:[NSString stringWithFormat:@"class_totalTime_%@_%@",self.jiemuID,dict[@"id"]]];
+                    if (playTime != nil && [playTime intValue] > 0) {
+                        [dict setObject:playTime forKey:@"play_time"];
+                    }else{
+                        [dict setObject:@"0" forKey:@"play_time"];
+                    }
+                    if (totalTime != nil && [totalTime intValue] > 0) {
+                        [dict setObject:totalTime forKey:@"total_time"];
+                    }else{
+                        [dict setObject:@"0" forKey:@"total_time"];
+                    }
+                }
+                [tableView reloadData];
+                if ([ZRT_PlayerManager manager].channelType == ChannelTypeDiscoverAnchor) {
+                    [ZRT_PlayerManager manager].songList = xinwenArr;
+                }
+            }else{
+                [[XWAlerLoginView alertWithTitle:responseObject[msg]] show];
+            }
+            [tableView.mj_header endRefreshing];
+        } failure:^(NSError *error) {
+            RTLog(@"%@",error);
+            [tableView.mj_header endRefreshing];
+            if (isCurrenVCShow) {
+                [self xinwenRefresh:tableView];
+            }
+        }];
+    }else{
         [NetWorkTool postPaoGuoZhuBoOrJieMuMessageWithID:self.jiemuID andpage:@"1" andlimit:@"10" sccess:^(NSDictionary *responseObject) {
             if ([responseObject[results] isKindOfClass:[NSArray class]])
             {
@@ -649,7 +634,7 @@
             NSLog(@"error = %@",error);
             [tableView.mj_header endRefreshing];
         }];
-//    }
+    }
 }
 /**
  新闻上拉加载更多
@@ -1198,7 +1183,7 @@
         [self.navigationController popViewControllerAnimated:YES];
     }
     //上传播放记录
-//    [[ZRT_PlayerManager manager] uploadClassPlayHistoryData];
+    [[ZRT_PlayerManager manager] uploadClassPlayHistoryData];
 }
 
 - (void)shareAction:(UIButton *)sender {
@@ -1411,7 +1396,7 @@
         [self.navigationController popViewControllerAnimated:YES];
     }
     //上传播放记录
-//    [[ZRT_PlayerManager manager] uploadClassPlayHistoryData];
+    [[ZRT_PlayerManager manager] uploadClassPlayHistoryData];
 }
 
 - (void)guanzhuBtnAction:(UIButton *)sender
@@ -1760,15 +1745,11 @@
 
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
     if ([tableView isEqual:xinwenshuaxinTableView]) {
-//        if (_isClass) {
-//            if (isContinuePlay) {
-//                return IS_IPHONEX?55:40;
-//            }else{
-//                return 0.01f;
-//            }
-//        }else{
+        if (_isClass) {
+            return IS_IPHONEX?55:40;
+        }else{
             return 0.01f;
-//        }
+        }
     }
     //粉丝榜
     if ([tableView isEqual:fansWallTableView]){
@@ -1784,12 +1765,12 @@
  */
 - (void)continuePlayAction
 {
-    if (!isContinuePlay) {
+    if ([CommonCode readFromUserD:[NSString stringWithFormat:@"contiune_PlayHistory_%@",self.jiemuID]] == nil) {
         [[XWAlerLoginView alertWithTitle:@"暂无继续播放记录"] show];
         return;
     }
     //设置开始播放跳转上次记录
-    [NewPlayVC shareInstance].starDate = [time intValue]/1000;
+    [NewPlayVC shareInstance].starDate = [[CommonCode readFromUserD:[NSString stringWithFormat:@"contiune_PlayHistory_%@",self.jiemuID]] intValue]/1000;
     //设置频道类型
     [ZRT_PlayerManager manager].channelType = ChannelTypeDiscoverAnchor;
     //设置播放界面内容类型
@@ -1830,7 +1811,8 @@
         //保存当前播放新闻Index
         ExcurrentNumber = [number intValue];
         //调用播放对应Index方法
-        [[NewPlayVC shareInstance] playFromIndex:ExcurrentNumber];
+        [[NewPlayVC shareInstance] playFromIndex:
+         [[CommonCode readFromUserD:[NSString stringWithFormat:@"contiune_number_%@",self.jiemuID]] intValue]];
         //跳转播放界面
         [self.navigationController.navigationBar setHidden:YES];
         [self.navigationController pushViewController:[NewPlayVC shareInstance] animated:YES];
@@ -1839,29 +1821,29 @@
 }
 - (nullable UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section{
     if ([tableView isEqual:xinwenshuaxinTableView]) {
-//        UIView *sectionHeadView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH,IS_IPHONEX?55: 40)];
-//        [sectionHeadView setBackgroundColor:[UIColor whiteColor]];
-//
-//        UIButton *continuePlayButton = [UIButton buttonWithType:UIButtonTypeCustom];
-//        [continuePlayButton setFrame:CGRectMake(0, 0, SCREEN_WIDTH,IS_IPHONEX?55: 40)];
-//        [continuePlayButton setImage:[UIImage imageNamed:@"继续播放"] forState:UIControlStateNormal];
-//        continuePlayButton.titleEdgeInsets = UIEdgeInsetsMake(0, 20,IS_IPHONEX?0:10, 0);
-//        continuePlayButton.imageEdgeInsets = UIEdgeInsetsMake(0, 0, IS_IPHONEX?0:10, 0);
-//        [continuePlayButton setTitle:@"继 续 播 放" forState:UIControlStateNormal];
-//        continuePlayButton.titleLabel.font = [UIFont systemFontOfSize:15];
-//        [continuePlayButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
-//        [continuePlayButton addTarget:self action:@selector(continuePlayAction) forControlEvents:UIControlEventTouchUpInside];
-//        [sectionHeadView addSubview:continuePlayButton];
-//
-//        UIView *line = [[UIView alloc] initWithFrame:CGRectMake(10,IS_IPHONEX?49.5: 39.5, SCREEN_WIDTH, 0.5)];
-//        line.backgroundColor = [[UIColor grayColor] colorWithAlphaComponent:0.2];
-//        [sectionHeadView addSubview:line];
-//
-//        if (_isClass) {
-//            return sectionHeadView;
-//        }else{
+        UIView *sectionHeadView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH,IS_IPHONEX?55: 40)];
+        [sectionHeadView setBackgroundColor:[UIColor whiteColor]];
+
+        UIButton *continuePlayButton = [UIButton buttonWithType:UIButtonTypeCustom];
+        [continuePlayButton setFrame:CGRectMake(0, 0, SCREEN_WIDTH,IS_IPHONEX?55: 40)];
+        [continuePlayButton setImage:[UIImage imageNamed:@"继续播放"] forState:UIControlStateNormal];
+        continuePlayButton.titleEdgeInsets = UIEdgeInsetsMake(0, 20,IS_IPHONEX?0:10, 0);
+        continuePlayButton.imageEdgeInsets = UIEdgeInsetsMake(0, 0, IS_IPHONEX?0:10, 0);
+        [continuePlayButton setTitle:@"继 续 播 放" forState:UIControlStateNormal];
+        continuePlayButton.titleLabel.font = [UIFont systemFontOfSize:15];
+        [continuePlayButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+        [continuePlayButton addTarget:self action:@selector(continuePlayAction) forControlEvents:UIControlEventTouchUpInside];
+        [sectionHeadView addSubview:continuePlayButton];
+
+        UIView *line = [[UIView alloc] initWithFrame:CGRectMake(10,IS_IPHONEX?49.5: 39.5, SCREEN_WIDTH, 0.5)];
+        line.backgroundColor = [[UIColor grayColor] colorWithAlphaComponent:0.2];
+        [sectionHeadView addSubview:line];
+
+        if (_isClass) {
+            return sectionHeadView;
+        }else{
             return nil;
-//        }
+        }
     }else
     //粉丝榜
     if ([tableView isEqual:fansWallTableView]){

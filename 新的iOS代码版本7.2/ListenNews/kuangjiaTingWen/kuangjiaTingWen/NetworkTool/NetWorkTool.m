@@ -1329,11 +1329,15 @@ NSMutableDictionary *dic = [[NSMutableDictionary alloc]initWithCapacity:1
     [self asyncNetworkingUrl:@"/interfaceNew/insertHistory" andDict:dic success:success failure:failure];
 }
 //获取播放历史记录和列表数据
-+ (void)postPaoGuoGetLastHistoryDataWithAct_id:(NSString *)act_id andUser_id:(NSString *)user_id sccess:(void (^)(NSDictionary *responseObject))success failure:(void(^)(NSError *error))failure
++ (void)postPaoGuoGetLastHistoryDataWithAct_id:(NSString *)act_id
+                                    andUser_id:(NSString *)user_id
+                                    andNumber:(NSString *)number
+                                        sccess:(void (^)(NSDictionary *responseObject))success failure:(void(^)(NSError *error))failure
 {
     NSMutableDictionary *dic = [[NSMutableDictionary alloc]initWithCapacity:1];
     dic[@"act_id"] = act_id;
     dic[@"user_id"] = user_id;
+    dic[@"number"] = number;
     [self asyncNetworkingUrl:@"/interfaceNew/getLastPlay" andDict:dic success:success failure:failure];
 }
 

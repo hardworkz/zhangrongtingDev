@@ -219,5 +219,5 @@ typedef NS_ENUM(NSInteger, ZRTPlayStatus) {
 /**
  上传课堂播放历史记录
  */
-//- (void)uploadClassPlayHistoryData;
+- (void)uploadClassPlayHistoryData;
 @end

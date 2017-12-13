@@ -620,7 +620,7 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
         //判断当前播放的是否是课堂
         if (self.playType == ZRTPlayTypeClassroom) {
             weakSelf.playHistoryDataModel.time = [NSString stringWithFormat:@"%.0f",currentTime *1000];
-            weakSelf.playHistoryDataModel.number = [NSString stringWithFormat:@"%ld",weakSelf.currentSongIndex];
+            weakSelf.playHistoryDataModel.number = [NSString stringWithFormat:@"%ld",(long)weakSelf.currentSongIndex];
             weakSelf.playHistoryDataModel.act_id = weakSelf.act_id;
             //保存播放时间到本地
             RTLog(@"保存时间key:%@---时间：%@",[NSString stringWithFormat:@"playHistory_%@_%@",weakSelf.act_id,weakSelf.act_sub_id],[NSString stringWithFormat:@"%.0f",currentTime]);
@@ -826,6 +826,9 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
  */
 - (void)uploadClassPlayHistoryData
 {
+    [CommonCode writeToUserD:self.playHistoryDataModel.time andKey:[NSString stringWithFormat:@"contiune_PlayHistory_%@",self.act_id]];
+    [CommonCode writeToUserD:self.playHistoryDataModel.number andKey:[NSString stringWithFormat:@"contiune_number_%@",self.act_id]];
+    
 //    if ([self.playHistoryDataModel.time intValue] != 0) {
 //        [NetWorkTool postPaoGuoUploadHistoryDataWithAct_id:self.act_id andUser_id:ExdangqianUserUid andNumber:self.playHistoryDataModel.number andTime:self.playHistoryDataModel.time sccess:^(NSDictionary *responseObject) {
 //            if ([responseObject[status] intValue] == 1) {
