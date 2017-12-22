@@ -66,7 +66,6 @@
 @implementation BlogViewController
 - (void)viewDidLoad{
     [super viewDidLoad];
-//    self.navBarBgAlpha = @"0.0";
     [self setupData];
     [self setupView];
 }
@@ -133,6 +132,7 @@
     [self.blogTableview.mj_header beginRefreshing];
     self.automaticallyAdjustsScrollViewInsets = NO;
     self.navigationController.navigationBar.translucent = NO;
+    AdjustsScrollViewInsetNever(self, self.blogTableview)
     
     
     ExisRigester = NO;
@@ -244,13 +244,10 @@
 
 - (UITableView *)blogTableview {
     if (!_blogTableview) {
-        _blogTableview = [[UITableView alloc]initWithFrame:CGRectMake(0, 64, SCREEN_WIDTH, SCREEN_HEIGHT - 64) style:UITableViewStylePlain];
+        _blogTableview = [[UITableView alloc]initWithFrame:CGRectMake(0,IS_IPHONEX?IPHONEX_TOP_H:64, SCREEN_WIDTH,IS_IPHONEX?SCREEN_HEIGHT - IPHONEX_TOP_H:SCREEN_HEIGHT - 64) style:UITableViewStylePlain];
         [_blogTableview setDelegate:self];
         [_blogTableview setDataSource:self];
         _blogTableview.tableFooterView =  [UIView new];
-//        [_blogTableview setContentOffset:CGPointMake(SCREEN_WIDTH, SCREEN_HEIGHT - 64)];
-//        [_blogTableview setContentSize:CGSizeMake(SCREEN_WIDTH, SCREEN_HEIGHT - 64)];
-//        [_blogTableview setContentInset:UIEdgeInsetsMake(0, 0, 0, 150)];
     }
     return  _blogTableview;
 }

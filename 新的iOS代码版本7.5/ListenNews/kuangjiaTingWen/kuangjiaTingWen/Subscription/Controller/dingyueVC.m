@@ -79,6 +79,8 @@
     
     [self.view addSubview:self.tableView];
     
+    AdjustsScrollViewInsetNever(self, self.tableView)
+    
     RegisterNotify(@"loginSccess", @selector(refreshList))
 }
 - (void)refreshList
@@ -347,7 +349,7 @@
 {
     if (!_tableView)
     {
-        _tableView = [[UITableView alloc]initWithFrame:CGRectMake(0, 0, IPHONE_W, IPHONE_H - 64) style:UITableViewStylePlain];
+        _tableView = [[UITableView alloc]initWithFrame:CGRectMake(0,IS_IPHONEX?IPHONEX_TOP_H:64, IPHONE_W,IS_IPHONEX?IPHONE_H - IPHONEX_BOTTOM_H - IPHONEX_TOP_H :IPHONE_H - 49 - 64) style:UITableViewStylePlain];
         _tableView.delegate = self;
         _tableView.dataSource = self;
         [_tableView setSeparatorStyle:UITableViewCellSeparatorStyleNone];
