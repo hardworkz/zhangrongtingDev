@@ -110,6 +110,7 @@
         UILabel *content = [[UILabel alloc] init];
         content.textAlignment = NSTextAlignmentLeft;
         content.font = [UIFont systemFontOfSize:16.0];
+        content.textColor = TITLE_COLOR_HEX;
         content.numberOfLines = 0;
         [self.contentView addSubview:content];
         self.content = content;
@@ -484,7 +485,7 @@
         }
     }else{
         if (self.addReview) {
-            self.addReview(self,frameModel.model);
+            self.addReview(self,frameModel.model,_commentIndexRow);
         }
     }
 }
@@ -538,7 +539,7 @@
 - (void)userReviewClickedWithModel:(child_commentModel *)model
 {
     if (self.addReview) {
-        self.addReview(self,model);
+        self.addReview(self,model,_commentIndexRow);
     }
 }
 @end

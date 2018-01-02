@@ -61,7 +61,7 @@
         describe.textColor = gTextColorSub;
         describe.numberOfLines = 0;
         describe.textAlignment = NSTextAlignmentLeft;
-        describe.font = gFontMain14;
+        describe.font = [UIFont fontWithName:@"PingFangSC-Semibold" size:14.0];
         [self.contentView addSubview:describe];
         
         

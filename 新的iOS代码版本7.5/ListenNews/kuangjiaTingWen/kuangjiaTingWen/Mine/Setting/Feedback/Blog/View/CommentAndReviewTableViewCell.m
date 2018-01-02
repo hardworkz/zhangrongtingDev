@@ -35,26 +35,27 @@
         UIButton *reviewer = [[UIButton alloc] init];
         [reviewer setTitleColor:gMainColor forState:UIControlStateNormal];
         [reviewer addTarget:self action:@selector(name_clicked:) forControlEvents:UIControlEventTouchUpInside];
-        reviewer.titleLabel.font = gFontMain15;
+        reviewer.titleLabel.font = CUSTOM_FONT_TYPE(15.0);
         [self.contentView addSubview:reviewer];
         self.reviewer = reviewer;
         
         UILabel *review = [[UILabel alloc] init];
         review.text = @"回复";
-        review.font = gFontMain14;
+        review.font = CUSTOM_FONT_TYPE(14.0);
         [self.contentView addSubview:review];
         self.review = review;
         
         UIButton *commenter = [[UIButton alloc] init];
         [commenter setTitleColor:gMainColor forState:UIControlStateNormal];
         [commenter addTarget:self action:@selector(name_clicked:) forControlEvents:UIControlEventTouchUpInside];
-        commenter.titleLabel.font = gFontMain15;
+        commenter.titleLabel.font = CUSTOM_FONT_TYPE(15.0);
         [self.contentView addSubview:commenter];
         self.commenter = commenter;
         
         UILabel *content = [[UILabel alloc] init];
         content.numberOfLines = 0;
-        content.font = gFontMain15;
+        content.textColor = TITLE_COLOR_HEX;
+        content.font = CUSTOM_FONT_TYPE(15.0);
         [self.contentView addSubview:content];
         self.content = content;
     }
@@ -94,6 +95,9 @@
         object = [object nextResponder];
     }
     child_commentModel *model = _frameModel.model;
+    if (model.createtime == nil) {
+        return;
+    }
     
     gerenzhuyeVC *gerenzhuye = [gerenzhuyeVC new];
     gerenzhuye.isNewsComment = NO;

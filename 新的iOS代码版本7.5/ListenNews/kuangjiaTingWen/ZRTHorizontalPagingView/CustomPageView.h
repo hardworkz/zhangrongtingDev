@@ -26,9 +26,9 @@
 @property (nonatomic, strong) NSLayoutConstraint *magnifyTopConstraint;
 
 /**
- *  切换视图
+ *  切换视图容器
  */
-@property (nonatomic, strong, readonly) UIView *segmentView;
+@property (nonatomic, strong, readwrite) UIView  *segmentView;
 
 /**
  *  视图切换的回调block

@@ -14,7 +14,6 @@
 @property (nonatomic, strong) NSArray            *segmentButtons;
 @property (nonatomic, strong) NSArray            *contentViews;
 
-@property (nonatomic, strong, readwrite) UIView  *segmentView;
 
 @property (nonatomic, strong) UIScrollView   *horizontalScrollView;
 

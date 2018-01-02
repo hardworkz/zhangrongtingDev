@@ -20,8 +20,6 @@ static NSString *const kvo_playbackBufferEmpty = @"playbackBufferEmpty";
 static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
 
 @interface ZRT_PlayerManager ()
-//播放属性
-@property (nonatomic, strong) AVPlayerItem           *playerItem;
 @end
 @implementation ZRT_PlayerManager
 + (instancetype)manager {
@@ -161,7 +159,7 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
     if([[UIDevice currentDevice] systemVersion].intValue>=10){
         return self.player.timeControlStatus == AVPlayerTimeControlStatusPlaying;
     }else{
-        return self.player.rate==self.playRate;
+        return self.player.rate>0&&self.player.error == nil;
     }
 }
 
@@ -320,6 +318,9 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
             [self.player play];
             break;
     }
+    if ([[CommonCode readFromUserD:@"play_rate"] floatValue] != 0) {
+        [ZRT_PlayerManager manager].playRate = [[CommonCode readFromUserD:@"play_rate"] floatValue];
+    }   
 }
 /*
  * 暂停播放
@@ -464,6 +465,12 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
     // 每次都重新创建Player，替换replaceCurrentItemWithPlayerItem:，该方法阻塞线程
     self.player = [AVPlayer playerWithPlayerItem:self.playerItem];
     
+    if([[UIDevice currentDevice] systemVersion].intValue>=10){
+        //      增加下面这行可以解决iOS10兼容性问题了
+        self.player.automaticallyWaitsToMinimizeStalling = NO;
+    }
+    
+    
     //给当前歌曲添加监控
     [self addObserver];
     
@@ -556,6 +563,10 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
     // 每次都重新创建Player，替换replaceCurrentItemWithPlayerItem:，该方法阻塞线程
     self.player = [AVPlayer playerWithPlayerItem:self.playerItem];
     
+    if([[UIDevice currentDevice] systemVersion].intValue>=10){
+        //      增加下面这行可以解决iOS10兼容性问题了
+        self.player.automaticallyWaitsToMinimizeStalling = NO;
+    }
     //给当前歌曲添加监控
     [self addObserver];
     
@@ -585,6 +596,10 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
     // 每次都重新创建Player，替换replaceCurrentItemWithPlayerItem:该方法阻塞线程
     self.player = [AVPlayer playerWithPlayerItem:self.playerItem];
     
+    if([[UIDevice currentDevice] systemVersion].intValue>=10){
+        //      增加下面这行可以解决iOS10兼容性问题了
+        self.player.automaticallyWaitsToMinimizeStalling = NO;
+    }
     //给当前歌曲添加监控
     [self addObserver];
     
@@ -600,7 +615,7 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
     AVPlayerItem *songItem = self.player.currentItem;
     //更新播放器进度
     MJWeakSelf
-    _timeObserve = [self.player addPeriodicTimeObserverForInterval:CMTimeMake(1.0, self.playRate) queue:dispatch_get_main_queue() usingBlock:^(CMTime time)
+    _timeObserve = [self.player addPeriodicTimeObserverForInterval:CMTimeMake(1, 1) queue:dispatch_get_main_queue() usingBlock:^(CMTime time)
     {
         float currentTime = CMTimeGetSeconds(time);
         float total = CMTimeGetSeconds(songItem.duration);
@@ -702,6 +717,9 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
             case AVPlayerStatusReadyToPlay:
                 _status = ZRTPlayStatusReadyToPlay;
                 [APPDELEGATE configNowPlayingCenter];
+                if ([[CommonCode readFromUserD:@"play_rate"] floatValue] != 0) {
+                    [ZRT_PlayerManager manager].playRate = [[CommonCode readFromUserD:@"play_rate"] floatValue];
+                }
                 RTLog(@"KVO：准备完毕");
                 break;
             case AVPlayerStatusFailed:

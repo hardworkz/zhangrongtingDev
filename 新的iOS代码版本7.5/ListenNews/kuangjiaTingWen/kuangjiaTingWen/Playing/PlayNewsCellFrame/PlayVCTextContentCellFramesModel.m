@@ -23,11 +23,11 @@
     titleLab.frame = CGRectMake(20.0 / 375 * IPHONE_W, 20.0 / 667 * SCREEN_HEIGHT, IPHONE_W - 40.0 / 375 * IPHONE_W, 40.0 / 667 * IPHONE_H);
     titleLab.font = [UIFont boldSystemFontOfSize:self.titleFontSize];
     
-    CGFloat titleHight = [self computeTextHeightWithString:self.title andWidth:(SCREEN_WIDTH-20) andFontSize:[UIFont systemFontOfSize:self.titleFontSize]];
+    CGFloat titleHight = [self computeTextHeightWithString:self.title andWidth:(SCREEN_WIDTH-20) andFontSize:CUSTOM_FONT_TYPE(self.titleFontSize)];
     [titleLab setFrame:CGRectMake(20.0 / 375 * IPHONE_W, 20.0 / 667 * SCREEN_HEIGHT, IPHONE_W - 40.0 / 375 * IPHONE_W, (titleHight + 25) / 667 * IPHONE_H)];
     _titleLabelF = titleLab.frame;
     //日期
-    CGFloat timeHight = [self computeTextHeightWithString:self.timeString andWidth:(SCREEN_WIDTH-20) andFontSize:[UIFont systemFontOfSize:self.dateFont]];
+    CGFloat timeHight = [self computeTextHeightWithString:self.timeString andWidth:(SCREEN_WIDTH-20) andFontSize:CUSTOM_FONT_TYPE(self.dateFont)];
     _timeLabelF = CGRectMake(20.0 / 375 * IPHONE_W, CGRectGetMaxY(titleLab.frame) + 10.0 / 667 * IPHONE_H, IPHONE_W - 40.0 / 375 * IPHONE_W, timeHight);
     //新闻内容
     UITextView *zhengwenTextView = [[UITextView alloc]initWithFrame:CGRectMake(10.0 / 375 * IPHONE_W,CGRectGetMaxY(_timeLabelF) + 24.0 / 667 * IPHONE_H, IPHONE_W - 20.0 / 375 * IPHONE_W, 50.0 / 667 * IPHONE_H)];
@@ -36,7 +36,7 @@
     zhengwenTextView.scrollsToTop = NO;
     NSString *str1 = [_excerpt stringByReplacingOccurrencesOfString:@"\r" withString:@""];
     zhengwenTextView.text = str1;
-    zhengwenTextView.font = [UIFont systemFontOfSize:self.titleFontSize];
+    zhengwenTextView.font = CUSTOM_FONT_TYPE(self.titleFontSize);
     NSMutableParagraphStyle *paragraphStyle = [[NSMutableParagraphStyle alloc]init];
     [paragraphStyle setLineSpacing:8.0];
     [paragraphStyle setAlignment:NSTextAlignmentLeft];
@@ -44,7 +44,7 @@
     [paragraphStyle setLineBreakMode:NSLineBreakByCharWrapping];
     [zhengwenTextView sizeToFit];
     if (zhengwenTextView.text.length != 0){
-        NSMutableAttributedString *attributedString =  [[NSMutableAttributedString alloc] initWithString:zhengwenTextView.text attributes:@{NSForegroundColorAttributeName : gTextDownload,NSFontAttributeName : [UIFont systemFontOfSize:self.titleFontSize]}];
+        NSMutableAttributedString *attributedString =  [[NSMutableAttributedString alloc] initWithString:zhengwenTextView.text attributes:@{NSForegroundColorAttributeName : gTextDownload,NSFontAttributeName : CUSTOM_FONT_TYPE(self.titleFontSize)}];
         [attributedString addAttribute:NSParagraphStyleAttributeName value:paragraphStyle range:NSMakeRange(0, zhengwenTextView.text.length)];
         zhengwenTextView.attributedText = attributedString;
     }

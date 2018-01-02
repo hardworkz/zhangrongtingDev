@@ -40,12 +40,12 @@
     //用户头像
     _headerImageF = CGRectMake(10, 10, 46, 46);
     //用户昵称
-    CGSize nameSize = [[model.user.user_nicename isEqualToString:@""] ? model.user.user_login :model.user.user_nicename boundingRectWithSize:CGSizeMake(MAXFLOAT, MAXFLOAT) options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:[UIFont systemFontOfSize:16.0]} context:nil].size;
+    CGSize nameSize = [[model.user.user_nicename isEqualToString:@""] ? model.user.user_login :model.user.user_nicename boundingRectWithSize:CGSizeMake(MAXFLOAT, MAXFLOAT) options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:CUSTOM_FONT_TYPE(16.0)} context:nil].size;
     _nameLabeF = CGRectMake(CGRectGetMaxX(_headerImageF) + 14, 10, nameSize.width, 25);
     //发布时间
     _creat_timeLabelF = CGRectMake(SCREEN_WIDTH - 27 - 100, 17, 100, 18);
     //发布内容
-    CGSize contentSize = [model.comment boundingRectWithSize:CGSizeMake(SCREEN_WIDTH - _nameLabeF.origin.x - 10, MAXFLOAT) options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:[UIFont systemFontOfSize:16.0]} context:nil].size;
+    CGSize contentSize = [model.comment boundingRectWithSize:CGSizeMake(SCREEN_WIDTH - _nameLabeF.origin.x - 10, MAXFLOAT) options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:CUSTOM_FONT_TYPE(16.0)} context:nil].size;
     _contentF = CGRectMake(_nameLabeF.origin.x, CGRectGetMaxY(_nameLabeF) + 10, contentSize.width, contentSize.height);
     //发布图片
     //处理图片

@@ -170,6 +170,7 @@
 		69919FC21ED2D17100E31757 /* UIButton+Extension.m in Sources */ = {isa = PBXBuildFile; fileRef = 69919FBD1ED2D17100E31757 /* UIButton+Extension.m */; };
 		69919FC31ED2D17100E31757 /* UIImage+Extension.m in Sources */ = {isa = PBXBuildFile; fileRef = 69919FBF1ED2D17100E31757 /* UIImage+Extension.m */; };
 		69919FC41ED2D17100E31757 /* UIImageView+Extension.m in Sources */ = {isa = PBXBuildFile; fileRef = 69919FC11ED2D17100E31757 /* UIImageView+Extension.m */; };
+		69921FEB1FFB2FAA009E1ED7 /* mineVCHeaderTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 69921FEA1FFB2FAA009E1ED7 /* mineVCHeaderTableViewCell.m */; };
 		699582001EC559D20037E9A4 /* FeedBackAndListenFriendModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 699581FF1EC559D20037E9A4 /* FeedBackAndListenFriendModel.m */; };
 		699582031EC55A140037E9A4 /* BlobNewTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 699582021EC55A140037E9A4 /* BlobNewTableViewCell.m */; };
 		699582061EC55A380037E9A4 /* FeedBackAndListenFriendFrameModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 699582051EC55A380037E9A4 /* FeedBackAndListenFriendFrameModel.m */; };
@@ -182,6 +183,8 @@
 		699CA1F91EFA23B300670704 /* newsDetailModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 699CA1F81EFA23B300670704 /* newsDetailModel.m */; };
 		699CA1FC1EFA23CA00670704 /* newsActModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 699CA1FB1EFA23CA00670704 /* newsActModel.m */; };
 		699CA1FF1EFA23DF00670704 /* rewardModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 699CA1FE1EFA23DF00670704 /* rewardModel.m */; };
+		699F65BE1FF367C500E87320 /* UILabel+FontChange.m in Sources */ = {isa = PBXBuildFile; fileRef = 699F65BD1FF367C500E87320 /* UILabel+FontChange.m */; };
+		699F65C61FF3836000E87320 /* SimHei.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 699F65C51FF3835F00E87320 /* SimHei.ttf */; };
 		69A0B5031F30610B0028D5A0 /* PlayDefaultRewardTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 69A0B5021F30610B0028D5A0 /* PlayDefaultRewardTableViewCell.m */; };
 		69A477EB1F09D038001D8856 /* RootViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 69A477EA1F09D038001D8856 /* RootViewController.m */; };
 		69A592421FC81180003F02C9 /* ClassPlayHistoryDataModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 69A592411FC81180003F02C9 /* ClassPlayHistoryDataModel.m */; };
@@ -784,6 +787,8 @@
 		69919FBF1ED2D17100E31757 /* UIImage+Extension.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+Extension.m"; sourceTree = "<group>"; };
 		69919FC01ED2D17100E31757 /* UIImageView+Extension.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImageView+Extension.h"; sourceTree = "<group>"; };
 		69919FC11ED2D17100E31757 /* UIImageView+Extension.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImageView+Extension.m"; sourceTree = "<group>"; };
+		69921FE91FFB2FAA009E1ED7 /* mineVCHeaderTableViewCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = mineVCHeaderTableViewCell.h; sourceTree = "<group>"; };
+		69921FEA1FFB2FAA009E1ED7 /* mineVCHeaderTableViewCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = mineVCHeaderTableViewCell.m; sourceTree = "<group>"; };
 		699581FE1EC559D20037E9A4 /* FeedBackAndListenFriendModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FeedBackAndListenFriendModel.h; sourceTree = "<group>"; };
 		699581FF1EC559D20037E9A4 /* FeedBackAndListenFriendModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FeedBackAndListenFriendModel.m; sourceTree = "<group>"; };
 		699582011EC55A140037E9A4 /* BlobNewTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BlobNewTableViewCell.h; sourceTree = "<group>"; };
@@ -809,6 +814,9 @@
 		699CA1FB1EFA23CA00670704 /* newsActModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = newsActModel.m; sourceTree = "<group>"; };
 		699CA1FD1EFA23DF00670704 /* rewardModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = rewardModel.h; sourceTree = "<group>"; };
 		699CA1FE1EFA23DF00670704 /* rewardModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = rewardModel.m; sourceTree = "<group>"; };
+		699F65BC1FF367C500E87320 /* UILabel+FontChange.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UILabel+FontChange.h"; sourceTree = "<group>"; };
+		699F65BD1FF367C500E87320 /* UILabel+FontChange.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "UILabel+FontChange.m"; sourceTree = "<group>"; };
+		699F65C51FF3835F00E87320 /* SimHei.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = SimHei.ttf; sourceTree = "<group>"; };
 		69A0B5011F30610B0028D5A0 /* PlayDefaultRewardTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PlayDefaultRewardTableViewCell.h; sourceTree = "<group>"; };
 		69A0B5021F30610B0028D5A0 /* PlayDefaultRewardTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PlayDefaultRewardTableViewCell.m; sourceTree = "<group>"; };
 		69A477E91F09D038001D8856 /* RootViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RootViewController.h; sourceTree = "<group>"; };
@@ -1488,6 +1496,7 @@
 		636E33861D01154C002BA6DD /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				699F65C51FF3835F00E87320 /* SimHei.ttf */,
 				636E33871D01154C002BA6DD /* main.m */,
 				636E33D61D0127DD002BA6DD /* pchfile.pch */,
 			);
@@ -2174,6 +2183,8 @@
 			children = (
 				69C7122F1EC0740E00F2729E /* mineVC.h */,
 				69C712301EC0740E00F2729E /* mineVC.m */,
+				69921FE91FFB2FAA009E1ED7 /* mineVCHeaderTableViewCell.h */,
+				69921FEA1FFB2FAA009E1ED7 /* mineVCHeaderTableViewCell.m */,
 			);
 			path = Controller;
 			sourceTree = "<group>";
@@ -2735,6 +2746,8 @@
 				69919FBF1ED2D17100E31757 /* UIImage+Extension.m */,
 				69919FC01ED2D17100E31757 /* UIImageView+Extension.h */,
 				69919FC11ED2D17100E31757 /* UIImageView+Extension.m */,
+				699F65BC1FF367C500E87320 /* UILabel+FontChange.h */,
+				699F65BD1FF367C500E87320 /* UILabel+FontChange.m */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -3203,6 +3216,7 @@
 				E9EF15741E4A07C300436D62 /* Images.xcassets in Resources */,
 				695745921D5C7384001022AD /* DKColorTable.txt in Resources */,
 				697E3B3C1EF8EB9500D5151D /* no_data@3x.png in Resources */,
+				699F65C61FF3836000E87320 /* SimHei.ttf in Resources */,
 				697E3B3B1EF8EB9500D5151D /* no_data@2x.png in Resources */,
 				697E3B3A1EF8EB9500D5151D /* no_data.png in Resources */,
 				69C713841EC0740F00F2729E /* NewQA.storyboard in Resources */,
@@ -3432,6 +3446,7 @@
 				69C713761EC0740F00F2729E /* TradingRecordTableViewCell.m in Sources */,
 				E91A53411E8E3455005D2F68 /* NSLayoutConstraint+MASDebugAdditions.m in Sources */,
 				69C7136B1EC0740F00F2729E /* DownloadCell.m in Sources */,
+				699F65BE1FF367C500E87320 /* UILabel+FontChange.m in Sources */,
 				69C713691EC0740F00F2729E /* DownLoadRigthViewController.m in Sources */,
 				69C713661EC0740F00F2729E /* BatchDownloadTableTableViewController.m in Sources */,
 				69C713971EC0740F00F2729E /* PinglundianzanCustomBtn.m in Sources */,
@@ -3541,6 +3556,7 @@
 				69C713BC1EC0740F00F2729E /* UIImage+compress.m in Sources */,
 				69C713831EC0740F00F2729E /* NewBlogPictureController.m in Sources */,
 				691907A61D3F74B00012A42E /* SVProgressHUD.m in Sources */,
+				69921FEB1FFB2FAA009E1ED7 /* mineVCHeaderTableViewCell.m in Sources */,
 				698109531F1F4531000A1AD2 /* MyVipMonthTableViewCell.m in Sources */,
 				695322691F4AC301004AA759 /* NewsCell.m in Sources */,
 				69C713821EC0740F00F2729E /* BlogViewController.m in Sources */,

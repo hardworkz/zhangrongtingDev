@@ -325,7 +325,7 @@
             NSDictionary *userInfoDict = [CommonCode readFromUserD:@"dangqianUserInfo"];
             if ([newArr[_curPage][@"is_free"] isEqualToString:@"1"]||[userInfoDict[results][member_type] intValue] == 2) {
                 zhuboXiangQingVCNewController *faxianzhuboVC = [[zhuboXiangQingVCNewController alloc]init];
-                faxianzhuboVC.jiemuDescription = newArr[_curPage][@"description"];
+                faxianzhuboVC.jiemuDescription = newArr[_curPage][@"des"];
                 faxianzhuboVC.jiemuFan_num = newArr[_curPage][@"fan_num"];
                 faxianzhuboVC.jiemuID = newArr[_curPage][@"url"];
                 faxianzhuboVC.jiemuImages = newArr[_curPage][@"images"];

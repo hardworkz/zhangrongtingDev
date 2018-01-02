@@ -42,7 +42,7 @@
         
         nameLabel = [[UILabel alloc] init];
         nameLabel.frame = CGRectMake(CGRectGetMaxX(userHeadImageView.frame) + 10, 15, SCREEN_WIDTH - 100, 20);
-        nameLabel.font = [UIFont boldSystemFontOfSize:17];
+        nameLabel.font = CUSTOM_FONT_TYPE(17.0);
         nameLabel.textColor = [UIColor blackColor];
         [self.contentView addSubview:nameLabel];
         
@@ -54,8 +54,8 @@
         //vip说明
         detailLabel = [[UILabel alloc] init];
         detailLabel.numberOfLines = 0;
-        detailLabel.frame = CGRectMake(CGRectGetMaxX(userHeadImageView.frame) + 10, CGRectGetMaxY(nameLabel.frame) + 5, SCREEN_WIDTH - 100,IPHONE_W == 320?40:35);
-        detailLabel.font = [UIFont systemFontOfSize:IPHONE_W == 320 ?12:14];
+        detailLabel.frame = CGRectMake(CGRectGetMaxX(userHeadImageView.frame) + 10, CGRectGetMaxY(nameLabel.frame) + 5, SCREEN_WIDTH - 100,IPHONE_W == 320?40:45);
+        detailLabel.font = CUSTOM_FONT_TYPE(IPHONE_W == 320 ?12:14);
         detailLabel.textColor = [UIColor lightGrayColor];
         [self.contentView addSubview:detailLabel];
     }

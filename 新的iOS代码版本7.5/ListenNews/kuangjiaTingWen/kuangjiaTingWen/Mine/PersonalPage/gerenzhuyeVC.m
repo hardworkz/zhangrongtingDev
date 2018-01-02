@@ -49,6 +49,7 @@
     UIButton *topRightBtn;      //顶栏右侧按钮
     UIView *topSlipLine;        //顶栏滑动线
     UIButton *attentionBtn;
+    NSInteger CommentIndexRow;
 }
 @property (weak, nonatomic) UIScrollView *scrollView;
 @property (weak, nonatomic) UIImageView *lastImageView;
@@ -78,6 +79,7 @@
 
 @property (strong, nonatomic) NSString *friendsLv;
 
+@property (strong, nonatomic) NSIndexPath *commentIndexPath;
 //@property(strong,nonatomic)NSMutableArray *cellArr;
 @end
 
@@ -193,6 +195,7 @@
     [rightSwipe2 setDirection:UISwipeGestureRecognizerDirectionRight];
     [topBgView addGestureRecognizer:rightSwipe2];
     
+    AdjustsScrollViewInsetNever(self, self.zhuyetableView)
     DefineWeakSelf;
     weakSelf.zhuyetableView.mj_header = [MJRefreshNormalHeader headerWithRefreshingBlock:^{
         [weakSelf refreshData];
@@ -679,7 +682,8 @@
         
         [weakSelf addCommentInTableViewCell:cell];
     }];
-    [cell setAddReview:^(BlobNewTableViewCell *cell, child_commentModel *model) {
+    [cell setAddReview:^(BlobNewTableViewCell *cell, child_commentModel *model,NSInteger commentIndexRow) {
+        CommentIndexRow = commentIndexRow;
         [weakSelf reviewWithCell:cell andModel:model];
     }];
     [cell setDeleteBlog:^(BlobNewTableViewCell *cell,FeedBackAndListenFriendFrameModel *frameModel) {
@@ -768,6 +772,7 @@
             self.isReplyComment = YES;
             [self.commentTextField setPlaceholder:[NSString stringWithFormat:@"@%@",model.user.user_nicename]];
             NSIndexPath *indexPath = [self.zhuyetableView indexPathForCell:cell];
+            _commentIndexPath = indexPath;
             [CommonCode writeToUserD:[NSString stringWithFormat:@"%ld",(long)indexPath.row] andKey:@"rowIndex"];
         }
     }
@@ -968,7 +973,15 @@ didSelectLinkWithTransitInformation:(NSDictionary *)components {
     }
     return frameModelArray;
 }
-
+- (void)reloadFrameArrayWithIndex:(NSInteger)index
+{
+    FeedBackAndListenFriendFrameModel *frameModel = [[FeedBackAndListenFriendFrameModel alloc] init];
+    FeedBackAndListenFriendFrameModel *Fmodel = self.infoArr[index];
+    frameModel.isFeedbackVC = NO;
+    frameModel.model = Fmodel.model;
+    [self.infoArr replaceObjectAtIndex:index withObject:frameModel];
+    [self.zhuyetableView reloadRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:index inSection:0]] withRowAnimation:UITableViewRowAnimationNone];
+}
 - (void)refreshData {
     DefineWeakSelf
     [NetWorkTool getMyDynamicsListWithaccessToken:[DSE encryptUseDES:self.user_login] login_uid:ExdangqianUserUid andPage:@"1" andLimit:@"10" sccess:^(NSDictionary *responseObject) {
@@ -1092,6 +1105,8 @@ didSelectLinkWithTransitInformation:(NSDictionary *)components {
 
 - (void)addCommentInTableViewCell:(UITableViewCell *)cell{
     if ([[CommonCode readFromUserD:@"isLogin"]boolValue] == YES) {
+        NSIndexPath *indexPath = [self.zhuyetableView indexPathForCell:cell];
+        _commentIndexPath = indexPath;
         _commentCell = cell;
         self.toolBarView.frame = CGRectMake(0, SCREEN_HEIGHT, SCREEN_WIDTH, 46);
         [[UIApplication sharedApplication].keyWindow addSubview:self.toolBarView];
@@ -1270,11 +1285,17 @@ didSelectLinkWithTransitInformation:(NSDictionary *)components {
     [self.navigationController popViewControllerAnimated:YES];
 }
 
-- (void)sentCommentAction:(UIButton *)sender {
+- (void)sentCommentAction:(UIButton *)sender
+{
     [self.commentTextField resignFirstResponder];
     if ([self.commentTextStr isEmpty]) {
-        [SVProgressHUD showErrorWithStatus:@"评论内容不能为空"];
-        [self performSelector:@selector(SVPDismiss) withObject:nil afterDelay:1.0];
+        if (self.isReplyComment) {
+            [SVProgressHUD showErrorWithStatus:@"回复内容不能为空"];
+            [self performSelector:@selector(SVPDismiss) withObject:nil afterDelay:1.0];
+        }else{
+            [SVProgressHUD showErrorWithStatus:@"评论内容不能为空"];
+            [self performSelector:@selector(SVPDismiss) withObject:nil afterDelay:1.0];
+        }
     }
     else{
         //TODO:emoji解析上传
@@ -1294,77 +1315,94 @@ didSelectLinkWithTransitInformation:(NSDictionary *)components {
         NSString *iscomment = @"0";
         DefineWeakSelf;
         [SVProgressHUD setDefaultMaskType:SVProgressHUDMaskTypeBlack];
-        if (self.isReplyComment) {
+        FeedBackAndListenFriendFrameModel *frameModel = self.infoArr[row];
+        
+        //生成回复模型
+        child_commentModel *addModel = [child_commentModel new];
+        addModel.user = [UserDetailModel new];
+        addModel.to_user = [UserModel new];
+        if (weakSelf.isReplyComment) {//回复评论
             iscomment = @"1";
-            to_comment_id = self.infoArr[row][@"id"];
-            tuid = self.replyComment_tuid;
+            tuid = weakSelf.replyComment_tuid;//被回复人的uid
+            to_comment_id = frameModel.model.ID;//被回复评论的ID
+            addModel.comment = weakSelf.commentTextStr;
+            NSDictionary *userInfoDict = [CommonCode readFromUserD:@"dangqianUserInfo"];
+            RTLog(@"%@",userInfoDict);
+            addModel.user.ID = ExdangqianUserUid;
+            addModel.uid = ExdangqianUserUid;
+            addModel.user.user_nicename = userInfoDict[results][@"user_nicename"];
+            child_commentModel *child_Model = frameModel.model.child_comment[CommentIndexRow];
+            addModel.to_user.ID = child_Model.user.ID;
+            addModel.to_user.user_nicename = child_Model.user.user_nicename;
+        }else{
+            tuid = frameModel.model.uid;//发布动态人的uid
+            to_comment_id = frameModel.model.ID;//动态的ID
+            addModel.comment = weakSelf.commentTextStr;
+            addModel.uid = ExdangqianUserUid;
+            addModel.user.ID = ExdangqianUserUid;
+            NSDictionary *userInfoDict = [CommonCode readFromUserD:@"dangqianUserInfo"];
+            addModel.user.user_nicename = userInfoDict[results][@"user_nicename"];
         }
-        else{
-            FeedBackAndListenFriendFrameModel *frameModel = self.infoArr[row];
-            tuid = frameModel.model.uid;
-            to_comment_id = frameModel.model.ID;
-        }
-        FeedBackAndListenFriendFrameModel *frameModel = self.infoArr[indexPath.row];
         if ([frameModel.model.post_id isEqualToString:@"0"]) {
-            [NetWorkTool addfriendDynamicsPingLunWithaccessToken:AvatarAccessToken
-                                                         post_id:frameModel.model.post_id
-                                                      comment_id:to_comment_id
-                                                          to_uid:tuid
-                                                         content:self.commentTextStr
-                                                          sccess:^(NSDictionary *responseObject) {
-                                                              if ([[NSString stringWithFormat:@"%@",responseObject[@"status"]] isEqualToString:@"0"]){
-                                                                  
-                                                                  [SVProgressHUD showErrorWithStatus:responseObject[@"msg"]];
-                                                                  [self performSelector:@selector(SVPDismiss) withObject:nil afterDelay:1.0];
-                                                              }
-                                                              else{
-                                                                  [self.toolBarView setHidden:YES];
-                                                                  [self.view endEditing:YES];
-                                                                  self.commentTextStr = @"";
-                                                                  self.commentTextField.text = @"";
-                                                                  [weakSelf refreshData];
-                                                                  
-                                                                  [SVProgressHUD showSuccessWithStatus:@"评论成功"];
-                                                                  [self performSelector:@selector(SVPDismiss) withObject:nil afterDelay:1.0];
-                                                              }
-                                                          } failure:^(NSError *error) {
-                                                              [SVProgressHUD dismiss];
-                                                              NSLog(@"%@",error);
-                                                          }];
+            if (!self.isReplyComment) {
+                tuid = @"0";
+            }
+            [NetWorkTool addfriendDynamicsPingLunWithaccessToken:AvatarAccessToken post_id:nil comment_id:to_comment_id to_uid:tuid content:self.commentTextStr sccess:^(NSDictionary *responseObject) {
+                if ([[NSString stringWithFormat:@"%@",responseObject[status]] isEqualToString:@"0"]){
+                    
+                    [SVProgressHUD showErrorWithStatus:responseObject[msg]];
+                    [weakSelf performSelector:@selector(SVPDismiss) withObject:nil afterDelay:1.0];
+                }
+                else{
+                    [weakSelf.toolBarView setHidden:YES];
+                    [weakSelf.view endEditing:YES];
+                    weakSelf.commentTextStr = @"";
+                    weakSelf.commentTextField.text = @"";
+                    //添加数据到数据数组中
+                    if (frameModel.model.child_comment == nil) {
+                        frameModel.model.child_comment = [NSMutableArray arrayWithObject:addModel];
+                    }else{
+                        [frameModel.model.child_comment addObject:addModel];
+                    }
+                    //刷新frame值,刷新单行cell
+                    [weakSelf reloadFrameArrayWithIndex:_commentIndexPath.row];
+                    
+                    [SVProgressHUD showSuccessWithStatus:@"评论成功"];
+                    [weakSelf performSelector:@selector(SVPDismiss) withObject:nil afterDelay:1.0];
+                }
+            } failure:^(NSError *error) {
+                [SVProgressHUD dismiss];                                                                  NSLog(@"%@",error);
+            }];
         }
         else{
-            [NetWorkTool postPaoGuoXinWenPingLunWithaccessToken:AvatarAccessToken
-                                                      andto_uid:tuid
-                                                     andpost_id:frameModel.model.post_id
-                                                  andcomment_id:to_comment_id
-                                                  andpost_table:@"posts"
-                                                     andcontent:self.commentTextStr
-                                                         sccess:^(NSDictionary *responseObject) {
-                                                             
-                                                             if ([[NSString stringWithFormat:@"%@",responseObject[@"status"]] isEqualToString:@"0"]){
-                                                                 
-                                                                 [SVProgressHUD showErrorWithStatus:responseObject[@"msg"]];
-                                                                 [self performSelector:@selector(SVPDismiss) withObject:nil afterDelay:1.0];
-                                                             }
-                                                             else{
-                                                                 [self.toolBarView setHidden:YES];
-                                                                 [self.view endEditing:YES];
-                                                                 self.commentTextStr = @"";
-                                                                 self.commentTextField.text = @"";
-                                                                 [weakSelf refreshData];
-                                                                 
-                                                                 [SVProgressHUD showSuccessWithStatus:@"评论成功"];
-                                                                 [self performSelector:@selector(SVPDismiss) withObject:nil afterDelay:1.0];
-                                                             }
-                                                             
-                                                         } failure:^(NSError *error) {
-                                                             [SVProgressHUD dismiss];
-                                                             NSLog(@"%@",error);
-                                                         }];
+            [NetWorkTool postPaoGuoXinWenPingLunWithaccessToken:AvatarAccessToken andto_uid:tuid andpost_id:frameModel.model.post_id andcomment_id:to_comment_id andpost_table:@"posts" andcontent:self.commentTextStr sccess:^(NSDictionary *responseObject) {
+                if ([[NSString stringWithFormat:@"%@",responseObject[status]] isEqualToString:@"0"]){
+                    [SVProgressHUD showErrorWithStatus:responseObject[msg]];
+                    [weakSelf performSelector:@selector(SVPDismiss) withObject:nil afterDelay:1.0];
+                }
+                else{
+                    [weakSelf.toolBarView setHidden:YES];
+                    [weakSelf.view endEditing:YES];
+                    weakSelf.commentTextStr = @"";
+                    weakSelf.commentTextField.text = @"";
+                    //添加数据到数据数组中
+                    if (frameModel.model.child_comment == nil) {
+                        frameModel.model.child_comment = [NSMutableArray arrayWithObject:addModel];
+                    }else{
+                        [frameModel.model.child_comment addObject:addModel];
+                    }
+                    //刷新frame值,刷新单行cell
+                    [weakSelf reloadFrameArrayWithIndex:_commentIndexPath.row];
+                    
+                    [SVProgressHUD showSuccessWithStatus:@"评论成功"];
+                    [weakSelf performSelector:@selector(SVPDismiss) withObject:nil afterDelay:1.0];
+                }
+                
+            } failure:^(NSError *error) {
+                //
+                NSLog(@"%@",error);
+            }];
         }
-        
-        
-        
     }
 }
 
@@ -1412,7 +1450,7 @@ didSelectLinkWithTransitInformation:(NSDictionary *)components {
 - (UITableView *)zhuyetableView{
     if (!_zhuyetableView)
     {
-        _zhuyetableView = [[UITableView alloc]initWithFrame:CGRectMake(0,IS_IPHONEX?-45:-20, IPHONE_W, IPHONE_H) style:UITableViewStylePlain];
+        _zhuyetableView = [[UITableView alloc]initWithFrame:CGRectMake(0,0, IPHONE_W,IPHONE_H) style:UITableViewStylePlain];
         _zhuyetableView.delegate = self;
         _zhuyetableView.dataSource = self;
         _zhuyetableView.tag = 1;

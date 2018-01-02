@@ -65,20 +65,20 @@ typedef void(^animateBlock)();
     [self.view addSubview:self.signInView];
     _animateArr=@[].mutableCopy;
     //+ 经验
-    _experienceView = [[UIView alloc]initWithFrame:CGRectMake(SCREEN_WIDTH - 63, SCREEN_HEIGHT - 160, 40, 40)];
-    _experienceView.alpha=0;
-    [self.view addSubview:_experienceView];
-    UILabel *exptitle = [[UILabel alloc]initWithFrame:CGRectMake(0, 0, 35, 20)];
-    [exptitle setText:@"经验"];
-    [exptitle setFont:[UIFont systemFontOfSize:10.0]];
-    [exptitle setTextColor:gTextDownload];
-    [_experienceView addSubview:exptitle];
-    _exp = [[UILabel alloc]initWithFrame:CGRectMake(5, 15, 35, 20)];
+//    _experienceView = [[UIView alloc]initWithFrame:CGRectMake(SCREEN_WIDTH - 63, SCREEN_HEIGHT - 160, 40, 40)];
+//    _experienceView.alpha=0;
+//    [self.view addSubview:_experienceView];
+//    UILabel *exptitle = [[UILabel alloc]initWithFrame:CGRectMake(0, 0, 35, 20)];
+//    [exptitle setText:@"经验"];
+//    [exptitle setFont:[UIFont systemFontOfSize:10.0]];
+//    [exptitle setTextColor:gTextDownload];
+//    [_experienceView addSubview:exptitle];
+//    _exp = [[UILabel alloc]initWithFrame:CGRectMake(5, 15, 35, 20)];
     //每日签到 +2经验
-    [_exp setText:@"+2"];
-    [_exp setFont:[UIFont systemFontOfSize:10.0]];
-    [_exp setTextColor:UIColorFromHex(0xF67825)];
-    [_experienceView addSubview:_exp];
+//    [_exp setText:@"+2"];
+//    [_exp setFont:[UIFont systemFontOfSize:10.0]];
+//    [_exp setTextColor:UIColorFromHex(0xF67825)];
+//    [_experienceView addSubview:_exp];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(loginAlert:) name:@"loginAlert" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateUserInfo:) name:@"updateUserInfo" object:nil];
@@ -93,30 +93,31 @@ typedef void(^animateBlock)();
     [super viewWillAppear:animated];
     
     [self.navigationController setNavigationBarHidden:YES animated:YES];
-    if ([[CommonCode readFromUserD:@"isLogin"]boolValue] == YES){
-        self.signInView.hidden = NO;
-        NSDictionary *userInfo = [CommonCode readFromUserD:@"dangqianUserInfo"];
-        if ([userInfo[results][@"sign"] isEqualToString:@"0"]) {
-            self.isSigned = NO;
-            [_signInImageView setImage:[UIImage imageNamed:@"sign_in"]];
+    
+//    if ([[CommonCode readFromUserD:@"isLogin"]boolValue] == YES){
+//        self.signInView.hidden = NO;
+//        NSDictionary *userInfo = [CommonCode readFromUserD:@"dangqianUserInfo"];
+//        if ([userInfo[results][@"sign"] isEqualToString:@"0"]) {
+//            self.isSigned = NO;
+//            [_signInImageView setImage:[UIImage imageNamed:@"sign_in"]];
             //TODO:未签到时添加动画
-            CAKeyframeAnimation *anim = [CAKeyframeAnimation animation];
-            anim.keyPath = @"position";
-            anim.path = [UIBezierPath bezierPathWithOvalInRect:CGRectMake(SCREEN_WIDTH - 23 - 18, SCREEN_HEIGHT - 85 - 60, 0, 10)].CGPath;
-            anim.repeatCount = HUGE_VALF;
-            anim.duration = 1.0;
-            anim.calculationMode = kCAAnimationPaced;//动画连续效果
-            [self.signInView.layer addAnimation:anim forKey:nil];
+//            CAKeyframeAnimation *anim = [CAKeyframeAnimation animation];
+//            anim.keyPath = @"position";
+//            anim.path = [UIBezierPath bezierPathWithOvalInRect:CGRectMake(SCREEN_WIDTH - 23 - 18, SCREEN_HEIGHT - 85 - 60, 0, 10)].CGPath;
+//            anim.repeatCount = HUGE_VALF;
+//            anim.duration = 1.0;
+//            anim.calculationMode = kCAAnimationPaced;//动画连续效果
+//            [self.signInView.layer addAnimation:anim forKey:nil];
             
-        }
-        else{
-            self.isSigned = YES;
-            [_signInImageView setImage:[UIImage imageNamed:@"sign_ined"]];
-        }
-    }
-    else{
-        self.signInView.hidden = YES;
-    }
+//        }
+//        else{
+//            self.isSigned = YES;
+//            [_signInImageView setImage:[UIImage imageNamed:@"sign_ined"]];
+//        }
+//    }
+//    else{
+//        self.signInView.hidden = YES;
+//    }
     [self getUnreadMessage];
     
 }
@@ -297,52 +298,52 @@ typedef void(^animateBlock)();
     }];
 }
 
-- (void)signInAction:(UITapGestureRecognizer *)tap
-{
-    if (self.isSigned) {
-        [self.signInImageView setImage:[UIImage imageNamed:@"sign_ined"]];
-        [self.signInView.layer removeAllAnimations];
-        [[NSNotificationCenter defaultCenter] postNotificationName:@"updateUserInfo" object:nil];
-    }
-    else{
-        tap.view.userInteractionEnabled = NO;
-        //签到
-        NSDictionary *userInfo = [CommonCode readFromUserD:@"dangqianUserInfo"];
-        NSString *accesstoken = nil;
-        if ([[CommonCode readFromUserD:@"isWhatLogin"] isEqualToString:@"ShouJi"]) {
-            //
-            accesstoken = [DSE encryptUseDES:userInfo[results][@"user_phone"]];
-        }
-        else{
-            accesstoken = AvatarAccessToken;
-        }
-        [NetWorkTool signInWithaccessToken:AvatarAccessToken sccess:^(NSDictionary *responseObject) {
-            tap.view.userInteractionEnabled = YES;
-            if ([responseObject[@"msg"] isEqualToString:@"签到成功!"]) {
-                self.isSigned = YES;
-                [self.signInImageView setImage:[UIImage imageNamed:@"sign_ined"]];
-                [self.signInView.layer removeAllAnimations];
-                 [[NSNotificationCenter defaultCenter] postNotificationName:@"updateUserInfo" object:nil];
-                [self showUpAnimations];
-                [self getUnreadMessage];
-            }
-            else if([responseObject[@"msg"] isEqualToString:@"签到失败，今天已经签到过了!"]){
-                self.isSigned = YES;
-                [self.signInImageView setImage:[UIImage imageNamed:@"sign_ined"]];
-                [self.signInView.layer removeAllAnimations];
-                [[NSNotificationCenter defaultCenter] postNotificationName:@"updateUserInfo" object:nil];
-                [self showUpAnimations];
-                [self getUnreadMessage];
-            }
-            else {
-                XWAlerLoginView *alert = [[XWAlerLoginView alloc] initWithTitle:responseObject[@"msg"]];
-                [alert show];
-            }
-        } failure:^(NSError *error) {
-            tap.view.userInteractionEnabled = YES;
-        }];
-    }
-}
+//- (void)signInAction:(UITapGestureRecognizer *)tap
+//{
+//    if (self.isSigned) {
+//        [self.signInImageView setImage:[UIImage imageNamed:@"sign_ined"]];
+//        [self.signInView.layer removeAllAnimations];
+//        [[NSNotificationCenter defaultCenter] postNotificationName:@"updateUserInfo" object:nil];
+//    }
+//    else{
+//        tap.view.userInteractionEnabled = NO;
+//        //签到
+//        NSDictionary *userInfo = [CommonCode readFromUserD:@"dangqianUserInfo"];
+//        NSString *accesstoken = nil;
+//        if ([[CommonCode readFromUserD:@"isWhatLogin"] isEqualToString:@"ShouJi"]) {
+//            //
+//            accesstoken = [DSE encryptUseDES:userInfo[results][@"user_phone"]];
+//        }
+//        else{
+//            accesstoken = AvatarAccessToken;
+//        }
+//        [NetWorkTool signInWithaccessToken:AvatarAccessToken sccess:^(NSDictionary *responseObject) {
+//            tap.view.userInteractionEnabled = YES;
+//            if ([responseObject[@"msg"] isEqualToString:@"签到成功!"]) {
+//                self.isSigned = YES;
+//                [self.signInImageView setImage:[UIImage imageNamed:@"sign_ined"]];
+//                [self.signInView.layer removeAllAnimations];
+//                 [[NSNotificationCenter defaultCenter] postNotificationName:@"updateUserInfo" object:nil];
+//                [self showUpAnimations];
+//                [self getUnreadMessage];
+//            }
+//            else if([responseObject[@"msg"] isEqualToString:@"签到失败，今天已经签到过了!"]){
+//                self.isSigned = YES;
+//                [self.signInImageView setImage:[UIImage imageNamed:@"sign_ined"]];
+//                [self.signInView.layer removeAllAnimations];
+//                [[NSNotificationCenter defaultCenter] postNotificationName:@"updateUserInfo" object:nil];
+//                [self showUpAnimations];
+//                [self getUnreadMessage];
+//            }
+//            else {
+//                XWAlerLoginView *alert = [[XWAlerLoginView alloc] initWithTitle:responseObject[@"msg"]];
+//                [alert show];
+//            }
+//        } failure:^(NSError *error) {
+//            tap.view.userInteractionEnabled = YES;
+//        }];
+//    }
+//}
 
 - (void)lvQAButtonAction{
     
@@ -537,6 +538,13 @@ typedef void(^animateBlock)();
     [self.tableView reloadData];
 }
 
+/**
+ 跳转我的会员界面
+ */
+- (void)vipTap
+{
+    [self.navigationController pushViewController:[MyVipMenbersViewController new] animated:YES];
+}
 #pragma mark --- UITableViewDataSource
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
@@ -547,227 +555,26 @@ typedef void(^animateBlock)();
     
     if ([[CommonCode readFromUserD:@"isIAP"] boolValue] == YES) {
         if (indexPath.row == 0){
-            static NSString *wotouxiangcellIdentify = @"wotouxiangcellIdentify";
-            UITableViewCell *cell = [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:wotouxiangcellIdentify];
-//            cell.backgroundColor = [UIColor redColor];
-            if (!cell){
-                
-                cell = [tableView dequeueReusableCellWithIdentifier:wotouxiangcellIdentify];
-            }
-            
-            UIImageView *cellBgView = [[UIImageView alloc]initWithFrame:CGRectMake(0, -20, SCREEN_WIDTH,240.0 / 667 * IPHONE_H)];
-            [cellBgView setUserInteractionEnabled:YES];
-            [cell.contentView addSubview:cellBgView];
-            
-            UIImageView *ShadowImageView = [[UIImageView alloc]initWithFrame:CGRectMake(0, -20, SCREEN_WIDTH, 240.0 / 667 * IPHONE_H)];
-            [cellBgView setUserInteractionEnabled:YES];
-            [cell.contentView addSubview:ShadowImageView];
-            
-            UIImageView *coverView = [UIImageView new];
-            [coverView setFrame:CGRectMake(0, -20, SCREEN_WIDTH, 240.0/ 667 * IPHONE_H)];
-            [coverView setImage:[UIImage imageNamed:@"me_topbg1"]];
-            [cell.contentView addSubview:coverView];
-            
-            //title
-            UILabel *topLab = [[UILabel alloc]initWithFrame:CGRectMake((SCREEN_WIDTH - 44 )/2,IS_IPHONEX?20:0, 44, 44)];
-            topLab.textColor = gTextColorMain;
-            topLab.font = [UIFont fontWithName:@"Semibold" size:17.0f ];
-            topLab.text = @"我";
-            topLab.backgroundColor = [UIColor clearColor];
-            topLab.textAlignment = NSTextAlignmentCenter;
-            [cell.contentView addSubview:topLab];
-            
-            UIView *imgBorderView = [[UIView alloc]initWithFrame:CGRectMake(30.0 / 667 * IPHONE_H, 170.0 / 667 * IPHONE_H, 95.0 / 667 * IPHONE_H, 95.0 / 667 * IPHONE_H)];
-            [imgBorderView setBackgroundColor:gImageBorderColor];
-            [imgBorderView setUserInteractionEnabled:YES];
-            [imgBorderView.layer setMasksToBounds:YES];
-            [imgBorderView.layer setCornerRadius:95.0 / 667 * IPHONE_H / 2];
-            [cell.contentView addSubview:imgBorderView];
-            
-            UIImageView *titleImage = [[UIImageView alloc]initWithFrame:CGRectMake(2.5/ 667 * IPHONE_H, 2.5 / 667 *IPHONE_H, 90.0 / 667 * IPHONE_H, 90.0 / 667 * IPHONE_H)];
-            titleImage.image = [UIImage imageWithContentsOfFile:ExTouXiangPath];
-            ShadowImageView.image = [UIImage imageWithContentsOfFile:ExTouXiangPath];
-            ShadowImageView.contentMode = UIViewContentModeScaleAspectFill;
-            ShadowImageView.clipsToBounds = YES;
-            
-            if (titleImage.image == nil){
-                titleImage.image = [UIImage imageNamed:@"right-1"];
-            }
-            titleImage.layer.cornerRadius = titleImage.frame.size.width / 2;
-            titleImage.clipsToBounds = YES;
-            titleImage.userInteractionEnabled = YES;
-            [titleImage addTapGesWithTarget:self action:@selector(dianjitouxiangshijian)];
-            [imgBorderView addSubview:titleImage];
-            //加边框
-            CALayer *layer = [titleImage layer];
-            layer.borderColor = [gImageBorderColor CGColor];
-            layer.borderWidth = 0.0f;
-            [self.newPersonMessageButton setHidden:YES];
-            [cell.contentView addSubview:self.newPersonMessageButton];
-            
-            
-            UILabel *lab = [[UILabel alloc]initWithFrame:CGRectMake(CGRectGetMaxX(imgBorderView.frame) + 12, imgBorderView.frame.origin.y + 10.0 / 667 * IPHONE_H, SCREEN_WIDTH - 150, 20.0 / 667 * IPHONE_H)];
-            lab.font = [UIFont fontWithName:@"Semibold" size:18.0f ];
-            lab.textColor = [UIColor blackColor];
-            //        lab.backgroundColor = [UIColor greenColor];
-            lab.textAlignment = NSTextAlignmentLeft;
-            [lab addTapGesWithTarget:self action:@selector(dianjitouxiangshijian)];
-            [cell.contentView addSubview:lab];
+            DefineWeakSelf
+            mineVCHeaderTableViewCell *cell = [mineVCHeaderTableViewCell cellWithTableView:tableView];
             cell.selectionStyle = UITableViewCellSelectionStyleNone;
-            
-            //vip图标
-            UIImageView *vipImgView = [[UIImageView alloc] init];
-            vipImgView.hidden = YES;
-            vipImgView.contentMode = UIViewContentModeScaleAspectFill;
-            [cell.contentView addSubview:vipImgView];
-            
-            UIImageView *lvView = [[UIImageView alloc]initWithFrame:CGRectMake(vipImgView.hidden? CGRectGetMaxX(lab.frame) + 5:CGRectGetMaxX(vipImgView.frame) + 5, lab.frame.origin.y, 44.0, 16.0)];
-            [lvView setImage:[UIImage imageNamed:@"LV1~9"]];
-            lvView.hidden = YES;
-            lvView.contentMode = UIViewContentModeScaleAspectFill;
-            lvView.clipsToBounds = YES;
-            [lvView addTapGesWithTarget:self action:@selector(lvQAButtonAction)];
-            [cell.contentView addSubview:lvView];
-            
-            UILabel *lvLab = [[UILabel alloc]initWithFrame:CGRectMake(lvView.frame.size.width - 20, 0, 25, 16)];
-            [lvLab setFont:gFontMain12];
-            [lvLab setTextAlignment:NSTextAlignmentCenter];
-            [lvLab setTextColor:[UIColor whiteColor]];
-            if (TARGETED_DEVICE_IS_IPHONE_480) {
-                [lvLab setFrame:CGRectMake(lvView.frame.size.width - 25, 0, 25, 16)];
-            }
-            else if (TARGETED_DEVICE_IS_IPHONE_568){
-                [lvLab setFrame:CGRectMake(lvView.frame.size.width - 25, 0, 25, 16)];
-            }
-            else if (TARGETED_DEVICE_IS_IPHONE_667){
-                [lvLab setFrame:CGRectMake(lvView.frame.size.width - 20, 0, 25, 16)];
-            }
-            else if (TARGETED_DEVICE_IS_IPHONE_736){
-                [lvLab setFrame:CGRectMake(lvView.frame.size.width - 20, 0, 25, 16)];
-            }else if(IS_IPAD){
-                [lvLab setFrame:CGRectMake(lvView.frame.size.width, 5, 25, 16)];
-                [lvLab setFont:gFontMajor17];
-            }else if(IS_IPHONEX){
-                [lvLab setFrame:CGRectMake(lvView.frame.size.width - 10, 0, 25, 16)];
-            }
-            [lvView addSubview:lvLab];
-            
-            TTTAttributedLabel *signtureLab = [[TTTAttributedLabel alloc]initWithFrame:CGRectMake(lab.frame.origin.x, 230.0 / 667 * IPHONE_H, SCREEN_WIDTH - 150,20.0 / 667 * IPHONE_H)];
-            [cell.contentView addSubview:signtureLab];
-            
-            if ([[CommonCode readFromUserD:@"isLogin"]boolValue] == YES){
-                NSDictionary *userInfo = [CommonCode readFromUserD:@"dangqianUserInfo"];
-                NSString *isNameNil = userInfo[results][@"user_nicename"];
-                if (isNameNil.length == 0){
-                    lab.text = userInfo[results][@"user_login"];
-                }
-                else{
-                    lab.text = userInfo[results][@"user_nicename"];
-                }
-                
-                //账户信息
-                NSString *df = [NSString stringWithFormat:@"金币：%@ | 听币：%@",userInfo[results][@"gold"],userInfo[results][@"listen_money"]];
-                NSMutableAttributedString *attriString =[[NSMutableAttributedString alloc] initWithString:df attributes:@{NSForegroundColorAttributeName:gTextDownload,NSFontAttributeName:gFontMain12}];
-                NSRange range1=[df rangeOfString:[NSString stringWithFormat:@"%@",userInfo[results][@"gold"]]];
-                [attriString addAttributes:@{NSForegroundColorAttributeName:UIColorFromHex(0xf78540),NSFontAttributeName:gFontMain12} range:range1];
-                [signtureLab addLinkToTransitInformation:nil withRange:range1];
-                NSRange range2=[df rangeOfString:[NSString stringWithFormat:@"%@",userInfo[results][@"listen_money"]]];
-                [attriString addAttributes:@{NSForegroundColorAttributeName:UIColorFromHex(0xf78540),NSFontAttributeName:gFontMain12} range:range2];
-                [signtureLab addLinkToTransitInformation:nil withRange:range2];
-                signtureLab.attributedText = attriString;
-                //充值按钮
-                UIButton *payButton = [UIButton buttonWithType:UIButtonTypeCustom];
-                [payButton setFrame:CGRectMake(lab.frame.origin.x, 255.0 / 667 * IPHONE_H, 80.0 / 375 * SCREEN_WIDTH, 20.0 / 667 * IPHONE_H)];
-                [payButton setBackgroundColor:gButtonRewardColor];
-                [payButton setTitle:@"充值" forState:UIControlStateNormal];
-                [payButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-                [payButton.titleLabel setFont:gFontMain12];
-                [payButton.layer setMasksToBounds:YES];
-                [payButton.layer setCornerRadius:8.0];
-                [payButton addTarget:self action:@selector(payButtonAction:) forControlEvents:UIControlEventTouchUpInside];
-                [cell.contentView addSubview:payButton];
-                
-                CGSize contentSize = [lab sizeThatFits:CGSizeMake(lab.frame.size.width, MAXFLOAT)];
-                lab.frame = CGRectMake(lab.frame.origin.x, lab.frame.origin.y,contentSize.width, lab.frame.size.height);
-                
-                NSDictionary *userInfoDict = [CommonCode readFromUserD:@"dangqianUserInfo"];
-                
-                //判断是否在审核中
-                if ([[CommonCode readFromUserD:@"isIAP"] boolValue] == YES) {
-                    vipImgView.hidden = YES;
-                }else{
-                    if ([userInfoDict[results][member_type] intValue] == 1||[userInfoDict[results][member_type] intValue] == 2) {
-                        
-                        vipImgView.frame = CGRectMake(CGRectGetMaxX(lab.frame) + 10, lab.y + 2, 30, 37);
-                        vipImgView.centerY = lab.centerY;
-                        vipImgView.hidden = NO;
-                        if ([userInfoDict[results][member_type] intValue] == 1) {
-                            vipImgView.image = [UIImage imageNamed:@"vip"];
-                        }else{
-                            vipImgView.image = [UIImage imageNamed:@"svip"];
-                        }
-                    }else{
-                        vipImgView.hidden = YES;
-                    }
-                }
-                
-                [lvView setFrame:CGRectMake(vipImgView.hidden? CGRectGetMaxX(lab.frame) + 5:CGRectGetMaxX(vipImgView.frame) + 10,IS_IPHONEX? lab.frame.origin.y + 4:lab.frame.origin.y + 2, 50.0 / 667 * IPHONE_H,IS_IPHONEX?16.0:16.0 / 667 * IPHONE_H)];
-                lvView.hidden = NO;
-                NSInteger lv = [userInfo[results][@"level"] integerValue];
-                if (lv > 0 && lv < 10) {
-                    [lvView setImage:[UIImage imageNamed:@"LV1~9"]];
-                }
-                else if (lv >= 10 && lv < 20){
-                    [lvView setImage:[UIImage imageNamed:@"LV10~19"]];
-                }
-                else if (lv >= 20 && lv < 30){
-                    [lvView setImage:[UIImage imageNamed:@"LV20~29"]];
-                }
-                else if (lv >= 30 && lv < 40){
-                    [lvView setImage:[UIImage imageNamed:@"LV30~39"]];
-                }
-                else if (lv >= 40 && lv < 50){
-                    [lvView setImage:[UIImage imageNamed:@"LV40~49"]];
-                }
-                else if (lv >= 50 && lv < 60){
-                    [lvView setImage:[UIImage imageNamed:@"LV50~59"]];
-                }
-                else if (lv >= 60 && lv < 70){
-                    [lvView setImage:[UIImage imageNamed:@"LV60~69"]];
-                }
-                else if (lv >= 70 && lv < 80){
-                    [lvView setImage:[UIImage imageNamed:@"LV70~79"]];
-                }
-                else if (lv >= 80 && lv < 90){
-                    [lvView setImage:[UIImage imageNamed:@"LV80~89"]];
-                }
-                else if (lv >= 90 && lv < 99){
-                    [lvView setImage:[UIImage imageNamed:@"LV90~99"]];
-                }
-                else{
-                    [lvView setImage:[UIImage imageNamed:@"LV100"]];
-                }
-                [lvLab setText:userInfo[results][@"level"]];
-                
-            }
-            else{
-                lab.text = nil;
-                signtureLab.text = nil;
-                lvView.hidden = YES;
-                vipImgView.hidden = YES;
-            }
-            
+            cell.isIAP = [[CommonCode readFromUserD:@"isIAP"] boolValue];
+            cell.dianjitouxiangshijian = ^{
+                [weakSelf dianjitouxiangshijian];
+            };
+            cell.vipTap = ^{
+                [weakSelf vipTap];
+            };
             return cell;
         }
         else if (indexPath.row == 1){
             UITableViewCell *cell = [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"wotwoIdentify"];
             UILabel *lab = [[UILabel alloc]initWithFrame:CGRectMake(40.0 / 375 * IPHONE_W,IS_IPHONEX?14.0:14.0 / 667 * IPHONE_H, 100.0 / 375 * IPHONE_W, 30.0 / 667 * IPHONE_H)];
             lab.text = @"听友圈";
-            //        lab.text = @"我的关注";
             lab.textAlignment = NSTextAlignmentLeft;
-            lab.textColor = nTextColorMain;
+            lab.textColor = TITLE_COLOR_HEX;
+            lab.font =  CUSTOM_FONT_TYPE(17.0);
             [cell.contentView addSubview:lab];
-            lab.font =  [UIFont fontWithName:@"Regular" size:17.0f ];
             UIView *line = [[UIView alloc]initWithFrame:CGRectMake(20.0 / 375 * IPHONE_W,IS_IPHONEX?57.0: 57.0 / 667 * IPHONE_H, SCREEN_WIDTH - 20.0 / 375 * IPHONE_W, 1)];
             [line setBackgroundColor:gThinLineColor];
             [cell.contentView addSubview:line];
@@ -782,9 +589,9 @@ typedef void(^animateBlock)();
             UILabel *lab = [[UILabel alloc]initWithFrame:CGRectMake(40.0 / 375 * IPHONE_W, IS_IPHONEX?14.0:14.0 / 667 * IPHONE_H, 100.0 / 375 * IPHONE_W, 30.0 / 667 * IPHONE_H)];
             lab.text = @"我的下载";
             lab.textAlignment = NSTextAlignmentLeft;
-            lab.textColor = nTextColorMain;
+            lab.textColor = TITLE_COLOR_HEX;
             [cell.contentView addSubview:lab];
-            lab.font = gFontMajor17;
+            lab.font = CUSTOM_FONT_TYPE(17.0);
             UIView *line = [[UIView alloc]initWithFrame:CGRectMake(20.0 / 375 * IPHONE_W,IS_IPHONEX?57.0: 57.0 / 667 * IPHONE_H, SCREEN_WIDTH - 20.0 / 375 * IPHONE_W, 1)];
             [line setBackgroundColor:gThinLineColor];
             [cell.contentView addSubview:line];
@@ -797,9 +604,9 @@ typedef void(^animateBlock)();
             UILabel *lab = [[UILabel alloc]initWithFrame:CGRectMake(40.0 / 375 * IPHONE_W, IS_IPHONEX?14.0:14.0 / 667 * IPHONE_H, 100.0 / 375 * IPHONE_W, 30.0 / 667 * IPHONE_H)];
             lab.text = @"我的收藏";
             lab.textAlignment = NSTextAlignmentLeft;
-            lab.textColor = nTextColorMain;
+            lab.textColor = TITLE_COLOR_HEX;
             [cell.contentView addSubview:lab];
-            lab.font = gFontMajor17;
+            lab.font = CUSTOM_FONT_TYPE(17.0);
             UIView *line = [[UIView alloc]initWithFrame:CGRectMake(20.0 / 375 * IPHONE_W, IS_IPHONEX?57.0:57.0 / 667 * IPHONE_H, SCREEN_WIDTH - 20.0 / 375 * IPHONE_W, 1)];
             [line setBackgroundColor:gThinLineColor];
             [cell.contentView addSubview:line];
@@ -812,9 +619,9 @@ typedef void(^animateBlock)();
             UILabel *lab = [[UILabel alloc]initWithFrame:CGRectMake(40.0 / 375 * IPHONE_W, IS_IPHONEX?14.0:14.0 / 667 * IPHONE_H, 100.0 / 375 * IPHONE_W, 30.0 / 667 * IPHONE_H)];
             lab.text = @"我的课堂";
             lab.textAlignment = NSTextAlignmentLeft;
-            lab.textColor = nTextColorMain;
+            lab.textColor = TITLE_COLOR_HEX;
             [cell.contentView addSubview:lab];
-            lab.font = gFontMajor17;
+            lab.font = CUSTOM_FONT_TYPE(17.0);
             UIView *line = [[UIView alloc]initWithFrame:CGRectMake(20.0 / 375 * IPHONE_W, IS_IPHONEX?57.0:57.0 / 667 * IPHONE_H, SCREEN_WIDTH - 20.0 / 375 * IPHONE_W, 1)];
             [line setBackgroundColor:gThinLineColor];
             [cell.contentView addSubview:line];
@@ -831,9 +638,9 @@ typedef void(^animateBlock)();
             UILabel *lab = [[UILabel alloc]initWithFrame:CGRectMake(40.0 / 375 * IPHONE_W, 14.0 / 667 * IPHONE_H, 100.0 / 375 * IPHONE_W, 30.0 / 667 * IPHONE_H)];
             lab.text = @"设置";
             lab.textAlignment = NSTextAlignmentLeft;
-            lab.textColor = nTextColorMain;
+            lab.textColor = TITLE_COLOR_HEX;
             [cell.contentView addSubview:lab];
-            lab.font = gFontMajor17;
+            lab.font = CUSTOM_FONT_TYPE(17.0);
             cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
             [self.newSettingMessageButton setHidden:YES];
             [cell.contentView addSubview:self.newSettingMessageButton];
@@ -844,216 +651,228 @@ typedef void(^animateBlock)();
             return cell;
         }
     }else{
+        //TODO:更改UI
         if (indexPath.row == 0){
-            static NSString *wotouxiangcellIdentify = @"wotouxiangcellIdentify";
-            UITableViewCell *cell = [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:wotouxiangcellIdentify];
-            if (!cell){
-                
-                cell = [tableView dequeueReusableCellWithIdentifier:wotouxiangcellIdentify];
-            }
-            
-            UIImageView *cellBgView = [[UIImageView alloc]initWithFrame:CGRectMake(0, -20, SCREEN_WIDTH, 240.0 / 667 * IPHONE_H)];
-            [cellBgView setUserInteractionEnabled:YES];
-            [cell.contentView addSubview:cellBgView];
-            
-            UIImageView *ShadowImageView = [[UIImageView alloc]initWithFrame:CGRectMake(0, -20, SCREEN_WIDTH, 240.0 / 667 * IPHONE_H)];
-            [cellBgView setUserInteractionEnabled:YES];
-            [cell.contentView addSubview:ShadowImageView];
-            
-            UIImageView *coverView = [UIImageView new];
-            [coverView setFrame:CGRectMake(0, -20, SCREEN_WIDTH, 240.0/ 667 * IPHONE_H)];
-            [coverView setImage:[UIImage imageNamed:@"me_topbg1"]];
-            [cell.contentView addSubview:coverView];
-            
-            //title
-            UILabel *topLab = [[UILabel alloc]initWithFrame:CGRectMake((SCREEN_WIDTH - 44 )/2, IS_IPHONEX?20:0, 44, 44)];
-            topLab.textColor = gTextColorMain;
-            topLab.font = [UIFont fontWithName:@"Semibold" size:17.0f ];
-            topLab.text = @"我";
-            topLab.backgroundColor = [UIColor clearColor];
-            topLab.textAlignment = NSTextAlignmentCenter;
-            [cell.contentView addSubview:topLab];
-            
-            UIView *imgBorderView = [[UIView alloc]initWithFrame:CGRectMake(30.0 / 667 * IPHONE_H, 170.0 / 667 * IPHONE_H, 95.0 / 667 * IPHONE_H, 95.0 / 667 * IPHONE_H)];
-            [imgBorderView setBackgroundColor:gImageBorderColor];
-            [imgBorderView setUserInteractionEnabled:YES];
-            [imgBorderView.layer setMasksToBounds:YES];
-            [imgBorderView.layer setCornerRadius:95.0 / 667 * IPHONE_H / 2];
-            [cell.contentView addSubview:imgBorderView];
-            
-            UIImageView *titleImage = [[UIImageView alloc]initWithFrame:CGRectMake(2.5/ 667 * IPHONE_H, 2.5 / 667 *IPHONE_H, 90.0 / 667 * IPHONE_H, 90.0 / 667 * IPHONE_H)];
-            titleImage.image = [UIImage imageWithContentsOfFile:ExTouXiangPath];
-            ShadowImageView.image = [UIImage imageWithContentsOfFile:ExTouXiangPath];
-            ShadowImageView.contentMode = UIViewContentModeScaleAspectFill;
-            ShadowImageView.clipsToBounds = YES;
-            
-            if (titleImage.image == nil){
-                titleImage.image = [UIImage imageNamed:@"right-1"];
-            }
-            titleImage.layer.cornerRadius = titleImage.frame.size.width / 2;
-            titleImage.clipsToBounds = YES;
-            titleImage.userInteractionEnabled = YES;
-            [titleImage addTapGesWithTarget:self action:@selector(dianjitouxiangshijian)];
-            [imgBorderView addSubview:titleImage];
-            //加边框
-            CALayer *layer = [titleImage layer];
-            layer.borderColor = [gImageBorderColor CGColor];
-            layer.borderWidth = 0.0f;
-            [self.newPersonMessageButton setHidden:YES];
-            [cell.contentView addSubview:self.newPersonMessageButton];
-            
-            
-            UILabel *lab = [[UILabel alloc]initWithFrame:CGRectMake(CGRectGetMaxX(imgBorderView.frame) + 12, imgBorderView.frame.origin.y + 10.0 / 667 * IPHONE_H, SCREEN_WIDTH - 150, 20.0 / 667 * IPHONE_H)];
-            lab.font = [UIFont fontWithName:@"Semibold" size:18.0f ];
-            lab.textColor = [UIColor blackColor];
-            //        lab.backgroundColor = [UIColor greenColor];
-            lab.textAlignment = NSTextAlignmentLeft;
-            [lab addTapGesWithTarget:self action:@selector(dianjitouxiangshijian)];
-            [cell.contentView addSubview:lab];
+//            static NSString *wotouxiangcellIdentify = @"wotouxiangcellIdentify";
+//            UITableViewCell *cell = [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:wotouxiangcellIdentify];
+//            if (!cell){
+//
+//                cell = [tableView dequeueReusableCellWithIdentifier:wotouxiangcellIdentify];
+//            }
+//
+//            UIImageView *cellBgView = [[UIImageView alloc]initWithFrame:CGRectMake(0, -20, SCREEN_WIDTH, 240.0 / 667 * IPHONE_H)];
+//            [cellBgView setUserInteractionEnabled:YES];
+//            [cell.contentView addSubview:cellBgView];
+//
+//            UIImageView *ShadowImageView = [[UIImageView alloc]initWithFrame:CGRectMake(0, -20, SCREEN_WIDTH, 240.0 / 667 * IPHONE_H)];
+//            [cellBgView setUserInteractionEnabled:YES];
+//            [cell.contentView addSubview:ShadowImageView];
+//
+//            UIImageView *coverView = [UIImageView new];
+//            [coverView setFrame:CGRectMake(0, -20, SCREEN_WIDTH, 240.0/ 667 * IPHONE_H)];
+//            [coverView setImage:[UIImage imageNamed:@"me_topbg1"]];
+//            [cell.contentView addSubview:coverView];
+//
+//            //title
+//            UILabel *topLab = [[UILabel alloc]initWithFrame:CGRectMake((SCREEN_WIDTH - 44 )/2, IS_IPHONEX?20:0, 44, 44)];
+//            topLab.textColor = gTextColorMain;
+//            topLab.font = [UIFont fontWithName:@"Semibold" size:17.0f ];
+//            topLab.text = @"我";
+//            topLab.backgroundColor = [UIColor clearColor];
+//            topLab.textAlignment = NSTextAlignmentCenter;
+//            [cell.contentView addSubview:topLab];
+//
+//            UIView *imgBorderView = [[UIView alloc]initWithFrame:CGRectMake(30.0 / 667 * IPHONE_H, 100.0 / 667 * IPHONE_H, 95.0 / 667 * IPHONE_H, 95.0 / 667 * IPHONE_H)];
+//            [imgBorderView setBackgroundColor:gImageBorderColor];
+//            [imgBorderView setUserInteractionEnabled:YES];
+//            [imgBorderView.layer setMasksToBounds:YES];
+//            [imgBorderView.layer setCornerRadius:95.0 / 667 * IPHONE_H / 2];
+//            [cell.contentView addSubview:imgBorderView];
+//
+//            UIImageView *titleImage = [[UIImageView alloc]initWithFrame:CGRectMake(2.5/ 667 * IPHONE_H, 2.5 / 667 *IPHONE_H, 90.0 / 667 * IPHONE_H, 90.0 / 667 * IPHONE_H)];
+//            titleImage.image = [UIImage imageWithContentsOfFile:ExTouXiangPath];
+//            ShadowImageView.image = [UIImage imageWithContentsOfFile:ExTouXiangPath];
+//            ShadowImageView.contentMode = UIViewContentModeScaleAspectFill;
+//            ShadowImageView.clipsToBounds = YES;
+//
+//            if (titleImage.image == nil){
+//                titleImage.image = [UIImage imageNamed:@"right-1"];
+//            }
+//            titleImage.layer.cornerRadius = titleImage.frame.size.width / 2;
+//            titleImage.clipsToBounds = YES;
+//            titleImage.userInteractionEnabled = YES;
+//            [titleImage addTapGesWithTarget:self action:@selector(dianjitouxiangshijian)];
+//            [imgBorderView addSubview:titleImage];
+//            //加边框
+//            CALayer *layer = [titleImage layer];
+//            layer.borderColor = [gImageBorderColor CGColor];
+//            layer.borderWidth = 0.0f;
+//            [self.newPersonMessageButton setHidden:YES];
+//            [cell.contentView addSubview:self.newPersonMessageButton];
+//
+//
+//            UILabel *lab = [[UILabel alloc]initWithFrame:CGRectMake(CGRectGetMaxX(imgBorderView.frame) + 12, imgBorderView.frame.origin.y + 10.0 / 667 * IPHONE_H, SCREEN_WIDTH - 150, 20.0 / 667 * IPHONE_H)];
+//            lab.font =  CUSTOM_FONT_TYPE(17.0);
+//            lab.textColor = TITLE_COLOR_HEX;
+//            //        lab.backgroundColor = [UIColor greenColor];
+//            lab.textAlignment = NSTextAlignmentLeft;
+//            [lab addTapGesWithTarget:self action:@selector(dianjitouxiangshijian)];
+//            [cell.contentView addSubview:lab];
+//            cell.selectionStyle = UITableViewCellSelectionStyleNone;
+//
+//            //vip图标
+//            UIImageView *vipImgView = [[UIImageView alloc] init];
+//            vipImgView.hidden = YES;
+//            vipImgView.contentMode = UIViewContentModeScaleAspectFill;
+//            vipImgView.userInteractionEnabled = YES;
+//            [vipImgView addTapGesWithTarget:self action:@selector(vipTap)];
+//            [cell.contentView addSubview:vipImgView];
+//
+//            UIImageView *lvView = [[UIImageView alloc]initWithFrame:CGRectMake(vipImgView.hidden? CGRectGetMaxX(lab.frame) + 5:CGRectGetMaxX(vipImgView.frame) + 5, lab.frame.origin.y, 44.0, 16.0)];
+//            [lvView setImage:[UIImage imageNamed:@"LV1~9"]];
+//            lvView.hidden = YES;
+//            lvView.contentMode = UIViewContentModeScaleAspectFill;
+//            lvView.clipsToBounds = YES;
+//            [lvView addTapGesWithTarget:self action:@selector(lvQAButtonAction)];
+////            [cell.contentView addSubview:lvView];
+//
+//            UILabel *lvLab = [[UILabel alloc]initWithFrame:CGRectMake(lvView.frame.size.width - 20, 0, 25, 16)];
+//            [lvLab setFont:gFontMain12];
+//            [lvLab setTextAlignment:NSTextAlignmentCenter];
+//            [lvLab setTextColor:[UIColor whiteColor]];
+//            if (TARGETED_DEVICE_IS_IPHONE_480) {
+//                [lvLab setFrame:CGRectMake(lvView.frame.size.width - 25, 0, 25, 16)];
+//            }
+//            else if (TARGETED_DEVICE_IS_IPHONE_568){
+//                [lvLab setFrame:CGRectMake(lvView.frame.size.width - 25, 0, 25, 16)];
+//            }
+//            else if (TARGETED_DEVICE_IS_IPHONE_667){
+//                [lvLab setFrame:CGRectMake(lvView.frame.size.width - 20, 0, 25, 16)];
+//            }
+//            else if (TARGETED_DEVICE_IS_IPHONE_736){
+//                [lvLab setFrame:CGRectMake(lvView.frame.size.width - 20, 0, 25, 16)];
+//            }else if(IS_IPAD){
+//                [lvLab setFrame:CGRectMake(lvView.frame.size.width, 5, 25, 16)];
+//                [lvLab setFont:gFontMajor17];
+//            }else if(IS_IPHONEX){
+//                [lvLab setFrame:CGRectMake(lvView.frame.size.width - 20, 0, 25, 16)];
+//            }
+//            [lvView addSubview:lvLab];
+//
+//            TTTAttributedLabel *signtureLab = [[TTTAttributedLabel alloc]initWithFrame:CGRectMake(lab.frame.origin.x, 230.0 / 667 * IPHONE_H, SCREEN_WIDTH - 150, 20.0 / 667 * IPHONE_H)];
+////            [cell.contentView addSubview:signtureLab];
+//
+//            if ([[CommonCode readFromUserD:@"isLogin"]boolValue] == YES){
+//                NSDictionary *userInfo = [CommonCode readFromUserD:@"dangqianUserInfo"];
+//                NSString *isNameNil = userInfo[results][@"user_nicename"];
+//                if (isNameNil.length == 0){
+//                    lab.text = userInfo[results][@"user_login"];
+//                }
+//                else{
+//                    lab.text = userInfo[results][@"user_nicename"];
+//                }
+//
+//                //账户信息
+//                NSString *df = [NSString stringWithFormat:@"金币：%@ | 听币：%@",userInfo[results][@"gold"],userInfo[results][@"listen_money"]];
+//                NSMutableAttributedString *attriString =[[NSMutableAttributedString alloc] initWithString:df attributes:@{NSForegroundColorAttributeName:gTextDownload,NSFontAttributeName:gFontMain12}];
+//                NSRange range1=[df rangeOfString:[NSString stringWithFormat:@"%@",userInfo[results][@"gold"]]];
+//                [attriString addAttributes:@{NSForegroundColorAttributeName:UIColorFromHex(0xf78540),NSFontAttributeName:gFontMain12} range:range1];
+//                [signtureLab addLinkToTransitInformation:nil withRange:range1];
+//                NSRange range2=[df rangeOfString:[NSString stringWithFormat:@"%@",userInfo[results][@"listen_money"]]];
+//                [attriString addAttributes:@{NSForegroundColorAttributeName:UIColorFromHex(0xf78540),NSFontAttributeName:gFontMain12} range:range2];
+//                [signtureLab addLinkToTransitInformation:nil withRange:range2];
+//                signtureLab.attributedText = attriString;
+//                //充值按钮
+//                UIButton *payButton = [UIButton buttonWithType:UIButtonTypeCustom];
+//                [payButton setFrame:CGRectMake(lab.frame.origin.x + 5, 225.0 / 667 * IPHONE_H, 80.0 / 375 * SCREEN_WIDTH, 20.0 / 667 * IPHONE_H)];
+//                [payButton setBackgroundColor:gButtonRewardColor];
+//                [payButton setTitle:@"充值" forState:UIControlStateNormal];
+//                [payButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+//                [payButton.titleLabel setFont:gFontMain12];
+//                [payButton.layer setMasksToBounds:YES];
+//                [payButton.layer setCornerRadius:8.0];
+//                [payButton addTarget:self action:@selector(payButtonAction:) forControlEvents:UIControlEventTouchUpInside];
+//                [cell.contentView addSubview:payButton];
+//
+//                CGSize contentSize = [lab sizeThatFits:CGSizeMake(lab.frame.size.width, MAXFLOAT)];
+//                lab.frame = CGRectMake(lab.frame.origin.x, lab.frame.origin.y,contentSize.width, lab.frame.size.height);
+//
+//                NSDictionary *userInfoDict = [CommonCode readFromUserD:@"dangqianUserInfo"];
+//
+//                //判断是否在审核中
+//                if ([[CommonCode readFromUserD:@"isIAP"] boolValue] == YES) {
+//                    vipImgView.hidden = YES;
+//                }else{
+//                    if ([userInfoDict[results][member_type] intValue] == 1||[userInfoDict[results][member_type] intValue] == 2) {
+//
+//                        vipImgView.frame = CGRectMake(CGRectGetMaxX(lab.frame) + 10, lab.y + 2, 30, 37);
+//                        vipImgView.centerY = lab.centerY;
+//                        vipImgView.hidden = NO;
+//                        if ([userInfoDict[results][member_type] intValue] == 1) {
+//                            vipImgView.image = [UIImage imageNamed:@"vip"];
+//                        }else{
+//                            vipImgView.image = [UIImage imageNamed:@"svip"];
+//                        }
+//                    }else{
+//                        vipImgView.hidden = YES;
+//                    }
+//                }
+//
+//                [lvView setFrame:CGRectMake(vipImgView.hidden? CGRectGetMaxX(lab.frame) + 5:CGRectGetMaxX(vipImgView.frame) + 10, IS_IPHONEX? lab.frame.origin.y + 4:lab.frame.origin.y + 2,IS_IPHONEX? 50.0: 50.0 / 667 * IPHONE_H, IS_IPHONEX?16.0:16.0 / 667 * IPHONE_H)];
+//                lvView.hidden = NO;
+//                NSInteger lv = [userInfo[results][@"level"] integerValue];
+//                if (lv > 0 && lv < 10) {
+//                    [lvView setImage:[UIImage imageNamed:@"LV1~9"]];
+//                }
+//                else if (lv >= 10 && lv < 20){
+//                    [lvView setImage:[UIImage imageNamed:@"LV10~19"]];
+//                }
+//                else if (lv >= 20 && lv < 30){
+//                    [lvView setImage:[UIImage imageNamed:@"LV20~29"]];
+//                }
+//                else if (lv >= 30 && lv < 40){
+//                    [lvView setImage:[UIImage imageNamed:@"LV30~39"]];
+//                }
+//                else if (lv >= 40 && lv < 50){
+//                    [lvView setImage:[UIImage imageNamed:@"LV40~49"]];
+//                }
+//                else if (lv >= 50 && lv < 60){
+//                    [lvView setImage:[UIImage imageNamed:@"LV50~59"]];
+//                }
+//                else if (lv >= 60 && lv < 70){
+//                    [lvView setImage:[UIImage imageNamed:@"LV60~69"]];
+//                }
+//                else if (lv >= 70 && lv < 80){
+//                    [lvView setImage:[UIImage imageNamed:@"LV70~79"]];
+//                }
+//                else if (lv >= 80 && lv < 90){
+//                    [lvView setImage:[UIImage imageNamed:@"LV80~89"]];
+//                }
+//                else if (lv >= 90 && lv < 99){
+//                    [lvView setImage:[UIImage imageNamed:@"LV90~99"]];
+//                }
+//                else{
+//                    [lvView setImage:[UIImage imageNamed:@"LV100"]];
+//                }
+//                [lvLab setText:userInfo[results][@"level"]];
+//
+//            }
+//            else{
+//                lab.text = nil;
+//                signtureLab.text = nil;
+//                lvView.hidden = YES;
+//                vipImgView.hidden = YES;
+//            }
+            DefineWeakSelf
+            mineVCHeaderTableViewCell *cell = [mineVCHeaderTableViewCell cellWithTableView:tableView];
             cell.selectionStyle = UITableViewCellSelectionStyleNone;
-            
-            //vip图标
-            UIImageView *vipImgView = [[UIImageView alloc] init];
-            vipImgView.hidden = YES;
-            vipImgView.contentMode = UIViewContentModeScaleAspectFill;
-            [cell.contentView addSubview:vipImgView];
-            
-            UIImageView *lvView = [[UIImageView alloc]initWithFrame:CGRectMake(vipImgView.hidden? CGRectGetMaxX(lab.frame) + 5:CGRectGetMaxX(vipImgView.frame) + 5, lab.frame.origin.y, 44.0, 16.0)];
-            [lvView setImage:[UIImage imageNamed:@"LV1~9"]];
-            lvView.hidden = YES;
-            lvView.contentMode = UIViewContentModeScaleAspectFill;
-            lvView.clipsToBounds = YES;
-            [lvView addTapGesWithTarget:self action:@selector(lvQAButtonAction)];
-            [cell.contentView addSubview:lvView];
-            
-            UILabel *lvLab = [[UILabel alloc]initWithFrame:CGRectMake(lvView.frame.size.width - 20, 0, 25, 16)];
-            [lvLab setFont:gFontMain12];
-            [lvLab setTextAlignment:NSTextAlignmentCenter];
-            [lvLab setTextColor:[UIColor whiteColor]];
-            if (TARGETED_DEVICE_IS_IPHONE_480) {
-                [lvLab setFrame:CGRectMake(lvView.frame.size.width - 25, 0, 25, 16)];
-            }
-            else if (TARGETED_DEVICE_IS_IPHONE_568){
-                [lvLab setFrame:CGRectMake(lvView.frame.size.width - 25, 0, 25, 16)];
-            }
-            else if (TARGETED_DEVICE_IS_IPHONE_667){
-                [lvLab setFrame:CGRectMake(lvView.frame.size.width - 20, 0, 25, 16)];
-            }
-            else if (TARGETED_DEVICE_IS_IPHONE_736){
-                [lvLab setFrame:CGRectMake(lvView.frame.size.width - 20, 0, 25, 16)];
-            }else if(IS_IPAD){
-                [lvLab setFrame:CGRectMake(lvView.frame.size.width, 5, 25, 16)];
-                [lvLab setFont:gFontMajor17];
-            }else if(IS_IPHONEX){
-                [lvLab setFrame:CGRectMake(lvView.frame.size.width - 10, 0, 25, 16)];
-            }
-            [lvView addSubview:lvLab];
-            
-            TTTAttributedLabel *signtureLab = [[TTTAttributedLabel alloc]initWithFrame:CGRectMake(lab.frame.origin.x, 230.0 / 667 * IPHONE_H, SCREEN_WIDTH - 150, 20.0 / 667 * IPHONE_H)];
-            [cell.contentView addSubview:signtureLab];
-            
-            if ([[CommonCode readFromUserD:@"isLogin"]boolValue] == YES){
-                NSDictionary *userInfo = [CommonCode readFromUserD:@"dangqianUserInfo"];
-                NSString *isNameNil = userInfo[results][@"user_nicename"];
-                if (isNameNil.length == 0){
-                    lab.text = userInfo[results][@"user_login"];
-                }
-                else{
-                    lab.text = userInfo[results][@"user_nicename"];
-                }
-                
-                //账户信息
-                NSString *df = [NSString stringWithFormat:@"金币：%@ | 听币：%@",userInfo[results][@"gold"],userInfo[results][@"listen_money"]];
-                NSMutableAttributedString *attriString =[[NSMutableAttributedString alloc] initWithString:df attributes:@{NSForegroundColorAttributeName:gTextDownload,NSFontAttributeName:gFontMain12}];
-                NSRange range1=[df rangeOfString:[NSString stringWithFormat:@"%@",userInfo[results][@"gold"]]];
-                [attriString addAttributes:@{NSForegroundColorAttributeName:UIColorFromHex(0xf78540),NSFontAttributeName:gFontMain12} range:range1];
-                [signtureLab addLinkToTransitInformation:nil withRange:range1];
-                NSRange range2=[df rangeOfString:[NSString stringWithFormat:@"%@",userInfo[results][@"listen_money"]]];
-                [attriString addAttributes:@{NSForegroundColorAttributeName:UIColorFromHex(0xf78540),NSFontAttributeName:gFontMain12} range:range2];
-                [signtureLab addLinkToTransitInformation:nil withRange:range2];
-                signtureLab.attributedText = attriString;
-                //充值按钮
-                UIButton *payButton = [UIButton buttonWithType:UIButtonTypeCustom];
-                [payButton setFrame:CGRectMake(lab.frame.origin.x, 255.0 / 667 * IPHONE_H, 80.0 / 375 * SCREEN_WIDTH, 20.0 / 667 * IPHONE_H)];
-                [payButton setBackgroundColor:gButtonRewardColor];
-                [payButton setTitle:@"充值" forState:UIControlStateNormal];
-                [payButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-                [payButton.titleLabel setFont:gFontMain12];
-                [payButton.layer setMasksToBounds:YES];
-                [payButton.layer setCornerRadius:8.0];
-                [payButton addTarget:self action:@selector(payButtonAction:) forControlEvents:UIControlEventTouchUpInside];
-                [cell.contentView addSubview:payButton];
-                
-                CGSize contentSize = [lab sizeThatFits:CGSizeMake(lab.frame.size.width, MAXFLOAT)];
-                lab.frame = CGRectMake(lab.frame.origin.x, lab.frame.origin.y,contentSize.width, lab.frame.size.height);
-                
-                NSDictionary *userInfoDict = [CommonCode readFromUserD:@"dangqianUserInfo"];
-                
-                //判断是否在审核中
-                if ([[CommonCode readFromUserD:@"isIAP"] boolValue] == YES) {
-                    vipImgView.hidden = YES;
-                }else{
-                    if ([userInfoDict[results][member_type] intValue] == 1||[userInfoDict[results][member_type] intValue] == 2) {
-                        
-                        vipImgView.frame = CGRectMake(CGRectGetMaxX(lab.frame) + 10, lab.y + 2, 30, 37);
-                        vipImgView.centerY = lab.centerY;
-                        vipImgView.hidden = NO;
-                        if ([userInfoDict[results][member_type] intValue] == 1) {
-                            vipImgView.image = [UIImage imageNamed:@"vip"];
-                        }else{
-                            vipImgView.image = [UIImage imageNamed:@"svip"];
-                        }
-                    }else{
-                        vipImgView.hidden = YES;
-                    }
-                }
-                
-                [lvView setFrame:CGRectMake(vipImgView.hidden? CGRectGetMaxX(lab.frame) + 5:CGRectGetMaxX(vipImgView.frame) + 10, IS_IPHONEX? lab.frame.origin.y + 4:lab.frame.origin.y + 2, 50.0 / 667 * IPHONE_H, IS_IPHONEX?16.0:16.0 / 667 * IPHONE_H)];
-                lvView.hidden = NO;
-                NSInteger lv = [userInfo[results][@"level"] integerValue];
-                if (lv > 0 && lv < 10) {
-                    [lvView setImage:[UIImage imageNamed:@"LV1~9"]];
-                }
-                else if (lv >= 10 && lv < 20){
-                    [lvView setImage:[UIImage imageNamed:@"LV10~19"]];
-                }
-                else if (lv >= 20 && lv < 30){
-                    [lvView setImage:[UIImage imageNamed:@"LV20~29"]];
-                }
-                else if (lv >= 30 && lv < 40){
-                    [lvView setImage:[UIImage imageNamed:@"LV30~39"]];
-                }
-                else if (lv >= 40 && lv < 50){
-                    [lvView setImage:[UIImage imageNamed:@"LV40~49"]];
-                }
-                else if (lv >= 50 && lv < 60){
-                    [lvView setImage:[UIImage imageNamed:@"LV50~59"]];
-                }
-                else if (lv >= 60 && lv < 70){
-                    [lvView setImage:[UIImage imageNamed:@"LV60~69"]];
-                }
-                else if (lv >= 70 && lv < 80){
-                    [lvView setImage:[UIImage imageNamed:@"LV70~79"]];
-                }
-                else if (lv >= 80 && lv < 90){
-                    [lvView setImage:[UIImage imageNamed:@"LV80~89"]];
-                }
-                else if (lv >= 90 && lv < 99){
-                    [lvView setImage:[UIImage imageNamed:@"LV90~99"]];
-                }
-                else{
-                    [lvView setImage:[UIImage imageNamed:@"LV100"]];
-                }
-                [lvLab setText:userInfo[results][@"level"]];
-                
-            }
-            else{
-                lab.text = nil;
-                signtureLab.text = nil;
-                lvView.hidden = YES;
-                vipImgView.hidden = YES;
-            }
-            
+            cell.isIAP = [[CommonCode readFromUserD:@"isIAP"] boolValue];
+            cell.dianjitouxiangshijian = ^{
+                [weakSelf dianjitouxiangshijian];
+            };
+            cell.vipTap = ^{
+                [weakSelf vipTap];
+            };
             return cell;
         }
         else if (indexPath.row == 1){
@@ -1062,9 +881,9 @@ typedef void(^animateBlock)();
             lab.text = @"听友圈";
             //        lab.text = @"我的关注";
             lab.textAlignment = NSTextAlignmentLeft;
-            lab.textColor = nTextColorMain;
+            lab.textColor = TITLE_COLOR_HEX;
+            lab.font =  CUSTOM_FONT_TYPE(17.0);
             [cell.contentView addSubview:lab];
-            lab.font =  [UIFont fontWithName:@"Regular" size:17.0f ];
             UIView *line = [[UIView alloc]initWithFrame:CGRectMake(20.0 / 375 * IPHONE_W, IS_IPHONEX?57.0:57.0 / 667 * IPHONE_H, SCREEN_WIDTH - 20.0 / 375 * IPHONE_W, 1)];
             [line setBackgroundColor:gThinLineColor];
             [cell.contentView addSubview:line];
@@ -1079,9 +898,9 @@ typedef void(^animateBlock)();
             UILabel *lab = [[UILabel alloc]initWithFrame:CGRectMake(40.0 / 375 * IPHONE_W, IS_IPHONEX?14.0:14.0 / 667 * IPHONE_H, 100.0 / 375 * IPHONE_W, 30.0 / 667 * IPHONE_H)];
             lab.text = @"我的会员";
             lab.textAlignment = NSTextAlignmentLeft;
-            lab.textColor = nTextColorMain;
+            lab.textColor = TITLE_COLOR_HEX;
             [cell.contentView addSubview:lab];
-            lab.font = gFontMajor17;
+            lab.font = CUSTOM_FONT_TYPE(17.0);
             UIView *line = [[UIView alloc]initWithFrame:CGRectMake(20.0 / 375 * IPHONE_W, IS_IPHONEX?57.0:57.0 / 667 * IPHONE_H, SCREEN_WIDTH - 20.0 / 375 * IPHONE_W, 1)];
             [line setBackgroundColor:gThinLineColor];
             [cell.contentView addSubview:line];
@@ -1094,9 +913,9 @@ typedef void(^animateBlock)();
             UILabel *lab = [[UILabel alloc]initWithFrame:CGRectMake(40.0 / 375 * IPHONE_W, IS_IPHONEX?14.0:14.0 / 667 * IPHONE_H, 100.0 / 375 * IPHONE_W, 30.0 / 667 * IPHONE_H)];
             lab.text = @"我的下载";
             lab.textAlignment = NSTextAlignmentLeft;
-            lab.textColor = nTextColorMain;
+            lab.textColor = TITLE_COLOR_HEX;
             [cell.contentView addSubview:lab];
-            lab.font = gFontMajor17;
+            lab.font = CUSTOM_FONT_TYPE(17.0);
             UIView *line = [[UIView alloc]initWithFrame:CGRectMake(20.0 / 375 * IPHONE_W, IS_IPHONEX?57.0:57.0 / 667 * IPHONE_H, SCREEN_WIDTH - 20.0 / 375 * IPHONE_W, 1)];
             [line setBackgroundColor:gThinLineColor];
             [cell.contentView addSubview:line];
@@ -1109,9 +928,9 @@ typedef void(^animateBlock)();
             UILabel *lab = [[UILabel alloc]initWithFrame:CGRectMake(40.0 / 375 * IPHONE_W, IS_IPHONEX?14.0:14.0 / 667 * IPHONE_H, 100.0 / 375 * IPHONE_W, 30.0 / 667 * IPHONE_H)];
             lab.text = @"我的收藏";
             lab.textAlignment = NSTextAlignmentLeft;
-            lab.textColor = nTextColorMain;
+            lab.textColor = TITLE_COLOR_HEX;
             [cell.contentView addSubview:lab];
-            lab.font = gFontMajor17;
+            lab.font = CUSTOM_FONT_TYPE(17.0);
             UIView *line = [[UIView alloc]initWithFrame:CGRectMake(20.0 / 375 * IPHONE_W, IS_IPHONEX?57.0:57.0 / 667 * IPHONE_H, SCREEN_WIDTH - 20.0 / 375 * IPHONE_W, 1)];
             [line setBackgroundColor:gThinLineColor];
             [cell.contentView addSubview:line];
@@ -1124,9 +943,9 @@ typedef void(^animateBlock)();
             UILabel *lab = [[UILabel alloc]initWithFrame:CGRectMake(40.0 / 375 * IPHONE_W, IS_IPHONEX?14.0:14.0 / 667 * IPHONE_H, 100.0 / 375 * IPHONE_W, 30.0 / 667 * IPHONE_H)];
             lab.text = @"我的课堂";
             lab.textAlignment = NSTextAlignmentLeft;
-            lab.textColor = nTextColorMain;
+            lab.textColor = TITLE_COLOR_HEX;
             [cell.contentView addSubview:lab];
-            lab.font = gFontMajor17;
+            lab.font = CUSTOM_FONT_TYPE(17.0);
             UIView *line = [[UIView alloc]initWithFrame:CGRectMake(20.0 / 375 * IPHONE_W, IS_IPHONEX?57.0:57.0 / 667 * IPHONE_H, SCREEN_WIDTH - 20.0 / 375 * IPHONE_W, 1)];
             [line setBackgroundColor:gThinLineColor];
             [cell.contentView addSubview:line];
@@ -1143,9 +962,9 @@ typedef void(^animateBlock)();
             UILabel *lab = [[UILabel alloc]initWithFrame:CGRectMake(40.0 / 375 * IPHONE_W, IS_IPHONEX?14.0:14.0 / 667 * IPHONE_H, 100.0 / 375 * IPHONE_W, 30.0 / 667 * IPHONE_H)];
             lab.text = @"设置";
             lab.textAlignment = NSTextAlignmentLeft;
-            lab.textColor = nTextColorMain;
+            lab.textColor = TITLE_COLOR_HEX;
             [cell.contentView addSubview:lab];
-            lab.font = gFontMajor17;
+            lab.font = CUSTOM_FONT_TYPE(17.0);
             cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
             [self.newSettingMessageButton setHidden:YES];
             [cell.contentView addSubview:self.newSettingMessageButton];
@@ -1160,7 +979,7 @@ typedef void(^animateBlock)();
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
     if (indexPath.row == 0){
-        return 265.0 / 667 * IPHONE_H;
+        return 225.0 / 667 * IPHONE_H;
     }
     else{
         return IS_IPHONEX?58.0:58.0f / 667 * IPHONE_H;
@@ -1344,24 +1163,24 @@ typedef void(^animateBlock)();
     return _newSettingMessageButton;
 }
 
-- (UIView *)signInView{
-    if (!_signInView) {
-        _signInView = [[UIView alloc]init];
-        [_signInView setFrame:CGRectMake(SCREEN_WIDTH - 83, SCREEN_HEIGHT - 85 - 83, 83, 83)];
-        [_signInView setUserInteractionEnabled:YES];
-        [_signInView addSubview:self.signInImageView];
-        [_signInView addTapGesWithTarget:self action:@selector(signInAction:)];
-    }
-    return _signInView;
-}
+//- (UIView *)signInView{
+//    if (!_signInView) {
+//        _signInView = [[UIView alloc]init];
+//        [_signInView setFrame:CGRectMake(SCREEN_WIDTH - 83, SCREEN_HEIGHT - 85 - 83, 83, 83)];
+//        [_signInView setUserInteractionEnabled:YES];
+//        [_signInView addSubview:self.signInImageView];
+//        [_signInView addTapGesWithTarget:self action:@selector(signInAction:)];
+//    }
+//    return _signInView;
+//}
 
-- (UIImageView *)signInImageView {
-    if (!_signInImageView ) {
-        _signInImageView  = [[UIImageView alloc]initWithFrame:CGRectMake(0,23, 60, 60)];
-        [_signInImageView setUserInteractionEnabled:YES];
-        [_signInImageView setImage:[UIImage imageNamed:@"sign_in"]];
-    }
-    return _signInImageView;
-}
+//- (UIImageView *)signInImageView {
+//    if (!_signInImageView ) {
+//        _signInImageView  = [[UIImageView alloc]initWithFrame:CGRectMake(0,23, 60, 60)];
+//        [_signInImageView setUserInteractionEnabled:YES];
+//        [_signInImageView setImage:[UIImage imageNamed:@"sign_in"]];
+//    }
+//    return _signInImageView;
+//}
 
 @end

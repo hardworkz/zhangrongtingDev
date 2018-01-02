@@ -153,7 +153,7 @@
     UILabel *lab = [[UILabel alloc]initWithFrame:CGRectMake(38.0 / 375 * IPHONE_W, 11.0 / 667 * SCREEN_HEIGHT, 150.0 / 375 * IPHONE_W, 21)];
     lab.text = [NSString stringWithFormat:@"%@",self.dataArr[indexPath.section][indexPath.row]];
     [cell.contentView addSubview:lab];
-    lab.font = [UIFont systemFontOfSize:15.0f];
+    lab.font = CUSTOM_FONT_TYPE(15.0);
     lab.userInteractionEnabled = YES;
     if ([[CommonCode readFromUserD:@"isLogin"]boolValue] == YES){
         if (indexPath.section == 2 && indexPath.row == 4){

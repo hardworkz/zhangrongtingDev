@@ -458,6 +458,7 @@
     NewReportViewController *newreportVC = [[NewReportViewController alloc]init];
     newreportVC.term_id = term_id;
     newreportVC.NewsTpye = newsType;
+    newreportVC.view.backgroundColor = [UIColor whiteColor];
     [self.navigationController pushViewController:newreportVC animated:YES];
 }
 
@@ -559,10 +560,10 @@
                 [newsItem.layer setMasksToBounds:YES];
                 [newsItem.layer setCornerRadius:IS_IPAD?20:12.5];
                 [newsItem.layer setBorderWidth:0.5];
-                [newsItem.layer setBorderColor:gTextColorSub.CGColor];
+                [newsItem.layer setBorderColor:TITLE_COLOR_HEX.CGColor];
                 [newsItem setTitle:newsItemTitle[i] forState:UIControlStateNormal];
-                [newsItem setTitleColor:gTextDownload forState:UIControlStateNormal];
-                [newsItem.titleLabel setFont:gFontMain14];
+                [newsItem setTitleColor:TITLE_COLOR_HEX forState:UIControlStateNormal];
+                [newsItem.titleLabel setFont:CUSTOM_FONT_TYPE(14.0)];
                 [newsItem setTag:(500+ i)];
                 [newsItem addTarget:self action:@selector(newsItemAction:) forControlEvents:UIControlEventTouchUpInside];
                 [cell.contentView addSubview:newsItem];

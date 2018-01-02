@@ -109,6 +109,10 @@ typedef NS_ENUM(NSInteger, ZRTPlayStatus) {
  */
 @property (nonatomic, strong) AVPlayer * player;
 /**
+ 播放属性
+ */
+@property (nonatomic, strong) AVPlayerItem           *playerItem;
+/**
  课堂播放历史记录数据
  */
 @property (strong, nonatomic) ClassPlayHistoryDataModel *playHistoryDataModel;

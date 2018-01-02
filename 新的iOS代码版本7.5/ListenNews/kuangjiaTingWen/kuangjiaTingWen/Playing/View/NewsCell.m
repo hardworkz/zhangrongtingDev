@@ -56,8 +56,9 @@
             [titleLab setFrame:CGRectMake(15.0, 16.0 + offsetY, SCREEN_WIDTH - 155.0, 21.0)];
         }
         titleLab.textAlignment = NSTextAlignmentLeft;
-        titleLab.font = [UIFont boldSystemFontOfSize:17.0f];
+        titleLab.font = CUSTOM_FONT_TYPE(17.0);
         titleLab.lineBreakMode = NSLineBreakByWordWrapping;
+        titleLab.textColor = TITLE_COLOR_HEX;
         [titleLab setNumberOfLines:3];
 //        titleLab.backgroundColor = [UIColor blueColor];
         [self.contentView addSubview:titleLab];
@@ -68,7 +69,7 @@
             detailNews.numberOfLines = 0;
             detailNews.textColor = gTextColorSub;
 //            detailNews.backgroundColor = [UIColor redColor];
-            detailNews.font = [UIFont systemFontOfSize:15.0f];
+            detailNews.font = CUSTOM_FONT_TYPE(15.0);
             [self.contentView addSubview:detailNews];
         }
         
@@ -78,7 +79,7 @@
             [riqiLab setFrame:CGRectMake(15.0, 86.0 + offsetY, 135.0, 21.0)];
         }
         riqiLab.textColor = nSubColor;
-        riqiLab.font = [UIFont systemFontOfSize:13.0f];
+        riqiLab.font = CUSTOM_FONT_TYPE(13.0);
         [self.contentView addSubview:riqiLab];
         //大小
         dataLab = [[UILabel alloc]initWithFrame:CGRectMake(SCREEN_WIDTH - 213.0 / 375 * IPHONE_W, 86.0 / 667 *IPHONE_H + offsetY, 45.0 / 375 * IPHONE_W, 21.0 / 667 *IPHONE_H)];
@@ -86,7 +87,7 @@
             [dataLab setFrame:CGRectMake(SCREEN_WIDTH - 213.0, 86.0 + offsetY, 45.0, 21.0)];
         }
         dataLab.textColor = nSubColor;
-        dataLab.font = [UIFont systemFontOfSize:13.0f];
+        dataLab.font = CUSTOM_FONT_TYPE(13.0);
         dataLab.textAlignment = NSTextAlignmentCenter;
         [self.contentView addSubview:dataLab];
         //下载

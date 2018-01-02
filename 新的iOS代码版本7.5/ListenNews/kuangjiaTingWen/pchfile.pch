@@ -158,6 +158,10 @@ selector:_selector name:_name object:nil];
 #define IMAGEVIEWHTTP2(a,b) [a sd_setImageWithURL:[NSURL URLWithString:USERPOTOAD(b)] placeholderImage:[UIImage imageNamed:@"thumbnailsdefault"]]
 #define IMAGEVIEWHTTP(a,b) [a sd_setImageWithURL:[NSURL URLWithString:USERPHOTOHTTPSTRINGZhuBo(b)] placeholderImage:[UIImage imageNamed:@"thumbnailsdefault"]]
 
+//标题苹方粗体颜色
+#define TITLE_COLOR_HEX HEXCOLOR(0x333333)
+#define CUSTOM_FONT_TYPE(a) [UIFont fontWithName:@"PingFangSC-Semibold" size:(a)]
+
 //新闻图片url处理
 #define NEWSSEMTPHOTOURL(smetaUrl) [[[[[smetaUrl stringByReplacingOccurrencesOfString:@"\\" withString:@""] stringByReplacingOccurrencesOfString:@"\"" withString:@""] stringByReplacingOccurrencesOfString:@"thumb:" withString:@""]stringByReplacingOccurrencesOfString:@"{" withString:@""]stringByReplacingOccurrencesOfString:@"}" withString:@""]
 

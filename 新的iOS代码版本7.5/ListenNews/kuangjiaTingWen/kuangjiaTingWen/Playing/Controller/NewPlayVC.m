@@ -256,7 +256,7 @@ static NewPlayVC *_instance = nil;
     [self setupNavigation];
     
     //设置底部播放控件
-    [self xinwenxiangqingbujv];
+    [self xinwenxiangqingbujvNew];
     
     //设置新闻头部详情控件
     self.tableView.tableHeaderView = [self setupTableViewHeader];
@@ -594,8 +594,214 @@ static NewPlayVC *_instance = nil;
     
     [self bofangqiSet];
 }
+- (void)xinwenxiangqingbujvNew{
+    
+    //底部view主容器控件
+    dibuView = [[UIView alloc]initWithFrame:CGRectMake(0, IPHONE_H - 159.0 / 667 * IPHONE_H, IPHONE_W, 159.0 / 667 * IPHONE_H)];
+    dibuView.backgroundColor = [UIColor whiteColor];
+    [self.view addSubview:dibuView];
+    
+    //底部收藏按钮
+    bofangfenxiangBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+    bofangfenxiangBtn.frame = CGRectMake(IPHONE_W - 52.0 / 375 * IPHONE_W, 54.0 / 667 * IPHONE_H,IS_IPHONEX?32.0: 32.0 / 667 * IPHONE_H,IS_IPHONEX?32.0: 32.0 / 667 * IPHONE_H);
+    [bofangfenxiangBtn setImageEdgeInsets:UIEdgeInsetsMake(5, 5, 7, 7)];
+    [bofangfenxiangBtn setImage:[UIImage imageNamed:@"home_news_collection"] forState:UIControlStateNormal];
+    [bofangfenxiangBtn setImage:[UIImage imageNamed:@"home_news_collectioned"] forState:UIControlStateSelected];
+    [bofangfenxiangBtn setTag:99];
+    bofangfenxiangBtn.accessibilityLabel = @"收藏";
+    [bofangfenxiangBtn addTarget:self action:@selector(collect) forControlEvents:UIControlEventTouchUpInside];
+    bofangfenxiangBtn.contentMode = UIViewContentModeScaleToFill;
+    [dibuView addSubview:bofangfenxiangBtn];
+    
+    //底部定时按钮
+    UIButton *bofangdingshiBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+    bofangdingshiBtn.frame = CGRectMake(20.0 / 375 * IPHONE_W, 54.0 / 667 * IPHONE_H, 32.0 / 667 * IPHONE_H, 32.0 / 667 * IPHONE_H);
+    [bofangdingshiBtn setImage:[UIImage imageNamed:@"home_news_ic_time"] forState:UIControlStateNormal];
+    [bofangdingshiBtn setImageEdgeInsets:UIEdgeInsetsMake(5, 5, 5, 5)];
+    bofangdingshiBtn.accessibilityLabel = @"定时";
+    [bofangdingshiBtn addTarget:self action:@selector(bofangdingshiBtnAction:) forControlEvents:UIControlEventTouchUpInside];
+    bofangdingshiBtn.contentMode = UIViewContentModeScaleToFill;
+    [dibuView addSubview:bofangdingshiBtn];
+    
+    UIView *dibuTopLine = [[UIView alloc]initWithFrame:CGRectMake(0, 0, IPHONE_W, 0.5)];
+    dibuTopLine.backgroundColor = [UIColor grayColor];
+    dibuTopLine.alpha = 0.5f;
+    [dibuView addSubview:dibuTopLine];
+    
+    
+    UIView *bottomBgView = [[UIView alloc]initWithFrame:CGRectMake(0, IS_IPHONEX?159.0 / 667 * IPHONE_H - 50 - 34 + 10:159.0 / 667 * IPHONE_H - 50, IPHONE_W, IS_IPHONEX? 50 + 34:50)];
+    bottomBgView.backgroundColor = HEXCOLOR(0xfafafa);
+    [dibuView addSubview:bottomBgView];
+    
+    UIView *line = [[UIView alloc]initWithFrame:CGRectMake(0, 0, IPHONE_W, 0.5)];
+    line.backgroundColor = [UIColor grayColor];
+    line.alpha = 0.5f;
+    [bottomBgView addSubview:line];
+    //功能按钮
+    for (int i = 0; i<4; i++) {
+        UIButton *button = [[UIButton alloc] initWithFrame:CGRectMake(SCREEN_WIDTH/4 * i, 10, SCREEN_WIDTH/4, 20)];
+        button.imageView.contentMode = UIViewContentModeScaleAspectFit;
+        [button addTarget:self action:@selector(button_click:)];
+        [bottomBgView addSubview:button];
+        
+        UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(SCREEN_WIDTH/4 * i, CGRectGetMaxY(button.frame), SCREEN_WIDTH/4, 15)];
+        label.textAlignment = NSTextAlignmentCenter;
+        label.textColor = [UIColor grayColor];
+        label.font = [UIFont systemFontOfSize:13.];
+        [bottomBgView addSubview:label];
+        
+        if (i == 0) {
+            [button setImage:[UIImage imageNamed:@"icon_down"] forState:UIControlStateNormal];
+            button.accessibilityIdentifier = @"下载";
+            label.text = @"下载";
+        }else if (i == 1) {
+            [button setImage:[UIImage imageNamed:@"icon_played"] forState:UIControlStateNormal];
+            button.accessibilityIdentifier = @"倍数";
+            label.text = @"倍数";
+        }else if (i == 2) {
+            [button setImage:[UIImage imageNamed:@"icon_player_quality"] forState:UIControlStateNormal];
+            button.accessibilityIdentifier = @"音质";
+            label.text = @"音质";
+        }else if (i == 3) {
+            [button setImage:[UIImage imageNamed:@"icon_comment"] forState:UIControlStateNormal];
+            button.accessibilityIdentifier = @"评论";
+            label.text = @"评论";
+        }
+    }
+    
+    [self bofangqiSetNew];
+}
+/**
+ 点击底部按钮时间
+ */
+- (void)button_click:(UIButton *)button
+{
+    if ([button.accessibilityIdentifier isEqualToString:@"下载"]) {
+        //下载
+        [self downloadAction:button];
+    }else if ([button.accessibilityIdentifier isEqualToString:@"评论"]) {
+        //评论
+        [self pinglunAction];
+    }else if ([button.accessibilityIdentifier isEqualToString:@"倍数"]) {
+        if ([[CommonCode readFromUserD:@"play_rate"] floatValue] == 1.5) {
+            [ZRT_PlayerManager manager].playRate = 1.0;
+            [CommonCode writeToUserD:@([ZRT_PlayerManager manager].playRate) andKey:@"play_rate"];
+            [[XWAlerLoginView alertWithTitle:@"当前播放速度为X1.0"] show];
+            [[ZRT_PlayerManager manager] startPlay];
+        }else{
+            [ZRT_PlayerManager manager].playRate = 1.50;
+            [CommonCode writeToUserD:@([ZRT_PlayerManager manager].playRate) andKey:@"play_rate"];
+            [[XWAlerLoginView alertWithTitle:@"当前播放速度为X1.5"] show];
+            [[ZRT_PlayerManager manager] startPlay];
+        }
+    }else if ([button.accessibilityIdentifier isEqualToString:@"音质"]) {
+        [[XWAlerLoginView alertWithTitle:@"~暂未开放~"] show];
+    }
+}
 #pragma mark - 播放器设置
 - (void)bofangqiSet
+{
+    //底部播放左按钮
+    bofangLeftBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+    bofangLeftBtn.frame = CGRectMake(104.5 / 375 * IPHONE_W, 54.0 / 667 * IPHONE_H, 32.0 / 667 * IPHONE_H, 32.0 / 667 * IPHONE_H);
+    [bofangLeftBtn setImage:[UIImage imageNamed:@"home_news_ic_before"] forState:UIControlStateNormal];
+    [bofangLeftBtn setImage:[UIImage imageNamed:@"home_news_ic_before"] forState:UIControlStateDisabled];
+    bofangLeftBtn.accessibilityLabel = @"上一条新闻";
+    [bofangLeftBtn addTarget:self action:@selector(bofangLeftAction:) forControlEvents:UIControlEventTouchUpInside];
+    bofangLeftBtn.contentMode = UIViewContentModeScaleToFill;
+    [dibuView addSubview:bofangLeftBtn];
+    
+    //底部播放右按钮
+    bofangRightBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+    bofangRightBtn.frame = CGRectMake(IPHONE_W - 104.5 / 375 * SCREEN_WIDTH -  bofangLeftBtn.frame.size.width, bofangLeftBtn.frame.origin.y, bofangLeftBtn.frame.size.width,bofangLeftBtn.frame.size.height);
+    [bofangRightBtn setImage:[UIImage imageNamed:@"home_news_ic_next"] forState:UIControlStateNormal];
+    [bofangRightBtn setImage:[UIImage imageNamed:@"home_news_ic_next"] forState:UIControlStateDisabled];
+    bofangRightBtn.accessibilityLabel = @"下一则新闻";
+    [bofangRightBtn addTarget:self action:@selector(bofangRightAction:) forControlEvents:UIControlEventTouchUpInside];
+    bofangRightBtn.contentMode = UIViewContentModeScaleToFill;
+    [dibuView addSubview:bofangRightBtn];
+    
+    //底部播放暂停按钮
+    bofangCenterBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+    bofangCenterBtn.frame = CGRectMake((IPHONE_W  - bofangLeftBtn.frame.size.width)/ 2, bofangLeftBtn.frame.origin.y, bofangLeftBtn.frame.size.width ,bofangLeftBtn.frame.size.height);
+    [bofangCenterBtn setImage:[UIImage imageNamed:@"home_news_ic_play"] forState:UIControlStateNormal];
+    [bofangCenterBtn setImage:[UIImage imageNamed:@"home_news_ic_pause"] forState:UIControlStateSelected];
+    bofangCenterBtn.accessibilityLabel = @"播放";
+    [bofangCenterBtn addTarget:self action:@selector(playPauseClicked:) forControlEvents:UIControlEventTouchUpInside];
+    bofangCenterBtn.contentMode = UIViewContentModeScaleToFill;
+    bofangCenterBtn.selected = YES;
+    
+    //新闻时长
+    if (IS_IPAD) {
+        self.yinpinzongTime = [[UILabel alloc]initWithFrame:CGRectMake(SCREEN_WIDTH - 70.0 / 375 * SCREEN_WIDTH, 32.0 / 667 * IPHONE_H, 50.0 / 375 * IPHONE_W, 20.0 / 667 * IPHONE_H)];
+    }
+    else{
+        self.yinpinzongTime = [[UILabel alloc]initWithFrame:CGRectMake(SCREEN_WIDTH - 70.0 / 375 * SCREEN_WIDTH, 32.0 / 667 * IPHONE_H, 50.0 / 375 * IPHONE_W, 20.0 / 667 * IPHONE_H)];
+    }
+    
+    self.yinpinzongTime.textColor = nTextColorMain;
+    [self.yinpinzongTime setTextAlignment:NSTextAlignmentRight];
+    self.yinpinzongTime.font = [UIFont systemFontOfSize:12.0f ];
+    
+    [self reloadPlayAllTime];/**<刷新音频总时长*/
+    
+    [dibuView addSubview:self.yinpinzongTime];
+    
+    //当前时间
+    if (IS_IPAD) {
+        dangqianTime = [[UILabel alloc]initWithFrame:CGRectMake(20.0 / 375 * IPHONE_W, 32.0 / 667 * IPHONE_H, 50.0 / 375 * IPHONE_W, 20.0 / 667 * IPHONE_H)];
+    }
+    else{
+        dangqianTime = [[UILabel alloc]initWithFrame:CGRectMake(20.0 / 375 * IPHONE_W, 32.0 / 667 * IPHONE_H, 50.0 / 375 * IPHONE_W, 20.0 / 667 * IPHONE_H)];
+    }
+    
+    dangqianTime.textColor = gMainColor;
+    dangqianTime.font = [UIFont systemFontOfSize:12.0f ];
+    dangqianTime.text = @"00:00";
+    [dibuView addSubview:dangqianTime];
+    
+    //播放进度条
+    [self.sliderProgress setThumbImage:[UIImage imageNamed:@"slider"] forState:UIControlStateNormal];
+    self.sliderProgress.minimumTrackTintColor = gMainColor;
+    self.sliderProgress.maximumTrackTintColor = [UIColor clearColor];
+    [self.sliderProgress addTarget:self action:@selector(doChangeProgress:) forControlEvents:UIControlEventValueChanged];
+    [self.sliderProgress addTarget:self action:@selector(sliderTouchDown:) forControlEvents:UIControlEventTouchDown];
+    self.prgBufferProgress.frame = self.sliderProgress.frame;
+    self.prgBufferProgress.progressTintColor = gMainColor;;
+    [dibuView addSubview:self.prgBufferProgress];
+    [dibuView addSubview:self.sliderProgress];
+    self.sliderProgress.maximumTrackTintColor = [UIColor clearColor];
+    
+    [dibuView addSubview:bofangCenterBtn];
+    
+    DefineWeakSelf
+    [ZRT_PlayerManager manager].playTimeObserve = ^(float progress,float currentTime,float totalDuration) {
+        
+        dangqianTime.text = [weakSelf convertStringWithTime:currentTime];
+        weakSelf.sliderProgress.value = currentTime;
+        weakSelf.sliderProgress.maximumValue = totalDuration;
+    };
+    [ZRT_PlayerManager manager].reloadBufferProgress = ^(float bufferProgress,float totalDuration) {
+        if (bufferProgress>0) {
+            //添加播放记录功能：实例60秒开始播放
+            if ((bufferProgress*totalDuration)>self.starDate && self.starDate!= 0) {
+                //调到指定时间去播放
+                [[ZRT_PlayerManager manager].player seekToTime:CMTimeMake(_starDate, 1) completionHandler:^(BOOL finished) {
+                    if (finished == YES){
+                        [[ZRT_PlayerManager manager] startPlay];
+                    }
+                }];
+                self.starDate = 0;
+            }
+            //更新播放条进度
+            [weakSelf.prgBufferProgress setProgress:bufferProgress animated:YES];
+        }else{
+            [weakSelf.prgBufferProgress setProgress:0. animated:YES];
+        }
+    };
+    
+}
+- (void)bofangqiSetNew
 {
     //底部播放左按钮
     bofangLeftBtn = [UIButton buttonWithType:UIButtonTypeCustom];
@@ -848,14 +1054,12 @@ static NewPlayVC *_instance = nil;
 {
     if (!_tableView)
     {
-        _tableView = [[UITableView alloc]initWithFrame:CGRectMake(0,IS_IPHONEX?-25:0, IPHONE_W, IPHONE_H - 109.0 / 667 * IPHONE_H) style:UITableViewStylePlain];
+        _tableView = [[UITableView alloc]initWithFrame:CGRectMake(0,IS_IPHONEX?-25:0, IPHONE_W, IPHONE_H - 159.0 / 667 * IPHONE_H) style:UITableViewStylePlain];
         _tableView.delegate = self;
         _tableView.backgroundColor = [UIColor whiteColor];
         _tableView.scrollsToTop = YES;
         _tableView.dataSource = self;
-//        _tableView.sectionFooterHeight = 0.0;
         _tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
-//        _tableView.tableFooterView = [UIView new];
     }
     return _tableView;
 }
@@ -863,7 +1067,7 @@ static NewPlayVC *_instance = nil;
 {
     if (_scrollTopBtn == nil) {
         CGFloat W = 40.0f;
-        _scrollTopBtn = [[UIButton alloc] initWithFrame:CGRectMake(SCREEN_WIDTH - W, SCREEN_HEIGHT - W - 10 - 109.0/667*IPHONE_H, W, W)];
+        _scrollTopBtn = [[UIButton alloc] initWithFrame:CGRectMake(SCREEN_WIDTH - W, SCREEN_HEIGHT - W - 10 - 159.0/667*IPHONE_H, W, W)];
         _scrollTopBtn.layer.cornerRadius = 25;
         [_scrollTopBtn setImage:@"置顶"];
         [_scrollTopBtn addTarget:self action:@selector(scrollToTop)];
@@ -920,9 +1124,9 @@ static NewPlayVC *_instance = nil;
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
     if (self.pinglunArr.count != 0) {
-        return 3 + self.pinglunArr.count;
+        return 1 + self.pinglunArr.count;
     }else{
-        return 3;
+        return 1;
     }
 }
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -1436,7 +1640,7 @@ static NewPlayVC *_instance = nil;
     if (_forwardBackView == nil) {
         CGFloat height = 70;
         _forwardBackView = [[UIView alloc] init];
-        _forwardBackView.frame = CGRectMake(0, IPHONE_H - 109.0 / 667 * IPHONE_H - height, SCREEN_WIDTH, height);
+        _forwardBackView.frame = CGRectMake(0, IPHONE_H - 159.0 / 667 * IPHONE_H - height, SCREEN_WIDTH, height);
         _forwardBackView.backgroundColor = ColorWithRGBA(0, 0, 0, 0.5);
         
         UIButton *back = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH * 0.5, height)];
@@ -1572,7 +1776,7 @@ static NewPlayVC *_instance = nil;
         AVAudioSessionInterruptionOptions options = [info[AVAudioSessionInterruptionOptionKey] unsignedIntegerValue];
         if (options == AVAudioSessionInterruptionOptionShouldResume) {
             //Handle Resume 重新开始播放
-            [[ZRT_PlayerManager manager] startPlay];
+            [[ZRT_PlayerManager manager] pausePlay];
         }
     }
 }

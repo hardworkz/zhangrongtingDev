@@ -35,8 +35,9 @@
     return self;
 }
 
-- (void)awakeFromNib {
-
+- (void)awakeFromNib
+{
+    [super awakeFromNib];
 }
 
 - (void)displayCell:(WHC_Download *)object{

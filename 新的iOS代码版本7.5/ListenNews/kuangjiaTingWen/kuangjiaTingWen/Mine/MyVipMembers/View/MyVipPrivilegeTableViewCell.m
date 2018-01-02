@@ -38,7 +38,7 @@ static NSString *const VIPContent = @"普通会员:\n1.每日可收听新闻数�
         textView.backgroundColor = ColorWithRGBA(249, 247, 247, 1);
         textView.textColor = [UIColor lightGrayColor];
         textView.text = VIPContent;
-        textView.font = [UIFont systemFontOfSize:12];
+        textView.font = CUSTOM_FONT_TYPE(12.0);
         textView.scrollEnabled = NO;
         [self.contentView addSubview:textView];
     }

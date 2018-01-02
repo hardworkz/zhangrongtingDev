@@ -113,6 +113,19 @@ static CGFloat const MaxScale = 1.0;/** 选中文字放大  */
     UIView *seperatorLine = [[UIView alloc]initWithFrame:CGRectMake(0, 63.5, SCREEN_WIDTH, 0.5)];
     [seperatorLine setBackgroundColor:[UIColor lightGrayColor]];
     [topView addSubview:seperatorLine];
+    
+    //适配iPhoneX导航栏
+    if (IS_IPHONEX) {
+        topView.frame = CGRectMake(0, 0, IPHONE_W, 88);
+        leftBtn.frame = CGRectMake(10, 25 + 24, 35, 35);
+        topLab.frame = CGRectMake(50, 30 + 24, IPHONE_W - 100, 30);
+        seperatorLine.frame = CGRectMake(0, 63.5 + 24, SCREEN_WIDTH, 0.5);
+    }else{
+        topView.frame = CGRectMake(0, 0, IPHONE_W, 64);
+        leftBtn.frame = CGRectMake(10, 25, 35, 35);
+        topLab.frame = CGRectMake(50, 30, IPHONE_W - 100, 30);
+        seperatorLine.frame = CGRectMake(0, 63.5, SCREEN_WIDTH, 0.5);
+    }
 
     [self addChildViewController];    /** 添加子控制器视图  */
     
@@ -201,7 +214,7 @@ static CGFloat const MaxScale = 1.0;/** 选中文字放大  */
 
 - (void)setTitleScrollView{
     
-    CGRect rect  = CGRectMake(0, 64, SCREEN_WIDTH, titleH);
+    CGRect rect  = CGRectMake(0,IS_IPHONEX?IPHONEX_TOP_H:64, SCREEN_WIDTH, titleH);
     self.titleScrollView = [[UIScrollView alloc] initWithFrame:rect];
     [self.view addSubview:self.titleScrollView];
     

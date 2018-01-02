@@ -52,7 +52,7 @@
         
         UILabel *lab = [[UILabel alloc]initWithFrame:CGRectMake(imageView.frame.origin.x, CGRectGetMaxY(imageView.frame) + 8.0 / 667 * IPHONE_H, imageView.frame.size.width, 20.0 / 667 * IPHONE_H)];
         lab.text = title;
-        lab.textColor = [UIColor blackColor];
+        lab.textColor = TITLE_COLOR_HEX;
         lab.font =[UIFont fontWithName:@"Courier" size:13.0];
         lab.textAlignment = NSTextAlignmentCenter;
         lab.tag = 2;

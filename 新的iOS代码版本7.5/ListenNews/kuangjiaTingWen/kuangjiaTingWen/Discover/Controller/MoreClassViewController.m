@@ -76,6 +76,20 @@
     UIView *seperatorLine = [[UIView alloc]initWithFrame:CGRectMake(0, 63.5, SCREEN_WIDTH, 0.5)];
     [seperatorLine setBackgroundColor:[UIColor lightGrayColor]];
     [topView addSubview:seperatorLine];
+    
+    //适配iPhoneX导航栏
+    if (IS_IPHONEX) {
+        topView.frame = CGRectMake(0, 0, IPHONE_W, 88);
+        leftBtn.frame = CGRectMake(10, 25 + 24, 35, 35);
+        topLab.frame = CGRectMake(50, 30 + 24, IPHONE_W - 100, 30);
+        seperatorLine.frame = CGRectMake(0, 63.5 + 24, SCREEN_WIDTH, 0.5);
+    }else{
+        topView.frame = CGRectMake(0, 0, IPHONE_W, 64);
+        leftBtn.frame = CGRectMake(10, 25, 35, 35);
+        topLab.frame = CGRectMake(50, 30, IPHONE_W - 100, 30);
+        seperatorLine.frame = CGRectMake(0, 63.5, SCREEN_WIDTH, 0.5);
+    }
+    
     [self.view addSubview:self.commentTableView];
     UISwipeGestureRecognizer *rightSwipe = [[UISwipeGestureRecognizer alloc]initWithTarget:self action:@selector(back)];
     [rightSwipe setDirection:UISwipeGestureRecognizerDirectionRight];
@@ -92,7 +106,7 @@
 }
 - (UITableView *)commentTableView{
     if (!_commentTableView){
-        _commentTableView = [[UITableView alloc]initWithFrame:CGRectMake(0, 64, SCREEN_WIDTH, SCREEN_HEIGHT - 64) style:UITableViewStylePlain];
+        _commentTableView = [[UITableView alloc]initWithFrame:CGRectMake(0,IS_IPHONEX?IPHONEX_TOP_H:64, SCREEN_WIDTH,IS_IPHONEX?SCREEN_HEIGHT - IPHONEX_TOP_H: SCREEN_HEIGHT - 64) style:UITableViewStylePlain];
         _commentTableView.delegate = self;
         _commentTableView.dataSource = self;
         _commentTableView.tableFooterView = [UIView new];

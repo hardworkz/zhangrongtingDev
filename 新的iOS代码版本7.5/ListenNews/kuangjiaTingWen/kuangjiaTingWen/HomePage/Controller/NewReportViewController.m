@@ -26,7 +26,8 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    [self setupData];
+    self.view.backgroundColor = [UIColor whiteColor];
+//    [self setupData];
     [self setupView];
     
 }
@@ -38,13 +39,11 @@
 }
 
 - (void)setupData {
-    [self enableAutoBack];
+//    [self enableAutoBack];
 }
 
 - (void)setupView {
-    numberPage = 1;
     self.edgesForExtendedLayout = UIRectEdgeNone;
-    self.view.backgroundColor = [UIColor whiteColor];
     self.title = (self.NewsTpye != nil) ? self.NewsTpye : @"新闻播报";
     self.navigationController.navigationBar.titleTextAttributes = @{NSForegroundColorAttributeName: [UIColor blackColor],
                                                                     NSFontAttributeName : [UIFont boldSystemFontOfSize:18]};
@@ -56,17 +55,20 @@
     [leftBtn addTarget:self action:@selector(back) forControlEvents:UIControlEventTouchUpInside];
     self.navigationItem.leftBarButtonItem = back;
     
+    
     UISwipeGestureRecognizer *rightSwipe = [[UISwipeGestureRecognizer alloc]initWithTarget:self action:@selector(back)];
     [rightSwipe setDirection:UISwipeGestureRecognizerDirectionRight];
     [self.tableView addGestureRecognizer:rightSwipe];
     [self.view addSubview:self.tableView];
     
+    numberPage = 1;
     [self.tableView.mj_header beginRefreshing];
     self.tableView.mj_header.automaticallyChangeAlpha = YES;
     //通知
     //播放下一条自动加载更多新闻信息通知
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(gaibianyanse:) name:@"gaibianyanse" object:nil];
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(dianjihougaibianyanse:) name:@"dianjihougaibiangezhongyanse" object:nil];
+    AdjustsScrollViewInsetNever(self, self.tableView)
 }
 
 - (void)dianjihougaibianyanse:(NSNotification *)notification {
@@ -195,7 +197,7 @@
 {
     if (!_tableView)
     {
-        _tableView = [[UITableView alloc]initWithFrame:CGRectMake(0, 0, IPHONE_W, IPHONE_H - 64) style:UITableViewStylePlain];
+        _tableView = [[UITableView alloc]initWithFrame:CGRectMake(0,0, SCREEN_WIDTH,IS_IPHONEX?SCREEN_HEIGHT - IPHONEX_TOP_H: SCREEN_HEIGHT - 64) style:UITableViewStylePlain];
         _tableView.delegate = self;
         _tableView.dataSource = self;
         _tableView.separatorStyle = UITableViewCellSeparatorStyleNone;

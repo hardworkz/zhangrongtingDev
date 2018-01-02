@@ -33,6 +33,7 @@
 #import "BlobNewTableViewCell.h"
 #import "CommentAndReviewTableViewCell.h"
 #import "MyClassroomTableViewCell.h"
+#import "mineVCHeaderTableViewCell.h"
 
 #import "MultiImageView.h"
 #import "UIView+tap.h"

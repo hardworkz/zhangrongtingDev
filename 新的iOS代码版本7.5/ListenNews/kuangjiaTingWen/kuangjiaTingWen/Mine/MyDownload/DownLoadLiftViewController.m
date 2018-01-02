@@ -113,7 +113,7 @@ static NSInteger selectIndex2 = -1;
         [_allDeletebutton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
         [_allDeletebutton setTitle:@"删除全部" forState:UIControlStateNormal];
         _allDeletebutton.backgroundColor = [UIColor redColor];
-        _allDeletebutton.frame = CGRectMake(10, SCREEN_HEIGHT - 50, SCREEN_WIDTH - 20, 44);
+        _allDeletebutton.frame = CGRectMake(10,IS_IPHONEX? SCREEN_HEIGHT - IPHONEX_BOTTOM_H:SCREEN_HEIGHT - 50, SCREEN_WIDTH - 20, 44);
         [_allDeletebutton addTarget:self action:@selector(remove:) forControlEvents:UIControlEventTouchUpInside];
     }
     return _allDeletebutton;

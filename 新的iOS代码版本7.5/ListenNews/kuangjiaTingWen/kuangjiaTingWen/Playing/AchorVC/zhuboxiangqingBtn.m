@@ -16,7 +16,7 @@
     if (self.isClass) {
         if (SCREEN_WIDTH >= 375) {
             if (IS_IPHONEX) {
-                return CGRectMake(15, (62.0 - 25)*0.5 + 25, 25, 25);
+                return CGRectMake(15, (62.0 - 25)*0.5, 25, 25);
             }else{
                 return CGRectMake(35, (62.0 / 667 * SCREEN_HEIGHT - 25)*0.5, 25, 25);
             }
@@ -26,7 +26,7 @@
     }else{
         if (SCREEN_WIDTH >= 375) {
             if (IS_IPHONEX) {
-                return CGRectMake(15, (62.0 - 25)*0.5 + 25, 25, 25);
+                return CGRectMake(15, (62.0 - 25)*0.5, 25, 25);
             }else{
                 return CGRectMake(10, (62.0 / 667 * SCREEN_HEIGHT - 25)*0.5, 25, 25);
             }

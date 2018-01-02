@@ -54,6 +54,7 @@
     UITableView *fansWallTableView;
     UITableView *xinwenshuaxinTableView;
     UITableView *ImageTableView;
+    UILabel *fensiliuyan;
     
     NSInteger selectedSwitchIndex;/**<选中按钮*/
     NSInteger touchCount;
@@ -214,10 +215,6 @@
                 btn.accessibilityLabel = @"下载";
             }
             btn.frame = CGRectMake((75.0 / 375 * SCREEN_WIDTH) * i, 0, 75.0 / 375 * SCREEN_WIDTH, 52.0 / 667 * SCREEN_HEIGHT);
-            if (IS_IPHONEX) {
-                btn.frame = CGRectMake((75.0) * i, 0, 75.0 , 82.0);
-                btn.titleEdgeInsets = UIEdgeInsetsMake(30, 10, 0, 0);
-            }
             [buttonArray addObject:btn];
         }
         
@@ -276,7 +273,7 @@
     }else{
         headerH = IS_IPHONEX?303.0:273.0 / 667 * SCREEN_HEIGHT;
     }
-    pagingView = [CustomPageView pagingViewWithHeaderView:headerView headerHeight:headerH segmentButtons:buttonArray segmentHeight:IS_IPHONEX?82.0: 52.0 / 667 * SCREEN_HEIGHT contentViews:@[xinwenshuaxinTableView, fansWallTableView, pinglunhoushuaxinTableView,ImageTableView]];
+    pagingView = [CustomPageView pagingViewWithHeaderView:headerView headerHeight:headerH segmentButtons:buttonArray segmentHeight:IS_IPHONEX?52.0: 52.0 / 667 * SCREEN_HEIGHT contentViews:@[xinwenshuaxinTableView, fansWallTableView, pinglunhoushuaxinTableView,ImageTableView]];
     
     UIView *picView = [[UIView alloc]initWithFrame:CGRectMake(IPHONE_W * 3, 0, IPHONE_W, IPHONE_H - 50.0 / 667 * SCREEN_HEIGHT - 50.0 / 667 * IPHONE_H)];
     if (IS_IPHONEX) {
@@ -924,14 +921,14 @@
     [headerView addSubview:shareBtn];
     
     //头像背景
-    UIView *imgBorderView = [[UIView alloc]initWithFrame:CGRectMake(15.0 / 375 * IPHONE_W, 112.0 / 667 * IPHONE_H, 95.0 / 667 * IPHONE_H, 95.0 / 667 * IPHONE_H)];
+    UIView *imgBorderView = [[UIView alloc]initWithFrame:CGRectMake(15.0 / 375 * IPHONE_W, IS_IPHONEX?112.0:112.0 / 667 * IPHONE_H, 95.0 / 667 * IPHONE_H, 95.0 / 667 * IPHONE_H)];
     [imgBorderView setBackgroundColor:gSubColor];
     [headerView addSubview:imgBorderView];
     [imgBorderView.layer setMasksToBounds:YES];
     [imgBorderView.layer setCornerRadius:95.0 / 667 * IPHONE_H / 2];
     
     //头像
-    UIImageView *img = [[UIImageView alloc]initWithFrame:CGRectMake(2.5 / 667 * SCREEN_HEIGHT, 2.5 / 667 * SCREEN_HEIGHT, 90.0 / 667 * IPHONE_H, 90.0 / 667 * IPHONE_H)];
+    UIImageView *img = [[UIImageView alloc]initWithFrame:CGRectMake(2.5 / 667 * SCREEN_HEIGHT,2.5 / 667 * SCREEN_HEIGHT, 90.0 / 667 * IPHONE_H, 90.0 / 667 * IPHONE_H)];
     if([self.jiemuImages rangeOfString:@"/data/upload/"].location !=NSNotFound){
         [img sd_setImageWithURL:[NSURL URLWithString:USERPHOTOHTTPSTRINGZhuBo(self.jiemuImages)] placeholderImage:[UIImage imageNamed:@"tingwen_bg_square"]];
     }
@@ -953,10 +950,10 @@
     if (!self.isClass) {
         name.frame = CGRectMake(CGRectGetMaxX(imgBorderView.frame) + 12, imgBorderView.frame.origin.y + 15.0 / 667 * IPHONE_H, SCREEN_WIDTH - (CGRectGetMaxX(imgBorderView.frame) + 12 + 20), 20.0 / 667 * IPHONE_H);
     }else{//课堂
-        CGSize nameSize = [self.jiemuName boundingRectWithSize:CGSizeMake(SCREEN_WIDTH - CGRectGetMaxX(imgBorderView.frame) - 12 - 20, MAXFLOAT) options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:[UIFont boldSystemFontOfSize:17.0]} context:nil].size;
+        CGSize nameSize = [self.jiemuName boundingRectWithSize:CGSizeMake(SCREEN_WIDTH - CGRectGetMaxX(imgBorderView.frame) - 12 - 20, MAXFLOAT) options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:CUSTOM_FONT_TYPE(17.0)} context:nil].size;
         name.frame = CGRectMake(CGRectGetMaxX(imgBorderView.frame) + 12, imgBorderView.frame.origin.y + 5.0 / 667 * IPHONE_H, SCREEN_WIDTH - CGRectGetMaxX(imgBorderView.frame) - 12 - 20, nameSize.height);
     }
-    name.font = [UIFont boldSystemFontOfSize:17.0];
+    name.font = CUSTOM_FONT_TYPE(17.0);
     name.numberOfLines = 0;
     name.textColor = nTextColorMain;
     name.textAlignment = NSTextAlignmentLeft;
@@ -964,24 +961,25 @@
     [headerView addSubview:name];
     
     //简介
-    UILabel *fensiliuyan = [[UILabel alloc]init];
+    fensiliuyan = [[UILabel alloc]init];
     if (!self.isClass) {
-        fensiliuyan.frame = CGRectMake(name.frame.origin.x,CGRectGetMaxY(imgBorderView.frame) - 50.0 / 667 *SCREEN_HEIGHT, SCREEN_WIDTH - name.frame.origin.x - 80.0 / 375 * SCREEN_WIDTH, 60.0 / 667 * IPHONE_H);
+        fensiliuyan.frame = CGRectMake(name.frame.origin.x,CGRectGetMaxY(imgBorderView.frame) - 50.0 / 667 *SCREEN_HEIGHT, SCREEN_WIDTH - name.frame.origin.x - 30.0 / 375 * SCREEN_WIDTH, 60.0 / 667 * IPHONE_H);
         fensiliuyan.numberOfLines = 3;
     }else{//课堂
-        CGSize fensiliuyanSize = [self.jiemuDescription boundingRectWithSize:CGSizeMake(MAXFLOAT, MAXFLOAT) options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:[UIFont boldSystemFontOfSize:17.0]} context:nil].size;
-        fensiliuyan.frame = CGRectMake(name.frame.origin.x,CGRectGetMaxY(name.frame) + 15.0 / 667 *SCREEN_HEIGHT, SCREEN_WIDTH - name.frame.origin.x - 30.0 / 375 * SCREEN_WIDTH, fensiliuyanSize.height);
+        CGSize fensiliuyanSize = [self.jiemuDescription boundingRectWithSize:CGSizeMake(MAXFLOAT, MAXFLOAT) options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:CUSTOM_FONT_TYPE(17.0)} context:nil].size;
+        fensiliuyan.frame = CGRectMake(name.frame.origin.x,CGRectGetMaxY(name.frame) + 15.0 , SCREEN_WIDTH - name.frame.origin.x - 30.0 / 375 * SCREEN_WIDTH, fensiliuyanSize.height);
         fensiliuyan.numberOfLines = 3;
     }
     fensiliuyan.textColor = gTextColorSub;
     fensiliuyan.font = gFontMain14;
     fensiliuyan.textAlignment = NSTextAlignmentLeft;
-    [headerView addSubview:fensiliuyan];
     fensiliuyan.text = [NSString stringWithFormat:@"%@",self.jiemuDescription];
+    //防止简介和粉丝留言被控件遮挡
+    [headerView addSubview:fensiliuyan];
     
     if (!self.isClass) {//课堂详情隐藏控件
         UIButton *guanzhuBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-        guanzhuBtn.frame = CGRectMake(SCREEN_WIDTH - 80.0 / 375 * IPHONE_W,151.0 / 667 * IPHONE_H, 80.0 / 375 * IPHONE_W, 20.0 / 667 * IPHONE_H);
+        guanzhuBtn.frame = CGRectMake(SCREEN_WIDTH - 80.0 / 375 * IPHONE_W,111.0 / 667 * IPHONE_H, 80.0 / 375 * IPHONE_W, 20.0 / 667 * IPHONE_H);
         if (isGuanZhu == YES)
         {
             [guanzhuBtn setTitle:@"取消" forState:UIControlStateNormal];

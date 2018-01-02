@@ -35,7 +35,6 @@ static NSString *const VIPContent = @"普通会员:\n1.每日可收听新闻数�
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(WechatPayResults:) name:WechatPayResultsMembers object:nil];
 }
 - (void)setUpView{
-    
     self.automaticallyAdjustsScrollViewInsets = NO;
     self.extendedLayoutIncludesOpaqueBars = NO;
     [self.view setBackgroundColor:[UIColor whiteColor]];
@@ -61,9 +60,23 @@ static NSString *const VIPContent = @"普通会员:\n1.每日可收听新闻数�
     topLab.backgroundColor = [UIColor clearColor];
     topLab.textAlignment = NSTextAlignmentCenter;
     [topView addSubview:topLab];
+    
     UIView *seperatorLine = [[UIView alloc]initWithFrame:CGRectMake(0, 63.5, SCREEN_WIDTH, 0.5)];
     [seperatorLine setBackgroundColor:[UIColor lightGrayColor]];
     [topView addSubview:seperatorLine];
+    
+    //适配iPhoneX导航栏
+    if (IS_IPHONEX) {
+        topView.frame = CGRectMake(0, 0, IPHONE_W, 88);
+        leftBtn.frame = CGRectMake(10, 25 + 24, 35, 35);
+        topLab.frame = CGRectMake(50, 30 + 24, IPHONE_W - 100, 30);
+        seperatorLine.frame = CGRectMake(0, 63.5 + 24, SCREEN_WIDTH, 0.5);
+    }else{
+        topView.frame = CGRectMake(0, 0, IPHONE_W, 64);
+        leftBtn.frame = CGRectMake(10, 25, 35, 35);
+        topLab.frame = CGRectMake(50, 30, IPHONE_W - 100, 30);
+        seperatorLine.frame = CGRectMake(0, 63.5, SCREEN_WIDTH, 0.5);
+    }
     
     [self.view addSubview:self.tableView];
     
@@ -180,7 +193,7 @@ static NSString *const VIPContent = @"普通会员:\n1.每日可收听新闻数�
                 UIAlertController *qingshuruyonghuming = [UIAlertController alertControllerWithTitle:@"温馨提示" message:@"您已购买超级会员，享有所有特权，无需在购买普通会员" preferredStyle:UIAlertControllerStyleAlert];
                 [qingshuruyonghuming addAction:[UIAlertAction actionWithTitle:@"我知道了" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
                 }]];
-                [self presentViewController:qingshuruyonghuming animated:YES completion:nil];
+                [weakSelf presentViewController:qingshuruyonghuming animated:YES completion:nil];
 
                 return;
             }
@@ -188,7 +201,7 @@ static NSString *const VIPContent = @"普通会员:\n1.每日可收听新闻数�
             APPDELEGATE.payType = PayTypeMembers;
             if ([[CommonCode readFromUserD:@"isIAP"] boolValue] == YES)
             {//当前为内购路线
-                _alertView = [[CustomAlertView alloc] initWithCustomView:[self setupPayAlertWithIAP:YES]];
+                _alertView = [[CustomAlertView alloc] initWithCustomView:[weakSelf setupPayAlertWithIAP:YES]];
                 _alertView.alertHeight = 105;
                 _alertView.alertDuration = 0.25;
                 _alertView.coverAlpha = 0.6;
@@ -198,14 +211,14 @@ static NSString *const VIPContent = @"普通会员:\n1.每日可收听新闻数�
             {//当前为支付宝，微信，支付路线
                 if ([[CommonCode readFromUserD:@"isLogin"]boolValue] == YES){
                     APPDELEGATE.payType = PayTypeMembers;
-                    _alertView = [[CustomAlertView alloc] initWithCustomView:[self setupPayAlertWithIAP:NO]];
+                    _alertView = [[CustomAlertView alloc] initWithCustomView:[weakSelf setupPayAlertWithIAP:NO]];
                     _alertView.alertHeight = 155;
                     _alertView.alertDuration = 0.25;
                     _alertView.coverAlpha = 0.6;
                     [_alertView show];
                 }
                 else{
-                    [self loginFirst];
+                    [weakSelf loginFirst];
                 }
             }
         };
@@ -228,7 +241,7 @@ static NSString *const VIPContent = @"普通会员:\n1.每日可收听新闻数�
             APPDELEGATE.payType = PayTypeMembers;
             if ([[CommonCode readFromUserD:@"isIAP"] boolValue] == YES)
             {//当前为内购路线
-                _alertView = [[CustomAlertView alloc] initWithCustomView:[self setupPayAlertWithIAP:YES]];
+                _alertView = [[CustomAlertView alloc] initWithCustomView:[weakSelf setupPayAlertWithIAP:YES]];
                 _alertView.alertHeight = 105;
                 _alertView.alertDuration = 0.25;
                 _alertView.coverAlpha = 0.6;
@@ -238,14 +251,14 @@ static NSString *const VIPContent = @"普通会员:\n1.每日可收听新闻数�
             {//当前为支付宝，微信，支付路线
                 if ([[CommonCode readFromUserD:@"isLogin"]boolValue] == YES){
                     APPDELEGATE.payType = PayTypeMembers;
-                    _alertView = [[CustomAlertView alloc] initWithCustomView:[self setupPayAlertWithIAP:NO]];
+                    _alertView = [[CustomAlertView alloc] initWithCustomView:[weakSelf setupPayAlertWithIAP:NO]];
                     _alertView.alertHeight = 155;
                     _alertView.alertDuration = 0.25;
                     _alertView.coverAlpha = 0.6;
                     [_alertView show];
                 }
                 else{
-                    [self loginFirst];
+                    [weakSelf loginFirst];
                 }
             }
         };
@@ -263,7 +276,7 @@ static NSString *const VIPContent = @"普通会员:\n1.每日可收听新闻数�
 }
 - (UITableView *)tableView{
     if (_tableView == nil) {
-        _tableView = [[UITableView alloc]initWithFrame:CGRectMake(0, 64, SCREEN_WIDTH, SCREEN_HEIGHT - 64) style:UITableViewStylePlain];
+        _tableView = [[UITableView alloc]initWithFrame:CGRectMake(0,IS_IPHONEX?IPHONEX_TOP_H:64, SCREEN_WIDTH,IS_IPHONEX?SCREEN_HEIGHT - IPHONEX_TOP_H:SCREEN_HEIGHT - 64) style:UITableViewStylePlain];
         [_tableView setDelegate:self];
         [_tableView setDataSource:self];
         _tableView.backgroundColor = ColorWithRGBA(249, 247, 247, 1);

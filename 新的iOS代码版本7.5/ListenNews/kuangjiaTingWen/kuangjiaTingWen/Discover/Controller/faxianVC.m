@@ -283,7 +283,7 @@
             cell = [tableView dequeueReusableCellWithIdentifier:faxianIdentify];
         }
         UILabel *faxiantitleLab = [[UILabel alloc]initWithFrame:CGRectMake(21.0 / 375 * IPHONE_W, 10.0 / 667 * IPHONE_H, 100.0 / 375 * IPHONE_W, 20.0 / 667 * IPHONE_H)];
-        faxiantitleLab.textColor = [UIColor blackColor];
+        faxiantitleLab.textColor = TITLE_COLOR_HEX;
         faxiantitleLab.font = [UIFont boldSystemFontOfSize:17.0f];
         faxiantitleLab.textAlignment = NSTextAlignmentLeft;
         UIView *faxianshutiao = [[UIView alloc]initWithFrame:CGRectMake(faxiantitleLab.frame.origin.x - 6.0 / 375 * IPHONE_W, faxiantitleLab.frame.origin.y + 0.5 / 667 * IPHONE_H, 4.0 / 375 * IPHONE_W, faxiantitleLab.frame.size.height - 1.0 / 667 * IPHONE_H)];
@@ -357,7 +357,7 @@
             //标题
             UILabel *classTitle = [[UILabel alloc]initWithFrame:CGRectMake(IS_IPHONEX?CGRectGetMaxX(imgLeft.frame) +5.0 / 375 * 375: CGRectGetMaxX(imgLeft.frame) +5.0 / 375 * IPHONE_W, imgLeft.frame.origin.y,IS_IPHONEX?SCREEN_WIDTH - CGRectGetMaxX(imgLeft.frame) - 70.0 / 375 * 375:SCREEN_WIDTH - CGRectGetMaxX(imgLeft.frame) - 70.0 / 375 * IPHONE_W, IS_IPHONEX?21.0:21.0 / 667 *IPHONE_H)];
             classTitle.text = subModel2.name;
-            classTitle.textColor = [UIColor blackColor];
+            classTitle.textColor = TITLE_COLOR_HEX;
             classTitle.textAlignment = NSTextAlignmentLeft;
             classTitle.font = [UIFont boldSystemFontOfSize:16.0f ];
             [cell.contentView addSubview:classTitle];
@@ -1140,7 +1140,7 @@
 #pragma mark - Setter
 - (UITableView *)faxianTableView{
     if (!_faxianTableView){
-        _faxianTableView = [[UITableView alloc]initWithFrame:CGRectMake(0, CGRectGetMaxY(self.SouSuosearchBar.frame), IPHONE_W ,IS_IPHONEX?IPHONE_H - CGRectGetMaxY(self.SouSuosearchBar.frame) - 49 - 30: IPHONE_H - CGRectGetMaxY(self.SouSuosearchBar.frame) - 49 ) style:UITableViewStylePlain];
+        _faxianTableView = [[UITableView alloc]initWithFrame:CGRectMake(0, CGRectGetMaxY(self.SouSuosearchBar.frame), IPHONE_W ,IS_IPHONEX?IPHONE_H - CGRectGetMaxY(self.SouSuosearchBar.frame) - IPHONEX_BOTTOM_H: IPHONE_H - CGRectGetMaxY(self.SouSuosearchBar.frame) - 49) style:UITableViewStylePlain];
         _faxianTableView.delegate = self;
         _faxianTableView.dataSource = self;
         _faxianTableView.tag = 4;
@@ -1160,7 +1160,7 @@
 }
 - (UITableView *)SouSuotableView {
     if (!_SouSuotableView){
-        _SouSuotableView = [[UITableView alloc]initWithFrame:CGRectMake(0, CGRectGetMaxY(self.SouSuosearchBar.frame), IPHONE_W , IPHONE_H - CGRectGetMaxY(self.SouSuosearchBar.frame)) style:UITableViewStylePlain];
+        _SouSuotableView = [[UITableView alloc]initWithFrame:CGRectMake(0, CGRectGetMaxY(self.SouSuosearchBar.frame), IPHONE_W , IPHONE_H - CGRectGetMaxY(self.SouSuosearchBar.frame) - IPHONEX_BOTTOM_H) style:UITableViewStylePlain];
         _SouSuotableView.delegate = self;
         _SouSuotableView.dataSource = self;
         _SouSuotableView.tag = 1;
@@ -1181,7 +1181,7 @@
 {
     if (!_SouSuosousuoTableView)
     {
-        _SouSuosousuoTableView = [[UITableView alloc]initWithFrame:CGRectMake(0, CGRectGetMaxY(self.SouSuosearchBar.frame), IPHONE_W, IPHONE_H - CGRectGetMaxY(self.SouSuosearchBar.frame) - 49) style:UITableViewStylePlain];
+        _SouSuosousuoTableView = [[UITableView alloc]initWithFrame:CGRectMake(0, CGRectGetMaxY(self.SouSuosearchBar.frame), IPHONE_W, IPHONE_H - CGRectGetMaxY(self.SouSuosearchBar.frame) - IPHONEX_BOTTOM_H) style:UITableViewStylePlain];
         _SouSuosousuoTableView.backgroundColor = [UIColor clearColor];
         _SouSuosousuoTableView.delegate = self;
         _SouSuosousuoTableView.dataSource = self;

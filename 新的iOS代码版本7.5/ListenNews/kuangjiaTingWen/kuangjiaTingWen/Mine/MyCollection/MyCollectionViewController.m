@@ -148,9 +148,23 @@
     topLab.backgroundColor = [UIColor clearColor];
     topLab.textAlignment = NSTextAlignmentCenter;
     [topView addSubview:topLab];
+    
     UIView *seperatorLine = [[UIView alloc]initWithFrame:CGRectMake(0, 63.5, SCREEN_WIDTH, 0.5)];
     [seperatorLine setBackgroundColor:[UIColor lightGrayColor]];
     [topView addSubview:seperatorLine];
+    
+    //适配iPhoneX导航栏
+    if (IS_IPHONEX) {
+        topView.frame = CGRectMake(0, 0, IPHONE_W, 88);
+        leftBtn.frame = CGRectMake(10, 25 + 24, 35, 35);
+        topLab.frame = CGRectMake(50, 30 + 24, IPHONE_W - 100, 30);
+        seperatorLine.frame = CGRectMake(0, 63.5 + 24, SCREEN_WIDTH, 0.5);
+    }else{
+        topView.frame = CGRectMake(0, 0, IPHONE_W, 64);
+        leftBtn.frame = CGRectMake(10, 25, 35, 35);
+        topLab.frame = CGRectMake(50, 30, IPHONE_W - 100, 30);
+        seperatorLine.frame = CGRectMake(0, 63.5, SCREEN_WIDTH, 0.5);
+    }
     
     [self.view addSubview:self.helpTableView];
     
@@ -246,7 +260,7 @@
 
 - (UITableView *)helpTableView{
     if (_helpTableView == nil) {
-        _helpTableView = [[UITableView alloc]initWithFrame:CGRectMake(0, 64, SCREEN_WIDTH, SCREEN_HEIGHT - 64) style:UITableViewStylePlain];
+        _helpTableView = [[UITableView alloc]initWithFrame:CGRectMake(0,IS_IPHONEX?IPHONEX_TOP_H:64, SCREEN_WIDTH,IS_IPHONEX?SCREEN_HEIGHT - IPHONEX_TOP_H: SCREEN_HEIGHT - 64) style:UITableViewStylePlain];
         [_helpTableView setDelegate:self];
         [_helpTableView setDataSource:self];
         [_helpTableView setSeparatorStyle:UITableViewCellSeparatorStyleNone];
