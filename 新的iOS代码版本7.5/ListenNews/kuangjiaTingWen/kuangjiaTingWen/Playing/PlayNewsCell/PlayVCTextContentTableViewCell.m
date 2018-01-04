@@ -46,7 +46,7 @@
         riqiLab = [[UILabel alloc] init];
         riqiLab.textAlignment = NSTextAlignmentCenter;
         riqiLab.textColor = nTextColorSub;
-        riqiLab.numberOfLines = 0;
+        riqiLab.numberOfLines = 2;
         [self.contentView addSubview:riqiLab];
 
         //新闻内容

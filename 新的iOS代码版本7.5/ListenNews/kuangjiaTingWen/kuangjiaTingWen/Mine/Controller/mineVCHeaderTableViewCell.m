@@ -120,10 +120,10 @@
         [self.contentView addSubview:vipImgView];
         
         //签名
-        sign = [[UILabel alloc]initWithFrame:CGRectMake(CGRectGetMaxX(imgBorderView.frame) + 12, CGRectGetMaxY(lab.frame) + 30, SCREEN_WIDTH - CGRectGetMaxX(imgBorderView.frame) - 30, 20.0 / 667 * IPHONE_H)];
+        sign = [[UILabel alloc]initWithFrame:CGRectMake(CGRectGetMaxX(imgBorderView.frame) + 12, CGRectGetMaxY(lab.frame) + 20, SCREEN_WIDTH - CGRectGetMaxX(imgBorderView.frame) - 30, 20.0 / 667 * IPHONE_H)];
         sign.font =  CUSTOM_FONT_TYPE(13.0);
         sign.textColor = HEXCOLOR(0xf5f5f5);
-        sign.numberOfLines = 0;
+        sign.numberOfLines = 2;
         sign.textAlignment = NSTextAlignmentLeft;
         [self.contentView addSubview:sign];
     }

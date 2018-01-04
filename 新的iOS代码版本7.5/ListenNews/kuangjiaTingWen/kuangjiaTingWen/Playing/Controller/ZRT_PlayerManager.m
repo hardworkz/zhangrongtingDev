@@ -207,7 +207,9 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
 - (void)setPlayRate:(float)playRate
 {
     _playRate = playRate;
-    self.player.rate = playRate;
+    if (self.isPlaying) {
+        self.player.rate = playRate;
+    }
 }
 /*
  * 总时长(秒)
@@ -318,8 +320,9 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
             [self.player play];
             break;
     }
+    //开始播放设置播放速度
     if ([[CommonCode readFromUserD:@"play_rate"] floatValue] != 0) {
-        [ZRT_PlayerManager manager].playRate = [[CommonCode readFromUserD:@"play_rate"] floatValue];
+        self.player.rate = [[CommonCode readFromUserD:@"play_rate"] floatValue];
     }   
 }
 /*

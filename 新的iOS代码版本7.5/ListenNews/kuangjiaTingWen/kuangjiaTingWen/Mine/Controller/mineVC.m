@@ -548,7 +548,7 @@ typedef void(^animateBlock)();
 #pragma mark --- UITableViewDataSource
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return [[CommonCode readFromUserD:@"isIAP"] boolValue] == YES?6:7;
+    return [[CommonCode readFromUserD:@"isIAP"] boolValue] == YES?7:8;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -618,6 +618,21 @@ typedef void(^animateBlock)();
             UITableViewCell *cell = [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"wofourIdentify"];
             UILabel *lab = [[UILabel alloc]initWithFrame:CGRectMake(40.0 / 375 * IPHONE_W, IS_IPHONEX?14.0:14.0 / 667 * IPHONE_H, 100.0 / 375 * IPHONE_W, 30.0 / 667 * IPHONE_H)];
             lab.text = @"我的课堂";
+            lab.textAlignment = NSTextAlignmentLeft;
+            lab.textColor = TITLE_COLOR_HEX;
+            [cell.contentView addSubview:lab];
+            lab.font = CUSTOM_FONT_TYPE(17.0);
+            UIView *line = [[UIView alloc]initWithFrame:CGRectMake(20.0 / 375 * IPHONE_W, IS_IPHONEX?57.0:57.0 / 667 * IPHONE_H, SCREEN_WIDTH - 20.0 / 375 * IPHONE_W, 1)];
+            [line setBackgroundColor:gThinLineColor];
+            [cell.contentView addSubview:line];
+            cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+            cell.selectionStyle = UITableViewCellSelectionStyleNone;
+            return cell;
+        }
+        else if (indexPath.row == 5){
+            UITableViewCell *cell = [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"wofourIdentify"];
+            UILabel *lab = [[UILabel alloc]initWithFrame:CGRectMake(40.0 / 375 * IPHONE_W, IS_IPHONEX?14.0:14.0 / 667 * IPHONE_H, 100.0 / 375 * IPHONE_W, 30.0 / 667 * IPHONE_H)];
+            lab.text = @"学习记录";
             lab.textAlignment = NSTextAlignmentLeft;
             lab.textColor = TITLE_COLOR_HEX;
             [cell.contentView addSubview:lab];
@@ -953,6 +968,21 @@ typedef void(^animateBlock)();
             cell.selectionStyle = UITableViewCellSelectionStyleNone;
             return cell;
         }
+        else if (indexPath.row == 6){
+            UITableViewCell *cell = [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"wofourIdentify"];
+            UILabel *lab = [[UILabel alloc]initWithFrame:CGRectMake(40.0 / 375 * IPHONE_W, IS_IPHONEX?14.0:14.0 / 667 * IPHONE_H, 100.0 / 375 * IPHONE_W, 30.0 / 667 * IPHONE_H)];
+            lab.text = @"学习记录";
+            lab.textAlignment = NSTextAlignmentLeft;
+            lab.textColor = TITLE_COLOR_HEX;
+            [cell.contentView addSubview:lab];
+            lab.font = CUSTOM_FONT_TYPE(17.0);
+            UIView *line = [[UIView alloc]initWithFrame:CGRectMake(20.0 / 375 * IPHONE_W, IS_IPHONEX?57.0:57.0 / 667 * IPHONE_H, SCREEN_WIDTH - 20.0 / 375 * IPHONE_W, 1)];
+            [line setBackgroundColor:gThinLineColor];
+            [cell.contentView addSubview:line];
+            cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+            cell.selectionStyle = UITableViewCellSelectionStyleNone;
+            return cell;
+        }
         else {
             static NSString *wosixIdentify = @"wosixIdentify";
             UITableViewCell *cell = [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:wosixIdentify];
@@ -1024,6 +1054,14 @@ typedef void(^animateBlock)();
             }
         }
         else if (indexPath.row == 5) {
+            if ([[CommonCode readFromUserD:@"isLogin"]boolValue] == YES){
+                [self.navigationController pushViewController:[MyLearningRecordController new] animated:YES];
+            }
+            else {
+                [self loginFirst];
+            }
+        }
+        else if (indexPath.row == 6) {
             [self.navigationController pushViewController:[SheZhiVC new] animated:YES];
         }
     }else{
@@ -1069,6 +1107,14 @@ typedef void(^animateBlock)();
             }
         }
         else if (indexPath.row == 6) {
+            if ([[CommonCode readFromUserD:@"isLogin"]boolValue] == YES){
+                [self.navigationController pushViewController:[MyLearningRecordController new] animated:YES];
+            }
+            else {
+                [self loginFirst];
+            }
+        }
+        else if (indexPath.row == 7) {
             [self.navigationController pushViewController:[SheZhiVC new] animated:YES];
         }
     }

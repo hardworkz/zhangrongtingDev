@@ -194,6 +194,9 @@
 		69AF4FD61F1378C30097893F /* ContentOffsetYDataModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 69AF4FD11F1378C30097893F /* ContentOffsetYDataModel.m */; };
 		69AF4FD71F1378C30097893F /* CustomPageScrollView.m in Sources */ = {isa = PBXBuildFile; fileRef = 69AF4FD31F1378C30097893F /* CustomPageScrollView.m */; };
 		69AF4FD81F1378C30097893F /* CustomPageView.m in Sources */ = {isa = PBXBuildFile; fileRef = 69AF4FD51F1378C30097893F /* CustomPageView.m */; };
+		69B64BBB1FFCAC430009C7CC /* BezierCurveView.m in Sources */ = {isa = PBXBuildFile; fileRef = 69B64BB91FFCAC420009C7CC /* BezierCurveView.m */; };
+		69B64BBC1FFCAC430009C7CC /* BezierCurveView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 69B64BBA1FFCAC420009C7CC /* BezierCurveView.xib */; };
+		69B64BC01FFCADEE0009C7CC /* MyLearningRecordController.m in Sources */ = {isa = PBXBuildFile; fileRef = 69B64BBF1FFCADEE0009C7CC /* MyLearningRecordController.m */; };
 		69C1D5CD1FAFFCA30092A290 /* NewRegisterController.m in Sources */ = {isa = PBXBuildFile; fileRef = 69C1D5CC1FAFFCA30092A290 /* NewRegisterController.m */; };
 		69C1D5D11FB0036D0092A290 /* Xzb_CountDownButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 69C1D5D01FB0036C0092A290 /* Xzb_CountDownButton.m */; };
 		69C671AF1F9EC9E200570027 /* SearchLessonListTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 69C671AE1F9EC9E200570027 /* SearchLessonListTableViewCell.m */; };
@@ -835,6 +838,11 @@
 		69AF4FD31F1378C30097893F /* CustomPageScrollView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CustomPageScrollView.m; sourceTree = "<group>"; };
 		69AF4FD41F1378C30097893F /* CustomPageView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CustomPageView.h; sourceTree = "<group>"; };
 		69AF4FD51F1378C30097893F /* CustomPageView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CustomPageView.m; sourceTree = "<group>"; };
+		69B64BB81FFCAC420009C7CC /* BezierCurveView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BezierCurveView.h; sourceTree = "<group>"; };
+		69B64BB91FFCAC420009C7CC /* BezierCurveView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BezierCurveView.m; sourceTree = "<group>"; };
+		69B64BBA1FFCAC420009C7CC /* BezierCurveView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = BezierCurveView.xib; sourceTree = "<group>"; };
+		69B64BBE1FFCADEE0009C7CC /* MyLearningRecordController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MyLearningRecordController.h; sourceTree = "<group>"; };
+		69B64BBF1FFCADEE0009C7CC /* MyLearningRecordController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MyLearningRecordController.m; sourceTree = "<group>"; };
 		69C1D5CB1FAFFCA30092A290 /* NewRegisterController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NewRegisterController.h; sourceTree = "<group>"; };
 		69C1D5CC1FAFFCA30092A290 /* NewRegisterController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NewRegisterController.m; sourceTree = "<group>"; };
 		69C1D5CF1FB0036C0092A290 /* Xzb_CountDownButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Xzb_CountDownButton.h; sourceTree = "<group>"; };
@@ -1290,6 +1298,7 @@
 		6300DB141D05647F00B82C42 /* External */ = {
 			isa = PBXGroup;
 			children = (
+				69B64BB71FFCAC420009C7CC /* BezierCurvcLineTool */,
 				69C1D5CE1FB0036C0092A290 /* verifyCodeCountDown */,
 				69AF4FCF1F1378C30097893F /* ZRTHorizontalPagingView */,
 				698E60C81F0CD60C006D7EC0 /* GDTMobSDKlibs */,
@@ -1952,6 +1961,25 @@
 			path = ZRTHorizontalPagingView;
 			sourceTree = "<group>";
 		};
+		69B64BB71FFCAC420009C7CC /* BezierCurvcLineTool */ = {
+			isa = PBXGroup;
+			children = (
+				69B64BB81FFCAC420009C7CC /* BezierCurveView.h */,
+				69B64BB91FFCAC420009C7CC /* BezierCurveView.m */,
+				69B64BBA1FFCAC420009C7CC /* BezierCurveView.xib */,
+			);
+			path = BezierCurvcLineTool;
+			sourceTree = "<group>";
+		};
+		69B64BBD1FFCADCC0009C7CC /* MyLearningRecord */ = {
+			isa = PBXGroup;
+			children = (
+				69B64BBE1FFCADEE0009C7CC /* MyLearningRecordController.h */,
+				69B64BBF1FFCADEE0009C7CC /* MyLearningRecordController.m */,
+			);
+			path = MyLearningRecord;
+			sourceTree = "<group>";
+		};
 		69C1D5CE1FB0036C0092A290 /* verifyCodeCountDown */ = {
 			isa = PBXGroup;
 			children = (
@@ -2153,6 +2181,7 @@
 			isa = PBXGroup;
 			children = (
 				69C7122E1EC0740E00F2729E /* Controller */,
+				69B64BBD1FFCADCC0009C7CC /* MyLearningRecord */,
 				698109471F1F3802000A1AD2 /* MyVipMembers */,
 				695873161EF118A20011B174 /* MyClassroom */,
 				69C7122B1EC0740E00F2729E /* APPReference */,
@@ -3230,6 +3259,7 @@
 				69C713631EC0740F00F2729E /* TXLCell.xib in Resources */,
 				E91A53391E8E3455005D2F68 /* Info.plist in Resources */,
 				E965A6AF1E1F3A3B00845E18 /* AlipaySDK.bundle in Resources */,
+				69B64BBC1FFCAC430009C7CC /* BezierCurveView.xib in Resources */,
 				69C713C51EC0754200F2729E /* BlogTableViewCell.xib in Resources */,
 				69C7136F1EC0740F00F2729E /* DownloadNewCell.xib in Resources */,
 				E9FC0F591E78EC6D008A36AE /* TencentOpenApi_IOS_Bundle.bundle in Resources */,
@@ -3452,6 +3482,7 @@
 				69C713971EC0740F00F2729E /* PinglundianzanCustomBtn.m in Sources */,
 				6995820D1EC563240037E9A4 /* child_commentModel.m in Sources */,
 				69C7135B1EC0740F00F2729E /* zhaohuiyanzhengmaVC.m in Sources */,
+				69B64BC01FFCADEE0009C7CC /* MyLearningRecordController.m in Sources */,
 				69C713A51EC0740F00F2729E /* HeNanAudioManager.m in Sources */,
 				69AA54AD1EF75F3E003053DB /* AutoImageViewHeightFrameModel.m in Sources */,
 				697CA2A01EF384BE00F853AF /* UIViewController+Cloudox.m in Sources */,
@@ -3569,6 +3600,7 @@
 				69C713921EC0740F00F2729E /* Post_actor.m in Sources */,
 				69A7BABA1ED4177C0094E0BA /* SuNetworkMonitor.m in Sources */,
 				6991653F1EE10E9B001914EB /* ClassAuditionCellFrameModel.m in Sources */,
+				69B64BBB1FFCAC430009C7CC /* BezierCurveView.m in Sources */,
 				69C7138C1EC0740F00F2729E /* FontViewController.m in Sources */,
 				69C7135F1EC0740F00F2729E /* tianjiaGuanZhuVC.m in Sources */,
 				69C713B31EC0740F00F2729E /* TabbarView.m in Sources */,

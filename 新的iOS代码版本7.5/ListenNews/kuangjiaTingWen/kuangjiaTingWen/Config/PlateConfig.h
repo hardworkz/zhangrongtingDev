@@ -15,7 +15,7 @@
 #else
 
 
-//#define gMainColor [UIColor colorWithRed:0/255.0 green:159/255.0 blue:240/255.0 alpha:1]
+#define gMainColorRGB [UIColor colorWithRed:0/255.0 green:159/255.0 blue:240/255.0 alpha:0.5]
 #define gMainColor UIColorFromHex(0x5cb8e6)
 
 #define gSubColor [UIColor colorWithRed:238/255.0 green:238/255.0 blue:238/255.0 alpha:1]

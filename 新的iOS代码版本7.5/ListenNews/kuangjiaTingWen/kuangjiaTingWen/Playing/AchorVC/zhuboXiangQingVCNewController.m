@@ -161,7 +161,7 @@
     
     NSMutableArray *buttonArray = [NSMutableArray array];
     CustomPageView *pagingView;
-        for (int i = 0; i < 5; i ++ ){
+        for (int i = 0; i < 4; i ++ ){
             zhuboxiangqingBtn *btn = [[zhuboxiangqingBtn alloc] init];
             if (SCREEN_WIDTH >= 375) {
                 btn.titleEdgeInsets = UIEdgeInsetsMake(10, 10, 0, 0);
@@ -178,16 +178,16 @@
                 btn.accessibilityLabel = @"节目";
                 btn.selected = YES;
             }
+//            else if (i == 1){
+//                [btn setImage:@"BmentButton2"];
+//                [btn setSelectedImage:@"mentButton2"];
+//                [btn setTitleColor:gTextColorSub];
+//                [btn setSelectedTitleColor:nMainColor];
+//                btn.titleLabel.font = gFontSub11;
+//                [btn setTitle:@"粉丝榜"];
+//                btn.accessibilityLabel = @"粉丝榜";
+//            }
             else if (i == 1){
-                [btn setImage:@"BmentButton2"];
-                [btn setSelectedImage:@"mentButton2"];
-                [btn setTitleColor:gTextColorSub];
-                [btn setSelectedTitleColor:nMainColor];
-                btn.titleLabel.font = gFontSub11;
-                [btn setTitle:@"粉丝榜"];
-                btn.accessibilityLabel = @"粉丝榜";
-            }
-            else if (i == 2){
                 [btn setImage:@"BmentButton3"];
                 [btn setSelectedImage:@"mentButton3"];
                 [btn setTitleColor:gTextColorSub];
@@ -196,7 +196,7 @@
                 [btn setTitle:@"留言"];
                 btn.accessibilityLabel = @"留言";
             }
-            else if (i == 3){
+            else if (i == 2){
                 [btn setImage:@"BmentButton4"];
                 [btn setSelectedImage:@"mentButton4"];
                 [btn setTitleColor:gTextColorSub];
@@ -219,23 +219,23 @@
         }
         
         //分页tableView
-        for (int i = 0; i < 4; i ++ ){
+        for (int i = 0; i < 3; i ++ ){
             CustomPageScrollView *tableView = [[CustomPageScrollView alloc] initWithFrame:CGRectMake(IPHONE_W * i, 0, IPHONE_W ,IS_IPHONEX?IPHONE_H - 24.0: IPHONE_H - 24.0/ 667 * SCREEN_HEIGHT) style:UITableViewStyleGrouped];
             tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
             tableView.backgroundColor = [UIColor whiteColor];
             if (i == 0){
                 xinwenshuaxinTableView = tableView;
             }
+//            else if (i == 1){
+//                tableView = [[CustomPageScrollView alloc]initWithFrame:CGRectMake(IPHONE_W * i + 1, 0, IPHONE_W , IS_IPHONEX?IPHONE_H - 20.0:IPHONE_H - 20.0/ 667 * SCREEN_HEIGHT) style:UITableViewStyleGrouped];
+//                tableView.backgroundColor = [UIColor whiteColor];
+//                fansWallTableView = tableView;
+//                tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
+//            }
             else if (i == 1){
-                tableView = [[CustomPageScrollView alloc]initWithFrame:CGRectMake(IPHONE_W * i + 1, 0, IPHONE_W , IS_IPHONEX?IPHONE_H - 20.0:IPHONE_H - 20.0/ 667 * SCREEN_HEIGHT) style:UITableViewStyleGrouped];
-                tableView.backgroundColor = [UIColor whiteColor];
-                fansWallTableView = tableView;
-                tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
-            }
-            else if (i == 2){
                 tableView.frame = CGRectMake(IPHONE_W * i + 2, 0, IPHONE_W, IS_IPHONEX?IPHONE_H - 20.0:IPHONE_H - 20.0 / 667 * SCREEN_HEIGHT);
                 pinglunhoushuaxinTableView = tableView;
-            }else if (i == 3){
+            }else if (i == 2){
                 tableView.frame = CGRectMake(IPHONE_W * i + 3, 0, IPHONE_W, IS_IPHONEX?IPHONE_H - 20.0:IPHONE_H - 20.0 / 667 * SCREEN_HEIGHT);
                 tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
                 ImageTableView = tableView;
@@ -251,10 +251,10 @@
                 }];
                 [tableView.mj_header beginRefreshing];
             }
+//            else if (i == 1){
+//                [tableView.mj_header beginRefreshing];
+//            }
             else if (i == 1){
-                [tableView.mj_header beginRefreshing];
-            }
-            else if (i == 2){
                 tableView.mj_footer = [MJRefreshAutoNormalFooter footerWithRefreshingBlock:^{
                     [self liuyanshanglajiazai:tableView];
                 }];
@@ -273,7 +273,7 @@
     }else{
         headerH = IS_IPHONEX?303.0:273.0 / 667 * SCREEN_HEIGHT;
     }
-    pagingView = [CustomPageView pagingViewWithHeaderView:headerView headerHeight:headerH segmentButtons:buttonArray segmentHeight:IS_IPHONEX?52.0: 52.0 / 667 * SCREEN_HEIGHT contentViews:@[xinwenshuaxinTableView, fansWallTableView, pinglunhoushuaxinTableView,ImageTableView]];
+    pagingView = [CustomPageView pagingViewWithHeaderView:headerView headerHeight:headerH segmentButtons:buttonArray segmentHeight:IS_IPHONEX?52.0: 52.0 / 667 * SCREEN_HEIGHT contentViews:@[xinwenshuaxinTableView, pinglunhoushuaxinTableView,ImageTableView]];
     
     UIView *picView = [[UIView alloc]initWithFrame:CGRectMake(IPHONE_W * 3, 0, IPHONE_W, IPHONE_H - 50.0 / 667 * SCREEN_HEIGHT - 50.0 / 667 * IPHONE_H)];
     if (IS_IPHONEX) {
@@ -294,16 +294,16 @@
                     }
                 }
                 break;
+//            case 1:
+//                if (selectedSwitchIndex == switchIndex) {
+//                    [self fansRefresh:fansWallTableView];
+//                }else{
+//                    if (_rewardListArray.count == 0) {
+//                        [self fansRefresh:fansWallTableView];
+//                    }
+//                }
+//                break;
             case 1:
-                if (selectedSwitchIndex == switchIndex) {
-                    [self fansRefresh:fansWallTableView];
-                }else{
-                    if (_rewardListArray.count == 0) {
-                        [self fansRefresh:fansWallTableView];
-                    }
-                }
-                break;
-            case 2:
                 if (selectedSwitchIndex == switchIndex) {
                     [self liuyanRefresh:pinglunhoushuaxinTableView];
                 }else{
@@ -316,7 +316,7 @@
                 break;
         }
         
-        if (switchIndex != 2 && switchIndex != 4) {//切换到粉丝列表
+        if (switchIndex != 1 && switchIndex != 3) {//切换到粉丝列表
             if (self.isbofangye == YES) {
                 [UIView animateWithDuration:0.3f animations:^{
                     pinglunBgView.frame = CGRectMake(pinglunBgView.frame.origin.x, IPHONE_H, pinglunBgView.frame.size.width, pinglunBgView.frame.size.height);
@@ -327,7 +327,7 @@
                     pinglunBgView.frame = CGRectMake(pinglunBgView.frame.origin.x, IPHONE_H, pinglunBgView.frame.size.width, pinglunBgView.frame.size.height);
                 }];
             }
-        }else if (switchIndex == 2) {//切换到留言列表
+        }else if (switchIndex == 1) {//切换到留言列表
             [self.view endEditing:YES];
             _isReplyComment = NO;
             pinglunTextF.placeholder = @"输入评论";
@@ -341,7 +341,7 @@
                     pinglunBgView.frame = CGRectMake(pinglunBgView.frame.origin.x, IPHONE_H - pinglunBgView.frame.size.height, pinglunBgView.frame.size.width, pinglunBgView.frame.size.height);
                 }];
             }
-        }else if (switchIndex == 4) {//点击下载跳转
+        }else if (switchIndex == 3) {//点击下载跳转
             if ([[CommonCode readFromUserD:@"isLogin"]boolValue] == YES) {
                 NSDictionary *userInfoDict = [CommonCode readFromUserD:@"dangqianUserInfo"];
                 if ([userInfoDict[results][member_type] intValue] == 0 && !_isClass) {//非会员
@@ -375,7 +375,7 @@
                 [self loginFirst];
             }
         }
-        if (switchIndex != 4) {
+        if (switchIndex != 3) {
             selectedSwitchIndex = switchIndex;
         }
     };
@@ -438,7 +438,7 @@
     }
     [self imageArrayWithImageData:(NSMutableArray *)imageUrlArray];
     
-    if (selectedSwitchIndex != 4) {
+    if (selectedSwitchIndex != 3) {
         [self.pagingView pagingViewDidSelectedIndex:selectedSwitchIndex];
     }
 }

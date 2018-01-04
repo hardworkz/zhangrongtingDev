@@ -50,6 +50,14 @@
  */
 @property(strong,nonatomic) UITableView *tableView;
 /**
+ 倍数更改tableView
+ */
+@property(strong,nonatomic) UITableView *playSpeedTableView;
+/**
+ 倍数弹窗容器
+ */
+@property (strong, nonatomic) CustomAlertView *alertView;
+/**
  新闻详情模型数据
  */
 @property (strong, nonatomic) newsDetailModel *postDetailModel;
@@ -61,6 +69,10 @@
  评论数据数组
  */
 @property(strong,nonatomic)NSMutableArray *pinglunArr;
+/**
+ 倍数数组
+ */
+@property (strong, nonatomic) NSMutableArray *speedArray;
 /**
  播放进度条
  */
@@ -238,7 +250,8 @@ static NewPlayVC *_instance = nil;
 }
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
+    //倍数数据
+    self.speedArray = [NSMutableArray arrayWithArray:@[@"0.666667",@"1.0",@"1.25",@"1.5",@"2.0"]];
     //评论分页数据
     self.commentPage = 1;
     self.commentPageSize = 10;
@@ -683,20 +696,28 @@ static NewPlayVC *_instance = nil;
         //评论
         [self pinglunAction];
     }else if ([button.accessibilityIdentifier isEqualToString:@"倍数"]) {
-        if ([[CommonCode readFromUserD:@"play_rate"] floatValue] == 1.5) {
-            [ZRT_PlayerManager manager].playRate = 1.0;
-            [CommonCode writeToUserD:@([ZRT_PlayerManager manager].playRate) andKey:@"play_rate"];
-            [[XWAlerLoginView alertWithTitle:@"当前播放速度为X1.0"] show];
-            [[ZRT_PlayerManager manager] startPlay];
-        }else{
-            [ZRT_PlayerManager manager].playRate = 1.50;
-            [CommonCode writeToUserD:@([ZRT_PlayerManager manager].playRate) andKey:@"play_rate"];
-            [[XWAlerLoginView alertWithTitle:@"当前播放速度为X1.5"] show];
-            [[ZRT_PlayerManager manager] startPlay];
-        }
+        
+        _alertView = [[CustomAlertView alloc] initWithCustomView:[self setupPlaySpeedAlertView]];
+        _alertView.alertHeight = 49 * (self.speedArray.count + 1);
+        _alertView.alertDuration = 0.25;
+        _alertView.coverAlpha = 0.6;
+        [_alertView show];
     }else if ([button.accessibilityIdentifier isEqualToString:@"音质"]) {
         [[XWAlerLoginView alertWithTitle:@"~暂未开放~"] show];
     }
+}
+/**
+ 倍数设置弹窗
+ */
+- (UIView *)setupPlaySpeedAlertView
+{
+    UIView *bgView = [[UIView alloc] init];
+    bgView.backgroundColor = HEXCOLOR(0xe3e3e3);
+    bgView.frame = CGRectMake(0, 0, SCREEN_WIDTH, 49 * (self.speedArray.count + 1));
+    
+    [bgView addSubview:self.playSpeedTableView];
+    
+    return bgView;
 }
 #pragma mark - 播放器设置
 - (void)bofangqiSet
@@ -1063,6 +1084,30 @@ static NewPlayVC *_instance = nil;
     }
     return _tableView;
 }
+- (UITableView *)playSpeedTableView
+{
+    if (!_playSpeedTableView)
+    {
+        _playSpeedTableView = [[UITableView alloc]initWithFrame:CGRectMake(0,0, IPHONE_W, 49 * (self.speedArray.count + 1)) style:UITableViewStylePlain];
+        _playSpeedTableView.delegate = self;
+        _playSpeedTableView.dataSource = self;
+        _playSpeedTableView.backgroundColor = [UIColor whiteColor];
+        
+        UIButton *cancelBtn = [[UIButton alloc] init];
+        cancelBtn.frame = CGRectMake(0, 0, SCREEN_WIDTH, 49);
+        cancelBtn.backgroundColor = [UIColor whiteColor];
+        [cancelBtn setTitle:@"取消" forState:UIControlStateNormal];
+        [cancelBtn setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+        cancelBtn.titleLabel.font = [UIFont systemFontOfSize:15];
+        [cancelBtn addTarget:self action:@selector(cancel_playSpeed_view)];
+        _playSpeedTableView.tableFooterView = cancelBtn;
+    }
+    return _playSpeedTableView;
+}
+- (void)cancel_playSpeed_view
+{
+    [_alertView coverClick];
+}
 - (UIButton *)scrollTopBtn
 {
     if (_scrollTopBtn == nil) {
@@ -1123,149 +1168,196 @@ static NewPlayVC *_instance = nil;
 #pragma mark - table datasource
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    if (self.pinglunArr.count != 0) {
-        return 1 + self.pinglunArr.count;
+    if ([tableView isEqual:self.tableView]) {
+        if (self.pinglunArr.count != 0) {
+            return 1 + self.pinglunArr.count;
+        }else{
+            return 1;
+        }
     }else{
-        return 1;
+        return self.speedArray.count;
     }
 }
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    if (indexPath.row == 0) {
-        PlayVCTextContentTableViewCell *cell = [PlayVCTextContentTableViewCell cellWithTableView:tableView];
-        cell.frameModel = self.textFrameModel;
-        cell.selectionStyle = UITableViewCellSelectionStyleNone;
-        return cell;
-    }else if (indexPath.row == 1) {
-        PlayVCThreeBtnTableViewCell *cell = [PlayVCThreeBtnTableViewCell cellWithTableView:tableView];
-        cell.appreciateNum.text = self.postDetailModel.gold;
-        self.appreciateNum = cell.appreciateNum;
-        cell.commentNum.text = self.postDetailModel.comment_count;
-        DefineWeakSelf
-        cell.selectedItem = ^(UIButton *item) {
-            [weakSelf selecteItemAction:item];
-        };
-        cell.selectionStyle = UITableViewCellSelectionStyleNone;
-        return cell;
-    }else if (indexPath.row == 2) {
-        if (_rewardType == RewardViewTypeNone) {
-            PlayDefaultRewardTableViewCell *cell = [PlayDefaultRewardTableViewCell cellWithTableView:tableView];
-            cell.rewardArray = self.postDetailModel.reward;
-            DefineWeakSelf
-            cell.rewardButtonAciton = ^(UIButton *item) {
-                [weakSelf rewardButtonAciton:item];
-            };
-            cell.lookupRewardListButton = ^(UIButton *item) {
-                [weakSelf lookupRewardListButton:item];
-            };
+    if ([tableView isEqual:self.tableView]) {
+        if (indexPath.row == 0) {
+            PlayVCTextContentTableViewCell *cell = [PlayVCTextContentTableViewCell cellWithTableView:tableView];
+            cell.frameModel = self.textFrameModel;
             cell.selectionStyle = UITableViewCellSelectionStyleNone;
             return cell;
-        }else{
-            PlayCustomRewardTableViewCell *cell = [PlayCustomRewardTableViewCell cellWithTableView:tableView];
-            cell.rewardType = _rewardType;
-            rewardAnimationBtn = cell.finalRewardButton;
-            DefineWeakSelf
-            cell.selecteRewardCountAction = ^(UIButton *item, NSArray *buttons) {
-                [weakSelf selecteRewardCountAction:item buttons:buttons];
-            };
-            cell.finalRewardButtonAciton = ^(OJLAnimationButton *item,UITextField *payTextField) {
-                [weakSelf finalRewardButtonAciton:item payTextField:payTextField];
-            };
-            cell.backButtonAction = ^(UIButton *item) {
-                [weakSelf backButtonAction:item];
-            };
+            //    }
+            //    else if (indexPath.row == 1) {
+            //        PlayVCThreeBtnTableViewCell *cell = [PlayVCThreeBtnTableViewCell cellWithTableView:tableView];
+            //        cell.appreciateNum.text = self.postDetailModel.gold;
+            //        self.appreciateNum = cell.appreciateNum;
+            //        cell.commentNum.text = self.postDetailModel.comment_count;
+            //        DefineWeakSelf
+            //        cell.selectedItem = ^(UIButton *item) {
+            //            [weakSelf selecteItemAction:item];
+            //        };
+            //        cell.selectionStyle = UITableViewCellSelectionStyleNone;
+            //        return cell;
+            //    }else if (indexPath.row == 2) {
+            //        if (_rewardType == RewardViewTypeNone) {
+            //            PlayDefaultRewardTableViewCell *cell = [PlayDefaultRewardTableViewCell cellWithTableView:tableView];
+            //            cell.rewardArray = self.postDetailModel.reward;
+            //            DefineWeakSelf
+            //            cell.rewardButtonAciton = ^(UIButton *item) {
+            //                [weakSelf rewardButtonAciton:item];
+            //            };
+            //            cell.lookupRewardListButton = ^(UIButton *item) {
+            //                [weakSelf lookupRewardListButton:item];
+            //            };
+            //            cell.selectionStyle = UITableViewCellSelectionStyleNone;
+            //            return cell;
+            //        }else{
+            //            PlayCustomRewardTableViewCell *cell = [PlayCustomRewardTableViewCell cellWithTableView:tableView];
+            //            cell.rewardType = _rewardType;
+            //            rewardAnimationBtn = cell.finalRewardButton;
+            //            DefineWeakSelf
+            //            cell.selecteRewardCountAction = ^(UIButton *item, NSArray *buttons) {
+            //                [weakSelf selecteRewardCountAction:item buttons:buttons];
+            //            };
+            //            cell.finalRewardButtonAciton = ^(OJLAnimationButton *item,UITextField *payTextField) {
+            //                [weakSelf finalRewardButtonAciton:item payTextField:payTextField];
+            //            };
+            //            cell.backButtonAction = ^(UIButton *item) {
+            //                [weakSelf backButtonAction:item];
+            //            };
+            //            cell.selectionStyle = UITableViewCellSelectionStyleNone;
+            //            return cell;
+            //        }
+        }
+        else{
+            PlayVCCommentTableViewCell *cell = [PlayVCCommentTableViewCell cellWithTableView:tableView];
+            cell.commentCellType = CommentCellTypeNewsDetail;
+            PlayVCCommentFrameModel *frameModel = self.pinglunArr[indexPath.row - 1];
             cell.selectionStyle = UITableViewCellSelectionStyleNone;
+            cell.hideZanBtn = YES;
+            cell.frameModel = frameModel;
             return cell;
         }
     }else{
-        PlayVCCommentTableViewCell *cell = [PlayVCCommentTableViewCell cellWithTableView:tableView];
-        cell.commentCellType = CommentCellTypeNewsDetail;
-        PlayVCCommentFrameModel *frameModel = self.pinglunArr[indexPath.row - 3];
-        cell.selectionStyle = UITableViewCellSelectionStyleNone;
-        cell.frameModel = frameModel;
+        UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"play_speed_cell"];
+        if (cell == nil) {
+            cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"play_speed_cell"];
+        }
+        cell.textLabel.font = CUSTOM_FONT_TYPE(15.0);
+        cell.accessoryType = UITableViewCellAccessoryNone;
+        RTLog(@"%f",[self.speedArray[indexPath.row] floatValue]);
+        if ([self.speedArray[indexPath.row] isEqualToString:@"0.666667"]) {
+            cell.textLabel.text = @"0.7倍速";
+        }else if ([self.speedArray[indexPath.row] floatValue] == 1.0) {
+            cell.textLabel.text = @"正常倍速";
+        }else if ([self.speedArray[indexPath.row] floatValue] == 1.25) {
+            cell.textLabel.text = @"1.25倍速";
+        }else if ([self.speedArray[indexPath.row] floatValue] == 1.5) {
+            cell.textLabel.text = @"1.5倍速";
+        }else if ([self.speedArray[indexPath.row] floatValue] == 2.0) {
+            cell.textLabel.text = @"2倍速";
+        }
+        if ([[CommonCode readFromUserD:@"play_rate"] floatValue] == [self.speedArray[indexPath.row] floatValue]) {
+            cell.accessoryType = UITableViewCellAccessoryCheckmark;
+        }else{
+            cell.accessoryType = UITableViewCellAccessoryNone;
+        }
         return cell;
     }
 }
 #pragma mark - table delegate
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    if (indexPath.row >= 3) {
-        //TODO:删除自己的评论 或者回复、复制
-        PlayVCCommentFrameModel *frameModel = self.pinglunArr[indexPath.row - 3];
-        PlayVCCommentModel *model = frameModel.model;
-        NSDictionary *userInfo = [CommonCode readFromUserD:@"dangqianUserInfo"];
-        NSString *currentUserID = userInfo[@"results"][@"id"];
-        if ([currentUserID isEqualToString:model.uid]) {
-            [UIActionSheet actionSheetWithTitle:nil message:nil buttons:@[@"删除", @"复制"] showInView:self.view onDismiss:^(int buttonIndex) {
-                if (buttonIndex == 0) {
-                    [NetWorkTool delCommentWithaccessToken:[DSE encryptUseDES:ExdangqianUser] comment_id:model.playCommentID sccess:^(NSDictionary *responseObject)
-                    {
-                        [self getCommentList];
-                        
-                    } failure:^(NSError *error) {
-                        //
-                        RTLog(@"delete error");
-                    }];
-                }
-                else{
-                    UIPasteboard *gr                             = [UIPasteboard generalPasteboard];
-                    gr.string                                    = [NSString stringWithFormat:@"%@",model.content];
-                    XWAlerLoginView *xw = [[XWAlerLoginView alloc]initWithTitle:@"分享链接已复制到您的剪切板~~"];
-                    [xw show];
-                }
-            } onCancel:^{
-                
-            }];
-            
-        }
-        else{
-            
-            [UIActionSheet actionSheetWithTitle:nil message:nil buttons:@[@"回复", @"复制"] showInView:self.view onDismiss:^(int buttonIndex) {
-                if (buttonIndex == 0) {
-                    if ([[CommonCode readFromUserD:@"isLogin"] boolValue] == YES)
-                    {
-                        pinglunyeVC *pinglunye = [pinglunyeVC new];
-                        pinglunye.isNewsCommentPage = YES;
-                        pinglunye.post_id = model.post_id;
-                        pinglunye.to_uid = model.uid;
-                        pinglunye.comment_id = model.playCommentID;
-                        pinglunye.post_table = model.post_table;
-                        self.hidesBottomBarWhenPushed = YES;
-                        [self.navigationController pushViewController:pinglunye animated:YES];
-                        self.hidesBottomBarWhenPushed = YES;
+    if ([tableView isEqual:self.tableView]) {
+        if (indexPath.row >= 1) {
+            //TODO:删除自己的评论 或者回复、复制
+            PlayVCCommentFrameModel *frameModel = self.pinglunArr[indexPath.row - 3];
+            PlayVCCommentModel *model = frameModel.model;
+            NSDictionary *userInfo = [CommonCode readFromUserD:@"dangqianUserInfo"];
+            NSString *currentUserID = userInfo[@"results"][@"id"];
+            if ([currentUserID isEqualToString:model.uid]) {
+                [UIActionSheet actionSheetWithTitle:nil message:nil buttons:@[@"删除", @"复制"] showInView:self.view onDismiss:^(int buttonIndex) {
+                    if (buttonIndex == 0) {
+                        [NetWorkTool delCommentWithaccessToken:[DSE encryptUseDES:ExdangqianUser] comment_id:model.playCommentID sccess:^(NSDictionary *responseObject)
+                         {
+                             [self getCommentList];
+                             
+                         } failure:^(NSError *error) {
+                             //
+                             RTLog(@"delete error");
+                         }];
                     }
                     else{
-                        [self loginFirst];
+                        UIPasteboard *gr                             = [UIPasteboard generalPasteboard];
+                        gr.string                                    = [NSString stringWithFormat:@"%@",model.content];
+                        XWAlerLoginView *xw = [[XWAlerLoginView alloc]initWithTitle:@"分享链接已复制到您的剪切板~~"];
+                        [xw show];
                     }
-                }
-                else{
-                    UIPasteboard *gr                             = [UIPasteboard generalPasteboard];
-                    gr.string                                    = [NSString stringWithFormat:@"%@",model.content];
-                    XWAlerLoginView *xw = [[XWAlerLoginView alloc]initWithTitle:@"分享链接已复制到您的剪切板~~"];
-                    [xw show];
-                }
-            } onCancel:^{
+                } onCancel:^{
+                    
+                }];
                 
-            }];
+            }
+            else{
+                
+                [UIActionSheet actionSheetWithTitle:nil message:nil buttons:@[@"回复", @"复制"] showInView:self.view onDismiss:^(int buttonIndex) {
+                    if (buttonIndex == 0) {
+                        if ([[CommonCode readFromUserD:@"isLogin"] boolValue] == YES)
+                        {
+                            pinglunyeVC *pinglunye = [pinglunyeVC new];
+                            pinglunye.isNewsCommentPage = YES;
+                            pinglunye.post_id = model.post_id;
+                            pinglunye.to_uid = model.uid;
+                            pinglunye.comment_id = model.playCommentID;
+                            pinglunye.post_table = model.post_table;
+                            self.hidesBottomBarWhenPushed = YES;
+                            [self.navigationController pushViewController:pinglunye animated:YES];
+                            self.hidesBottomBarWhenPushed = YES;
+                        }
+                        else{
+                            [self loginFirst];
+                        }
+                    }
+                    else{
+                        UIPasteboard *gr                             = [UIPasteboard generalPasteboard];
+                        gr.string                                    = [NSString stringWithFormat:@"%@",model.content];
+                        XWAlerLoginView *xw = [[XWAlerLoginView alloc]initWithTitle:@"分享链接已复制到您的剪切板~~"];
+                        [xw show];
+                    }
+                } onCancel:^{
+                    
+                }];
+            }
         }
+    }else{
+        //倍数弹窗退出
+        [_alertView coverClick];
+        //把倍数写入播放器和本地
+        [ZRT_PlayerManager manager].playRate = [self.speedArray[indexPath.row] floatValue];
+        [CommonCode writeToUserD:@([ZRT_PlayerManager manager].playRate) andKey:@"play_rate"];
+        [tableView reloadData];
     }
 }
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    if (indexPath.row == 0) {
-        PlayVCTextContentCellFramesModel *frameModel = self.textFrameModel;
-        return frameModel.cellHeight;
-    }else if (indexPath.row == 1) {
-        return 72.0;
-    }else if (indexPath.row == 2) {
-        if (self.rewardType == RewardViewTypeNone) {
-            return 177;
+    if ([tableView isEqual:self.tableView]) {
+        if (indexPath.row == 0) {
+            PlayVCTextContentCellFramesModel *frameModel = self.textFrameModel;
+            return frameModel.cellHeight;
+        }else if (indexPath.row == 1) {
+            return 72.0;
+        }else if (indexPath.row == 2) {
+            if (self.rewardType == RewardViewTypeNone) {
+                return 177;
+            }else{
+                return 266;
+            }
         }else{
-            return 266;
+            PlayVCCommentFrameModel *frameModel = self.pinglunArr[indexPath.row - 1];
+            return frameModel.cellHeight;
         }
     }else{
-        PlayVCCommentFrameModel *frameModel = self.pinglunArr[indexPath.row - 3];
-        return frameModel.cellHeight;
+        return 49;
     }
 }
 #pragma mark - UIScrollViewDelegate

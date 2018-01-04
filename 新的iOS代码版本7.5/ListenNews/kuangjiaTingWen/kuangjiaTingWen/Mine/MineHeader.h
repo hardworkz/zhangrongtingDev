@@ -9,6 +9,7 @@
 #ifndef MineHeader_h
 #define MineHeader_h
 
+#import "MyLearningRecordController.h"
 #import "MyClassroomController.h"
 #import "MyVipMenbersViewController.h"
 #import "NewRegisterController.h"

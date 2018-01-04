@@ -26,11 +26,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "kuangjiaTingWen/kuangjiaTingWen/Playing/Controller/NewPlayVC.m"
-            timestampString = "536578831.037524"
+            timestampString = "536748848.09804"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1471"
-            endingLineNumber = "1471"
+            startingLineNumber = "1563"
+            endingLineNumber = "1563"
             landmarkName = "-pinglunAction"
             landmarkType = "7">
          </BreakpointContent>
@@ -43,22 +43,6 @@
             continueAfterRunningActions = "No"
             scope = "0"
             stopOnStyle = "0">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "kuangjiaTingWen/kuangjiaTingWen/Playing/Controller/NewPlayVC.m"
-            timestampString = "536578954.428895"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1769"
-            endingLineNumber = "1769"
-            landmarkName = "-handleInterruption:"
-            landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>

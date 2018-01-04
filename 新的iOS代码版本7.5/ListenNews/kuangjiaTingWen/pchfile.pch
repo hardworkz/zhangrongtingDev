@@ -47,6 +47,7 @@
 #import "UINavigationController+Cloudox.h"
 #import "UIViewController+Cloudox.h"
 #import "BJNoDataView.h"
+#import "BezierCurveView.h"
 
 #import "PlayingHeader.h"
 #import "MineHeader.h"

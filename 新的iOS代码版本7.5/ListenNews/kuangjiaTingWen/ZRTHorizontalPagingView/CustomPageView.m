@@ -378,10 +378,10 @@ static NSInteger pagingButtonTag                 = 1000;
         [b setSelected:NO];
     }
     [segmentButton setSelected:YES];
-    
+    RTLog(@"segmentButton.tag:%ld",segmentButton.tag);
     NSInteger clickIndex = segmentButton.tag-pagingButtonTag;
     
-    if (clickIndex <4) {
+    if (clickIndex <3) {
         [self.horizontalScrollView setContentOffset:CGPointMake(clickIndex * SCREEN_WIDTH, self.horizontalScrollView.contentOffset.y) animated:NO];
         if(self.currentScrollView.contentOffset.y<-(self.headerViewHeight+self.segmentBarHeight)) {
             [self.currentScrollView setContentOffset:CGPointMake(self.currentScrollView.contentOffset.x, -(self.headerViewHeight+self.segmentBarHeight)) animated:NO];
