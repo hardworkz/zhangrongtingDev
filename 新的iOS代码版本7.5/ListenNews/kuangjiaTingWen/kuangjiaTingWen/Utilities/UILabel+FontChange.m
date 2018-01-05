@@ -50,11 +50,11 @@
         if (self.tag == 10086) {
             self.font = [UIFont systemFontOfSize:self.font.pointSize];
         } else {
-            if ([UIFont fontNamesForFamilyName:CustomFontName])
+            if (![UIFont fontNamesForFamilyName:CustomFontName]){
                 self.font  = CUSTOM_FONT_TYPE(self.font.pointSize);
+            }
         }
-    }
-    
+    } 
 }
 
 @end

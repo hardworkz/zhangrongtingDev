@@ -44,41 +44,50 @@ typedef NS_ENUM(NSInteger, BlogContentType)
 {
     [super viewDidLoad];
     self.txBlogText.delegate = self;
-    if (self.isAddNewQuestion) {
+    self.txBlogText.placeholder = @"说点什么吧...";
+    
+    [IQKeyboardManager sharedManager].shouldFixTextViewClip = NO;
+    [IQKeyboardManager sharedManager].canAdjustTextView = NO;
+    
+//    if (self.isAddNewQuestion) {
 //        self.txBlogText.placeholder = @"清晰的描述问题，可以更容易获得答案噢 ~";
-    }
-    else{
+//    }
+//    else{
 //        self.txBlogText.placeholder = @"请输入添加答案的内容";
-    }
-    if (self.placeHolderString) {
+//    }
+//    if (self.placeHolderString) {
 //        self.txBlogText.placeholder = self.placeHolderString;
-    }
+//    }
+    
     CGSize size = [[UIScreen mainScreen] bounds].size;
     if (size.height <= 480.0f) {
         _txBlogText.height -= 50;
     }
     
     _receivers  = [NSMutableArray array];
+    
 }
-
 -(void)viewDidAppear:(BOOL)animated
 {
-    dispatch_once(&onceToken, ^{
-        [self.txBlogText becomeFirstResponder];
-    });
     [super viewDidAppear:animated];
+    
+    [self.txBlogText becomeFirstResponder];
 }
-
+- (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event
+{
+    [self.txBlogText resignFirstResponder];
+}
 #pragma mark - UITextViewDelegate
--(void)textViewDidBeginEditing:(UITextView *)textView
-{
-    // do sth necessary
-}
-
--(void)textViewDidEndEditing:(UITextView *)textView
-{
-    // do sth necessary
-}
+//-(void)textViewDidBeginEditing:(UITextView *)textView
+//{
+//    // do sth necessary
+//}
+//
+//-(void)textViewDidEndEditing:(UITextView *)textView
+//{
+//    // do sth necessary
+////    [textView setNeedsLayout];
+//}
 
 - (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text
 {
@@ -91,37 +100,39 @@ typedef NS_ENUM(NSInteger, BlogContentType)
     return YES;
 }
 
-- (void)textViewDidChange:(UITextView *)textView
-{
-    if (textView.markedTextRange == nil && self.maxContentLength > 0 && textView.text.length >= self.maxContentLength) {
-        /**
-         *  SAAS-3855
-         【兼容】【问答社区】4S 7.0.4输入内容大于1024个字符应用闪退
-         *  NSMutableRLEArray replaceObjectsInRange:withObject:length:: Out of bounds
-         *                 --- linyawen  03.18
-         */
-        @try {
-            NSString *msg = [NSString stringWithFormat:@"最大输入字符为%ld个", (long)self.maxContentLength];
-            [SVProgressHUD showErrorWithStatus:msg];
-            textView.text = [textView.text substringToIndex:(self.maxContentLength -1)];
-            [textView scrollRangeToVisible:NSMakeRange(textView.text.length - 10, 10)];
-        }
-        @catch (NSException *exception) {
-            ;
-        }
-        @finally {
-            ;
-        };
+//- (void)textViewDidChange:(UITextView *)textView
+//{
+////    [self adjustLayout];
+//    if (textView.markedTextRange == nil && self.maxContentLength > 0 && textView.text.length >= self.maxContentLength) {
+//        /**
+//         *  SAAS-3855
+//         【兼容】【问答社区】4S 7.0.4输入内容大于1024个字符应用闪退
+//         *  NSMutableRLEArray replaceObjectsInRange:withObject:length:: Out of bounds
+//         *                 --- linyawen  03.18
+//         */
+////        @try {
+//            NSString *msg = [NSString stringWithFormat:@"最大输入字符为%ld个", (long)self.maxContentLength];
+////            [SVProgressHUD showErrorWithStatus:msg];
+//        [[XWAlerLoginView alertWithTitle:msg] show];
+////            textView.text = [textView.text substringToIndex:(self.maxContentLength -1)];
+////            [textView scrollRangeToVisible:NSMakeRange(textView.text.length - 10, 10)];
+////        }
+////        @catch (NSException *exception) {
+////            ;
+////        }
+////        @finally {
+////            ;
+////        };
+//    }
+//}
 
-    }
-}
-
--(void)adjustLayout{
-    [self.tableView reloadData];
-    if (!IOS_VERSION_LESS_THAN_OR_EQUAL_TO(@"7")) {
-        [self.txBlogText resignFirstResponder];
-    };
-}
+//-(void)adjustLayout{
+//    [self.tableView reloadData];
+//    self.txBlogText.width = self.txBlogText.width;
+//    if (!IOS_VERSION_LESS_THAN_OR_EQUAL_TO(@"7")) {
+//        [self.txBlogText resignFirstResponder];
+//    };
+//}
 
 
 #pragma mark - Table view data source
@@ -218,10 +229,11 @@ typedef NS_ENUM(NSInteger, BlogContentType)
 
 #pragma mark - UIScrollViewDelegate
 
-- (void)scrollViewDidScroll:(UIScrollView *)scrollView{
+//- (void)scrollViewDidScroll:(UIScrollView *)scrollView{
 //    [self.view endEditing:YES];
-    [self.txBlogText resignFirstResponder];
-}
+//    [self adjustLayout];
+//    [self.txBlogText resignFirstResponder];
+//}
 
 
 @end

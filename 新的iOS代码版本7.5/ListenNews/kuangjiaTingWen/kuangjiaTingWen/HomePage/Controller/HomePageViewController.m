@@ -247,16 +247,17 @@
                 [weakSelf.newsInfoArr removeAllObjects];
             }
             else{
-                NSRange range = {NSNotFound, NSNotFound};
-                for (int i = 0 ; i < [weakSelf.newsInfoArr count]; i ++) {
-                    if ([weakSelf.newsInfoArr[i][@"id"] isEqualToString:[responseObject[@"results"] firstObject][@"id"] ]) {
-                        range = NSMakeRange(i, [weakSelf.newsInfoArr count] - i);
-                        break;
-                    }
-                }
-                if (range.location < [weakSelf.newsInfoArr count]) {
-                    [weakSelf.newsInfoArr removeObjectsInRange:range];
-                }
+//                NSRange range = {NSNotFound, NSNotFound};
+//                for (int i = 0 ; i < [weakSelf.newsInfoArr count]; i ++) {
+//                    if ([weakSelf.newsInfoArr[i][@"id"] isEqualToString:[responseObject[@"results"] firstObject][@"id"] ]) {
+//                        range = NSMakeRange(i, [weakSelf.newsInfoArr count] - i);
+//                        break;
+//                    }
+//                }
+//                if (range.location < [weakSelf.newsInfoArr count]) {
+//                    [weakSelf.newsInfoArr removeObjectsInRange:range];
+//                }
+                
             }
             [weakSelf.newsInfoArr addObjectsFromArray:responseObject[@"results"]];
             weakSelf.newsInfoArr = [[NSMutableArray alloc]initWithArray:weakSelf.newsInfoArr];
@@ -283,21 +284,21 @@
                 [weakSelf.columnInfoArr removeAllObjects];
             }
             else{
-                NSRange range = {NSNotFound, NSNotFound};
-                for (int i = 0 ; i < [weakSelf.columnInfoArr count]; i ++) {
-                    if ([weakSelf.columnInfoArr[i][@"id"] isEqualToString:[responseObject[@"results"] firstObject][@"id"] ]) {
-                        range = NSMakeRange(i, [weakSelf.columnInfoArr count] - i);
-                        break;
-                    }
-                }
-                if (range.location < [weakSelf.columnInfoArr count]) {
-                    [weakSelf.columnInfoArr removeObjectsInRange:range];
-                }
+//                NSRange range = {NSNotFound, NSNotFound};
+//                for (int i = 0 ; i < [weakSelf.columnInfoArr count]; i ++) {
+//                    if ([weakSelf.columnInfoArr[i][@"id"] isEqualToString:[responseObject[@"results"] firstObject][@"id"] ]) {
+//                        range = NSMakeRange(i, [weakSelf.columnInfoArr count] - i);
+//                        break;
+//                    }
+//                }
+//                if (range.location < [weakSelf.columnInfoArr count]) {
+//                    [weakSelf.columnInfoArr removeObjectsInRange:range];
+//                }
             }
             [weakSelf.columnInfoArr addObjectsFromArray:responseObject[@"results"]];
             weakSelf.columnInfoArr = [[NSMutableArray alloc]initWithArray:weakSelf.columnInfoArr];
             if ([ZRT_PlayerManager manager].channelType == ChannelTypeHomeChannelTwo) {
-                [ZRT_PlayerManager manager].songList = weakSelf.newsInfoArr;
+                [ZRT_PlayerManager manager].songList = weakSelf.columnInfoArr;
             }
             [weakSelf.columnTableView reloadData];
             [weakSelf endColumnRefreshing];
@@ -472,17 +473,17 @@
     }
 }
 
-- (void)zidongjiazai:(NSNotification *)notification{
-    DefineWeakSelf;
-    if (self.segmentedControl.selectedSegmentIndex == 0) {
-        weakSelf.columnIndex ++;
-        [weakSelf loadColumnDataWithAutoLoading:YES];
-    }
-    else if (self.segmentedControl.selectedSegmentIndex == 1){
-        weakSelf.newsIndex ++;
-        [weakSelf loadNewsDataWithAutoLoading:YES];
-    }
-}
+//- (void)zidongjiazai:(NSNotification *)notification{
+//    DefineWeakSelf;
+//    if (self.segmentedControl.selectedSegmentIndex == 0) {
+//        weakSelf.columnIndex ++;
+//        [weakSelf loadColumnDataWithAutoLoading:YES];
+//    }
+//    else if (self.segmentedControl.selectedSegmentIndex == 1){
+//        weakSelf.newsIndex ++;
+//        [weakSelf loadNewsDataWithAutoLoading:YES];
+//    }
+//}
 //刷新课堂列表
 - (void)reloadClassList
 {
@@ -617,11 +618,11 @@
         }
         
         NSArray *arr;
-        if (self.segmentedControl.selectedSegmentIndex == 0) {
+        if (self.playListIndex == 0) {
             arr = self.columnInfoArr;
             [ZRT_PlayerManager manager].channelType = ChannelTypeHomeChannelTwo;
         }
-        else if (self.segmentedControl.selectedSegmentIndex == 1){
+        else if (self.playListIndex == 1){
             arr = self.newsInfoArr;
             [ZRT_PlayerManager manager].channelType = ChannelTypeHomeChannelOne;
         }

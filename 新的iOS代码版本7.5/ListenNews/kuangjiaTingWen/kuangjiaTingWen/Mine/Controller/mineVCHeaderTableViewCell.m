@@ -10,6 +10,7 @@
 
 @interface mineVCHeaderTableViewCell()
 {
+    UIView *imgBorderView;
     UIImageView *titleImage;
     UIImageView *ShadowImageView;
     UILabel *lab;
@@ -155,12 +156,12 @@
         lab.frame = CGRectMake(lab.frame.origin.x, lab.frame.origin.y,contentSize.width, lab.frame.size.height);
         
         if (isSignatureNil.length == 0) {
-            sign.text = @"暂无简介";
+            sign.text = @"该用户没有什么想说的";
         }else{
             sign.text = isSignatureNil;
         }
-        CGSize signContentSize = [sign sizeThatFits:CGSizeMake(sign.frame.size.width, MAXFLOAT)];
-        sign.frame = CGRectMake(sign.frame.origin.x, sign.frame.origin.y,signContentSize.width, signContentSize.height);
+        CGSize signContentSize = [sign.text boundingRectWithSize:CGSizeMake(SCREEN_WIDTH - CGRectGetMaxX(imgBorderView.frame) - 30, MAXFLOAT) options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:sign.font} context:nil].size;
+        sign.frame = CGRectMake(sign.x, sign.y,signContentSize.width, signContentSize.height);
         
         //判断是否在审核中
         if (isIAP) {

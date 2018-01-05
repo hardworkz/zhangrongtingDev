@@ -250,6 +250,9 @@
         [_blogTableview setDelegate:self];
         [_blogTableview setDataSource:self];
         _blogTableview.tableFooterView =  [UIView new];
+        _blogTableview.estimatedRowHeight = 0;
+        _blogTableview.estimatedSectionHeaderHeight = 0;
+        _blogTableview.estimatedSectionFooterHeight = 0;
     }
     return  _blogTableview;
 }

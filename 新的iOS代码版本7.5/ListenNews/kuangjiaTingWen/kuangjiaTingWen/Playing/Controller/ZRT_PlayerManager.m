@@ -321,7 +321,7 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
             break;
     }
     //开始播放设置播放速度
-    if ([[CommonCode readFromUserD:@"play_rate"] floatValue] != 0) {
+    if ([[CommonCode readFromUserD:@"play_rate"] floatValue] != 0 && ![self limitPlayStatusWithAdd:NO]) {
         self.player.rate = [[CommonCode readFromUserD:@"play_rate"] floatValue];
     }   
 }
@@ -847,8 +847,8 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
  */
 - (void)uploadClassPlayHistoryData
 {
-    [CommonCode writeToUserD:self.playHistoryDataModel.time andKey:[NSString stringWithFormat:@"contiune_PlayHistory_%@",self.act_id]];
-    [CommonCode writeToUserD:self.playHistoryDataModel.number andKey:[NSString stringWithFormat:@"contiune_number_%@",self.act_id]];
+//    [CommonCode writeToUserD:self.playHistoryDataModel.time andKey:[NSString stringWithFormat:@"contiune_PlayHistory_%@",self.act_id]];
+//    [CommonCode writeToUserD:self.playHistoryDataModel.number andKey:[NSString stringWithFormat:@"contiune_number_%@",self.act_id]];
     
 //    if ([self.playHistoryDataModel.time intValue] != 0) {
 //        [NetWorkTool postPaoGuoUploadHistoryDataWithAct_id:self.act_id andUser_id:ExdangqianUserUid andNumber:self.playHistoryDataModel.number andTime:self.playHistoryDataModel.time sccess:^(NSDictionary *responseObject) {

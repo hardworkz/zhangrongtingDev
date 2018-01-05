@@ -1455,6 +1455,9 @@ didSelectLinkWithTransitInformation:(NSDictionary *)components {
         _zhuyetableView.dataSource = self;
         _zhuyetableView.tag = 1;
         [_zhuyetableView setSeparatorStyle:UITableViewCellSeparatorStyleNone];
+        _zhuyetableView.estimatedRowHeight = 0;
+        _zhuyetableView.estimatedSectionHeaderHeight = 0;
+        _zhuyetableView.estimatedSectionFooterHeight = 0;
 //        _zhuyetableView.tableHeaderView = HeaderViewBg;
     }
     return _zhuyetableView;
