@@ -247,7 +247,7 @@ static CGFloat const MaxScale = 1.0;/** 选中文字放大  */
         [btn setTitle:vc.title forState:UIControlStateNormal];
         [btn setTitleColor:gTextDownload forState:UIControlStateNormal];
         [btn.titleLabel setTextAlignment:NSTextAlignmentCenter];
-        btn.titleLabel.font = [UIFont systemFontOfSize:15];
+        btn.titleLabel.font = CUSTOM_FONT_TYPE(15.0);
         [btn addTarget:self action:@selector(click:) forControlEvents:UIControlEventTouchDown];
         
         [self.buttons addObject:btn];

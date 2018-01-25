@@ -59,14 +59,14 @@
         titleLab.font = CUSTOM_FONT_TYPE(17.0);
         titleLab.lineBreakMode = NSLineBreakByWordWrapping;
         titleLab.textColor = TITLE_COLOR_HEX;
-        [titleLab setNumberOfLines:3];
+        [titleLab setNumberOfLines:SCREEN_WIDTH == 320 ?2:3];
 //        titleLab.backgroundColor = [UIColor blueColor];
         [self.contentView addSubview:titleLab];
         
         if (IS_IPAD) {
             //正文
-            detailNews = [[UILabel alloc]initWithFrame:CGRectMake(15.0 / 375 * IPHONE_W, titleLab.frame.origin.y + titleLab.frame.size.height + 20.0 , titleLab.frame.size.width, 40.0)];
-            detailNews.numberOfLines = 0;
+            detailNews = [[UILabel alloc]initWithFrame:CGRectMake(15.0 / 375 * IPHONE_W, titleLab.frame.origin.y + titleLab.frame.size.height + 20.0 , titleLab.frame.size.width, 60.0)];
+            detailNews.numberOfLines = 2;
             detailNews.textColor = gTextColorSub;
 //            detailNews.backgroundColor = [UIColor redColor];
             detailNews.font = CUSTOM_FONT_TYPE(15.0);
@@ -148,7 +148,7 @@
 }
 - (void)downloadColumnNewsAction:(UIButton *)button
 {
-    if ([[ZRT_PlayerManager manager] limitPlayStatusWithAdd:NO]) {
+    if ([[ZRT_PlayerManager manager] limitPlayStatusWithPost_id:nil withAdd:NO]) {
         [self alertMessageWithVipLimit];
         return;
     }

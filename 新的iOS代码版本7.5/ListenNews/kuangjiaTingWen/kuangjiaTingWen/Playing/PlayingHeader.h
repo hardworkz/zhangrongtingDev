@@ -21,6 +21,7 @@
 #import "ZRT_PlayerManager.h"
 #import "ProjiectDownLoadManager.h"
 #import "WHC_Download.h"
+#import "StudyRecordTimer.h"
 
 #import "NewsModel.h"
 #import "NewObj.h"
@@ -64,4 +65,5 @@ static NSString *const is_stop = @"is_stop";
 static NSString *const server_date = @"server_date";
 static NSString *const limit_num = @"limit_num";
 static NSString *const limit_time = @"limit_time";
+static NSString *const limit_array = @"limit_array";
 #endif /* PlayingHeader_h */

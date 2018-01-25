@@ -209,7 +209,7 @@ typedef NS_ENUM(NSInteger, BlogContentType)
 //        NIDASSERT([segue.destinationViewController isKindOfClass:[NewQASelectedUsersController class]]);
         NewQAController *blogVC = (NewQAController *)self.qaController;
 //        NIDASSERT([blogVC isKindOfClass:[NewQAController class]]);
-        NewQASelectedUsersController *vc = segue.destinationViewController;
+        NewQASelectedUsersController *vc = (NewQASelectedUsersController *)segue.destinationViewController;
         self.selectUserController = vc;
         blogVC.selectUserController = vc;
     }

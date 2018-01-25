@@ -85,6 +85,7 @@ static NSInteger selectIndex2 = -1;
         [_allPlayButton setFrame:CGRectMake(15, 10, 20, 20)];
         [_allPlayButton setBackgroundImage:[UIImage imageNamed:@"downloaded_play"] forState:UIControlStateNormal];
         [_allPlayButton setAccessibilityLabel:@"播放全部"];
+        _allPlayButton.titleLabel.font = CUSTOM_FONT_TYPE(17.0);
         [_allPlayButton addTarget:self action:@selector(allPlayButtonAction:) forControlEvents:UIControlEventTouchUpInside];
         
     }

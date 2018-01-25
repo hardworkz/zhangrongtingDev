@@ -14,6 +14,7 @@
     UILabel *titleLab;
     UILabel *riqiLab;
     UITextView *zhengwenTextView;
+    UIView *devider;
 //    UIButton *readOriginalEssay;
 }
 @end
@@ -46,7 +47,7 @@
         riqiLab = [[UILabel alloc] init];
         riqiLab.textAlignment = NSTextAlignmentCenter;
         riqiLab.textColor = nTextColorSub;
-        riqiLab.numberOfLines = 2;
+        riqiLab.numberOfLines = 0;
         [self.contentView addSubview:riqiLab];
 
         //新闻内容
@@ -55,6 +56,10 @@
         zhengwenTextView.editable = NO;
         zhengwenTextView.scrollsToTop = NO;
         [self.contentView addSubview:zhengwenTextView];
+        
+        devider = [[UIView alloc] init];
+        devider.backgroundColor = [UIColor lightGrayColor];
+        [self.contentView addSubview:devider];
     }
     return self;
 }
@@ -87,5 +92,6 @@
         zhengwenTextView.attributedText = attributedString;
     }
     zhengwenTextView.frame = frameModel.contentLabelF;
+    devider.frame = frameModel.deviderF;
 }
 @end

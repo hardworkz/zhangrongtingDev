@@ -1200,7 +1200,7 @@ typedef void(^animateBlock)();
         }else{
             [_newSettingMessageButton setFrame:CGRectMake(IS_IPAD?140:110, IS_IPAD?20.0 / 667 * IPHONE_H:16.0 / 667 * IPHONE_H, 20, 20)];
         }
-        [_newSettingMessageButton setFrame:CGRectMake(IS_IPAD?140:110, IS_IPAD?23.0 / 667 * IPHONE_H:IS_IPHONEX?20.0:16.0 / 667 * IPHONE_H, 20, 20)];
+        [_newSettingMessageButton setFrame:CGRectMake(IS_IPAD?140:110, IS_IPAD?20.0 / 667 * IPHONE_H:IS_IPHONEX?20.0:16.0 / 667 * IPHONE_H, 20, 20)];
         [_newSettingMessageButton.layer setMasksToBounds:YES];
         [_newSettingMessageButton.layer setCornerRadius:10.0];
         [_newSettingMessageButton setBackgroundColor:UIColorFromHex(0xf23131)];

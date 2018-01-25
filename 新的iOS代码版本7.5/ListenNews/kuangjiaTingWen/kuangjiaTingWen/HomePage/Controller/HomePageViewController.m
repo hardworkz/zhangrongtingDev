@@ -71,8 +71,21 @@
     
     //系统消息提醒
 //    [self getSystemNotice];
+    
+    //设置盲人模式下拉刷新按钮
+    UIButton *VoiceOverBtn = [[UIButton alloc] initWithFrame:CGRectMake(0, IS_IPHONEX? 128:104, SCREEN_WIDTH, 30)];
+    [VoiceOverBtn setTitle:@"刷新列表" forState:UIControlStateNormal];
+    [VoiceOverBtn setTitleColor:[UIColor clearColor] forState:UIControlStateNormal];
+    VoiceOverBtn.backgroundColor = [UIColor clearColor];
+    [VoiceOverBtn addTarget:self action:@selector(voiceOver_Clicked)];
+    [self.view insertSubview:VoiceOverBtn aboveSubview:self.scrollView];
 }
-
+- (void)voiceOver_Clicked
+{
+    [self.columnTableView.mj_header beginRefreshing];
+    [self.newsTableView.mj_header beginRefreshing];
+    [self.classroomTableView.mj_header beginRefreshing];
+}
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     [self.navigationController setNavigationBarHidden:NO animated:YES];
@@ -119,6 +132,7 @@
     [self.scrollView addSubview:self.columnTableView];
     [self.scrollView addSubview:self.newsTableView];
     [self.scrollView addSubview:self.classroomTableView];
+    self.newsTableView.mj_footer.hidden = YES;
     [self.view addSubview:self.segmentedControl];
     [self.view addSubview:self.scrollView];
     DefineWeakSelf;
@@ -239,6 +253,7 @@
 - (void)loadNewsDataWithAutoLoading:(BOOL)isAuto{
     if (self.newsIndex == 1) {
         [self getAD];
+        self.newsTableView.mj_footer.hidden = YES;
     }
     DefineWeakSelf;
     [NetWorkTool getInformationListWithaccessToken:AvatarAccessToken andPage:[NSString stringWithFormat:@"%ld",(long)self.newsIndex] andLimit:[NSString stringWithFormat:@"%ld",(long)self.newsPageSize] sccess:^(NSDictionary *responseObject) {
@@ -246,7 +261,7 @@
             if (weakSelf.newsIndex == 1) {
                 [weakSelf.newsInfoArr removeAllObjects];
             }
-            else{
+//            else{
 //                NSRange range = {NSNotFound, NSNotFound};
 //                for (int i = 0 ; i < [weakSelf.newsInfoArr count]; i ++) {
 //                    if ([weakSelf.newsInfoArr[i][@"id"] isEqualToString:[responseObject[@"results"] firstObject][@"id"] ]) {
@@ -257,13 +272,13 @@
 //                if (range.location < [weakSelf.newsInfoArr count]) {
 //                    [weakSelf.newsInfoArr removeObjectsInRange:range];
 //                }
-                
-            }
+//            }
             [weakSelf.newsInfoArr addObjectsFromArray:responseObject[@"results"]];
-            weakSelf.newsInfoArr = [[NSMutableArray alloc]initWithArray:weakSelf.newsInfoArr];
+            weakSelf.newsInfoArr = [[NSMutableArray alloc] initWithArray:weakSelf.newsInfoArr];
             if ([ZRT_PlayerManager manager].channelType == ChannelTypeHomeChannelOne) {
                 [ZRT_PlayerManager manager].songList = weakSelf.newsInfoArr;
             }
+            weakSelf.newsTableView.mj_footer.hidden = NO;
             [weakSelf.newsTableView reloadData];
             [weakSelf endNewsRefreshing];
         }
@@ -283,7 +298,7 @@
             if (weakSelf.columnIndex == 1) {
                 [weakSelf.columnInfoArr removeAllObjects];
             }
-            else{
+//            else{
 //                NSRange range = {NSNotFound, NSNotFound};
 //                for (int i = 0 ; i < [weakSelf.columnInfoArr count]; i ++) {
 //                    if ([weakSelf.columnInfoArr[i][@"id"] isEqualToString:[responseObject[@"results"] firstObject][@"id"] ]) {
@@ -294,7 +309,7 @@
 //                if (range.location < [weakSelf.columnInfoArr count]) {
 //                    [weakSelf.columnInfoArr removeObjectsInRange:range];
 //                }
-            }
+//            }
             [weakSelf.columnInfoArr addObjectsFromArray:responseObject[@"results"]];
             weakSelf.columnInfoArr = [[NSMutableArray alloc]initWithArray:weakSelf.columnInfoArr];
             if ([ZRT_PlayerManager manager].channelType == ChannelTypeHomeChannelTwo) {

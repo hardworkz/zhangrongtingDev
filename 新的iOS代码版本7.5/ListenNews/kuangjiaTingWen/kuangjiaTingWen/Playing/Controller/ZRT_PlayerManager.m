@@ -20,6 +20,7 @@ static NSString *const kvo_playbackBufferEmpty = @"playbackBufferEmpty";
 static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
 
 @interface ZRT_PlayerManager ()
+@property (assign, nonatomic) BOOL isUpdateStudyRecordLock;
 @end
 @implementation ZRT_PlayerManager
 + (instancetype)manager {
@@ -39,8 +40,11 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
         }else{
             self.songList = [NSMutableArray array];
         }
+        _isUpdateStudyRecordLock = NO;
         self.playRate = 1.0;
         self.playHistoryDataModel = [ClassPlayHistoryDataModel new];
+        //创建计时器
+        self.studyRecordTimer = [[StudyRecordTimer alloc] init];
         //获取限制播放状态
         [self limitPlayStatusWithAdd:NO];
     }
@@ -54,7 +58,7 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
         if ([userInfoDict[results][member_type] intValue] == 0) {
             int limitTime = [[CommonCode readFromUserD:limit_time] intValue];
             int limitNum = [[CommonCode readFromUserD:limit_num] intValue];
-            if (limitTime >= limitNum||[userInfoDict[results][is_stop] intValue] == 1) {
+            if ((limitTime >= limitNum)||[userInfoDict[results][is_stop] intValue] == 1) {
                 switch (self.playType) {
                     case ZRTPlayTypeNews:
                         isStopPlay = YES;
@@ -90,7 +94,6 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
     }else{
         int limitTime = [[CommonCode readFromUserD:limit_time] intValue];
         int limitNum = [[CommonCode readFromUserD:limit_num] intValue];
-        RTLog(@"limitTime--:%d",limitTime);
         if (limitTime >= limitNum) {
             switch (self.playType) {
                 case ZRTPlayTypeNews:
@@ -110,6 +113,112 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
             isStopPlay = NO;
             if (isAdd) {
                 [CommonCode writeToUserD:[NSString stringWithFormat:@"%d",limitTime + 1] andKey:limit_time];
+            }
+        }
+    }
+    //审核中不弹窗
+    if ([[CommonCode readFromUserD:@"isIAP"] boolValue] == YES) {
+        isStopPlay = NO;
+    }
+    return isStopPlay;
+}
+- (BOOL)limitPlayStatusWithPost_id:(NSString *)post_id withAdd:(BOOL)isAdd
+{
+    //判断是否是播放新闻，记录次数限制
+    BOOL isStopPlay = NO;
+    if ([[CommonCode readFromUserD:@"isLogin"] boolValue] == YES) {
+        NSDictionary *userInfoDict = [CommonCode readFromUserD:@"dangqianUserInfo"];
+        if ([userInfoDict[results][member_type] intValue] == 0) {
+            NSArray *limitArray = [CommonCode readFromUserD:limit_array];
+            int limitNum = [[CommonCode readFromUserD:limit_num] intValue];
+            if ((limitArray.count >= (limitNum))||[userInfoDict[results][is_stop] intValue] == 1) {
+                switch (self.playType) {
+                    case ZRTPlayTypeNews:
+                        //判断数组中是否存在当前ID
+                        isStopPlay = YES;
+                        for (NSString *post_id in limitArray) {
+                            if ([post_id isEqualToString:self.currentSong[@"id"]]) {
+                                isStopPlay = NO;
+                            }
+                        }
+                        //上传播放限制状态
+                        [NetWorkTool sendLimitDataWithaccessToken:AvatarAccessToken sccess:^(NSDictionary *responseObject) {
+                            if ([responseObject[status] intValue] == 1) {
+                                [[NSNotificationCenter defaultCenter] postNotificationName:@"updateUserInfo" object:nil];
+                            }
+                        } failure:^(NSError *error) {
+                            
+                        }];
+                        break;
+                    case ZRTPlayTypeDownload:
+                        isStopPlay = NO;
+                        break;
+                    case ZRTPlayTypeClassroom:
+                        isStopPlay = NO;
+                        break;
+                        
+                    default:
+                        isStopPlay = NO;
+                        break;
+                }
+            }else{
+                isStopPlay = NO;
+                if (isAdd) {
+                    NSMutableArray *limitArray = [NSMutableArray arrayWithArray:[CommonCode readFromUserD:limit_array]];
+                    if (limitArray.count < 5) {
+                        if (limitArray == nil) {
+                            NSMutableArray *array = [NSMutableArray arrayWithObject:post_id];
+                            [CommonCode writeToUserD:array andKey:limit_array];
+                        }else{
+                            [limitArray addObject:post_id];
+                            NSSet *set = [NSSet setWithArray:limitArray];
+                            [CommonCode writeToUserD:set.allObjects andKey:limit_array];
+                        }
+                    }
+                }
+            }
+        }else
+        {
+            isStopPlay = NO;
+        }
+    }else{
+        NSArray *limitArray = [CommonCode readFromUserD:limit_array];
+        int limitNum = [[CommonCode readFromUserD:limit_num] intValue];
+        if (limitArray.count >= (limitNum)) {
+            switch (self.playType) {
+                case ZRTPlayTypeNews:
+                    //判断数组中是否存在当前ID
+                    isStopPlay = YES;
+                    for (NSString *post_id in limitArray) {
+                        if ([post_id isEqualToString:self.currentSong[@"id"]]) {
+                            isStopPlay = NO;
+                        }
+                    }
+                    break;
+                case ZRTPlayTypeDownload:
+                    isStopPlay = NO;
+                    break;
+                case ZRTPlayTypeClassroom:
+                    isStopPlay = NO;
+                    break;
+                default:
+                    isStopPlay = NO;
+                    break;
+            }
+        }else{
+            isStopPlay = NO;
+            if (isAdd) {
+                NSMutableArray *limitArray = [NSMutableArray arrayWithArray:[CommonCode readFromUserD:limit_array]];
+                if (limitArray.count < 5) {
+                    if (limitArray == nil) {
+                        NSMutableArray *array = [NSMutableArray arrayWithObject:post_id];
+                        [CommonCode writeToUserD:array andKey:limit_array];
+                    }else{
+                        [limitArray addObject:post_id];
+                        NSSet *set = [NSSet setWithArray:limitArray];
+                        [CommonCode writeToUserD:set.allObjects andKey:limit_array];
+                    }
+                }
             }
         }
     }
@@ -223,9 +332,11 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
 - (void)setPlayType:(ZRTPlayType)playType
 {
     //当前为课堂频道并且切换到其他频道保存数据
-    if (_playType == ZRTPlayTypeClassroom && playType != ZRTPlayTypeClassroom) {
+//    if (_playType == ZRTPlayTypeClassroom && playType != ZRTPlayTypeClassroom) {
+//        [[ZRT_PlayerManager manager].studyRecordTimer pauseCount];
         [self uploadClassPlayHistoryData];
-    }
+        
+//    }
     _playType = playType;
 }
 /*
@@ -234,6 +345,7 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
 - (void)setAct_id:(NSString *)act_id
 {
     if (_act_id != act_id) {
+//        [[ZRT_PlayerManager manager].studyRecordTimer pauseCount];
         [self uploadClassPlayHistoryData];
     }
     _act_id = act_id;
@@ -291,10 +403,23 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
                 SendNotify(SONGPLAYSTATUSCHANGE, nil)
                 [self.player play];
             }else{
-                if (![[ZRT_PlayerManager manager] limitPlayStatusWithAdd:NO]) {
+                if (![[ZRT_PlayerManager manager] limitPlayStatusWithPost_id:nil withAdd:NO]) {//没有播放限制
                     _status = ZRTPlayStatusPlay;
                     SendNotify(SONGPLAYSTATUSCHANGE, nil)
                     [self.player play];
+                }else{//播放限制
+                    BOOL isStopPlay = YES;
+                    NSArray *limitArray = [CommonCode readFromUserD:limit_array];
+                    for (NSString *post_id in limitArray) {
+                        if ([post_id isEqualToString:self.currentSong[@"id"]]) {
+                            isStopPlay = NO;
+                        }
+                    }
+                    if (!isStopPlay) {
+                        _status = ZRTPlayStatusPlay;
+                        SendNotify(SONGPLAYSTATUSCHANGE, nil)
+                        [self.player play];
+                    }
                 }
             }
             break;
@@ -469,7 +594,7 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
     self.player = [AVPlayer playerWithPlayerItem:self.playerItem];
     
     if([[UIDevice currentDevice] systemVersion].intValue>=10){
-        //      增加下面这行可以解决iOS10兼容性问题了
+        //      增加下面这行可以解决iOS10兼容性问题了，设置后可以直接播放，不需要等待缓冲完成就可以播放mp3
         self.player.automaticallyWaitsToMinimizeStalling = NO;
     }
     
@@ -648,6 +773,12 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
                 [CommonCode writeToUserD:[NSString stringWithFormat:@"%.0f",total] andKey:[NSString stringWithFormat:@"class_totalTime_%@_%@",weakSelf.act_id,weakSelf.act_sub_id]];
             }
         }
+        //判断是否暂停计时器，如果暂停，则开始计时
+        if (weakSelf.studyRecordTimer.isPause) {
+            if (weakSelf.status == ZRTPlayStatusPlay||weakSelf.status == ZRTPlayStatusReadyToPlay) {
+                [weakSelf.studyRecordTimer startCount];
+            }
+        }
     }];
 }
 - (void)removeObserver
@@ -687,7 +818,8 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
 //        self.playHistoryDataModel.number = [NSString stringWithFormat:@"%d",[self.playHistoryDataModel.number intValue] + 1];
 //        self.playHistoryDataModel.time = @"0";
         //上传播放记录数据
-//        [self uploadClassPlayHistoryData];
+//        [[ZRT_PlayerManager manager].studyRecordTimer pauseCount];
+        [self uploadClassPlayHistoryData];
     }
     //播放列表中的下一条
     [self playNext];
@@ -719,6 +851,7 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
                 break;
             case AVPlayerStatusReadyToPlay:
                 _status = ZRTPlayStatusReadyToPlay;
+                _duration = CMTimeGetSeconds(songItem.duration);
                 [APPDELEGATE configNowPlayingCenter];
                 if ([[CommonCode readFromUserD:@"play_rate"] floatValue] != 0) {
                     [ZRT_PlayerManager manager].playRate = [[CommonCode readFromUserD:@"play_rate"] floatValue];
@@ -748,6 +881,7 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
         
     }else if ([keyPath isEqualToString:kvo_playbackBufferEmpty])
     {
+        [self.studyRecordTimer pauseCount];
 //        if (songItem.playbackBufferEmpty) {
 //            //缓冲区域为空，暂停播放
 //            [self pausePlay];
@@ -847,18 +981,22 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
  */
 - (void)uploadClassPlayHistoryData
 {
-//    [CommonCode writeToUserD:self.playHistoryDataModel.time andKey:[NSString stringWithFormat:@"contiune_PlayHistory_%@",self.act_id]];
-//    [CommonCode writeToUserD:self.playHistoryDataModel.number andKey:[NSString stringWithFormat:@"contiune_number_%@",self.act_id]];
-    
-//    if ([self.playHistoryDataModel.time intValue] != 0) {
-//        [NetWorkTool postPaoGuoUploadHistoryDataWithAct_id:self.act_id andUser_id:ExdangqianUserUid andNumber:self.playHistoryDataModel.number andTime:self.playHistoryDataModel.time sccess:^(NSDictionary *responseObject) {
-//            if ([responseObject[status] intValue] == 1) {
-//                RTLog(@"上传课堂播放记录成功");
-//                [[XWAlerLoginView alertWithTitle:responseObject[msg]] show];
-//            }
-//        } failure:^(NSError *error) {
-//            RTLog(@"error:%@",error);
-//        }];
-//    }
+    if (!_isUpdateStudyRecordLock) {
+        _isUpdateStudyRecordLock = YES;
+        //上传学习记录时间
+        [NetWorkTool postPaoGuoSaveStudyRecordWithStudyRecord:self.studyRecordTimer.strTime andUser_id:ExdangqianUserUid sccess:^(NSDictionary *responseObject) {
+            RTLog(@"%@",responseObject);
+            if ([responseObject[status] intValue] == 1) {
+                //上传完成清空秒数
+                self.studyRecordTimer.timeCount = 0;
+            }
+            _isUpdateStudyRecordLock = NO;
+        } failure:^(NSError *error) {
+            _isUpdateStudyRecordLock = NO;
+        }];
+    }
+    //上传本地保存继续播放记录
+    [CommonCode writeToUserD:self.playHistoryDataModel.time andKey:[NSString stringWithFormat:@"contiune_PlayHistory_%@",self.act_id]];
+    [CommonCode writeToUserD:self.playHistoryDataModel.number andKey:[NSString stringWithFormat:@"contiune_number_%@",self.act_id]];
 }
 @end

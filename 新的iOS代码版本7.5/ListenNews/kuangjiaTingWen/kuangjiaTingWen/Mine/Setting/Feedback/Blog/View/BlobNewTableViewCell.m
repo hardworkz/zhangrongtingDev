@@ -109,7 +109,7 @@
         //用户发布内容
         UILabel *content = [[UILabel alloc] init];
         content.textAlignment = NSTextAlignmentLeft;
-        content.font = [UIFont systemFontOfSize:16.0];
+        content.font = CUSTOM_FONT_TYPE(16.0);
         content.textColor = TITLE_COLOR_HEX;
         content.numberOfLines = 0;
         [self.contentView addSubview:content];

@@ -39,7 +39,7 @@ typedef NS_ENUM(NSInteger, ZRTPlayStatus) {
     ZRTPlayStatusPause,//播放界面：暂停播放
     ZRTPlayStatusStop//播放界面：停止播放
 };
-@class ClassPlayHistoryDataModel;
+@class ClassPlayHistoryDataModel,StudyRecordTimer;
 @interface ZRT_PlayerManager : NSObject
 {
     id _timeObserve; //监控进度
@@ -108,6 +108,10 @@ typedef NS_ENUM(NSInteger, ZRTPlayStatus) {
  * 播放器
  */
 @property (nonatomic, strong) AVPlayer * player;
+/*
+ * 播放器学习记录计时器
+ */
+@property (nonatomic, strong) StudyRecordTimer* studyRecordTimer;
 /**
  播放属性
  */
@@ -220,6 +224,12 @@ typedef NS_ENUM(NSInteger, ZRTPlayStatus) {
  @param isAdd 是否是播放完成回调+1或者下载次数+1
  */
 - (BOOL)limitPlayStatusWithAdd:(BOOL)isAdd;
+/**
+ 获取播放器播放状态是否限制
+ 
+ @param post_id 当前选中新闻id
+ */
+- (BOOL)limitPlayStatusWithPost_id:(NSString *)post_id withAdd:(BOOL)isAdd;
 /**
  上传课堂播放历史记录
  */

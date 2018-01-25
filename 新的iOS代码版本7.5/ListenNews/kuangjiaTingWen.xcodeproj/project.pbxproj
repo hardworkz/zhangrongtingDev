@@ -199,6 +199,7 @@
 		69B64BC01FFCADEE0009C7CC /* MyLearningRecordController.m in Sources */ = {isa = PBXBuildFile; fileRef = 69B64BBF1FFCADEE0009C7CC /* MyLearningRecordController.m */; };
 		69C1D5CD1FAFFCA30092A290 /* NewRegisterController.m in Sources */ = {isa = PBXBuildFile; fileRef = 69C1D5CC1FAFFCA30092A290 /* NewRegisterController.m */; };
 		69C1D5D11FB0036D0092A290 /* Xzb_CountDownButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 69C1D5D01FB0036C0092A290 /* Xzb_CountDownButton.m */; };
+		69C1F8B820033B9B00B76D6D /* StudyRecordTimer.m in Sources */ = {isa = PBXBuildFile; fileRef = 69C1F8B720033B9B00B76D6D /* StudyRecordTimer.m */; };
 		69C671AF1F9EC9E200570027 /* SearchLessonListTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 69C671AE1F9EC9E200570027 /* SearchLessonListTableViewCell.m */; };
 		69C713341EC0740F00F2729E /* CommonCode.m in Sources */ = {isa = PBXBuildFile; fileRef = 69C711E51EC0740E00F2729E /* CommonCode.m */; };
 		69C713351EC0740F00F2729E /* CommonEnums.m in Sources */ = {isa = PBXBuildFile; fileRef = 69C711E71EC0740E00F2729E /* CommonEnums.m */; };
@@ -847,6 +848,8 @@
 		69C1D5CC1FAFFCA30092A290 /* NewRegisterController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NewRegisterController.m; sourceTree = "<group>"; };
 		69C1D5CF1FB0036C0092A290 /* Xzb_CountDownButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Xzb_CountDownButton.h; sourceTree = "<group>"; };
 		69C1D5D01FB0036C0092A290 /* Xzb_CountDownButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Xzb_CountDownButton.m; sourceTree = "<group>"; };
+		69C1F8B620033B9B00B76D6D /* StudyRecordTimer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = StudyRecordTimer.h; sourceTree = "<group>"; };
+		69C1F8B720033B9B00B76D6D /* StudyRecordTimer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = StudyRecordTimer.m; sourceTree = "<group>"; };
 		69C671AD1F9EC9E200570027 /* SearchLessonListTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SearchLessonListTableViewCell.h; sourceTree = "<group>"; };
 		69C671AE1F9EC9E200570027 /* SearchLessonListTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SearchLessonListTableViewCell.m; sourceTree = "<group>"; };
 		69C711E41EC0740E00F2729E /* CommonCode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CommonCode.h; sourceTree = "<group>"; };
@@ -2592,6 +2595,8 @@
 				698B67EB1F28299F00E1FFE0 /* NewPlayVC.m */,
 				69967CA81F26D69600337AF4 /* ZRT_PlayerManager.h */,
 				69967CA91F26D69600337AF4 /* ZRT_PlayerManager.m */,
+				69C1F8B620033B9B00B76D6D /* StudyRecordTimer.h */,
+				69C1F8B720033B9B00B76D6D /* StudyRecordTimer.m */,
 			);
 			path = Controller;
 			sourceTree = "<group>";
@@ -3432,6 +3437,7 @@
 				636E338B1D01154C002BA6DD /* AppDelegate.m in Sources */,
 				69C713941EC0740F00F2729E /* XWAddView.m in Sources */,
 				69C713B71EC0740F00F2729E /* NSDateFormatter+Category.m in Sources */,
+				69C1F8B820033B9B00B76D6D /* StudyRecordTimer.m in Sources */,
 				E953A78F1D660787006CCFD8 /* TTTAttributedLabel.m in Sources */,
 				695745911D5C7384001022AD /* DKColorTable.m in Sources */,
 				691907941D3F6AFA0012A42E /* AIDatePickerController.m in Sources */,

@@ -42,6 +42,7 @@
         UILabel *review = [[UILabel alloc] init];
         review.text = @"回复";
         review.font = CUSTOM_FONT_TYPE(14.0);
+        review.textColor = TITLE_COLOR_HEX;
         [self.contentView addSubview:review];
         self.review = review;
         

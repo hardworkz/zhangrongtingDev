@@ -592,7 +592,8 @@ typedef enum : NSUInteger {
         if ([userInfoDict[results][member_type] intValue] == 0) {
             //判断是否是单次下载新闻，记录次数限制
             if (_isSingleDownload) {
-                [[ZRT_PlayerManager manager] limitPlayStatusWithAdd:YES];
+                RTLog(@"%@",_obj);
+                [[ZRT_PlayerManager manager] limitPlayStatusWithPost_id:_obj[@"id"] withAdd:YES];
             }
         }
         

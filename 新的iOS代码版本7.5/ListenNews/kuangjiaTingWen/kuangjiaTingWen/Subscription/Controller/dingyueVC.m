@@ -79,9 +79,21 @@
     
     [self.view addSubview:self.tableView];
     
+    //设置盲人模式下拉刷新按钮
+    UIButton *VoiceOverBtn = [[UIButton alloc] initWithFrame:CGRectMake(0,IS_IPHONEX? IPHONEX_TOP_H  : 64 , SCREEN_WIDTH, 30)];
+    [VoiceOverBtn setTitle:@"刷新列表" forState:UIControlStateNormal];
+    [VoiceOverBtn setTitleColor:[UIColor clearColor] forState:UIControlStateNormal];
+    VoiceOverBtn.backgroundColor = [UIColor clearColor];
+    [VoiceOverBtn addTarget:self action:@selector(voiceOver_Clicked)];
+    [self.view insertSubview:VoiceOverBtn aboveSubview:self.tableView];
+    
     AdjustsScrollViewInsetNever(self, self.tableView)
     
     RegisterNotify(@"loginSccess", @selector(refreshList))
+}
+- (void)voiceOver_Clicked
+{
+    [self.tableView.mj_header beginRefreshing];
 }
 - (void)refreshList
 {

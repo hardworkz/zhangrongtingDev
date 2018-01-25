@@ -632,6 +632,10 @@
                                       andTime:(NSString *)time
                                        sccess:(void (^)(NSDictionary *responseObject))success
                                       failure:(void(^)(NSError *error))failure;
+//上传学习记录时间
++ (void)postPaoGuoSaveStudyRecordWithStudyRecord:(NSString *)studyRecord andUser_id:(NSString *)user_id sccess:(void (^)(NSDictionary *responseObject))success failure:(void(^)(NSError *error))failure;
+//获取学习记录时间
++ (void)postPaoGuoGetStudyRecordWithUser_id:(NSString *)user_id sccess:(void (^)(NSDictionary *responseObject))success failure:(void(^)(NSError *error))failure;
 //获取播放历史记录和列表数据
 + (void)postPaoGuoGetLastHistoryDataWithAct_id:(NSString *)act_id
                                     andUser_id:(NSString *)user_id
@@ -1669,5 +1673,10 @@
 + (void)sendHotWordWithHotWord:(NSString *)hotWord
                         sccess:(void (^)(NSDictionary *responseObject))success
                        failure:(void(^)(NSError *error))failure;
+/**
+ 获取课堂和主播页面二维码图片
+ */
++ (void)getRQCodeImageUrlWithSccess:(void (^)(NSDictionary *responseObject))success
+                            failure:(void (^)(NSError *error))failure;
 @end
 

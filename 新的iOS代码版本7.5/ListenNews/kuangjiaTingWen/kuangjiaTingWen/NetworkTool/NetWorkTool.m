@@ -227,7 +227,7 @@
     [mgr.requestSerializer willChangeValueForKey:@"timeoutInterval"];
     mgr.requestSerializer.timeoutInterval = TimeOutSecond;
     [mgr.requestSerializer didChangeValueForKey:@"timeoutInterval"];
-    NSString *urlStr=[NSString stringWithFormat:@"%@",url];
+    NSString *urlStr=[NSString stringWithFormat:@"%@%@",APPHostURL,url];
     //发送请求
     if ([[CommonCode readFromUserD:@"isLogin"]boolValue] == NO) {//拦截判断当前是否登录，未登录则清空accessToken
         [param setValue:@"" forKey:@"accessToken"];
@@ -1328,6 +1328,21 @@ NSMutableDictionary *dic = [[NSMutableDictionary alloc]initWithCapacity:1
     dic[@"time"] = time;
     [self asyncNetworkingUrl:@"/interfaceNew/insertHistory" andDict:dic success:success failure:failure];
 }
+//上传学习记录时间
++ (void)postPaoGuoSaveStudyRecordWithStudyRecord:(NSString *)studyRecord andUser_id:(NSString *)user_id sccess:(void (^)(NSDictionary *responseObject))success failure:(void(^)(NSError *error))failure
+{
+    NSMutableDictionary *dic = [[NSMutableDictionary alloc]initWithCapacity:1];
+    dic[@"user_id"] = user_id;
+    dic[@"StudyRecord"] = studyRecord;
+    [self asyncNetworkingUrl:@"/interfaceNew/saveStudyRecord" andDict:dic success:success failure:failure];
+}
+//获取学习记录时间
++ (void)postPaoGuoGetStudyRecordWithUser_id:(NSString *)user_id sccess:(void (^)(NSDictionary *responseObject))success failure:(void(^)(NSError *error))failure
+{
+    NSMutableDictionary *dic = [[NSMutableDictionary alloc]initWithCapacity:1];
+    dic[@"user_id"] = user_id;
+    [self asyncNetworkingUrl:@"/interfaceNew/getStudyRecord" andDict:dic success:success failure:failure];
+}
 //获取播放历史记录和列表数据
 + (void)postPaoGuoGetLastHistoryDataWithAct_id:(NSString *)act_id
                                     andUser_id:(NSString *)user_id
@@ -2140,6 +2155,11 @@ NSMutableDictionary *dic = [[NSMutableDictionary alloc]initWithCapacity:1
     dic[@"page"] = page;
     dic[@"limit"] = limit;
     [self asyncNetworkingUrl:@"/interfaceNew/information" andDict:dic success:success failure:failure];
+}
++ (void)getRQCodeImageUrlWithSccess:(void (^)(NSDictionary *responseObject))success
+                                   failure:(void (^)(NSError *error))failure
+{
+    [self syncNetworkingUrl:@"/interfaceNew/getQRCode" andDict:nil success:success failure:failure];
 }
 
 + (void)getClassroomListWithaccessToken:(NSString *)accessToken

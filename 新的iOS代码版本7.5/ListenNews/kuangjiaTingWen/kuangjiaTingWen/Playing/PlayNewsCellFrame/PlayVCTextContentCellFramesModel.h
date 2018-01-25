@@ -28,6 +28,7 @@
 @property (assign, nonatomic,readonly) CGRect titleLabelF;
 @property (assign, nonatomic,readonly) CGRect timeLabelF;
 @property (assign, nonatomic,readonly) CGRect contentLabelF;
+@property (assign, nonatomic,readonly) CGRect deviderF;
 //@property (assign, nonatomic,readonly) CGRect readOriginalEssayF;
 @property (assign, nonatomic,readonly) CGFloat cellHeight;
 @end

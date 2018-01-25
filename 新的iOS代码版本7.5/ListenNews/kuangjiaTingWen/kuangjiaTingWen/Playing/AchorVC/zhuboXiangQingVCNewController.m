@@ -71,6 +71,11 @@
     
     BOOL isCurrenVCShow;
     BOOL isKeyboardShow;
+    
+    //二维码图片url
+    NSString *rqCodeString;
+    CGFloat rqCodeH;
+    BOOL rqCodeHidden;
 }
 
 @property (weak, nonatomic) CustomPageView *pagingView;
@@ -127,6 +132,20 @@
 }
 - (void)viewDidLoad {
     [super viewDidLoad];
+    
+    rqCodeH = 0.0;
+    [NetWorkTool getRQCodeImageUrlWithSccess:^(NSDictionary *responseObject) {
+        if ([responseObject[status] intValue] == 1) {
+            rqCodeHidden = NO;
+            rqCodeString = responseObject[@"path"];
+            [pinglunhoushuaxinTableView reloadData];
+        }else{
+            rqCodeHidden = YES;
+        }
+    } failure:^(NSError *error) {
+        rqCodeHidden = YES;
+    }];
+    
     touchCount = 0;
     [self.navigationController setNavigationBarHidden:YES animated:YES];
     [self setTitle:@"详情"];
@@ -1710,6 +1729,15 @@
     }
 }
 
+///**
+// 点击留言上方图片显示大图
+//
+// @param gesture <#gesture description#>
+// */
+//- (void)rqCodeTap:(UIGestureRecognizer *)gesture
+//{
+//
+//}
 /**
  图片列表点击显示大图
 
@@ -1749,6 +1777,18 @@
             return 0.01f;
         }
     }
+    if ([tableView isEqual:pinglunhoushuaxinTableView]) {
+        
+        if (_isClass) {
+            if (!rqCodeHidden&&rqCodeH!=0) {
+                return rqCodeH;
+            }else{
+                return 0.01f;
+            }
+        }else{
+            return 0.01f;
+        }
+    }
     //粉丝榜
     if ([tableView isEqual:fansWallTableView]){
         return 40.0f;
@@ -1763,6 +1803,7 @@
  */
 - (void)continuePlayAction
 {
+    RTLog(@"%@",[CommonCode readFromUserD:[NSString stringWithFormat:@"contiune_PlayHistory_%@",self.jiemuID]]);
     if ([CommonCode readFromUserD:[NSString stringWithFormat:@"contiune_PlayHistory_%@",self.jiemuID]] == nil) {
         [[XWAlerLoginView alertWithTitle:@"暂无播放记录"] show];
         return;
@@ -1786,6 +1827,7 @@
     [ZRT_PlayerManager manager].playReloadList = ^(NSInteger currentSongIndex) {
         [xinwenshuaxinTableView reloadData];
     };
+    number = [CommonCode readFromUserD:[NSString stringWithFormat:@"contiune_number_%@",self.jiemuID]];
     int indexPathRow = [number intValue];
     //设置播放界面打赏view的状态
     [NewPlayVC shareInstance].rewardType = RewardViewTypeNone;
@@ -1810,7 +1852,7 @@
         ExcurrentNumber = [number intValue];
         //调用播放对应Index方法
         [[NewPlayVC shareInstance] playFromIndex:
-         [[CommonCode readFromUserD:[NSString stringWithFormat:@"contiune_number_%@",self.jiemuID]] intValue]];
+        [[CommonCode readFromUserD:[NSString stringWithFormat:@"contiune_number_%@",self.jiemuID]] intValue]];
         //跳转播放界面
         [self.navigationController.navigationBar setHidden:YES];
         [self.navigationController pushViewController:[NewPlayVC shareInstance] animated:YES];
@@ -1819,16 +1861,17 @@
 }
 - (nullable UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section{
     if ([tableView isEqual:xinwenshuaxinTableView]) {
-        UIView *sectionHeadView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH,IS_IPHONEX?55: 40)];
+        UIView *sectionHeadView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH,IS_IPHONEX?55: 45)];
         [sectionHeadView setBackgroundColor:[UIColor whiteColor]];
 
         UIButton *continuePlayButton = [UIButton buttonWithType:UIButtonTypeCustom];
-        [continuePlayButton setFrame:CGRectMake(0, 0, SCREEN_WIDTH,IS_IPHONEX?55: 40)];
-        [continuePlayButton setImage:[UIImage imageNamed:@"继续播放"] forState:UIControlStateNormal];
+        [continuePlayButton setFrame:CGRectMake(0, 0, SCREEN_WIDTH,IS_IPHONEX?55: 45)];
+        [continuePlayButton setImage:[UIImage imageNamed:@"继续播放_2"] forState:UIControlStateNormal];
+        continuePlayButton.imageView.contentMode = UIViewContentModeCenter;
         continuePlayButton.titleEdgeInsets = UIEdgeInsetsMake(0, 20,IS_IPHONEX?0:10, 0);
         continuePlayButton.imageEdgeInsets = UIEdgeInsetsMake(0, 0, IS_IPHONEX?0:10, 0);
         [continuePlayButton setTitle:@"继 续 播 放" forState:UIControlStateNormal];
-        continuePlayButton.titleLabel.font = [UIFont systemFontOfSize:15];
+        continuePlayButton.titleLabel.font = [UIFont systemFontOfSize:20];
         [continuePlayButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
         [continuePlayButton addTarget:self action:@selector(continuePlayAction) forControlEvents:UIControlEventTouchUpInside];
         [sectionHeadView addSubview:continuePlayButton];
@@ -1839,6 +1882,48 @@
 
         if (_isClass) {
             return sectionHeadView;
+        }else{
+            return nil;
+        }
+    }else if ([tableView isEqual:pinglunhoushuaxinTableView]) {
+        UIView *view = [[UIView alloc] initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, SCREEN_WIDTH*1057/1825 + 20)];
+        view.backgroundColor = [UIColor whiteColor];
+        
+        UIImageView *rqcodeImageView = [[UIImageView alloc] initWithFrame:CGRectMake(10, 10, SCREEN_WIDTH - 20, 0)];
+        rqcodeImageView.contentMode = UIViewContentModeScaleAspectFill;
+        rqcodeImageView.userInteractionEnabled = YES;
+        
+        //判断图片URL获取的图片是否在缓存中，如果已经缓存，则直接获取如果未缓存，则进行下载
+        if([[SDWebImageManager sharedManager] cachedImageExistsForURL:[NSURL URLWithString:rqCodeString]]){
+            UIImage* img = [[SDWebImageManager sharedManager].imageCache imageFromMemoryCacheForKey:[[SDWebImageManager sharedManager] cacheKeyForURL:[NSURL URLWithString:rqCodeString]]];
+            
+            if(!img)
+                img = [[SDWebImageManager sharedManager].imageCache imageFromDiskCacheForKey:[[SDWebImageManager sharedManager] cacheKeyForURL:[NSURL URLWithString:rqCodeString]]];
+            rqcodeImageView.image = img;
+            rqcodeImageView.frame = CGRectMake(10, 10, SCREEN_WIDTH - 20, (SCREEN_WIDTH - 20)*img.size.height/img.size.width);
+            rqCodeH = SCREEN_WIDTH*img.size.height/img.size.width + 20;
+            view.height = rqCodeH;
+        }else{
+            [[SDWebImageManager sharedManager] downloadImageWithURL:[NSURL URLWithString:rqCodeString] options:SDWebImageRetryFailed|SDWebImageLowPriority progress:nil completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, BOOL finished, NSURL *imageURL) {
+                if (image) {
+                    rqcodeImageView.image = image;
+                    rqcodeImageView.frame = CGRectMake(10, 10, SCREEN_WIDTH - 20, (SCREEN_WIDTH - 20)*image.size.height/image.size.width);
+                    rqCodeH = SCREEN_WIDTH*image.size.height/image.size.width + 20;
+                    view.height = rqCodeH;
+                    [pinglunhoushuaxinTableView reloadData];
+                }
+            }];
+        }
+        [view addSubview:rqcodeImageView];
+        [rqcodeImageView addTapGesWithTarget:self action:@selector(showZoomImageView:)];
+        [rqcodeImageView addLongPressGesWithTarget:self action:@selector(showZoomImageView:)];
+        
+        UIView *devider = [[UIView alloc] initWithFrame:CGRectMake(0,SCREEN_WIDTH*1057/1825 + 10, SCREEN_WIDTH, 10)];
+        devider.backgroundColor = HEXCOLOR(0xF5F6F8);
+        [view addSubview:devider];
+        
+        if (_isClass) {
+            return (!rqCodeHidden&&rqCodeH!=0)?view:nil;
         }else{
             return nil;
         }

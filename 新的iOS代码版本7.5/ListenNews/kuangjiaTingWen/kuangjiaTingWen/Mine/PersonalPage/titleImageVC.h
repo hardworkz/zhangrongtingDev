@@ -10,4 +10,5 @@
 
 @interface titleImageVC : UIViewController
 
+@property (copy, nonatomic) void (^updateSignature)(NSString *signature);
 @end

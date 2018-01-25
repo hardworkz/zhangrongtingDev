@@ -251,7 +251,7 @@ static NewPlayVC *_instance = nil;
 - (void)viewDidLoad {
     [super viewDidLoad];
     //倍数数据
-    self.speedArray = [NSMutableArray arrayWithArray:@[@"0.666667",@"1.0",@"1.25",@"1.5",@"2.0"]];
+    self.speedArray = [NSMutableArray arrayWithArray:@[@"0.666667",@"1.0",@"1.25",@"1.5",@"2.0",@"3.0"]];
     //评论分页数据
     self.commentPage = 1;
     self.commentPageSize = 10;
@@ -313,7 +313,8 @@ static NewPlayVC *_instance = nil;
                 //判断当前播放内容为新闻播放，新闻播放限制数+1
                 if ([ZRT_PlayerManager manager].playType == ZRTPlayTypeNews) {
                     //判断限制状态，记录次数限制
-                    [[ZRT_PlayerManager manager] limitPlayStatusWithAdd:YES];
+//                    [[ZRT_PlayerManager manager] limitPlayStatusWithAdd:YES];
+                    [[ZRT_PlayerManager manager] limitPlayStatusWithPost_id:_post_id withAdd:YES];
                 }
             }
             //刷新新闻详情模型数据
@@ -651,16 +652,17 @@ static NewPlayVC *_instance = nil;
     line.alpha = 0.5f;
     [bottomBgView addSubview:line];
     //功能按钮
-    for (int i = 0; i<4; i++) {
-        UIButton *button = [[UIButton alloc] initWithFrame:CGRectMake(SCREEN_WIDTH/4 * i, 10, SCREEN_WIDTH/4, 20)];
+    int col = 3;
+    for (int i = 0; i<col; i++) {
+        UIButton *button = [[UIButton alloc] initWithFrame:CGRectMake(SCREEN_WIDTH/col * i, 10, SCREEN_WIDTH/col, 25)];
         button.imageView.contentMode = UIViewContentModeScaleAspectFit;
         [button addTarget:self action:@selector(button_click:)];
         [bottomBgView addSubview:button];
         
-        UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(SCREEN_WIDTH/4 * i, CGRectGetMaxY(button.frame), SCREEN_WIDTH/4, 15)];
+        UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(SCREEN_WIDTH/col * i, CGRectGetMaxY(button.frame)+2, SCREEN_WIDTH/col, 10)];
         label.textAlignment = NSTextAlignmentCenter;
         label.textColor = [UIColor grayColor];
-        label.font = [UIFont systemFontOfSize:13.];
+        label.font = [UIFont systemFontOfSize:10.0];
         [bottomBgView addSubview:label];
         
         if (i == 0) {
@@ -671,11 +673,13 @@ static NewPlayVC *_instance = nil;
             [button setImage:[UIImage imageNamed:@"icon_played"] forState:UIControlStateNormal];
             button.accessibilityIdentifier = @"倍数";
             label.text = @"倍数";
-        }else if (i == 2) {
-            [button setImage:[UIImage imageNamed:@"icon_player_quality"] forState:UIControlStateNormal];
-            button.accessibilityIdentifier = @"音质";
-            label.text = @"音质";
-        }else if (i == 3) {
+        }
+//        else if (i == 2) {
+//            [button setImage:[UIImage imageNamed:@"icon_player_quality"] forState:UIControlStateNormal];
+//            button.accessibilityIdentifier = @"音质";
+//            label.text = @"音质";
+//        }
+        else if (i == 2) {
             [button setImage:[UIImage imageNamed:@"icon_comment"] forState:UIControlStateNormal];
             button.accessibilityIdentifier = @"评论";
             label.text = @"评论";
@@ -788,6 +792,8 @@ static NewPlayVC *_instance = nil;
     [self.sliderProgress addTarget:self action:@selector(doChangeProgress:) forControlEvents:UIControlEventValueChanged];
     [self.sliderProgress addTarget:self action:@selector(sliderTouchDown:) forControlEvents:UIControlEventTouchDown];
     self.prgBufferProgress.frame = self.sliderProgress.frame;
+    self.prgBufferProgress.centerY = self.sliderProgress.centerY;
+//    self.prgBufferProgress.backgroundColor = [UIColor redColor];
     self.prgBufferProgress.progressTintColor = gMainColor;;
     [dibuView addSubview:self.prgBufferProgress];
     [dibuView addSubview:self.sliderProgress];
@@ -890,7 +896,8 @@ static NewPlayVC *_instance = nil;
     [self.sliderProgress addTarget:self action:@selector(doChangeProgress:) forControlEvents:UIControlEventValueChanged];
     [self.sliderProgress addTarget:self action:@selector(sliderTouchDown:) forControlEvents:UIControlEventTouchDown];
     self.prgBufferProgress.frame = self.sliderProgress.frame;
-    self.prgBufferProgress.progressTintColor = gMainColor;;
+    self.prgBufferProgress.centerY = self.sliderProgress.centerY;
+    self.prgBufferProgress.progressTintColor = gMainColor;
     [dibuView addSubview:self.prgBufferProgress];
     [dibuView addSubview:self.sliderProgress];
     self.sliderProgress.maximumTrackTintColor = [UIColor clearColor];
@@ -1139,9 +1146,10 @@ static NewPlayVC *_instance = nil;
 {
     if (!_sliderProgress)
     {
-        _sliderProgress = [[UISlider alloc]initWithFrame:CGRectMake(20.0 / 375 * IPHONE_W, 22.0 / 667 * SCREEN_HEIGHT - 6, IPHONE_W - 40.0 / 375 * IPHONE_W, 2.0)];
+        _sliderProgress = [[UISlider alloc]initWithFrame:CGRectMake(20.0 / 375 * IPHONE_W, 22.0 / 667 * SCREEN_HEIGHT - 10, IPHONE_W - 40.0 / 375 * IPHONE_W, 10.0)];
         _sliderProgress.value = 0.0f;
         _sliderProgress.continuous = NO;
+//        _sliderProgress.backgroundColor = [UIColor redColor];
     }
     return _sliderProgress;
 }
@@ -1259,6 +1267,8 @@ static NewPlayVC *_instance = nil;
             cell.textLabel.text = @"1.5倍速";
         }else if ([self.speedArray[indexPath.row] floatValue] == 2.0) {
             cell.textLabel.text = @"2倍速";
+        }else if ([self.speedArray[indexPath.row] floatValue] == 3.0) {
+            cell.textLabel.text = @"3倍速";
         }
         if ([[CommonCode readFromUserD:@"play_rate"] floatValue] == [self.speedArray[indexPath.row] floatValue]) {
             cell.accessoryType = UITableViewCellAccessoryCheckmark;
@@ -1347,15 +1357,17 @@ static NewPlayVC *_instance = nil;
         if (indexPath.row == 0) {
             PlayVCTextContentCellFramesModel *frameModel = self.textFrameModel;
             return frameModel.cellHeight;
-        }else if (indexPath.row == 1) {
-            return 72.0;
-        }else if (indexPath.row == 2) {
-            if (self.rewardType == RewardViewTypeNone) {
-                return 177;
-            }else{
-                return 266;
-            }
-        }else{
+        }
+//        else if (indexPath.row == 1) {
+//            return 72.0;
+//        }else if (indexPath.row == 2) {
+//            if (self.rewardType == RewardViewTypeNone) {
+//                return 177;
+//            }else{
+//                return 266;
+//            }
+//        }
+        else{
             PlayVCCommentFrameModel *frameModel = self.pinglunArr[indexPath.row - 1];
             return frameModel.cellHeight;
         }
@@ -1447,7 +1459,7 @@ static NewPlayVC *_instance = nil;
  */
 - (void)downloadAction:(UIButton *)sender
 {
-    if ([[ZRT_PlayerManager manager] limitPlayStatusWithAdd:NO]) {
+    if ([[ZRT_PlayerManager manager] limitPlayStatusWithPost_id:nil withAdd:NO]) {
         [self alertMessageWithVipLimit];
         return;
     }
@@ -1994,15 +2006,28 @@ static NSInteger goldTouchCount = 0;
     if ([ZRT_PlayerManager manager].currentSong) {
         [APPDELEGATE configNowPlayingCenter];
     }
-    if ([[ZRT_PlayerManager manager] limitPlayStatusWithAdd:NO] &&![ZRT_PlayerManager manager].isPlaying) {
-        [self alertMessageWithVipLimit];
-        return;
+    if ([[ZRT_PlayerManager manager] limitPlayStatusWithPost_id:nil withAdd:NO] &&![ZRT_PlayerManager manager].isPlaying) {
+        //播放第五条暂停时，可以继续播放
+//        int limitTime = [[CommonCode readFromUserD:limit_time] intValue];
+//        int limitNum = [[CommonCode readFromUserD:limit_num] intValue];
+        BOOL isStopPlay = YES;
+        NSArray *limitArray = [CommonCode readFromUserD:limit_array];
+        for (NSString *post_id in limitArray) {
+            if ([post_id isEqualToString:self.post_id]) {
+                isStopPlay = NO;
+            }
+        }
+        if (isStopPlay) {
+            [self alertMessageWithVipLimit];
+            return;
+        }
     }
     if ([ZRT_PlayerManager manager].isPlaying) {//点击暂停
         //上传课堂播放数据
-        if ([ZRT_PlayerManager manager].playType == ZRTPlayTypeClassroom) {
+//        if ([ZRT_PlayerManager manager].playType == ZRTPlayTypeClassroom) {
+//            [[ZRT_PlayerManager manager].studyRecordTimer pauseCount];
             [[ZRT_PlayerManager manager] uploadClassPlayHistoryData];
-        }
+//        }
         [[ZRT_PlayerManager manager] pausePlay];
         sender.selected = NO;
     }else{//点击播放
@@ -2017,7 +2042,7 @@ static NSInteger goldTouchCount = 0;
 - (void)bofangLeftAction:(UIButton *)sender
 {
     //判断限制状态，记录次数限制
-    if ([[ZRT_PlayerManager manager] limitPlayStatusWithAdd:NO]) {
+    if ([[ZRT_PlayerManager manager] limitPlayStatusWithPost_id:nil withAdd:NO]) {
         [self alertMessageWithVipLimit];
         return;
     }
@@ -2029,8 +2054,9 @@ static NSInteger goldTouchCount = 0;
         //播放上一首
         BOOL isfirst = [[ZRT_PlayerManager manager] previousSong];
         //上传课堂播放数据
+        [[ZRT_PlayerManager manager] uploadClassPlayHistoryData];
         if ([ZRT_PlayerManager manager].playType == ZRTPlayTypeClassroom) {
-            [[ZRT_PlayerManager manager] uploadClassPlayHistoryData];
+//            [[ZRT_PlayerManager manager].studyRecordTimer pauseCount];
             [ZRT_PlayerManager manager].act_sub_id = [ZRT_PlayerManager manager].currentSong[@"id"];
             //设置开始播放时间
             [NewPlayVC shareInstance].starDate = [[ZRT_PlayerManager manager].currentSong[@"play_time"] intValue];
@@ -2065,7 +2091,7 @@ static NSInteger goldTouchCount = 0;
 - (void)bofangRightAction:(UIButton *)sender
 {
     //判断限制状态，记录次数限制
-    if ([[ZRT_PlayerManager manager] limitPlayStatusWithAdd:NO]) {
+    if ([[ZRT_PlayerManager manager] limitPlayStatusWithPost_id:nil withAdd:NO]) {
         [self alertMessageWithVipLimit];
         return;
     }
@@ -2077,8 +2103,9 @@ static NSInteger goldTouchCount = 0;
         //播放下一首
         BOOL isLast = [[ZRT_PlayerManager manager] nextSong];
         //上传课堂播放数据
+        [[ZRT_PlayerManager manager] uploadClassPlayHistoryData];
         if ([ZRT_PlayerManager manager].playType == ZRTPlayTypeClassroom) {
-            [[ZRT_PlayerManager manager] uploadClassPlayHistoryData];
+//            [[ZRT_PlayerManager manager].studyRecordTimer pauseCount];
             [ZRT_PlayerManager manager].act_sub_id = [ZRT_PlayerManager manager].currentSong[@"id"];
             //设置开始播放时间
             [NewPlayVC shareInstance].starDate = [[ZRT_PlayerManager manager].currentSong[@"play_time"] intValue];
@@ -2140,7 +2167,7 @@ static NSInteger goldTouchCount = 0;
 - (void)playFromIndex:(NSInteger)index
 {
     //判断限制状态，记录次数限制
-    if ([[ZRT_PlayerManager manager] limitPlayStatusWithAdd:NO]) {
+    if ([[ZRT_PlayerManager manager] limitPlayStatusWithPost_id:nil withAdd:NO]) {
         if ([[ZRT_PlayerManager manager] post_mpWithDownloadNewsID:self.post_id] == nil) {
             [[ZRT_PlayerManager manager] pausePlay];
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
@@ -2274,10 +2301,14 @@ static NSInteger goldTouchCount = 0;
 - (void)back{
     self.isFormClass = NO;
     [self.navigationController popViewControllerAnimated:YES];
+    //上传播放记录
+    [[ZRT_PlayerManager manager] uploadClassPlayHistoryData];
 }
-- (void)rightSwipeAction:(UIGestureRecognizer *)gesture {
-    
+- (void)rightSwipeAction:(UIGestureRecognizer *)gesture
+{
     [self.navigationController popViewControllerAnimated:YES];
+    //上传播放记录
+    [[ZRT_PlayerManager manager] uploadClassPlayHistoryData];
 }
 - (void)SVPDismiss
 {

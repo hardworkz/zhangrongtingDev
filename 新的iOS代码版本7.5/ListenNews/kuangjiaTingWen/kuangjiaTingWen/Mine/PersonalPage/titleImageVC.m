@@ -470,7 +470,7 @@
     [CommonCode writeToUserD:Mdic andKey:@"dangqianUserInfo"];
 
     NSDictionary *postDic = [CommonCode readFromUserD:@"dangqianUserInfo"];
-    
+    DefineWeakSelf
     [NetWorkTool postPaoGuoUserInfoWithUserName:[DSE encryptUseDES:[CommonCode readFromUserD:@"dangqianUser"]] andNiceName:postDic[@"results"][@"user_nicename"] andSex:postDic[@"results"][@"sex"] andSignature:postDic[@"results"][@"signature"] sccess:^(NSDictionary *responseObject) {
         if ([responseObject[@"status"] integerValue] == 1) {
             UIAlertController *xiugaichenggong = [UIAlertController alertControllerWithTitle:@"修改信息成功" message:nil preferredStyle:UIAlertControllerStyleAlert];
@@ -481,6 +481,10 @@
             [self presentViewController:xiugaichenggong animated:YES completion:nil];
             //修改资料成功 --》 获取用户信息
             [[NSNotificationCenter defaultCenter] postNotificationName:@"updateUserInfo" object:nil];
+            //block回调新的签名更新个人界面数据
+            if (weakSelf.updateSignature) {
+                weakSelf.updateSignature(postDic[@"results"][@"signature"]);
+            }
         }
         else{
             UIAlertController *xiugaichenggong = [UIAlertController alertControllerWithTitle:[NSString stringWithFormat:@"%@",responseObject[@"msg"]] message:nil preferredStyle:UIAlertControllerStyleAlert];

@@ -47,7 +47,7 @@
         _titleLabel = [[UILabel alloc]initWithFrame:CGRectMake(123.0 / 375 * IPHONE_W, 11.0 / 667 * SCREEN_HEIGHT, 215.0 / 375 * IPHONE_W, 63.0 / 667 * SCREEN_HEIGHT)];
         [_titleLabel setTextColor:[UIColor blackColor]];
         [_titleLabel setNumberOfLines:3];
-        [_titleLabel setFont:[UIFont systemFontOfSize:17.0]];
+        [_titleLabel setFont:CUSTOM_FONT_TYPE(17.0)];
     }
     return _titleLabel;
 }

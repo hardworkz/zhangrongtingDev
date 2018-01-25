@@ -12,20 +12,25 @@
 static CGRect myFrame;
 
 @interface BezierCurveView ()
-
+//@property (assign, nonatomic) CGFloat margin;// 坐标轴与画布间距
+//@property (assign, nonatomic) CGFloat y_(SCREEN_WIDTH - 60)/6;// y轴每一个值的间隔数
+//@property (assign, nonatomic) CGFloat (SCREEN_WIDTH == 320?60:100);// 图表的高度
 @end
 
 @implementation BezierCurveView
-
+//- (CGFloat)margin
+//{
+//    return (SCREEN_WIDTH - 60)/6;
+//}
 //初始化画布
-+(instancetype)initWithFrame:(CGRect)frame{
-    
++ (instancetype)initWithFrame:(CGRect)frame
+{
     BezierCurveView *bezierCurveView = [[BezierCurveView alloc] initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH , 60)];
     bezierCurveView.frame = frame;
-    
+//    bezierCurveView.backgroundColor = [UIColor redColor];
     //背景视图
     UIView *backView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, frame.size.width, frame.size.height)];
-//    backView.backgroundColor = XYQColor(255, 229, 239);
+    //    backView.backgroundColor = XYQColor(255, 229, 239);
     [bezierCurveView addSubview:backView];
     
     myFrame = frame;
@@ -40,35 +45,35 @@ static CGRect myFrame;
     UIBezierPath *path = [UIBezierPath bezierPath];
     
     //1.Y轴、X轴的直线
-    [path moveToPoint:CGPointMake(MARGIN, CGRectGetHeight(myFrame)-MARGIN)];
-    [path addLineToPoint:CGPointMake(MARGIN, MARGIN)];
+    [path moveToPoint:CGPointMake((SCREEN_WIDTH - 60)/6, CGRectGetHeight(myFrame)-(SCREEN_WIDTH - 60)/6)];
+    [path addLineToPoint:CGPointMake((SCREEN_WIDTH - 60)/6, (SCREEN_WIDTH - 60)/6)];
     
-    [path moveToPoint:CGPointMake(MARGIN, CGRectGetHeight(myFrame)-MARGIN)];
-    [path addLineToPoint:CGPointMake(MARGIN+CGRectGetWidth(myFrame)-2*MARGIN, CGRectGetHeight(myFrame)-MARGIN)];
+    [path moveToPoint:CGPointMake((SCREEN_WIDTH - 60)/6, CGRectGetHeight(myFrame)-(SCREEN_WIDTH - 60)/6)];
+    [path addLineToPoint:CGPointMake((SCREEN_WIDTH - 60)/6+CGRectGetWidth(myFrame)-2*(SCREEN_WIDTH - 60)/6, CGRectGetHeight(myFrame)-(SCREEN_WIDTH - 60)/6)];
     
     //2.添加箭头
-    [path moveToPoint:CGPointMake(MARGIN, MARGIN)];
-    [path addLineToPoint:CGPointMake(MARGIN-5, MARGIN+5)];
-    [path moveToPoint:CGPointMake(MARGIN, MARGIN)];
-    [path addLineToPoint:CGPointMake(MARGIN+5, MARGIN+5)];
+    [path moveToPoint:CGPointMake((SCREEN_WIDTH - 60)/6, (SCREEN_WIDTH - 60)/6)];
+    [path addLineToPoint:CGPointMake((SCREEN_WIDTH - 60)/6-5, (SCREEN_WIDTH - 60)/6+5)];
+    [path moveToPoint:CGPointMake((SCREEN_WIDTH - 60)/6, (SCREEN_WIDTH - 60)/6)];
+    [path addLineToPoint:CGPointMake((SCREEN_WIDTH - 60)/6+5, (SCREEN_WIDTH - 60)/6+5)];
     
-    [path moveToPoint:CGPointMake(MARGIN+CGRectGetWidth(myFrame)-2*MARGIN, CGRectGetHeight(myFrame)-MARGIN)];
-    [path addLineToPoint:CGPointMake(MARGIN+CGRectGetWidth(myFrame)-2*MARGIN-5, CGRectGetHeight(myFrame)-MARGIN-5)];
-    [path moveToPoint:CGPointMake(MARGIN+CGRectGetWidth(myFrame)-2*MARGIN, CGRectGetHeight(myFrame)-MARGIN)];
-    [path addLineToPoint:CGPointMake(MARGIN+CGRectGetWidth(myFrame)-2*MARGIN-5, CGRectGetHeight(myFrame)-MARGIN+5)];
+    [path moveToPoint:CGPointMake((SCREEN_WIDTH - 60)/6+CGRectGetWidth(myFrame)-2*(SCREEN_WIDTH - 60)/6, CGRectGetHeight(myFrame)-(SCREEN_WIDTH - 60)/6)];
+    [path addLineToPoint:CGPointMake((SCREEN_WIDTH - 60)/6+CGRectGetWidth(myFrame)-2*(SCREEN_WIDTH - 60)/6-5, CGRectGetHeight(myFrame)-(SCREEN_WIDTH - 60)/6-5)];
+    [path moveToPoint:CGPointMake((SCREEN_WIDTH - 60)/6+CGRectGetWidth(myFrame)-2*(SCREEN_WIDTH - 60)/6, CGRectGetHeight(myFrame)-(SCREEN_WIDTH - 60)/6)];
+    [path addLineToPoint:CGPointMake((SCREEN_WIDTH - 60)/6+CGRectGetWidth(myFrame)-2*(SCREEN_WIDTH - 60)/6-5, CGRectGetHeight(myFrame)-(SCREEN_WIDTH - 60)/6+5)];
 
     //3.添加索引格
     //X轴
 //    for (int i=0; i<x_names.count; i++) {
-//        CGFloat X = MARGIN + MARGIN*(i);
+//        CGFloat X = (SCREEN_WIDTH - 60)/6 + (SCREEN_WIDTH - 60)/6*(i);
 //        CGPoint point = CGPointMake(X,CGRectGetHeight(myFrame)-20);
 //        [path moveToPoint:point];
 //        [path addLineToPoint:CGPointMake(point.x, point.y-3)];
 //    }
     //Y轴（实际长度为200,此处比例缩小一倍使用）
 //    for (int i=0; i<11; i++) {
-//        CGFloat Y = CGRectGetHeight(myFrame)-MARGIN-Y_EVERY_MARGIN*i;
-//        CGPoint point = CGPointMake(MARGIN,Y);
+//        CGFloat Y = CGRectGetHeight(myFrame)-(SCREEN_WIDTH - 60)/6-Y_EVERY_(SCREEN_WIDTH - 60)/6*i;
+//        CGPoint point = CGPointMake((SCREEN_WIDTH - 60)/6,Y);
 //        [path moveToPoint:point];
 //        [path addLineToPoint:CGPointMake(point.x+3, point.y)];
 //    }
@@ -76,9 +81,10 @@ static CGRect myFrame;
     //4.添加索引格文字
     //X轴
     for (int i=0; i<x_names.count; i++) {
-        CGFloat X = 10 + MARGIN*i;
-        UILabel *textLabel = [[UILabel alloc] initWithFrame:CGRectMake(X, IS_IPHONEX?CGRectGetHeight(myFrame)- 2 *MARGIN - 10:CGRectGetHeight(myFrame)- MARGIN - 10, MARGIN, 20)];
+        CGFloat X = 5 + (SCREEN_WIDTH - 60)/6*i;
+        UILabel *textLabel = [[UILabel alloc] initWithFrame:CGRectMake(X, IS_IPHONEX?CGRectGetHeight(myFrame)- 2 *(SCREEN_WIDTH - 60)/6 - 10:CGRectGetHeight(myFrame)- (SCREEN_WIDTH - 60)/6 - 10, (SCREEN_WIDTH - 60)/6, 20)];
         textLabel.text = x_names[i];
+//        textLabel.backgroundColor = [UIColor blueColor];
         textLabel.font = [UIFont systemFontOfSize:10];
         textLabel.textAlignment = NSTextAlignmentCenter;
         textLabel.textColor = [UIColor grayColor];
@@ -86,8 +92,8 @@ static CGRect myFrame;
     }
     //Y轴
 //    for (int i=0; i<11; i++) {
-//        CGFloat Y = CGRectGetHeight(myFrame)-MARGIN-Y_EVERY_MARGIN*i;
-//        UILabel *textLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, Y-5, MARGIN, 10)];
+//        CGFloat Y = CGRectGetHeight(myFrame)-(SCREEN_WIDTH - 60)/6-Y_EVERY_(SCREEN_WIDTH - 60)/6*i;
+//        UILabel *textLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, Y-5, (SCREEN_WIDTH - 60)/6, 10)];
 //        textLabel.text = [NSString stringWithFormat:@"%d",10*i];
 //        textLabel.font = [UIFont systemFontOfSize:10];
 //        textLabel.textAlignment = NSTextAlignmentCenter;
@@ -122,19 +128,19 @@ static CGRect myFrame;
     //3.获取目标值点坐标
     NSMutableArray *allPoints = [NSMutableArray array];
     for (int i=0; i<targetValues.count; i++) {
-        CGFloat X = MARGIN + MARGIN*(i) - 15;
+        CGFloat X = 30 + (SCREEN_WIDTH - 60)/6*(i) ;
         CGFloat Y = 0;
-        if (maxValue > BEZIER_H) {
+        if (maxValue > 60) {
             if (IS_IPHONEX) {
-                Y = CGRectGetHeight(myFrame)- 20 - 2*MARGIN-([targetValues[i] floatValue]/maxValue*BEZIER_H);
+                Y = CGRectGetHeight(myFrame)- 20 - 2*(SCREEN_WIDTH - 60)/6-([targetValues[i] floatValue]/maxValue*(SCREEN_WIDTH == 320?60:100));
             }else{
-                Y = CGRectGetHeight(myFrame)- 20 - MARGIN-([targetValues[i] floatValue]/maxValue*BEZIER_H);
+                Y = CGRectGetHeight(myFrame)- 20 - (SCREEN_WIDTH - 60)/6-([targetValues[i] floatValue]/maxValue*(SCREEN_WIDTH == 320?60:100));
             }
         }else{
             if (IS_IPHONEX) {
-                Y = CGRectGetHeight(myFrame)- 20 - 2*MARGIN-[targetValues[i] floatValue];
+                Y = CGRectGetHeight(myFrame)- 20 - 2*(SCREEN_WIDTH - 60)/6-[targetValues[i] floatValue];
             }else{
-                Y = CGRectGetHeight(myFrame)- 20 - MARGIN-[targetValues[i] floatValue];
+                Y = CGRectGetHeight(myFrame)- 20 - (SCREEN_WIDTH - 60)/6-[targetValues[i] floatValue];
             }
         }
         CGPoint point = CGPointMake(X,Y);
@@ -181,16 +187,16 @@ static CGRect myFrame;
     [self.subviews[0].layer insertSublayer:shapeLayer atIndex:0];
     
     //设置闭合区域填充渐变色
-    [path addLineToPoint:CGPointMake(MARGIN + MARGIN*(6) - 15,CGRectGetHeight(myFrame)- 20 - MARGIN)];
-    [path addLineToPoint:CGPointMake(MARGIN + MARGIN*(0) - 15,CGRectGetHeight(myFrame)- 20 - MARGIN)];
+    [path addLineToPoint:CGPointMake(30 + (SCREEN_WIDTH - 60)/6*(6),CGRectGetHeight(myFrame)- 20 - (SCREEN_WIDTH - 60)/6)];
+    [path addLineToPoint:CGPointMake(30 + (SCREEN_WIDTH - 60)/6*(0),CGRectGetHeight(myFrame)- 20 - (SCREEN_WIDTH - 60)/6)];
     
     //添加区域颜色填充
     CAShapeLayer *changeColorShapeLayer = [CAShapeLayer layer];
     changeColorShapeLayer.path = path.CGPath;
-    changeColorShapeLayer.strokeColor = [UIColor clearColor].CGColor;
+    changeColorShapeLayer.strokeColor = [UIColor redColor].CGColor;
     changeColorShapeLayer.fillColor = gMainColorRGB.CGColor;
     changeColorShapeLayer.borderWidth = 2.0;
-    changeColorShapeLayer.lineWidth = 0.5;
+    changeColorShapeLayer.lineWidth = 1;
     [self.subviews[0].layer insertSublayer:changeColorShapeLayer atIndex:0];
     
     //设置渐变属性
@@ -200,15 +206,15 @@ static CGRect myFrame;
     gradientLayer.locations = @[@0.0, @1.0];
     gradientLayer.startPoint = CGPointMake(0, 0);
     gradientLayer.endPoint = CGPointMake(0, 1.0);
-    gradientLayer.frame = CGRectMake(MARGIN + MARGIN*(0) - 15,IS_IPHONEX? CGRectGetHeight(myFrame)- 20 - 2*MARGIN - BEZIER_H:CGRectGetHeight(myFrame)- 20 - MARGIN - BEZIER_H, 0, BEZIER_H);
+    gradientLayer.frame = CGRectMake(30,IS_IPHONEX? CGRectGetHeight(myFrame)- 20 - 2*(SCREEN_WIDTH - 60)/6 - (SCREEN_WIDTH == 320?60:100):CGRectGetHeight(myFrame)- 20 - (SCREEN_WIDTH - 60)/6 - (SCREEN_WIDTH == 320?60:100), 0, (SCREEN_WIDTH == 320?60:100));
     [layer addSublayer:gradientLayer];
     [layer setMask:changeColorShapeLayer];
     [self.subviews[0].layer addSublayer:layer];
     
     //曲线动画
     CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"strokeEnd"];
-    animation.duration = 3.0f;
-    animation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
+    animation.duration = 2.0f;
+    animation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionLinear];
     animation.fromValue = @(0.0);
     animation.toValue = @(1.0);
     [shapeLayer addAnimation:animation forKey:@"path"];
@@ -216,9 +222,9 @@ static CGRect myFrame;
     //图层动画
     CABasicAnimation *anmi1 = [CABasicAnimation animation];
     anmi1.keyPath = @"bounds";
-    anmi1.duration = 3.0f;
-    anmi1.toValue = [NSValue valueWithCGRect:CGRectMake(MARGIN + MARGIN*(0) - 15,IS_IPHONEX? CGRectGetHeight(myFrame)- 20 - 2*MARGIN - BEZIER_H:CGRectGetHeight(myFrame)- 20 - MARGIN - BEZIER_H, MARGIN*(6) * 2, BEZIER_H)];
-    anmi1.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
+    anmi1.duration = 2.0f;
+    anmi1.toValue = [NSValue valueWithCGRect:CGRectMake((SCREEN_WIDTH - 60)/6 + (SCREEN_WIDTH - 60)/6*(0) - 15,IS_IPHONEX? CGRectGetHeight(myFrame)- 20 - 2*(SCREEN_WIDTH - 60)/6 - (SCREEN_WIDTH == 320?60:100):CGRectGetHeight(myFrame)- 20 - (SCREEN_WIDTH - 60)/6 - (SCREEN_WIDTH == 320?60:100), (SCREEN_WIDTH - 60)/6*(6) * 2, (SCREEN_WIDTH == 320?60:100))];
+    anmi1.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionLinear];
     anmi1.fillMode = kCAFillModeForwards;
     anmi1.autoreverses = NO;
     anmi1.removedOnCompletion = NO;
@@ -235,14 +241,14 @@ static CGRect myFrame;
         if (i==0) {
             CGPoint NowPoint = [allPoints[0] CGPointValue];
             label.text = [NSString stringWithFormat:@"%d分",[targetValues[i] intValue]];
-            label.frame = CGRectMake(NowPoint.x-MARGIN/2, NowPoint.y-25, MARGIN, 20);
+            label.frame = CGRectMake(NowPoint.x-(SCREEN_WIDTH - 60)/6/2, NowPoint.y-25, (SCREEN_WIDTH - 60)/6, 20);
             PrePonit = NowPoint;
         }else{
             CGPoint NowPoint = [allPoints[i] CGPointValue];
 //            if (NowPoint.y<=PrePonit.y) {  //文字置于点上方
-                label.frame = CGRectMake(NowPoint.x-MARGIN/2, NowPoint.y-25, MARGIN, 20);
+                label.frame = CGRectMake(NowPoint.x-(SCREEN_WIDTH - 60)/6/2, NowPoint.y-25, (SCREEN_WIDTH - 60)/6, 20);
 //            }else{ //文字置于点下方
-//                label.frame = CGRectMake(NowPoint.x-MARGIN/2, NowPoint.y, MARGIN, 20);
+//                label.frame = CGRectMake(NowPoint.x-(SCREEN_WIDTH - 60)/6/2, NowPoint.y, (SCREEN_WIDTH - 60)/6, 20);
 //            }
             label.text = [NSString stringWithFormat:@"%d分",[targetValues[i] intValue]];
             PrePonit = NowPoint;
@@ -261,9 +267,9 @@ static CGRect myFrame;
     //2.每一个目标值点坐标
     for (int i=0; i<targetValues.count; i++) {
         CGFloat doubleValue = 2*[targetValues[i] floatValue]; //目标值放大两倍
-        CGFloat X = MARGIN + MARGIN*(i+1)+5;
-        CGFloat Y = CGRectGetHeight(myFrame)-MARGIN-doubleValue;
-        UIBezierPath *path = [UIBezierPath bezierPathWithRect:CGRectMake(X-MARGIN/2, Y, MARGIN-10, doubleValue)];
+        CGFloat X = (SCREEN_WIDTH - 60)/6 + (SCREEN_WIDTH - 60)/6*(i+1)+5;
+        CGFloat Y = CGRectGetHeight(myFrame)-(SCREEN_WIDTH - 60)/6-doubleValue;
+        UIBezierPath *path = [UIBezierPath bezierPathWithRect:CGRectMake(X-(SCREEN_WIDTH - 60)/6/2, Y, (SCREEN_WIDTH - 60)/6-10, doubleValue)];
         CAShapeLayer *shapeLayer = [CAShapeLayer layer];
         shapeLayer.path = path.CGPath;
         shapeLayer.strokeColor = [UIColor clearColor].CGColor;
@@ -272,8 +278,8 @@ static CGRect myFrame;
         [self.subviews[0].layer addSublayer:shapeLayer];
         
         //3.添加文字
-        UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(X-MARGIN/2, Y-20, MARGIN-10, 20)];
-        label.text = [NSString stringWithFormat:@"%.0lf",(CGRectGetHeight(myFrame)-Y-MARGIN)/2];
+        UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(X-(SCREEN_WIDTH - 60)/6/2, Y-20, (SCREEN_WIDTH - 60)/6-10, 20)];
+        label.text = [NSString stringWithFormat:@"%.0lf",(CGRectGetHeight(myFrame)-Y-(SCREEN_WIDTH - 60)/6)/2];
         label.textColor = [UIColor purpleColor];
         label.textAlignment = NSTextAlignmentCenter;
         label.font = [UIFont systemFontOfSize:10];

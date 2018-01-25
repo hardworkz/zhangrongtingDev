@@ -190,7 +190,7 @@
     
     //设置播放限制初始值
     if ([CommonCode readFromUserD:limit_num] == nil) {
-        [CommonCode writeToUserD:@"10" andKey:limit_num];
+        [CommonCode writeToUserD:@"5" andKey:limit_num];
     }
     
     //启动时获取已登录用户的信息、未读消息
@@ -657,9 +657,9 @@
 - (void)applicationWillTerminate:(UIApplication *)application
 {
     //上传课堂播放记录
-    if ([ZRT_PlayerManager manager].playType == ZRTPlayTypeClassroom && [ZRT_PlayerManager manager].isPlaying == YES) {
+//    if ([ZRT_PlayerManager manager].playType == ZRTPlayTypeClassroom && [ZRT_PlayerManager manager].isPlaying == YES) {
         [[ZRT_PlayerManager manager] uploadClassPlayHistoryData];
-    }
+//    }
     //应用退出时保存已听过新闻ID
     [CommonCode writeToUserD:[NewPlayVC shareInstance].listenedNewsIDArray andKey:yitingguoxinwenID];
     //清空当前本地缓存的播放新闻，播放新闻ID
@@ -669,25 +669,6 @@
 
 - (void)applicationDidEnterBackground:(UIApplication *)application
 {
-//    [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler
-//     :^(){
-//         //程序在10分钟内未被系统关闭或者强制关闭，则程序会调用此代码块，可以在这里做一些保存或者清理工作
-//         NSLog(
-//               @"程序关闭"
-//               );
-//         //上传课堂播放记录
-//         if ([ZRT_PlayerManager manager].playType == ZRTPlayTypeClassroom && [ZRT_PlayerManager manager].isPlaying == NO) {
-//             [[ZRT_PlayerManager manager] uploadClassPlayHistoryData];
-//         }
-//         //应用退出时保存已听过新闻ID
-//         [CommonCode writeToUserD:[NewPlayVC shareInstance].listenedNewsIDArray andKey:yitingguoxinwenID];
-//         //清空当前本地缓存的播放新闻，播放新闻ID
-//         [CommonCode writeToUserD:nil andKey:@"dangqianbofangxinwenID"];
-//         [CommonCode writeToUserD:nil andKey:@"dangqianbofangxinwen"];
-//
-//     }];
-    
-    
     [[UIApplication sharedApplication] beginReceivingRemoteControlEvents];
     [self becomeFirstResponder];
     

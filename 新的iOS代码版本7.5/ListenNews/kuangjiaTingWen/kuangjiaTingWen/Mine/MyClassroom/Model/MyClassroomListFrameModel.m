@@ -22,7 +22,7 @@
     _priceF = CGRectMake(CGRectGetMaxX(_titleLabF) + 10, _titleLabF.origin.y,40.0 / 375 * IPHONE_W, 21.0 / 667 *IPHONE_H);
     
     CGSize describeSize = [model.Description boundingRectWithSize:CGSizeMake(SCREEN_WIDTH - CGRectGetMaxX(_imgLeftF) - 20.0 / 375 * IPHONE_W, MAXFLOAT) options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:CUSTOM_FONT_TYPE(14.0)} context:nil].size;
-    RTLog(@"%f",CGRectGetMaxY(_imgLeftF));
+//    RTLog(@"%f",CGRectGetMaxY(_imgLeftF));
     _describeF = CGRectMake(_titleLabF.origin.x, CGRectGetMaxY(_imgLeftF) - (describeSize.height), SCREEN_WIDTH - CGRectGetMaxX(_imgLeftF) - 20.0 / 375 * IPHONE_W, describeSize.height);
     
     _lineF = CGRectMake(20.0 / 375 * SCREEN_WIDTH, CGRectGetMaxY(_imgLeftF) + 15, SCREEN_WIDTH - 40.0 / 375 * SCREEN_WIDTH, 0.5);

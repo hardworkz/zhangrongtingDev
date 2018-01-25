@@ -328,7 +328,7 @@
             subModel = firstModel.data[indexPath.row];
             CGFloat tempHeight = 0;
             if (indexPath.row == 0) {
-                tempHeight = 30;
+                tempHeight = 40;
             }
             else{
                 tempHeight = 0;
@@ -336,7 +336,7 @@
             //图片
             UIImageView *imgLeft = [[UIImageView alloc]initWithFrame:CGRectMake(IS_IPHONEX?20.0: 20.0 / 375 * IPHONE_W, 15 + tempHeight,IS_IPHONEX?105.0: 105.0 / 375 * IPHONE_W, 105.0 / 375 *IPHONE_W)];
             if (IS_IPAD) {
-                [imgLeft setFrame:CGRectMake(20.0 / 375 * IPHONE_W, 15, 105.0 / 375 * IPHONE_W, 70.0 / 375 *IPHONE_W)];
+                [imgLeft setFrame:CGRectMake(20.0 / 375 * IPHONE_W, 15 + tempHeight , 105.0 / 375 * IPHONE_W, 70.0 / 375 *IPHONE_W)];
             }
             [imgLeft.layer setMasksToBounds:YES];
             [imgLeft.layer setCornerRadius:5.0];
@@ -374,22 +374,25 @@
             
             //简介
             UILabel *describe = [[UILabel alloc]initWithFrame:CGRectMake(classTitle.frame.origin.x,IS_IPHONEX?60.0: 60.0 * 667.0/SCREEN_HEIGHT + tempHeight,IS_IPHONEX?SCREEN_WIDTH - CGRectGetMaxX(imgLeft.frame) - 20.0 / 375 * 375:  SCREEN_WIDTH - CGRectGetMaxX(imgLeft.frame) - 20.0 / 375 * IPHONE_W,IS_IPHONEX?21.0: 21.0 / 667 *IPHONE_H)];
-            if (TARGETED_DEVICE_IS_IPHONE_568){
-                [describe setFrame:CGRectMake(classTitle.frame.origin.x, CGRectGetMaxY(classTitle.frame), SCREEN_WIDTH - CGRectGetMaxX(imgLeft.frame) - 20.0 / 375 * IPHONE_W, 21.0 / 667 *IPHONE_H)];
-            }
-            else{
-                [describe setFrame:CGRectMake(classTitle.frame.origin.x,IS_IPHONEX?60.0 + tempHeight: 60.0 * 667.0/SCREEN_HEIGHT + tempHeight,IS_IPHONEX?SCREEN_WIDTH - CGRectGetMaxX(imgLeft.frame) - 20.0 / 375 * 375:  SCREEN_WIDTH - CGRectGetMaxX(imgLeft.frame) - 20.0 / 375 * IPHONE_W,IS_IPHONEX?21.0: 21.0 / 667 *IPHONE_H)];
-            }
+//            if (TARGETED_DEVICE_IS_IPHONE_568){
+//                [describe setFrame:CGRectMake(classTitle.frame.origin.x, CGRectGetMaxY(classTitle.frame), SCREEN_WIDTH - CGRectGetMaxX(imgLeft.frame) - 20.0 / 375 * IPHONE_W, 21.0 / 667 *IPHONE_H)];
+//            }
+//            else{
+//                [describe setFrame:CGRectMake(classTitle.frame.origin.x,IS_IPHONEX?60.0 + tempHeight: 60.0 * 667.0/SCREEN_HEIGHT + tempHeight,IS_IPHONEX?SCREEN_WIDTH - CGRectGetMaxX(imgLeft.frame) - 20.0 / 375 * 375:  SCREEN_WIDTH - CGRectGetMaxX(imgLeft.frame) - 20.0 / 375 * IPHONE_W,IS_IPHONEX?21.0: 21.0 / 667 *IPHONE_H)];
+//            }
             describe.text = subModel2.Description;
             describe.textColor = [[UIColor grayColor]colorWithAlphaComponent:0.7f];
             describe.textColor = gTextColorSub;
             describe.textAlignment = NSTextAlignmentLeft;
-            describe.font = gFontMain13;
+            describe.font = CUSTOM_FONT_TYPE(13.0);
             [cell.contentView addSubview:describe];
             [describe setNumberOfLines:3];
             describe.lineBreakMode = NSLineBreakByWordWrapping;
-            CGSize size1 = [describe sizeThatFits:CGSizeMake(describe.frame.size.width, MAXFLOAT)];
-            describe.frame = CGRectMake(describe.frame.origin.x, describe.frame.origin.y, describe.frame.size.width, size1.height);
+//            CGSize size1 = [describe sizeThatFits:CGSizeMake(describe.frame.size.width, MAXFLOAT)];
+//            describe.frame = CGRectMake(describe.frame.origin.x, describe.frame.origin.y, describe.frame.size.width, size1.height);
+            
+            CGSize describeSize = [subModel2.Description boundingRectWithSize:CGSizeMake(SCREEN_WIDTH - CGRectGetMaxX(imgLeft.frame) - 20.0 / 375 * IPHONE_W, MAXFLOAT) options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:CUSTOM_FONT_TYPE(13.0)} context:nil].size;
+            describe.frame = CGRectMake(classTitle.origin.x, CGRectGetMaxY(imgLeft.frame) - (describeSize.height), SCREEN_WIDTH - CGRectGetMaxX(imgLeft.frame) - 20.0 / 375 * IPHONE_W, describeSize.height);
             cell.selectionStyle = UITableViewCellSelectionStyleNone;
         }
         else if (indexPath.row == [firstModel.data count]){
@@ -454,7 +457,7 @@
         faxianModel *model = [self.faxianArrM firstObject];
         if (indexPath.row == 0){
             if (IS_IPAD) {
-                return  172.5 ;
+                return  212.5;
             }else{
                 return IS_IPHONEX?167.5 / 667 * 667: 167.5 / 667 * IPHONE_H;
             }

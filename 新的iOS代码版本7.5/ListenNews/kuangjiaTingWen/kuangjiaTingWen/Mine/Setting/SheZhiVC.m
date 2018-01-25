@@ -150,6 +150,7 @@
     titleImg.image = [UIImage imageNamed:self.imgNameArr[indexPath.section][indexPath.row]];
     titleImg.contentMode = UIViewContentModeScaleAspectFit;
     [cell.contentView addSubview:titleImg];
+    
     UILabel *lab = [[UILabel alloc]initWithFrame:CGRectMake(38.0 / 375 * IPHONE_W, 11.0 / 667 * SCREEN_HEIGHT, 150.0 / 375 * IPHONE_W, 21)];
     lab.text = [NSString stringWithFormat:@"%@",self.dataArr[indexPath.section][indexPath.row]];
     [cell.contentView addSubview:lab];
@@ -160,16 +161,16 @@
             lab.textColor = [UIColor redColor];
         }
         else{
-            lab.textColor = [UIColor blackColor];
+            lab.textColor = TITLE_COLOR_HEX;
         }
     }
     else{
-        lab.textColor = [UIColor blackColor];
+        lab.textColor = TITLE_COLOR_HEX;
     }
     
     if (indexPath.section == 0 && indexPath.row == 0){
         UILabel *banBenRightLab = [[UILabel alloc]initWithFrame:CGRectMake(300.0 / 375 * IPHONE_W, 15.0, 63.0 / 375 * IPHONE_W, 11.0)];
-        banBenRightLab.textColor = ColorWithRGBA(0, 159, 240, 1);
+        banBenRightLab.textColor = TITLE_COLOR_HEX;
         banBenRightLab.text = [NSString stringWithFormat:@"%@", [[[NSBundle mainBundle] infoDictionary] valueForKey:@"CFBundleShortVersionString"]];;
         banBenRightLab.font = [UIFont systemFontOfSize:15.0f];
         banBenRightLab.textAlignment = NSTextAlignmentRight;
@@ -177,7 +178,7 @@
     }
     else if (indexPath.section == 0 && indexPath.row == 1){
         UILabel *qingchuhuancunLab = [[UILabel alloc]initWithFrame:CGRectMake(300.0 / 375 * IPHONE_W, 15.0, 63.0 / 375 * IPHONE_W, 11.0)];
-        qingchuhuancunLab.textColor = ColorWithRGBA(0, 159, 240, 1);
+        qingchuhuancunLab.textColor = TITLE_COLOR_HEX;
         qingchuhuancunLab.text = SDImageHuanCun;
         qingchuhuancunLab.font = [UIFont systemFontOfSize:15.0f];
         qingchuhuancunLab.textAlignment = NSTextAlignmentRight;
@@ -187,7 +188,7 @@
         UILabel *zitiLab = [[UILabel alloc]initWithFrame:CGRectMake(295.0 / 375 * IPHONE_W, 14.0 / 667 * SCREEN_HEIGHT, 50.0 / 375 * IPHONE_W, 20.0 / 667 * SCREEN_HEIGHT)];
         zitiLab.textAlignment = NSTextAlignmentRight;
         zitiLab.font = [UIFont systemFontOfSize:15.0f];
-        zitiLab.textColor = ColorWithRGBA(0, 159, 240, 1);
+        zitiLab.textColor = TITLE_COLOR_HEX;
         zitiLab.text = self.fontSize;
         [cell.contentView addSubview:zitiLab];
     }
@@ -415,7 +416,7 @@
     UILabel *zitiLab = [[UILabel alloc]initWithFrame:CGRectMake(295.0 / 375 * IPHONE_W, 14.0, 50.0 / 375 * IPHONE_W, 20)];
     zitiLab.textAlignment = NSTextAlignmentRight;
     zitiLab.font = [UIFont systemFontOfSize:15.0f];
-    zitiLab.textColor = ColorWithRGBA(0, 159, 240, 1);
+    zitiLab.textColor = TITLE_COLOR_HEX;
     zitiLab.text = self.fontSize;
     [cell.contentView addSubview:zitiLab];
     [self.tableView reloadData];

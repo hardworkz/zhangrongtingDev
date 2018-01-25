@@ -94,10 +94,10 @@
         // tabBar标题
         UILabel *titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, CGRectGetMaxY(_btnImgView.frame) + 5, ScreenWidth/(items.count + 1), 11)];
         titleLabel.textAlignment = NSTextAlignmentCenter;
-        titleLabel.font = [UIFont systemFontOfSize:10];
+        titleLabel.font = CUSTOM_FONT_TYPE(10.0);
         titleLabel.text = tabBarItem.title;
         titleLabel.tag = 1000 + idx;
-        titleLabel.textColor = nSubColor;
+        titleLabel.textColor = TITLE_COLOR_HEX;
         tabBarBtn.tag = idx + 2000;
         [tabBarBtn addSubview:_btnImgView];
         [tabBarBtn addSubview:titleLabel];
@@ -128,7 +128,7 @@
 //    if (btn == self.seletBtn) return;
     ((UIImageView *)self.seletBtn.subviews[0]).highlighted = NO;
     ((UIImageView *)btn.subviews[0]).highlighted = YES;
-    ((UILabel *)self.seletBtn.subviews[1]).textColor = [UIColor grayColor];
+    ((UILabel *)self.seletBtn.subviews[1]).textColor = TITLE_COLOR_HEX;
     ((UILabel *)btn.subviews[1]).textColor = nMainColor;
     self.seletBtn = btn;
     _currentIdx = btn.tag - 2000;

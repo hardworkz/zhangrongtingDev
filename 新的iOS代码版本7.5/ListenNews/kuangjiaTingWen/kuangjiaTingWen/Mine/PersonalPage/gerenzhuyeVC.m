@@ -252,6 +252,7 @@
     } failure:^(NSError *error) {
         
     }];
+    
 }
 
 - (void)viewDidDisappear:(BOOL)animated{
@@ -1225,7 +1226,14 @@ didSelectLinkWithTransitInformation:(NSDictionary *)components {
 - (void)rightbtnAction:(UIButton *)sender {
     self.hidesBottomBarWhenPushed=YES;
     _isToEditInfomation = YES;
-    [self.navigationController pushViewController:[titleImageVC new] animated:YES];
+    titleImageVC *TitleImageVC = [[titleImageVC alloc] init];
+    TitleImageVC.updateSignature = ^(NSString *signature) {
+        CGSize size = [jianjieLab sizeThatFits:CGSizeMake(jianjieLab.frame.size.width, MAXFLOAT)];
+        jianjieLab.frame = CGRectMake(jianjieLab.frame.origin.x, jianjieLab.frame.origin.y, jianjieLab.frame.size.width, size.height);
+        //更新个人简介
+        jianjieLab.text = [NSString stringWithFormat:@"简介：%@",signature];
+    };
+    [self.navigationController pushViewController:TitleImageVC animated:YES];
 }
 
 - (void)attentionAction:(UIButton *)sender {

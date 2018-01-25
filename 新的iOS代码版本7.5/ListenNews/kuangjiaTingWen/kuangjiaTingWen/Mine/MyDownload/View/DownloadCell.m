@@ -43,6 +43,7 @@
 - (void)displayCell:(WHC_Download *)object{
     self.op.delegate = nil;
     object.delegate = self;
+    self.labelName.font = CUSTOM_FONT_TYPE(15.0);
     self.labelName.text = object.obj[@"post_title"];
     //新闻图片url处理
     NSString *finalURL;

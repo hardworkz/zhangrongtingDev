@@ -52,7 +52,7 @@
 
 #import <UIKit/UIKit.h>
 
-#define MARGIN            50   // 坐标轴与画布间距
+//#define MARGIN            50   // 坐标轴与画布间距
 #define Y_EVERY_MARGIN    10   // y轴每一个值的间隔数
 #define BEZIER_H    110   // 图表的高度
 
