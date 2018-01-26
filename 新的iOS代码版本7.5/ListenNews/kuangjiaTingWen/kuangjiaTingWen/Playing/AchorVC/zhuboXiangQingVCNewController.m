@@ -1772,7 +1772,7 @@
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
     if ([tableView isEqual:xinwenshuaxinTableView]) {
         if (_isClass) {
-            return IS_IPHONEX?55:40;
+            return IS_IPHONEX?40:40;
         }else{
             return 0.01f;
         }
@@ -1861,22 +1861,22 @@
 }
 - (nullable UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section{
     if ([tableView isEqual:xinwenshuaxinTableView]) {
-        UIView *sectionHeadView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH,IS_IPHONEX?55: 45)];
+        UIView *sectionHeadView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH,IS_IPHONEX?40: 45)];
         [sectionHeadView setBackgroundColor:[UIColor whiteColor]];
 
         UIButton *continuePlayButton = [UIButton buttonWithType:UIButtonTypeCustom];
-        [continuePlayButton setFrame:CGRectMake(0, 0, SCREEN_WIDTH,IS_IPHONEX?55: 45)];
-        [continuePlayButton setImage:[UIImage imageNamed:@"继续播放_2"] forState:UIControlStateNormal];
+        [continuePlayButton setFrame:CGRectMake(0, 0, SCREEN_WIDTH,IS_IPHONEX?40: 45)];
+        [continuePlayButton setImage:[UIImage imageNamed:@"继续播放"] forState:UIControlStateNormal];
         continuePlayButton.imageView.contentMode = UIViewContentModeCenter;
         continuePlayButton.titleEdgeInsets = UIEdgeInsetsMake(0, 20,IS_IPHONEX?0:10, 0);
         continuePlayButton.imageEdgeInsets = UIEdgeInsetsMake(0, 0, IS_IPHONEX?0:10, 0);
         [continuePlayButton setTitle:@"继 续 播 放" forState:UIControlStateNormal];
-        continuePlayButton.titleLabel.font = [UIFont systemFontOfSize:20];
+        continuePlayButton.titleLabel.font = [UIFont systemFontOfSize:15];
         [continuePlayButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
         [continuePlayButton addTarget:self action:@selector(continuePlayAction) forControlEvents:UIControlEventTouchUpInside];
         [sectionHeadView addSubview:continuePlayButton];
 
-        UIView *line = [[UIView alloc] initWithFrame:CGRectMake(10,IS_IPHONEX?49.5: 39.5, SCREEN_WIDTH, 0.5)];
+        UIView *line = [[UIView alloc] initWithFrame:CGRectMake(10,IS_IPHONEX?39.5: 39.5, SCREEN_WIDTH, 0.5)];
         line.backgroundColor = [[UIColor grayColor] colorWithAlphaComponent:0.2];
         [sectionHeadView addSubview:line];
 

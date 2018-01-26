@@ -271,7 +271,7 @@
 - (void)getVipLimitData
 {
     [NetWorkTool get_VipLimitDataWithSccess:^(NSDictionary *responseObject) {
-        RTLog(@"%@",responseObject);
+//        RTLog(@"%@",responseObject);
         if ([responseObject[status] intValue] == 1) {
             [NetWorkTool isNewDayWithServer_date:responseObject[results][@"date"]];
             [CommonCode writeToUserD:responseObject[results][@"num"] andKey:limit_num];

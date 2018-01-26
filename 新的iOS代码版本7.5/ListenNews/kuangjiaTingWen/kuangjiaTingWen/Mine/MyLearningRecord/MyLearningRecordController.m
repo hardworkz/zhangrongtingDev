@@ -79,7 +79,7 @@
 }
 - (void)setupDataView
 {
-    totalTime = [[UILabel alloc]initWithFrame:CGRectMake(0, IPHONEX_TOP_H, IPHONE_W * 0.5, 30)];
+    totalTime = [[UILabel alloc]initWithFrame:CGRectMake(0,IS_IPHONEX? IPHONEX_TOP_H + 5:69, IPHONE_W * 0.5, 30)];
     totalTime.textColor = [UIColor blackColor];
     totalTime.font = [UIFont boldSystemFontOfSize:15.0f];
     totalTime.text = @"0分钟";
@@ -90,12 +90,12 @@
     UILabel *totalTimeTextLabel = [[UILabel alloc]initWithFrame:CGRectMake(0, CGRectGetMaxY(totalTime.frame), IPHONE_W * 0.5, 25)];
     totalTimeTextLabel.textColor = [UIColor grayColor];
     totalTimeTextLabel.font = [UIFont boldSystemFontOfSize:13.0f];
-    totalTimeTextLabel.text = @"学习时长";
+    totalTimeTextLabel.text = @"总学习时长";
     totalTimeTextLabel.backgroundColor = [UIColor clearColor];
     totalTimeTextLabel.textAlignment = NSTextAlignmentCenter;
     [self.view addSubview:totalTimeTextLabel];
     
-    dateLabel = [[UILabel alloc]initWithFrame:CGRectMake(IPHONE_W * 0.5, IPHONEX_TOP_H, IPHONE_W * 0.5, 30)];
+    dateLabel = [[UILabel alloc]initWithFrame:CGRectMake(IPHONE_W * 0.5, totalTime.y, IPHONE_W * 0.5, 30)];
     dateLabel.textColor = [UIColor blackColor];
     dateLabel.font = [UIFont boldSystemFontOfSize:15.0f];
     dateLabel.text = @"0天";

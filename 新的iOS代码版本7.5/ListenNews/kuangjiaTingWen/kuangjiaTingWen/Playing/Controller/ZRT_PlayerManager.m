@@ -136,9 +136,10 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
                     case ZRTPlayTypeNews:
                         //判断数组中是否存在当前ID
                         isStopPlay = YES;
-                        for (NSString *post_id in limitArray) {
-                            if ([post_id isEqualToString:self.currentSong[@"id"]]) {
+                        for (NSString *post_ID in limitArray) {
+                            if ([post_ID isEqualToString:post_id!=nil?post_id:self.currentSong[@"id"]]) {
                                 isStopPlay = NO;
+                                break;
                             }
                         }
                         //上传播放限制状态
@@ -189,9 +190,10 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
                 case ZRTPlayTypeNews:
                     //判断数组中是否存在当前ID
                     isStopPlay = YES;
-                    for (NSString *post_id in limitArray) {
-                        if ([post_id isEqualToString:self.currentSong[@"id"]]) {
+                    for (NSString *post_ID in limitArray) {
+                        if ([post_ID isEqualToString:post_id!=nil?post_id:self.currentSong[@"id"]]) {
                             isStopPlay = NO;
+                            break;
                         }
                     }
                     break;

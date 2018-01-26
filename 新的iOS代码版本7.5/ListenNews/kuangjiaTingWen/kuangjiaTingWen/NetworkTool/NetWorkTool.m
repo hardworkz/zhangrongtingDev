@@ -19,6 +19,7 @@
     if (![dateString isEqualToString:serverDate]) {//判断本地缓存时间和服务器返回时间是否一致，不一致则清空新闻播放限制次数
         [CommonCode writeToUserD:dateString andKey:server_date];
         [CommonCode writeToUserD:@"0" andKey:limit_time];
+        [CommonCode writeToUserD:nil andKey:limit_array];
         //更新用户信息
         [[NSNotificationCenter defaultCenter] postNotificationName:@"updateUserInfo" object:nil];
     }
@@ -2155,6 +2156,19 @@ NSMutableDictionary *dic = [[NSMutableDictionary alloc]initWithCapacity:1
     dic[@"page"] = page;
     dic[@"limit"] = limit;
     [self asyncNetworkingUrl:@"/interfaceNew/information" andDict:dic success:success failure:failure];
+}
++ (void)getInformationNewListWithaccessToken:(NSString *)accessToken
+                                    andId:(NSString *)Id
+                                    andType:(NSString *)type
+                                 andLimit:(NSString *)limit
+                                   sccess:(void (^)(NSDictionary *responseObject))success
+                                  failure:(void (^)(NSError *error))failure{
+    NSMutableDictionary *dic = [[NSMutableDictionary alloc]initWithCapacity:1];
+    dic[@"accessToken"] = accessToken;
+    dic[@"id"] = Id;
+    dic[@"idtype"] = type;
+    dic[@"limit"] = limit;
+    [self asyncNetworkingUrl:@"/interfaceNew/informationNew" andDict:dic success:success failure:failure];
 }
 + (void)getRQCodeImageUrlWithSccess:(void (^)(NSDictionary *responseObject))success
                                    failure:(void (^)(NSError *error))failure

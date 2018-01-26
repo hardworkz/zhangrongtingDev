@@ -650,7 +650,7 @@ typedef void(^animateBlock)();
             if (!cell){
                 cell = [tableView dequeueReusableCellWithIdentifier:wosixIdentify];
             }
-            UILabel *lab = [[UILabel alloc]initWithFrame:CGRectMake(40.0 / 375 * IPHONE_W, 14.0 / 667 * IPHONE_H, 100.0 / 375 * IPHONE_W, IS_IPHONEX?58.0:50.0f / 667 * IPHONE_H)];
+            UILabel *lab = [[UILabel alloc]initWithFrame:CGRectMake(40.0 / 375 * IPHONE_W, 0, 100.0 / 375 * IPHONE_W, IS_IPHONEX?58.0:50.0f / 667 * IPHONE_H)];
             lab.text = @"设置";
             lab.textAlignment = NSTextAlignmentLeft;
             lab.textColor = TITLE_COLOR_HEX;

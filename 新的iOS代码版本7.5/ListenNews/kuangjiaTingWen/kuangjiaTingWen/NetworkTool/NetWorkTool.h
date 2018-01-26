@@ -1480,6 +1480,23 @@
                                  andLimit:(NSString *)limit
                                    sccess:(void (^)(NSDictionary *responseObject))success
                                   failure:(void (^)(NSError *error))failure;
+
+/**
+ 获取快讯新闻列表数据
+
+ @param accessToken accessToken
+ @param Id 当前列表的最大ID或最小ID
+ @param type 当前接口类型是上拉加载还是下拉刷新（1：ID最大值，2：最小ID值）
+ @param limit 限制返回条数
+ @param success 成功
+ @param failure 错误
+ */
++ (void)getInformationNewListWithaccessToken:(NSString *)accessToken
+                                       andId:(NSString *)Id
+                                     andType:(NSString *)type
+                                    andLimit:(NSString *)limit
+                                      sccess:(void (^)(NSDictionary *responseObject))success
+                                     failure:(void (^)(NSError *error))failure;
 /**
  *  	获取听闻课堂列表列表数据
  *

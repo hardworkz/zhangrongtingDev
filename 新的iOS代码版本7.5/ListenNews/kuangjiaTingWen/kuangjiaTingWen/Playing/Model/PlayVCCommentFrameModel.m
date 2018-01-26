@@ -51,6 +51,7 @@
         _contentF = CGRectMake(CGRectGetMaxX(_pinglunImgF) - 3.0 / 375 * IPHONE_W, CGRectGetMaxY(_pinglunshijianF) + 10.0 / 667 * IPHONE_H,contentSize.width, contentSize.height);
     }
     _deviderF = CGRectMake(10, CGRectGetMaxY(_contentF) + 10 - 0.5, SCREEN_WIDTH, 0.5);
+    _topDeviderF = CGRectMake(10, 0, SCREEN_WIDTH, 0.5);
     _cellHeight = CGRectGetMaxY(_contentF) + 10;
 }
 @end

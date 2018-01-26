@@ -106,7 +106,11 @@
     pinglunTitle.frame = frameModel.pinglunTitleF;
     pinglunshijian.frame = frameModel.pinglunshijianF;
     content.frame = frameModel.contentF;
-    devider.frame = frameModel.deviderF;
+    if (_commentCellType == CommentCellTypeNewsDetail) {
+        devider.frame = frameModel.topDeviderF;
+    }else{
+        devider.frame = frameModel.deviderF;
+    }
     //设置头像
     if ([frameModel.model.avatar  rangeOfString:@"http"].location != NSNotFound){
         [pinglunImg sd_setImageWithURL:[NSURL URLWithString:frameModel.model.avatar] placeholderImage:[UIImage imageNamed:@"right-1"]];

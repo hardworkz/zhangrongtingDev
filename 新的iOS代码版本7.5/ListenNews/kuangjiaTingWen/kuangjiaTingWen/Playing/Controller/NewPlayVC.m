@@ -680,7 +680,7 @@ static NewPlayVC *_instance = nil;
 //            label.text = @"音质";
 //        }
         else if (i == 2) {
-            [button setImage:[UIImage imageNamed:@"icon_comment"] forState:UIControlStateNormal];
+            [button setImage:[UIImage imageNamed:@"icon_player_comment"] forState:UIControlStateNormal];
             button.accessibilityIdentifier = @"评论";
             label.text = @"评论";
         }
@@ -1460,8 +1460,18 @@ static NewPlayVC *_instance = nil;
 - (void)downloadAction:(UIButton *)sender
 {
     if ([[ZRT_PlayerManager manager] limitPlayStatusWithPost_id:nil withAdd:NO]) {
-        [self alertMessageWithVipLimit];
-        return;
+        NSArray *limitArray = [CommonCode readFromUserD:limit_array];
+        BOOL isStopPlay = YES;
+        for (NSString *post_id in limitArray) {
+            if ([post_id isEqualToString:self.post_id]) {
+                isStopPlay = NO;
+                break;
+            }
+        }
+        if (isStopPlay) {
+            [self alertMessageWithVipLimit];
+            return;
+        }
     }
     if ([[ZRT_PlayerManager manager] post_mpWithDownloadNewsID:self.postDetailModel.post_id] != nil) {
         XWAlerLoginView *alert = [XWAlerLoginView alertWithTitle:@"该新闻已下载过"];
@@ -2042,7 +2052,17 @@ static NSInteger goldTouchCount = 0;
 - (void)bofangLeftAction:(UIButton *)sender
 {
     //判断限制状态，记录次数限制
-    if ([[ZRT_PlayerManager manager] limitPlayStatusWithPost_id:nil withAdd:NO]) {
+    NSInteger previousIndex = [ZRT_PlayerManager manager].currentSongIndex;
+    NSString *previousPostID;
+    if (previousIndex > 0) {
+        NSArray *array = [ZRT_PlayerManager manager].songList;
+        previousPostID = array[previousIndex - 1][@"id"];
+    }else{
+        XWAlerLoginView *alert = [XWAlerLoginView alertWithTitle:@"这已经是第一条了"];
+        [alert show];
+        return;
+    }
+    if ([[ZRT_PlayerManager manager] limitPlayStatusWithPost_id:previousPostID withAdd:NO]) {
         [self alertMessageWithVipLimit];
         return;
     }
@@ -2075,8 +2095,6 @@ static NSInteger goldTouchCount = 0;
         [self loadData];
         //获取评论数据
         [self getCommentList];
-        
-
         
         [self performSelector:@selector(timeSetting) withObject:nil afterDelay:0.5];//1秒后点击次数清零
     }
@@ -2167,10 +2185,11 @@ static NSInteger goldTouchCount = 0;
 - (void)playFromIndex:(NSInteger)index
 {
     //判断限制状态，记录次数限制
-    if ([[ZRT_PlayerManager manager] limitPlayStatusWithPost_id:nil withAdd:NO]) {
+    if ([[ZRT_PlayerManager manager] limitPlayStatusWithPost_id:self.post_id withAdd:NO]) {
         if ([[ZRT_PlayerManager manager] post_mpWithDownloadNewsID:self.post_id] == nil) {
             [[ZRT_PlayerManager manager] pausePlay];
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                
                 [self alertMessageWithVipLimit];
                 return;
             });

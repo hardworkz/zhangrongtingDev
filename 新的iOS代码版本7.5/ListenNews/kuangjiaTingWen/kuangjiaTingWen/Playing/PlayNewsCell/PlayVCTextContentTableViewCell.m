@@ -14,7 +14,7 @@
     UILabel *titleLab;
     UILabel *riqiLab;
     UITextView *zhengwenTextView;
-    UIView *devider;
+//    UIView *devider;
 //    UIButton *readOriginalEssay;
 }
 @end
@@ -57,9 +57,9 @@
         zhengwenTextView.scrollsToTop = NO;
         [self.contentView addSubview:zhengwenTextView];
         
-        devider = [[UIView alloc] init];
-        devider.backgroundColor = [UIColor lightGrayColor];
-        [self.contentView addSubview:devider];
+//        devider = [[UIView alloc] init];
+//        devider.backgroundColor = [UIColor lightGrayColor];
+//        [self.contentView addSubview:devider];
     }
     return self;
 }
@@ -92,6 +92,6 @@
         zhengwenTextView.attributedText = attributedString;
     }
     zhengwenTextView.frame = frameModel.contentLabelF;
-    devider.frame = frameModel.deviderF;
+//    devider.frame = frameModel.deviderF;
 }
 @end

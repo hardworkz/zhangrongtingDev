@@ -20,6 +20,7 @@
 @property (assign, nonatomic) CGRect commenterF;
 @property (assign, nonatomic) CGRect contentF;
 @property (assign, nonatomic) CGRect deviderF;
+@property (assign, nonatomic) CGRect topDeviderF;
 @property (assign, nonatomic) CGFloat cellHeight;
 
 @property (strong, nonatomic) NSString *content;

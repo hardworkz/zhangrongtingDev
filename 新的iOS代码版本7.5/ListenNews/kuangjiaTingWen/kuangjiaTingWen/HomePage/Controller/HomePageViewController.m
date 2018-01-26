@@ -29,7 +29,7 @@
 @property (strong,nonatomic) NSMutableArray *classroomInfoArr;
 @property (assign, nonatomic) NSInteger columnIndex;
 @property (assign, nonatomic) NSInteger columnPageSize;
-@property (assign, nonatomic) NSInteger newsIndex;
+//@property (assign, nonatomic) NSInteger newsIndex;
 @property (assign, nonatomic) NSInteger newsPageSize;
 @property (assign, nonatomic) NSInteger classIndex;
 @property (assign, nonatomic) NSInteger classPageSize;
@@ -38,6 +38,8 @@
 @property (strong, nonatomic) NSMutableDictionary *pushNewsInfo;
 @property (strong, nonatomic) UIView *lineView;
 @property (assign, nonatomic) NSInteger playListIndex;
+@property (strong, nonatomic) UIView *refreshTipView;
+@property (strong, nonatomic) UILabel *tipLabel;
 @end
 
 @implementation HomePageViewController
@@ -99,7 +101,7 @@
 {
     self.columnIndex = 1;
     self.columnPageSize = 15;
-    self.newsIndex = 1;
+//    self.newsIndex = 1;
     self.newsPageSize = 15;
     self.classIndex = 1;
     self.classPageSize = 15;
@@ -110,7 +112,7 @@
     _ztADResult = [NSMutableArray new];
     _pushNewsInfo = [NSMutableDictionary new];
     [self loadColumnDataWithAutoLoading:NO];
-    [self loadNewsDataWithAutoLoading:NO];
+    [self loadNewsDataWithLoadType:LoadTypeNotData andId:nil];
     [self loadClassData];
     //获取频道列表 - 下载时有用到
     [NetWorkTool getPaoGuoFenLeiLieBiaoWithWhateverSomething:@"q" sccess:^(NSDictionary *responseObject) {
@@ -135,6 +137,7 @@
     self.newsTableView.mj_footer.hidden = YES;
     [self.view addSubview:self.segmentedControl];
     [self.view addSubview:self.scrollView];
+//    [self.view bringSubviewToFront:self.segmentedControl];
     DefineWeakSelf;
     [self.segmentedControl setIndexChangeBlock:^(NSInteger index) {
         [weakSelf.scrollView scrollRectToVisible:CGRectMake(SCREEN_WIDTH * index, 0, SCREEN_WIDTH, SCREEN_HEIGHT - 104 - 49) animated:YES];
@@ -149,12 +152,19 @@
         [self loadColumnDataWithAutoLoading:NO];
     }];
     self.newsTableView.mj_header = [MJRefreshNormalHeader headerWithRefreshingBlock:^{
-        weakSelf.newsIndex = 1;
-        [self loadNewsDataWithAutoLoading:NO];
+//        weakSelf.newsIndex = 1;
+        if (weakSelf.newsInfoArr.count!=0) {
+            [self loadNewsDataWithLoadType:LoadTypeNewData andId:[weakSelf.newsInfoArr firstObject][@"id"]];
+        }else{
+            [self loadNewsDataWithLoadType:LoadTypeNotData andId:nil];
+        }
     }];
     self.newsTableView.mj_footer = [MJRefreshAutoNormalFooter footerWithRefreshingBlock:^{
-        weakSelf.newsIndex ++;
-        [self loadNewsDataWithAutoLoading:NO];
+//        weakSelf.newsIndex ++;
+//        [self loadNewsDataWithAutoLoading:NO];
+        if (weakSelf.newsInfoArr.count!=0) {
+            [self loadNewsDataWithLoadType:LoadTypeMoreData andId:[weakSelf.newsInfoArr lastObject][@"id"]];
+        }
     }];
     self.classroomTableView.mj_header = [MJRefreshNormalHeader headerWithRefreshingBlock:^{
         weakSelf.classIndex = 1;
@@ -167,6 +177,20 @@
 }
 
 #pragma mark - setter
+- (UIView *)refreshTipView
+{
+    if (!_refreshTipView) {
+        _refreshTipView = [[UIView alloc] initWithFrame:CGRectMake(0, IS_IPHONEX? 128:104, SCREEN_WIDTH, 0)];
+        _refreshTipView.backgroundColor = gMainColorRGB;
+        
+        _tipLabel = [[UILabel alloc] initWithFrame:_refreshTipView.bounds];
+        _tipLabel.textColor = [UIColor whiteColor];
+        _tipLabel.font = CUSTOM_FONT_TYPE(15.0);
+        _tipLabel.textAlignment = NSTextAlignmentCenter;
+        [_refreshTipView addSubview:_tipLabel];
+    }
+    return _refreshTipView;
+}
 - (UIScrollView *)scrollView{
     if (!_scrollView) {
         _scrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0,IS_IPHONEX? 128:104, SCREEN_WIDTH, SCREEN_HEIGHT - 104 - 49)];
@@ -250,17 +274,18 @@
 }
 
 #pragma mark - Utiliteis
-- (void)loadNewsDataWithAutoLoading:(BOOL)isAuto{
-    if (self.newsIndex == 1) {
-        [self getAD];
-        self.newsTableView.mj_footer.hidden = YES;
-    }
-    DefineWeakSelf;
-    [NetWorkTool getInformationListWithaccessToken:AvatarAccessToken andPage:[NSString stringWithFormat:@"%ld",(long)self.newsIndex] andLimit:[NSString stringWithFormat:@"%ld",(long)self.newsPageSize] sccess:^(NSDictionary *responseObject) {
-        if ([responseObject[@"results"] isKindOfClass:[NSArray class]]){
-            if (weakSelf.newsIndex == 1) {
-                [weakSelf.newsInfoArr removeAllObjects];
-            }
+- (void)loadNewsDataWithAutoLoading:(BOOL)isAuto
+{
+//    if (self.newsIndex == 1) {
+//        [self getAD];
+//        self.newsTableView.mj_footer.hidden = YES;
+//    }
+//    DefineWeakSelf;
+//    [NetWorkTool getInformationListWithaccessToken:AvatarAccessToken andPage:[NSString stringWithFormat:@"%ld",(long)self.newsIndex] andLimit:[NSString stringWithFormat:@"%ld",(long)self.newsPageSize] sccess:^(NSDictionary *responseObject) {
+//        if ([responseObject[@"results"] isKindOfClass:[NSArray class]]){
+//            if (weakSelf.newsIndex == 1) {
+//                [weakSelf.newsInfoArr removeAllObjects];
+//            }
 //            else{
 //                NSRange range = {NSNotFound, NSNotFound};
 //                for (int i = 0 ; i < [weakSelf.newsInfoArr count]; i ++) {
@@ -273,8 +298,63 @@
 //                    [weakSelf.newsInfoArr removeObjectsInRange:range];
 //                }
 //            }
-            [weakSelf.newsInfoArr addObjectsFromArray:responseObject[@"results"]];
-            weakSelf.newsInfoArr = [[NSMutableArray alloc] initWithArray:weakSelf.newsInfoArr];
+//            [weakSelf.newsInfoArr addObjectsFromArray:responseObject[@"results"]];
+//            weakSelf.newsInfoArr = [[NSMutableArray alloc] initWithArray:weakSelf.newsInfoArr];
+//            if ([ZRT_PlayerManager manager].channelType == ChannelTypeHomeChannelOne) {
+//                [ZRT_PlayerManager manager].songList = weakSelf.newsInfoArr;
+//            }
+//            weakSelf.newsTableView.mj_footer.hidden = NO;
+//            [weakSelf.newsTableView reloadData];
+//            [weakSelf endNewsRefreshing];
+//        }
+//        else{
+//            [weakSelf endNewsRefreshing];
+//        }
+//    } failure:^(NSError *error) {
+//        [weakSelf endNewsRefreshing];
+//    }];
+}
+- (void)loadNewsDataWithLoadType:(LoadType)type andId:(NSString *)Id
+{
+    if (type == LoadTypeNewData || type == LoadTypeNotData) {
+        [self getAD];
+        self.newsTableView.mj_footer.hidden = YES;
+    }
+    DefineWeakSelf;
+    NSString *IDType;
+    switch (type) {
+        case LoadTypeNewData:
+            IDType = @"1";
+            break;
+        case LoadTypeMoreData:
+            IDType = @"2";
+            break;
+        case LoadTypeNotData:
+            IDType = nil;
+            break;
+        default:
+            IDType = nil;
+            break;
+    }
+    [NetWorkTool getInformationNewListWithaccessToken:AvatarAccessToken andId:Id == nil?nil:Id andType:IDType andLimit:@"15" sccess:^(NSDictionary *responseObject) {
+        if ([responseObject[status] intValue] == 1){
+            if (type == LoadTypeNotData) {
+                [weakSelf.newsInfoArr addObjectsFromArray:responseObject[results]];
+                weakSelf.newsInfoArr = [[NSMutableArray alloc] initWithArray:weakSelf.newsInfoArr];
+            }else if (type == LoadTypeNewData) {
+                if ([responseObject[results] isKindOfClass:[NSArray class]]) {
+                    NSMutableArray *tempArray = [NSMutableArray arrayWithArray:responseObject[results]];
+                    [tempArray addObjectsFromArray:weakSelf.newsInfoArr];
+                    weakSelf.newsInfoArr = tempArray;
+                    [weakSelf refreshTopTipWithTitle:[NSString stringWithFormat:@"听闻更新了%ld条新闻",self.newsInfoArr.count]];
+                }else{
+                    [weakSelf refreshTopTipWithTitle:@"暂无更新新闻"];
+//                    [[XWAlerLoginView alertWithTitle:@"暂无最新新闻"] show];
+                }
+            }else if (type == LoadTypeMoreData) {
+                [weakSelf.newsInfoArr addObjectsFromArray:responseObject[results]];
+                weakSelf.newsInfoArr = [[NSMutableArray alloc] initWithArray:weakSelf.newsInfoArr];
+            }
             if ([ZRT_PlayerManager manager].channelType == ChannelTypeHomeChannelOne) {
                 [ZRT_PlayerManager manager].songList = weakSelf.newsInfoArr;
             }
@@ -289,7 +369,27 @@
         [weakSelf endNewsRefreshing];
     }];
 }
-
+/**
+ 下拉刷新提示条
+ */
+- (void)refreshTopTipWithTitle:(NSString *)title
+{
+    [self.view insertSubview:self.refreshTipView aboveSubview:self.scrollView];
+    self.tipLabel.text = title;
+    [UIView animateWithDuration:0.5 animations:^{
+        self.refreshTipView.height = 30;
+        self.tipLabel.height = 30;
+    } completion:^(BOOL finished) {
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            [UIView animateWithDuration:0.5 animations:^{
+                self.refreshTipView.height = 0;
+                self.tipLabel.height = 0;
+            } completion:^(BOOL finished) {
+                [self.refreshTipView removeFromSuperview];
+            }];
+        });
+    }];
+}
 - (void)loadColumnDataWithAutoLoading:(BOOL)isAuto
 {
     DefineWeakSelf;
@@ -488,17 +588,6 @@
     }
 }
 
-//- (void)zidongjiazai:(NSNotification *)notification{
-//    DefineWeakSelf;
-//    if (self.segmentedControl.selectedSegmentIndex == 0) {
-//        weakSelf.columnIndex ++;
-//        [weakSelf loadColumnDataWithAutoLoading:YES];
-//    }
-//    else if (self.segmentedControl.selectedSegmentIndex == 1){
-//        weakSelf.newsIndex ++;
-//        [weakSelf loadNewsDataWithAutoLoading:YES];
-//    }
-//}
 //刷新课堂列表
 - (void)reloadClassList
 {
@@ -589,7 +678,7 @@
         else{
             NewsCell *cell = [NewsCell cellWithTableView:tableView];
             if ([self.newsInfoArr count]) {
-                cell.dataDict = self.newsInfoArr[indexPath.row];
+                cell.dataDict = self.newsInfoArr[indexPath.row - 1];
             }
             return cell;
         }
@@ -651,8 +740,8 @@
                 [weakSelf loadColumnDataWithAutoLoading:YES];
             }
             else if (weakSelf.playListIndex == 1){
-                weakSelf.newsIndex ++;
-                [weakSelf loadNewsDataWithAutoLoading:YES];
+//                weakSelf.newsIndex ++;
+                [weakSelf loadNewsDataWithLoadType:LoadTypeMoreData andId:[weakSelf.newsInfoArr lastObject][@"id"]];
             }
         };
         //播放内容切换后刷新对应的播放列表
@@ -682,7 +771,7 @@
             //设置新闻ID
             [NewPlayVC shareInstance].post_id = arr[indexPath.row][@"id"];
             //保存当前播放新闻Index
-            ExcurrentNumber = (int)indexPath.row;
+            ExcurrentNumber = (int)indexPath.row - 1;
             //调用播放对应Index方法
             [[NewPlayVC shareInstance] playFromIndex:ExcurrentNumber];
             //跳转播放界面
