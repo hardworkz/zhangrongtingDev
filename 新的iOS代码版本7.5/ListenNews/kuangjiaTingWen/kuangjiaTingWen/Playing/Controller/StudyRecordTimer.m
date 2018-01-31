@@ -15,6 +15,15 @@
 @property (strong, nonatomic) NSString *status;
 @end
 @implementation StudyRecordTimer
++ (instancetype)manager {
+    
+    static StudyRecordTimer * timer;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        timer = [[StudyRecordTimer alloc]init];
+    });
+    return timer;
+}
 - (instancetype)init
 {
     if (self == [super init]) {
@@ -87,32 +96,16 @@
 {
     switch ([ZRT_PlayerManager manager].status) {
         case ZRTPlayStatusPlay:
-//            if ([ZRT_PlayerManager manager].playType == ZRTPlayTypeClassroom) {
                 [self startCount];
-//            }else{
-//                [self pauseCount];
-//            }
             break;
         case ZRTPlayStatusPause:
-//            if ([ZRT_PlayerManager manager].playType == ZRTPlayTypeClassroom) {
-//                [self pauseCount];
-//            }else{
                 [self pauseCount];
-//            }
             break;
         case ZRTPlayStatusStop:
-//            if ([ZRT_PlayerManager manager].playType == ZRTPlayTypeClassroom) {
-//                [self pauseCount];
-//            }else{
                 [self pauseCount];
-//            }
             break;
         case ZRTPlayStatusReadyToPlay:
-//            if ([ZRT_PlayerManager manager].playType == ZRTPlayTypeClassroom) {
-//                [self pauseCount];
-//            }else{
                 [self pauseCount];
-//            }
             break;
         default:
             break;

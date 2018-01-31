@@ -9,7 +9,7 @@
 #import <Foundation/Foundation.h>
 
 @interface StudyRecordTimer : NSObject
-
++ (instancetype)manager;
 /**
  计时秒数
  */

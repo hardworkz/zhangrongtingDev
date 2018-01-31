@@ -1352,7 +1352,7 @@ NSMutableDictionary *dic = [[NSMutableDictionary alloc]initWithCapacity:1
 {
     NSMutableDictionary *dic = [[NSMutableDictionary alloc]initWithCapacity:1];
     dic[@"act_id"] = act_id;
-    dic[@"user_id"] = user_id;
+    dic[@"user_id"] = user_id==nil?@"26779":user_id;
     dic[@"number"] = number;
     [self asyncNetworkingUrl:@"/interfaceNew/getLastPlay" andDict:dic success:success failure:failure];
 }

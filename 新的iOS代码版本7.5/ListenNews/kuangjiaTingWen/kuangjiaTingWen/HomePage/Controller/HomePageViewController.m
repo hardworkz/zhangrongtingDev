@@ -152,7 +152,6 @@
         [self loadColumnDataWithAutoLoading:NO];
     }];
     self.newsTableView.mj_header = [MJRefreshNormalHeader headerWithRefreshingBlock:^{
-//        weakSelf.newsIndex = 1;
         if (weakSelf.newsInfoArr.count!=0) {
             [self loadNewsDataWithLoadType:LoadTypeNewData andId:[weakSelf.newsInfoArr firstObject][@"id"]];
         }else{
@@ -344,12 +343,14 @@
             }else if (type == LoadTypeNewData) {
                 if ([responseObject[results] isKindOfClass:[NSArray class]]) {
                     NSMutableArray *tempArray = [NSMutableArray arrayWithArray:responseObject[results]];
+                    [weakSelf refreshTopTipWithTitle:[NSString stringWithFormat:@"听闻更新了%ld条新闻",tempArray.count]];
+                    //增加播放器index
+                    [ZRT_PlayerManager manager].currentSongIndex = [ZRT_PlayerManager manager].currentSongIndex + tempArray.count;
+                    //添加数据到数组中
                     [tempArray addObjectsFromArray:weakSelf.newsInfoArr];
                     weakSelf.newsInfoArr = tempArray;
-                    [weakSelf refreshTopTipWithTitle:[NSString stringWithFormat:@"听闻更新了%ld条新闻",self.newsInfoArr.count]];
                 }else{
                     [weakSelf refreshTopTipWithTitle:@"暂无更新新闻"];
-//                    [[XWAlerLoginView alertWithTitle:@"暂无最新新闻"] show];
                 }
             }else if (type == LoadTypeMoreData) {
                 [weakSelf.newsInfoArr addObjectsFromArray:responseObject[results]];
@@ -722,11 +723,14 @@
         }
         
         NSArray *arr;
+        NSInteger index = 0;
         if (self.playListIndex == 0) {
+            index = indexPath.row;
             arr = self.columnInfoArr;
             [ZRT_PlayerManager manager].channelType = ChannelTypeHomeChannelTwo;
         }
         else if (self.playListIndex == 1){
+            index = indexPath.row - 1;
             arr = self.newsInfoArr;
             [ZRT_PlayerManager manager].channelType = ChannelTypeHomeChannelOne;
         }
@@ -756,7 +760,7 @@
         //设置播放界面打赏view的状态
         [NewPlayVC shareInstance].rewardType = RewardViewTypeNone;
         //判断是否是点击当前正在播放的新闻，如果是则直接跳转
-        if ([[CommonCode readFromUserD:@"dangqianbofangxinwenID"] isEqualToString:arr[indexPath.row][@"id"]]){
+        if ([[CommonCode readFromUserD:@"dangqianbofangxinwenID"] isEqualToString:arr[index][@"id"]]){
             
             //设置播放器播放数组
             [ZRT_PlayerManager manager].songList = arr;
@@ -769,9 +773,9 @@
             //设置播放器播放数组
             [ZRT_PlayerManager manager].songList = arr;
             //设置新闻ID
-            [NewPlayVC shareInstance].post_id = arr[indexPath.row][@"id"];
+            [NewPlayVC shareInstance].post_id = arr[index][@"id"];
             //保存当前播放新闻Index
-            ExcurrentNumber = (int)indexPath.row - 1;
+            ExcurrentNumber = (int)index;
             //调用播放对应Index方法
             [[NewPlayVC shareInstance] playFromIndex:ExcurrentNumber];
             //跳转播放界面

@@ -44,7 +44,7 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
         self.playRate = 1.0;
         self.playHistoryDataModel = [ClassPlayHistoryDataModel new];
         //创建计时器
-        self.studyRecordTimer = [[StudyRecordTimer alloc] init];
+        self.studyRecordTimer = [StudyRecordTimer manager];
         //获取限制播放状态
         [self limitPlayStatusWithAdd:NO];
     }
@@ -844,7 +844,7 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
     if (!self.player) return;
     
     AVPlayerItem * songItem = object;
-    
+    RTLog(@"%@",keyPath);
     if ([keyPath isEqualToString:kvo_status]) {
         
         switch (self.player.status) {
@@ -883,7 +883,8 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
         
     }else if ([keyPath isEqualToString:kvo_playbackBufferEmpty])
     {
-        [self.studyRecordTimer pauseCount];
+        [self pausePlay];
+//        [self uploadClassPlayHistoryData];
 //        if (songItem.playbackBufferEmpty) {
 //            //缓冲区域为空，暂停播放
 //            [self pausePlay];
@@ -896,11 +897,8 @@ static NSString *const kvo_playbackLikelyToKeepUp = @"playbackLikelyToKeepUp";
     
     else if ([keyPath isEqualToString:kvo_playbackLikelyToKeepUp])
     {
-//        if (songItem.playbackLikelyToKeepUp)
-//        {
-//            //缓存可用，继续播放
-//            [self startPlay];
-//        }
+            //缓存可用，继续播放
+            [self startPlay];
     }
 }
 
