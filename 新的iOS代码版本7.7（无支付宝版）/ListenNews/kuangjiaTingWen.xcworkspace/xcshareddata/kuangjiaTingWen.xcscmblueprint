@@ -1,0 +1,80 @@
+{
+  "DVTSourceControlWorkspaceBlueprintPrimaryRemoteRepositoryKey" : "014CFC6925D36BF7FD01013F8B4C6FE590D3FDC1+++0CFC41A",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyRepositoryLocationsKey" : {
+    "c2988c51-f223-f943-8fcb-354dfa8308fb++9794+++49261B0" : {
+
+    },
+    "c2988c51-f223-f943-8fcb-354dfa8308fb++9794+++7D0330D" : {
+
+    },
+    "c2988c51-f223-f943-8fcb-354dfa8308fb++9794+++82982C5" : {
+
+    }
+  },
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyStatesKey" : {
+    "c2988c51-f223-f943-8fcb-354dfa8308fb++9794+++7D0330D" : 0,
+    "FCDD593010EF15F6F9546362AB247BED8186AFCC+++C94525C" : 0,
+    "c2988c51-f223-f943-8fcb-354dfa8308fb++9794+++49261B0" : 0,
+    "6333F06D5D7BB82A4C4D4263701035C1EF12E184+++1BBB918" : 9223372036854775807,
+    "BBE27F097BF726E0CC59834D4DDFF3CED622BC1A+++2698B66" : 0,
+    "c2988c51-f223-f943-8fcb-354dfa8308fb++9794+++82982C5" : 0,
+    "014CFC6925D36BF7FD01013F8B4C6FE590D3FDC1+++0CFC41A" : 0,
+    "014CFC6925D36BF7FD01013F8B4C6FE590D3FDC1+++35FD042" : 0
+  },
+  "DVTSourceControlWorkspaceBlueprintIdentifierKey" : "08715B42-869E-46FE-9756-2927C739BAA6",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyPathsKey" : {
+    "c2988c51-f223-f943-8fcb-354dfa8308fb++9794+++7D0330D" : "ListenNews\/kuangjiaTingWen\/AFNetworking\/NetworkTool\/",
+    "FCDD593010EF15F6F9546362AB247BED8186AFCC+++C94525C" : "Desktop\/wutuobang\/",
+    "c2988c51-f223-f943-8fcb-354dfa8308fb++9794+++49261B0" : "tingwen\/kuangjiaTingWen\/AFNetworking\/NetworkTool\/",
+    "6333F06D5D7BB82A4C4D4263701035C1EF12E184+++1BBB918" : "Documents\/%E5%90%AC%E9%97%BB\/%E5%90%AC%E9%97%BB5.3\/",
+    "BBE27F097BF726E0CC59834D4DDFF3CED622BC1A+++2698B66" : "tingwen\/",
+    "c2988c51-f223-f943-8fcb-354dfa8308fb++9794+++82982C5" : "tingwen\/kuangjiaTingWen\/AFNetworking\/NetworkTool\/",
+    "014CFC6925D36BF7FD01013F8B4C6FE590D3FDC1+++0CFC41A" : "ListenNewsDeveloper\/",
+    "014CFC6925D36BF7FD01013F8B4C6FE590D3FDC1+++35FD042" : "ListenNews\/"
+  },
+  "DVTSourceControlWorkspaceBlueprintNameKey" : "kuangjiaTingWen",
+  "DVTSourceControlWorkspaceBlueprintVersion" : 204,
+  "DVTSourceControlWorkspaceBlueprintRelativePathToProjectKey" : "kuangjiaTingWen.xcworkspace",
+  "DVTSourceControlWorkspaceBlueprintRemoteRepositoriesKey" : [
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/git.coding.net\/hexuren\/ListenNews.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "014CFC6925D36BF7FD01013F8B4C6FE590D3FDC1+++0CFC41A"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/git.coding.net\/hexuren\/ListenNews.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "014CFC6925D36BF7FD01013F8B4C6FE590D3FDC1+++35FD042"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/git.oschina.net\/Mylovexiaodai\/tingwen_1125.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "6333F06D5D7BB82A4C4D4263701035C1EF12E184+++1BBB918"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/git.coding.net\/hexuren\/tingwen.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "BBE27F097BF726E0CC59834D4DDFF3CED622BC1A+++2698B66"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/git.coding.net\/ericxx\/wutuobang.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "FCDD593010EF15F6F9546362AB247BED8186AFCC+++C94525C"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/192.168.0.66\/svn\/zhediandian",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Subversion",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "c2988c51-f223-f943-8fcb-354dfa8308fb++9794+++49261B0"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/192.168.0.66\/svn\/zhediandian",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Subversion",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "c2988c51-f223-f943-8fcb-354dfa8308fb++9794+++7D0330D"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/192.168.0.66\/svn\/zhediandian",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Subversion",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "c2988c51-f223-f943-8fcb-354dfa8308fb++9794+++82982C5"
+    }
+  ]
+}
