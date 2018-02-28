@@ -1695,5 +1695,11 @@
  */
 + (void)getRQCodeImageUrlWithSccess:(void (^)(NSDictionary *responseObject))success
                             failure:(void (^)(NSError *error))failure;
+//上传新闻点赞数
++ (void)zanNewsUploadWithAccessToken:(NSString *)accessToken
+                             post_id:(NSString *)post_id
+                               times:(NSString *)times
+                              sccess:(void (^)(NSDictionary *responseObject))success
+                             failure:(void(^)(NSError *error))failure;
 @end
 

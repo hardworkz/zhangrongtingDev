@@ -38,6 +38,8 @@
 @property (nonatomic, strong) NSString *smeta;/**<新闻封面图片 */
 @property (nonatomic, strong) NSString *gold;/**<被打赏的金币总额 */
 @property (nonatomic, strong) NSString *is_collection;/**<是否收藏 */
+@property (nonatomic, strong) NSString *praisenum;/**<新闻总点赞数 */
+@property (nonatomic, strong) NSString *user_zan;/**<当前用户对新闻点赞数 */
 @property (nonatomic, strong) NSString *reward_num;/**<打赏数 */
 @property (nonatomic, strong) NSString *url;/**<原文url */
 @property (nonatomic, strong) newsActModel *act;/**<主播数据模型 */

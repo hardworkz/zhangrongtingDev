@@ -322,6 +322,10 @@ static NewPlayVC *_instance = nil;
             [self setFrameModel];
             //设置详情头部状态控件数据
             [self setHeaderStateControl];
+            //保存当前用户点赞数
+            if (IS_LOGIN){
+                [CommonCode writeToUserD:_postDetailModel.user_zan andKey:[NSString stringWithFormat:@"%@_%@_zanNum",ExdangqianUserUid,_post_id]];
+            }
         }
         else{
             [SVProgressHUD showErrorWithStatus:responseObject[msg]];
@@ -592,7 +596,8 @@ static NewPlayVC *_instance = nil;
     
     //底部定时按钮
     UIButton *bofangdingshiBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    bofangdingshiBtn.frame = CGRectMake(20.0 / 375 * IPHONE_W, 54.0 / 667 * IPHONE_H, 32.0 / 667 * IPHONE_H, 32.0 / 667 * IPHONE_H);
+    bofangdingshiBtn.backgroundColor = [UIColor redColor];
+    bofangdingshiBtn.frame = CGRectMake(20.0 / 375 * IPHONE_W, 54.0 / 667 * IPHONE_H,IS_IPHONEX?32.0: 32.0 / 667 * IPHONE_H,IS_IPHONEX?32.0: 32.0 / 667 * IPHONE_H);
     [bofangdingshiBtn setImage:[UIImage imageNamed:@"home_news_ic_time"] forState:UIControlStateNormal];
     [bofangdingshiBtn setImageEdgeInsets:UIEdgeInsetsMake(5, 5, 5, 5)];
     bofangdingshiBtn.accessibilityLabel = @"定时";
@@ -616,8 +621,9 @@ static NewPlayVC *_instance = nil;
     
     //底部收藏按钮
     bofangfenxiangBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+//    bofangfenxiangBtn.backgroundColor = [UIColor redColor];
     bofangfenxiangBtn.frame = CGRectMake(IPHONE_W - 52.0 / 375 * IPHONE_W, 54.0 / 667 * IPHONE_H,IS_IPHONEX?32.0: 32.0 / 667 * IPHONE_H,IS_IPHONEX?32.0: 32.0 / 667 * IPHONE_H);
-    [bofangfenxiangBtn setImageEdgeInsets:UIEdgeInsetsMake(5, 5, 7, 7)];
+    [bofangfenxiangBtn setImageEdgeInsets:UIEdgeInsetsMake(5, 5, 5, 5)];
     [bofangfenxiangBtn setImage:[UIImage imageNamed:@"home_news_collection"] forState:UIControlStateNormal];
     [bofangfenxiangBtn setImage:[UIImage imageNamed:@"home_news_collectioned"] forState:UIControlStateSelected];
     [bofangfenxiangBtn setTag:99];
@@ -628,8 +634,9 @@ static NewPlayVC *_instance = nil;
     
     //底部定时按钮
     UIButton *bofangdingshiBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    bofangdingshiBtn.frame = CGRectMake(20.0 / 375 * IPHONE_W, 54.0 / 667 * IPHONE_H, 32.0 / 667 * IPHONE_H, 32.0 / 667 * IPHONE_H);
-    [bofangdingshiBtn setImage:[UIImage imageNamed:@"home_news_ic_time"] forState:UIControlStateNormal];
+//    bofangdingshiBtn.backgroundColor = [UIColor redColor];
+    bofangdingshiBtn.frame = CGRectMake(20.0 / 375 * IPHONE_W, 54.0 / 667 * IPHONE_H, IS_IPHONEX?32.0: 32.0 / 667 * IPHONE_H,IS_IPHONEX?32.0: 32.0 / 667 * IPHONE_H);
+    [bofangdingshiBtn setImage:[UIImage imageNamed:@"home_news_ic_time-1"] forState:UIControlStateNormal];
     [bofangdingshiBtn setImageEdgeInsets:UIEdgeInsetsMake(5, 5, 5, 5)];
     bofangdingshiBtn.accessibilityLabel = @"定时";
     [bofangdingshiBtn addTarget:self action:@selector(bofangdingshiBtnAction:) forControlEvents:UIControlEventTouchUpInside];
@@ -1180,9 +1187,9 @@ static NewPlayVC *_instance = nil;
 {
     if ([tableView isEqual:self.tableView]) {
         if (self.pinglunArr.count != 0) {
-            return 1 + self.pinglunArr.count;
+            return 2 + self.pinglunArr.count;
         }else{
-            return 1;
+            return 2;
         }
     }else{
         return self.speedArray.count;
@@ -1239,10 +1246,20 @@ static NewPlayVC *_instance = nil;
             //            return cell;
             //        }
         }
+        else if (indexPath.row == 1) {
+            DefineWeakSelf
+            PlayVCZanTableViewCell *cell = [PlayVCZanTableViewCell cellWithTableView:tableView];
+            cell.user_zan = _postDetailModel.user_zan;
+            cell.zanNum = _postDetailModel.praisenum;
+            cell.zanBtnClicked = ^(UIButton *zanBtn) {
+                [weakSelf zanNews:zanBtn];
+            };
+            return cell;
+        }
         else{
             PlayVCCommentTableViewCell *cell = [PlayVCCommentTableViewCell cellWithTableView:tableView];
             cell.commentCellType = CommentCellTypeNewsDetail;
-            PlayVCCommentFrameModel *frameModel = self.pinglunArr[indexPath.row - 1];
+            PlayVCCommentFrameModel *frameModel = self.pinglunArr[indexPath.row - 2];
             cell.selectionStyle = UITableViewCellSelectionStyleNone;
             cell.hideZanBtn = YES;
             cell.frameModel = frameModel;
@@ -1357,6 +1374,9 @@ static NewPlayVC *_instance = nil;
             PlayVCTextContentCellFramesModel *frameModel = self.textFrameModel;
             return frameModel.cellHeight;
         }
+        else if (indexPath.row == 1) {
+            return 60.0;
+        }
 //        else if (indexPath.row == 1) {
 //            return 72.0;
 //        }else if (indexPath.row == 2) {
@@ -1366,8 +1386,9 @@ static NewPlayVC *_instance = nil;
 //                return 266;
 //            }
 //        }
-        else{
-            PlayVCCommentFrameModel *frameModel = self.pinglunArr[indexPath.row - 1];
+        else
+        {
+            PlayVCCommentFrameModel *frameModel = self.pinglunArr[indexPath.row - 2];
             return frameModel.cellHeight;
         }
     }else{
@@ -1403,7 +1424,7 @@ static NewPlayVC *_instance = nil;
     }
     _scrollTopBtn.alpha = alpha;
     
-    RTLog(@"scrollView.contentOffset.y-----%f",scrollView.contentOffset.y);
+//    RTLog(@"scrollView.contentOffset.y-----%f",scrollView.contentOffset.y);
 }
 
 #pragma mark --- 打赏按钮：OJLAnimationButtonDelegate
@@ -1492,6 +1513,91 @@ static NewPlayVC *_instance = nil;
     }else{
         XWAlerLoginView *xw = [[XWAlerLoginView alloc]initWithTitle:@"下载路径为空"];
         [xw show];
+    }
+}
+- (void)zanNews:(UIButton *)zanBtn
+{
+    if ([[CommonCode readFromUserD:@"isLogin"]boolValue] == YES){
+        [zanBtn setImage:@"icon_zan_red"];
+        zanBtn.layer.borderColor = [UIColor redColor].CGColor;
+        [zanBtn setTitleColor:[UIColor redColor] forState:UIControlStateNormal];
+        zanTouchCount++;
+        NSInteger count = [[CommonCode readFromUserD:[NSString stringWithFormat:@"%@_%@_zanNum",ExdangqianUserUid,_post_id]] integerValue];
+        if (zanTouchCount + count> 10 || [_postDetailModel.user_zan intValue] == 10) {
+            zanTouchCount--;
+            XWAlerLoginView *xw = [[XWAlerLoginView alloc]initWithTitle:@"您最多可以点赞10次"];
+            [xw show];
+            return;
+        }
+        [zanBtn setTitle:[NSString stringWithFormat:@"%d",[zanBtn.titleLabel.text intValue] + 1]];
+        [self stopTimer];
+        NSTimeInterval period = 1.0; //设置时间间隔
+        __block NSInteger uploadTime = 3.0;//上传间隔
+        dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+        gcd_timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, queue);
+        dispatch_source_set_timer(gcd_timer, dispatch_walltime(NULL, 0), period * NSEC_PER_SEC, 0); //每秒执行
+        dispatch_source_set_event_handler(gcd_timer, ^{
+            //在这里执行事件
+            RTLog(@"startGCDTimerWithGoldUpload:%ld",zanTouchCount);
+            uploadTime --;
+            if (uploadTime == 0) {
+                uploadTime = 3.0;
+                [self stopTimer];
+                //通知主线程刷新
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    //回调或者说是通知主线程刷新，
+                    [self uploadZanData:zanBtn];
+                    RTLog(@"上传操作--次数:%ld",zanTouchCount);
+                });
+            }
+        });
+        dispatch_resume(gcd_timer);
+    }else{
+        XWAlerLoginView *xw = [[XWAlerLoginView alloc]initWithTitle:@"登录后才可以点赞哦~"];
+        [xw show];
+    }
+}
+- (void)uploadZanData:(UIButton *)zanBtn
+{
+    DefineWeakSelf
+    [NetWorkTool zanNewsUploadWithAccessToken:AvatarAccessToken post_id:self.post_id times:[NSString stringWithFormat:@"%ld",zanTouchCount] sccess:^(NSDictionary *responseObject) {
+        if ([responseObject[status] intValue] == 1) {
+            
+            [weakSelf setZanBtn:zanBtn Light:YES];
+            NSInteger count = [[CommonCode readFromUserD:[NSString stringWithFormat:@"%@_%@_zanNum",ExdangqianUserUid,_post_id]] integerValue];
+            if (count < 10) {
+                [CommonCode writeToUserD:[NSString stringWithFormat:@"%ld",zanTouchCount+count] andKey:[NSString stringWithFormat:@"%@_%@_zanNum",ExdangqianUserUid,_post_id]];
+            }else{
+                _postDetailModel.user_zan = @"10";
+            }
+            
+            XWAlerLoginView *xw = [[XWAlerLoginView alloc]initWithTitle:responseObject[msg]];
+            [xw show];
+        }else{
+            if (![responseObject[msg] isEqualToString:@"您已点赞10次"]) {
+                [weakSelf setZanBtn:zanBtn Light:NO];
+                [zanBtn setTitle:[NSString stringWithFormat:@"%ld",[zanBtn.titleLabel.text intValue] - zanTouchCount]];
+            }
+            XWAlerLoginView *xw = [[XWAlerLoginView alloc]initWithTitle:responseObject[msg]];
+            [xw show];
+        }
+        zanTouchCount = 0;
+    } failure:^(NSError *error) {
+        [weakSelf setZanBtn:zanBtn Light:NO];
+        [zanBtn setTitle:[NSString stringWithFormat:@"%ld",[zanBtn.titleLabel.text intValue] - zanTouchCount]];
+        zanTouchCount = 0;
+    }];
+}
+- (void)setZanBtn:(UIButton *)zanBtn Light:(BOOL)isLight
+{
+    if (isLight) {
+        [zanBtn setImage:@"icon_zan_red"];
+        zanBtn.layer.borderColor = [UIColor redColor].CGColor;
+        [zanBtn setTitleColor:[UIColor redColor] forState:UIControlStateNormal];
+    }else{
+        [zanBtn setImage:@"icon_zan"];
+        zanBtn.layer.borderColor = [UIColor lightGrayColor].CGColor;
+        [zanBtn setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
     }
 }
 /**
@@ -2007,6 +2113,7 @@ static NewPlayVC *_instance = nil;
 #pragma mark - 控件事件action
 static NSInteger touchCount = 0;
 static NSInteger goldTouchCount = 0;
+static NSInteger zanTouchCount = 0;
 /**
  播放/暂停
  */

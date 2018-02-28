@@ -334,6 +334,7 @@
 		69C713BF1EC0740F00F2729E /* UIViewController+AutoBack.m in Sources */ = {isa = PBXBuildFile; fileRef = 69C713331EC0740F00F2729E /* UIViewController+AutoBack.m */; };
 		69C713C41EC0754200F2729E /* BlogTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 69C713C21EC0754200F2729E /* BlogTableViewCell.m */; };
 		69C713C51EC0754200F2729E /* BlogTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 69C713C31EC0754200F2729E /* BlogTableViewCell.xib */; };
+		69CB5D602030351800F888A0 /* PlayVCZanTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 69CB5D5F2030351800F888A0 /* PlayVCZanTableViewCell.m */; };
 		8D926761588F84556F75E34C /* Pods_kuangjiaTingWen.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3C57B8198921BF624F827CA4 /* Pods_kuangjiaTingWen.framework */; };
 		E91382561D757CC200530838 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E91382551D757CC200530838 /* MobileCoreServices.framework */; };
 		E91382581D757CCC00530838 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E91382571D757CCC00530838 /* CFNetwork.framework */; };
@@ -1028,6 +1029,8 @@
 		69C713C11EC0754200F2729E /* BlogTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BlogTableViewCell.h; sourceTree = "<group>"; };
 		69C713C21EC0754200F2729E /* BlogTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BlogTableViewCell.m; sourceTree = "<group>"; };
 		69C713C31EC0754200F2729E /* BlogTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = BlogTableViewCell.xib; sourceTree = "<group>"; };
+		69CB5D5E2030351800F888A0 /* PlayVCZanTableViewCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PlayVCZanTableViewCell.h; sourceTree = "<group>"; };
+		69CB5D5F2030351800F888A0 /* PlayVCZanTableViewCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PlayVCZanTableViewCell.m; sourceTree = "<group>"; };
 		99090FC437CBB943372122F0 /* Pods-kuangjiaTingWen.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-kuangjiaTingWen.release.xcconfig"; path = "kuangjiaTingWen/Pods/Target Support Files/Pods-kuangjiaTingWen/Pods-kuangjiaTingWen.release.xcconfig"; sourceTree = "<group>"; };
 		E91382551D757CC200530838 /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
 		E91382571D757CCC00530838 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
@@ -1753,6 +1756,8 @@
 				698B67FC1F288AD100E1FFE0 /* PlayCustomRewardTableViewCell.m */,
 				69A0B5011F30610B0028D5A0 /* PlayDefaultRewardTableViewCell.h */,
 				69A0B5021F30610B0028D5A0 /* PlayDefaultRewardTableViewCell.m */,
+				69CB5D5E2030351800F888A0 /* PlayVCZanTableViewCell.h */,
+				69CB5D5F2030351800F888A0 /* PlayVCZanTableViewCell.m */,
 			);
 			path = PlayNewsCell;
 			sourceTree = "<group>";
@@ -3293,6 +3298,7 @@
 				69C713A81EC0740F00F2729E /* OJLCircleAnimationView.m in Sources */,
 				E91A533E1E8E3455005D2F68 /* MASViewAttribute.m in Sources */,
 				69C7138A1EC0740F00F2729E /* UnreadMessageTableViewCell.m in Sources */,
+				69CB5D602030351800F888A0 /* PlayVCZanTableViewCell.m in Sources */,
 				E91A533C1E8E3455005D2F68 /* MASConstraintMaker.m in Sources */,
 				691907A31D3F74B00012A42E /* SVIndefiniteAnimatedView.m in Sources */,
 				699165261EE0F933001914EB /* ClassCommentTableViewCell.m in Sources */,

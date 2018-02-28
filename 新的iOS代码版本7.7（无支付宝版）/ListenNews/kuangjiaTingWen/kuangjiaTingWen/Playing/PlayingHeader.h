@@ -46,6 +46,7 @@
 #import "zhuboxiangqingNewVCPlayBtn.h"
 #import "CustomPageScrollView.h"
 #import "NewsCell.h"
+#import "PlayVCZanTableViewCell.h"
 
 #import "AKAlertView.h"
 #import "PinglundianzanCustomBtn.h"

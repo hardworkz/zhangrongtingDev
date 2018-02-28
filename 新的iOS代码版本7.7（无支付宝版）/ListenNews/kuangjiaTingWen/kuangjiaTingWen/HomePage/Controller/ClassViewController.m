@@ -318,13 +318,13 @@ static NSInteger timeCount = 0;
 //            [self.helpTableView setContentOffset:CGPointMake(0, -44) animated:YES];
             
             //判断是否是纯数字
-            NSString *textStr = [NSString stringWithFormat:@" ￥%@ ",[NetWorkTool formatFloat:[responseObject[results][@"sprice"] floatValue]]];
+            NSString *textStr = [NSString stringWithFormat:@" ¥%@ ",[NetWorkTool formatFloat:[responseObject[results][@"sprice"] floatValue]]];
 //            中划线
             NSDictionary *attribtDic = @{NSStrikethroughStyleAttributeName: [NSNumber numberWithInteger:NSUnderlineStyleSingle]};
             NSMutableAttributedString *attribtStr = [[NSMutableAttributedString alloc]initWithString:textStr attributes:attribtDic];
 //             赋值
             weakSelf.spriceLabel.attributedText = attribtStr;
-            weakSelf.priceLabel.text = [NSString stringWithFormat:@" ￥%@",[NetWorkTool formatFloat:[responseObject[results][@"price"] floatValue]]];
+            weakSelf.priceLabel.text = [NSString stringWithFormat:@" ¥%@",[NetWorkTool formatFloat:[responseObject[results][@"price"] floatValue]]];
             rewardMoney = responseObject[results][@"price"];
             
         }
@@ -1190,7 +1190,7 @@ static NSInteger timeCount = 0;
         _activityBtn.layer.borderColor = [UIColor whiteColor].CGColor;
         _activityBtn.layer.cornerRadius = 10;
         _activityBtn.backgroundColor = [UIColor clearColor];
-        _activityBtn.hidden = YES;
+//        _activityBtn.hidden = YES;
         [_activityBtn addTarget:self action:@selector(activeClicked)];
     }
     return _activityBtn;
@@ -1205,7 +1205,7 @@ static NSInteger timeCount = 0;
         _activityMoneyBtn.layer.borderWidth = 1.0;
         _activityMoneyBtn.titleLabel.font = CUSTOM_FONT_TYPE(14.0);
         _activityMoneyBtn.titleEdgeInsets = UIEdgeInsetsMake(0, 0, 0, 20);
-        _activityMoneyBtn.hidden = YES;
+//        _activityMoneyBtn.hidden = YES;
         [_activityMoneyBtn setTitle:@"赚20.70元"];
         [_activityMoneyBtn addTarget:self action:@selector(activeClicked)];
     }
@@ -1494,13 +1494,18 @@ static NSInteger timeCount = 0;
     arrayHeight = [@[@(rowH1),@(rowH2),@(rowH3)] mutableCopy];
     
     NSMutableArray *array = [NSMutableArray array];
+    //判断当屏幕宽大于375，调整屏幕界面
+    CGFloat averageW = 0;
+    if ((SCREEN_WIDTH - 30 - 340) > 0) {
+        averageW = (SCREEN_WIDTH - 30 - 340)/6;
+    }
     //列宽
-    CGFloat colW1 = 30;
-    CGFloat colW2 = 70;
-    CGFloat colW3 = 45;
-    CGFloat colW4 = 70;
-    CGFloat colW5 = 80;
-    CGFloat colW6 = 45;
+    CGFloat colW1 = 30 + averageW;
+    CGFloat colW2 = 70 + averageW;
+    CGFloat colW3 = 45 + averageW;
+    CGFloat colW4 = 70 + averageW;
+    CGFloat colW5 = 80 + averageW;
+    CGFloat colW6 = 45 + averageW;
     array = [@[@(colW1),@(colW2),@(colW3),@(colW4),@(colW5),@(colW6)] mutableCopy];
     
     UIScrollView *tableView = [[UIScrollView alloc] initWithFrame:CGRectMake(10, 10, SCREEN_WIDTH - 30, [self rowYWithIndex:3])];
@@ -1560,7 +1565,7 @@ static NSInteger timeCount = 0;
         }else if (i == 5) {
             label.text = @"证书";
         }else if (i == 7) {
-            label.text = @"超级会员";
+            label.text = @"超级会员\n一年";
         }else if (i == 8) {
             label.text = _classModel.svipPrice?[NSString stringWithFormat:@"¥%@",_classModel.svipPrice]:@"¥0";
         }else if (i == 9) {
@@ -1736,13 +1741,18 @@ static NSInteger timeCount = 0;
 {
     CGFloat X = 0;
     NSMutableArray *array = [NSMutableArray array];
+    
+    CGFloat averageW = 0;
+    if ((SCREEN_WIDTH - 30 - 340) > 0) {
+        averageW = (SCREEN_WIDTH - 30 - 340)/6;
+    }
     //列宽
-    CGFloat colW1 = 30;
-    CGFloat colW2 = 70;
-    CGFloat colW3 = 45;
-    CGFloat colW4 = 70;
-    CGFloat colW5 = 80;
-    CGFloat colW6 = 45;
+    CGFloat colW1 = 30 + averageW;
+    CGFloat colW2 = 70 + averageW;
+    CGFloat colW3 = 45 + averageW;
+    CGFloat colW4 = 70 + averageW;
+    CGFloat colW5 = 80 + averageW;
+    CGFloat colW6 = 45 + averageW;
     array = [@[@(colW1),@(colW2),@(colW3),@(colW4),@(colW5),@(colW6)] mutableCopy];
     for (int i = 0; i<index; i++) {
         X += [array[i] intValue];

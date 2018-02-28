@@ -18,8 +18,32 @@
     [super viewWillAppear:animated];
     [self.navigationController setNavigationBarHidden:NO animated:YES];
 }
+- (void)back {
+    [self.navigationController popViewControllerAnimated:YES];
+}
+- (void)shareClicked{
+    
+}
 - (void)viewDidLoad {
     [super viewDidLoad];
+    
+    UIButton *backImage = [UIButton buttonWithType:UIButtonTypeCustom];
+    [backImage setFrame:CGRectMake(0, 0, 44, 30)];
+    backImage.contentEdgeInsets = UIEdgeInsetsMake(0, 0, 0, 20);
+    [backImage setImage:[UIImage imageNamed:@"back"] forState:UIControlStateNormal];
+    [backImage addTarget:self action:@selector(back) forControlEvents:UIControlEventTouchUpInside];
+    
+    UIBarButtonItem *backItem = [[UIBarButtonItem alloc] initWithCustomView:backImage];
+    self.navigationItem.leftBarButtonItem = backItem;
+    
+    UIButton *shareImage = [UIButton buttonWithType:UIButtonTypeCustom];
+    [shareImage setFrame:CGRectMake(0, 0, 44, 30)];
+    shareImage.contentEdgeInsets = UIEdgeInsetsMake(0, 20, 0, 0);
+    [shareImage setImage:[UIImage imageNamed:@"title_ic_share"] forState:UIControlStateNormal];
+    [shareImage addTarget:self action:@selector(shareClicked) forControlEvents:UIControlEventTouchUpInside];
+    
+    UIBarButtonItem *shareItem = [[UIBarButtonItem alloc] initWithCustomView:shareImage];
+    self.navigationItem.rightBarButtonItem = shareItem;
     
     [self setupView];
 }

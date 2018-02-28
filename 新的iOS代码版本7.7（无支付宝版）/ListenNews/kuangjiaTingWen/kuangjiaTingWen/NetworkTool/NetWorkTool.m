@@ -2345,4 +2345,16 @@ NSMutableDictionary *dic = [[NSMutableDictionary alloc]initWithCapacity:1
     NSMutableDictionary *dic = [[NSMutableDictionary alloc]initWithCapacity:1];
     [self asyncNetworkingUrl:@"/interfaceYou/addHotWord" andDict:dic success:success failure:failure];
 }
+//上传新闻点赞数
++ (void)zanNewsUploadWithAccessToken:(NSString *)accessToken
+                    post_id:(NSString *)post_id
+                    times:(NSString *)times
+                        sccess:(void (^)(NSDictionary *responseObject))success
+                       failure:(void(^)(NSError *error))failure{
+    NSMutableDictionary *dic = [[NSMutableDictionary alloc]initWithCapacity:1];
+    dic[@"accessToken"] = accessToken;
+    dic[@"post_id"] = post_id;
+    dic[@"times"] = times;
+    [self asyncNetworkingUrl:@"/interfaceNew/news_zan" andDict:dic success:success failure:failure];
+}
 @end

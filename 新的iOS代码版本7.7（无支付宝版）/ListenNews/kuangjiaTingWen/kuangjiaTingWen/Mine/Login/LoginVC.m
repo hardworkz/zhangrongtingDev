@@ -15,6 +15,12 @@
 #import <UMSocialCore/UMSocialCore.h>
 //#import "UMSocialWechatHandler.h"
 #import "AFNetworking.h"
+#include <TencentOpenAPI/QQApiInterface.h>
+#import <TencentOpenAPI/QQApiInterfaceObject.h>
+#import <TencentOpenAPI/TencentOAuthObject.h>
+#import <TencentOpenAPI/TencentOAuth.h>
+#import <TencentOpenAPI/TencentApiInterface.h>
+#import <TencentOpenAPI/TencentMessageObject.h>
 
 @interface LoginVC ()<TencentSessionDelegate,WXApiDelegate>
 {
@@ -142,7 +148,8 @@
     downLab.font = [UIFont systemFontOfSize:13.0f];
     [self.view addSubview:downLab];
     
-    
+    NSMutableArray *btnArray = [NSMutableArray array];
+    NSMutableArray *labelArray = [NSMutableArray array];
     //wechat
     UIButton *weChatBtn = [UIButton buttonWithType:UIButtonTypeCustom];
     weChatBtn.frame = CGRectMake(64.0 / 375 * IPHONE_W,  downLine.frame.origin.y + 70.0 / 667 * IPHONE_H, 40.0 / 375 * IPHONE_W, 40.0 / 375 * IPHONE_W);
@@ -155,6 +162,8 @@
     weChatLab.textColor = UIColorFromHex(0x999999);
     weChatLab.textAlignment = NSTextAlignmentCenter;
     weChatLab.font = [UIFont systemFontOfSize:13.0f];
+    [btnArray addObject:weChatBtn];
+    [labelArray addObject:weChatLab];
     
     //QQ
     UIButton *QQBtn = [UIButton buttonWithType:UIButtonTypeCustom];
@@ -168,6 +177,8 @@
     qqLab.textColor = UIColorFromHex(0x999999);
     qqLab.textAlignment = NSTextAlignmentCenter;
     qqLab.font = [UIFont systemFontOfSize:13.0f];
+    [btnArray addObject:QQBtn];
+    [labelArray addObject:qqLab];
     
     //Sina
     UIButton *weiBoBtn = [UIButton buttonWithType:UIButtonTypeCustom];
@@ -176,39 +187,99 @@
     weiBoBtn.accessibilityLabel = @"微博登录";
     [weiBoBtn addTarget:self action:@selector(weiBoBtnAction:) forControlEvents:UIControlEventTouchUpInside];
     
-    
     UILabel *weiboLab = [[UILabel alloc]initWithFrame:CGRectMake(weiBoBtn.frame.origin.x - 20.0 / 375 * SCREEN_WIDTH,  weiBoBtn.frame.origin.y + weiBoBtn.frame.size.height + 8.0 / 667 * IPHONE_H, 80.0 / 375 * IPHONE_W, 20.0 / 667 * IPHONE_H)];
     weiboLab.text = @"微博登录";
     weiboLab.textColor = UIColorFromHex(0x999999);
     [weiboLab setTextAlignment:NSTextAlignmentCenter];
     weiboLab.font = [UIFont systemFontOfSize:13.0f];
+    [btnArray addObject:weiBoBtn];
+    [labelArray addObject:weiboLab];
     
+    [self.view addSubview:weChatBtn];
+    [self.view addSubview:weChatLab];
+    [self.view addSubview:QQBtn];
+    [self.view addSubview:qqLab];
+    [self.view addSubview:weiBoBtn];
+    [self.view addSubview:weiboLab];
     
-    if (![WXApi isWXAppInstalled]){
-        //App Store规定未安装微信时隐藏微信登录按钮
-        [QQBtn setFrame:CGRectMake(98.0 / 375 * IPHONE_W, downLine.frame.origin.y + 70.0 / 667 * IPHONE_H, 40.0 / 375 * IPHONE_W, 40.0 / 375 * IPHONE_W)];
-        [qqLab setFrame:CGRectMake(QQBtn.frame.origin.x - 20.0 / 375 * SCREEN_WIDTH,  QQBtn.frame.origin.y + QQBtn.frame.size.height + 8.0 / 667 * IPHONE_H, 80.0 / 375 * IPHONE_W, 20.0 / 667 * IPHONE_H)];
-        [weiBoBtn setFrame:CGRectMake(SCREEN_WIDTH - 137.0 / 375 * IPHONE_W,  downLine.frame.origin.y + 70.0 / 667 * IPHONE_H, 40.0 / 375 * IPHONE_W, 40.0 / 375 * IPHONE_W)];
-        [weiboLab setFrame:CGRectMake(weiBoBtn.frame.origin.x - 20.0 / 375 * SCREEN_WIDTH,  weiBoBtn.frame.origin.y + weiBoBtn.frame.size.height + 8.0 / 667 * IPHONE_H, 80.0 / 375 * IPHONE_W, 20.0 / 667 * IPHONE_H)];
-        [self.view addSubview:QQBtn];
-        [self.view addSubview:qqLab];
-        [self.view addSubview:weiBoBtn];
-        [self.view addSubview:weiboLab];
+    if ([QQApiInterface isQQInstalled]&&[WXApi isWXAppInstalled])
+    {
+        for (int i = 0; i<btnArray.count; i++) {
+            UIButton *btn = btnArray[i];
+            UILabel *label = labelArray[i];
+            btn.x = (SCREEN_WIDTH - btnArray.count *AUTO_WIDTH(40.0))/(btnArray.count + 1) + i*((SCREEN_WIDTH - btnArray.count *AUTO_WIDTH(40.0))/(btnArray.count + 1) + AUTO_WIDTH(40.0));
+            label.centerX = btn.centerX;
+        }
+    }else if ([QQApiInterface isQQInstalled]&&![WXApi isWXAppInstalled])
+    {
+        [btnArray removeObject:weChatBtn];
+        [labelArray removeObject:weChatLab];
+        
+        [weChatBtn removeFromSuperview];
+        [weChatLab removeFromSuperview];
+        for (int i = 0; i<btnArray.count; i++) {
+            UIButton *btn = btnArray[i];
+            UILabel *label = labelArray[i];
+            btn.x = (SCREEN_WIDTH - btnArray.count *AUTO_WIDTH(40.0))/(btnArray.count + 1) + i*((SCREEN_WIDTH - btnArray.count *AUTO_WIDTH(40.0))/(btnArray.count + 1) + AUTO_WIDTH(40.0));
+            label.centerX = btn.centerX;
+        }
+    }else if (![QQApiInterface isQQInstalled]&&[WXApi isWXAppInstalled])
+    {
+        [btnArray removeObject:QQBtn];
+        [labelArray removeObject:qqLab];
+        
+        [QQBtn removeFromSuperview];
+        [qqLab removeFromSuperview];
+        for (int i = 0; i<btnArray.count; i++) {
+            UIButton *btn = btnArray[i];
+            UILabel *label = labelArray[i];
+            btn.x = (SCREEN_WIDTH - btnArray.count *AUTO_WIDTH(40.0))/(btnArray.count + 1) + i*((SCREEN_WIDTH - btnArray.count *AUTO_WIDTH(40.0))/(btnArray.count + 1) + AUTO_WIDTH(40.0));
+            label.centerX = btn.centerX;
+        }
+    }else if (![QQApiInterface isQQInstalled]&&![WXApi isWXAppInstalled]){
+        
+        [btnArray removeObject:weChatBtn];
+        [labelArray removeObject:weChatLab];
+        [btnArray removeObject:QQBtn];
+        [labelArray removeObject:qqLab];
+        
+        [weChatBtn removeFromSuperview];
+        [weChatLab removeFromSuperview];
+        [QQBtn removeFromSuperview];
+        [qqLab removeFromSuperview];
+        for (int i = 0; i<btnArray.count; i++) {
+            UIButton *btn = btnArray[i];
+            UILabel *label = labelArray[i];
+            btn.x = (SCREEN_WIDTH - btnArray.count *AUTO_WIDTH(40.0))/(btnArray.count + 1) + i*((SCREEN_WIDTH - btnArray.count *AUTO_WIDTH(40.0))/(btnArray.count + 1) + AUTO_WIDTH(40.0));
+            label.centerX = btn.centerX;
+        }
     }
-    else{
-        [weChatBtn setFrame:CGRectMake(64.0 / 375 * IPHONE_W,  downLine.frame.origin.y + 70.0 / 667 * IPHONE_H, 40.0 / 375 * IPHONE_W, 40.0 / 375 * IPHONE_W)];
-        [weChatLab setFrame:CGRectMake(weChatBtn.frame.origin.x - 20.0 / 375 * SCREEN_WIDTH,weChatBtn.frame.origin.y + weChatBtn.frame.size.height + 8.0 / 667 * IPHONE_H, 80.0 / 375 * IPHONE_W, 20.0 / 667 * IPHONE_H)];
-        [QQBtn setFrame:CGRectMake(167.0 / 375 * IPHONE_W, downLine.frame.origin.y + 70.0 / 667 * IPHONE_H, 40.0 / 375 * IPHONE_W, 40.0 / 375 * IPHONE_W)];
-        [qqLab setFrame:CGRectMake(QQBtn.frame.origin.x - 20.0 / 375 * SCREEN_WIDTH,  QQBtn.frame.origin.y + QQBtn.frame.size.height + 8.0 / 667 * IPHONE_H, 80.0 / 375 * IPHONE_W, 20.0 / 667 * IPHONE_H)];
-        [weiBoBtn setFrame:CGRectMake(SCREEN_WIDTH - 104.0 / 375 * IPHONE_W,  downLine.frame.origin.y + 70.0 / 667 * IPHONE_H, 40.0 / 375 * IPHONE_W, 40.0 / 375 * IPHONE_W)];
-        [weiboLab setFrame:CGRectMake(weiBoBtn.frame.origin.x - 20.0 / 375 * SCREEN_WIDTH,  weiBoBtn.frame.origin.y + weiBoBtn.frame.size.height + 8.0 / 667 * IPHONE_H, 80.0 / 375 * IPHONE_W, 20.0 / 667 * IPHONE_H)];
-        [self.view addSubview:weChatBtn];
-        [self.view addSubview:weChatLab];
-        [self.view addSubview:QQBtn];
-        [self.view addSubview:qqLab];
-        [self.view addSubview:weiBoBtn];
-        [self.view addSubview:weiboLab];
-    }
+    
+//    if (![WXApi isWXAppInstalled]){
+//        //App Store规定未安装微信时隐藏微信登录按钮
+//        [QQBtn setFrame:CGRectMake(98.0 / 375 * IPHONE_W, downLine.frame.origin.y + 70.0 / 667 * IPHONE_H, 40.0 / 375 * IPHONE_W, 40.0 / 375 * IPHONE_W)];
+//        [qqLab setFrame:CGRectMake(QQBtn.frame.origin.x - 20.0 / 375 * SCREEN_WIDTH,  QQBtn.frame.origin.y + QQBtn.frame.size.height + 8.0 / 667 * IPHONE_H, 80.0 / 375 * IPHONE_W, 20.0 / 667 * IPHONE_H)];
+//        [weiBoBtn setFrame:CGRectMake(SCREEN_WIDTH - 137.0 / 375 * IPHONE_W,  downLine.frame.origin.y + 70.0 / 667 * IPHONE_H, 40.0 / 375 * IPHONE_W, 40.0 / 375 * IPHONE_W)];
+//        [weiboLab setFrame:CGRectMake(weiBoBtn.frame.origin.x - 20.0 / 375 * SCREEN_WIDTH,  weiBoBtn.frame.origin.y + weiBoBtn.frame.size.height + 8.0 / 667 * IPHONE_H, 80.0 / 375 * IPHONE_W, 20.0 / 667 * IPHONE_H)];
+//        [self.view addSubview:QQBtn];
+//        [self.view addSubview:qqLab];
+//        [self.view addSubview:weiBoBtn];
+//        [self.view addSubview:weiboLab];
+//    }
+//    else{
+//        [weChatBtn setFrame:CGRectMake(64.0 / 375 * IPHONE_W,  downLine.frame.origin.y + 70.0 / 667 * IPHONE_H, 40.0 / 375 * IPHONE_W, 40.0 / 375 * IPHONE_W)];
+//        [weChatLab setFrame:CGRectMake(weChatBtn.frame.origin.x - 20.0 / 375 * SCREEN_WIDTH,weChatBtn.frame.origin.y + weChatBtn.frame.size.height + 8.0 / 667 * IPHONE_H, 80.0 / 375 * IPHONE_W, 20.0 / 667 * IPHONE_H)];
+//        [QQBtn setFrame:CGRectMake(167.0 / 375 * IPHONE_W, downLine.frame.origin.y + 70.0 / 667 * IPHONE_H, 40.0 / 375 * IPHONE_W, 40.0 / 375 * IPHONE_W)];
+//        [qqLab setFrame:CGRectMake(QQBtn.frame.origin.x - 20.0 / 375 * SCREEN_WIDTH,  QQBtn.frame.origin.y + QQBtn.frame.size.height + 8.0 / 667 * IPHONE_H, 80.0 / 375 * IPHONE_W, 20.0 / 667 * IPHONE_H)];
+//        [weiBoBtn setFrame:CGRectMake(SCREEN_WIDTH - 104.0 / 375 * IPHONE_W,  downLine.frame.origin.y + 70.0 / 667 * IPHONE_H, 40.0 / 375 * IPHONE_W, 40.0 / 375 * IPHONE_W)];
+//        [weiboLab setFrame:CGRectMake(weiBoBtn.frame.origin.x - 20.0 / 375 * SCREEN_WIDTH,  weiBoBtn.frame.origin.y + weiBoBtn.frame.size.height + 8.0 / 667 * IPHONE_H, 80.0 / 375 * IPHONE_W, 20.0 / 667 * IPHONE_H)];
+//        [self.view addSubview:weChatBtn];
+//        [self.view addSubview:weChatLab];
+//        [self.view addSubview:QQBtn];
+//        [self.view addSubview:qqLab];
+//        [self.view addSubview:weiBoBtn];
+//        [self.view addSubview:weiboLab];
+//    }
     
     UISwipeGestureRecognizer *rightSwipe = [[UISwipeGestureRecognizer alloc]initWithTarget:self action:@selector(rightSwipeAction)];
     [rightSwipe setDirection:UISwipeGestureRecognizerDirectionRight];

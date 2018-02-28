@@ -119,6 +119,8 @@
 //判断是否是iPhoneX
 #define IS_IPHONEX  SCREEN_HEIGHT == 812
 
+#define IS_LOGIN [[CommonCode readFromUserD:@"isLogin"] boolValue] == YES
+
 // 当前系统版本
 #define CurrentSystemVersion [CommonCode getCurrentSystemVersion]
 
