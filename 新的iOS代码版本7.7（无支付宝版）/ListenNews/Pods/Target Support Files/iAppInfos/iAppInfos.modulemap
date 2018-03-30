@@ -1,6 +1,0 @@
-framework module iAppInfos {
-  umbrella header "iAppInfos-umbrella.h"
-
-  export *
-  module * { export * }
-}
